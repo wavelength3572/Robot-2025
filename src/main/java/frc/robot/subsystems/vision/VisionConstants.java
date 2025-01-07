@@ -14,14 +14,30 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.Filesystem;
+import java.io.IOException;
 
-public class VisionConstants {
+public final class VisionConstants {
   // AprilTag layout
-  public static AprilTagFieldLayout aprilTagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+  // public static AprilTagFieldLayout aprilTagLayout =
+  // AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
+  public static AprilTagFieldLayout aprilTagLayout = null;
+
+  static {
+    try {
+      aprilTagLayout =
+          new AprilTagFieldLayout(
+              Filesystem.getDeployDirectory().toPath().resolve("2025-reefscape.json"));
+    } catch (IOException e) {
+      aprilTagLayout = null;
+      // e.printStackTrace();
+      // throw new Error("2025-reefscape.json does not exists in the deploy
+      // directory");
+    }
+  }
 
   // Camera names, must match names configured on coprocessor
   public static String camera0Name = "camera_0";
@@ -55,4 +71,6 @@ public class VisionConstants {
   public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
   public static double angularStdDevMegatag2Factor =
       Double.POSITIVE_INFINITY; // No rotation data available
+
+  private VisionConstants() {}
 }
