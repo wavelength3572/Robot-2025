@@ -16,8 +16,6 @@ package frc.robot;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -29,10 +27,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -45,12 +39,12 @@ public class RobotContainer {
   // Subsystems
   private final Vision vision;
   private final Drive drive;
-  private SwerveDriveSimulation driveSimulation = null;
   private OperatorInterface oi = new OperatorInterface() {};
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     switch (Constants.currentMode) {
@@ -71,33 +65,24 @@ public class RobotContainer {
         break;
 
       case SIM:
-        // create a maple-sim swerve drive simulation instance
-        this.driveSimulation =
-            new SwerveDriveSimulation(
-                DriveConstants.mapleSimConfig,
-                new Pose2d(
-                    DriveConstants.simStartX, DriveConstants.simStartY, new Rotation2d(2.0)));
-        // add the simulated drivetrain to the simulation field
-        SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
         // Sim robot, instantiate physics sim IO implementations
         drive =
             new Drive(
-                new GyroIOSim(driveSimulation.getGyroSimulation()),
-                new ModuleIOSim(driveSimulation.getModules()[0]),
-                new ModuleIOSim(driveSimulation.getModules()[1]),
-                new ModuleIOSim(driveSimulation.getModules()[2]),
-                new ModuleIOSim(driveSimulation.getModules()[3]));
+                new GyroIO() {},
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim());
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(
-                    camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
-                new VisionIOPhotonVisionSim(
-                    camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
+                new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
         break;
 
       default:
         // Replayed robot, disable IO implementations
+        // (Use same number of dummy implementations as the real robot)
         drive =
             new Drive(
                 new GyroIO() {},
@@ -105,7 +90,6 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        // (Use same number of dummy implementations as the real robot)
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         break;
     }
@@ -175,27 +159,5 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
-  }
-
-  public void resetSimulationField() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
-    driveSimulation.setSimulationWorldPose(
-        new Pose2d(DriveConstants.simStartX, DriveConstants.simStartY, new Rotation2d()));
-    SimulatedArena.getInstance().resetFieldForAuto();
-    drive.setPose(new Pose2d(DriveConstants.simStartX, DriveConstants.simStartY, new Rotation2d()));
-  }
-
-  public void displaySimFieldToAdvantageScope() {
-    if (Constants.currentMode != Constants.Mode.SIM) return;
-    Logger.recordOutput(
-        "FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
-    Logger.recordOutput(
-        "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
-    Logger.recordOutput(
-        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-    Logger.recordOutput(
-        "FieldSimulation/StackedAlgae", ReefscapeCoralAlgaeStack.getStackedAlgaePoses());
-    Logger.recordOutput(
-        "FieldSimulation/StackedCoral", ReefscapeCoralAlgaeStack.getStackedCoralPoses());
   }
 }
