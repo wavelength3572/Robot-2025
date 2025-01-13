@@ -14,6 +14,7 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -45,7 +46,7 @@ public final class VisionConstants {
 
   // Robot to camera transforms
   public static Transform3d robotToCamera0 =
-      new Transform3d(0.2517648, -0.2517648, 0.2102358, new Rotation3d(0.0, 0.0, 0.0));
+      new Transform3d(0.2517648, -0.2517648, 0.2102358, new Rotation3d(0.0, 0.0, Rotation2d.fromDegrees(-45.0).getRadians()));
   public static Transform3d robotToCamera1 =
       new Transform3d(0.2517648, 0.2517648, 0.2102358, new Rotation3d(0.0, 0.0, 0.0));
 
