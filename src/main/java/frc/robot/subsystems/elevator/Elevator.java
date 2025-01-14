@@ -16,4 +16,8 @@ public class Elevator extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
   }
+
+  public void setPosition(Double requestedPosition) {
+    io.setPosition(requestedPosition);
+  }
 }

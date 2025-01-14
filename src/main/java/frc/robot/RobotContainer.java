@@ -16,6 +16,8 @@ package frc.robot;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -29,6 +31,9 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -43,6 +48,12 @@ public class RobotContainer {
   private final Drive drive;
   private final Elevator elevator;
   private OperatorInterface oi = new OperatorInterface() {};
+
+  private LoggedMechanism2d scoringSystem = new LoggedMechanism2d(.8382, 2.0);
+  private LoggedMechanismRoot2d root = scoringSystem.getRoot("Base", 0.0, .00);
+  private LoggedMechanismLigament2d m_elevator =
+      root.append(
+          new LoggedMechanismLigament2d("Elevator", .25, 90, 2, new Color8Bit(Color.kBlue)));
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -82,7 +93,7 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
-        elevator = new Elevator(new ElevatorIOSim(){});
+        elevator = new Elevator(new ElevatorIOSim() {});
         break;
 
       default:
@@ -98,6 +109,10 @@ public class RobotContainer {
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         elevator = null;
         break;
+    }
+
+    if (elevator !=null) {
+      elevator.setPosition(1.0);
     }
 
     // Set up auto routines
@@ -165,5 +180,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public LoggedMechanism2d getElevator() {
+    return scoringSystem;
   }
 }

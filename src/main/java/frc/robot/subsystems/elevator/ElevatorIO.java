@@ -5,6 +5,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
+    public double setpoint = 0.0;
     public double positionRad = 0.0;
     public double positionRotations = 0.0;
     public double velocityRadPerSec = 0.0;
@@ -17,4 +18,6 @@ public interface ElevatorIO {
 
   /** Run open loop at the specified voltage. */
   public default void setVoltage(double volts) {}
+
+  public default void setPosition(double requestedPosition) {}
 }

@@ -12,6 +12,8 @@ public class ElevatorIOSim implements ElevatorIO {
   private double elevatorFFVolts = 0.0;
   private double elevatorAppliedVolts = 0.0;
 
+  private double requestedPosition = 0.0;
+
   private DCMotorSim motorSim =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(
@@ -25,6 +27,7 @@ public class ElevatorIOSim implements ElevatorIO {
     motorSim.setInputVoltage(appliedVolts);
     motorSim.update(0.02);
 
+    inputs.setpoint = this.requestedPosition;
     inputs.positionRad = motorSim.getAngularPositionRad();
     inputs.positionRotations = motorSim.getAngularPositionRotations();
     inputs.velocityRadPerSec = motorSim.getAngularVelocityRadPerSec();
@@ -35,5 +38,10 @@ public class ElevatorIOSim implements ElevatorIO {
   @Override
   public void setVoltage(double volts) {
     appliedVolts = MathUtil.clamp(volts, -12.0, 12.0);
+  }
+
+  @Override
+  public void setPosition(double requestedPosition) {
+    this.requestedPosition = requestedPosition;
   }
 }
