@@ -40,8 +40,8 @@ public final class VisionConstants {
   }
 
   // Camera names, must match names configured on coprocessor
-  public static String camera0Name = "camera_0";
-  public static String camera1Name = "camera_1";
+  public static String camera0Name = "CAMERA_A";
+  public static String camera1Name = "CAMERA_B";
 
   // Robot to camera transforms
   public static Transform3d robotToCamera0 =
