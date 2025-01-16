@@ -111,7 +111,7 @@ public class RobotContainer {
         break;
     }
 
-    if (elevator !=null) {
+    if (elevator != null) {
       elevator.setPosition(1.0);
     }
 
