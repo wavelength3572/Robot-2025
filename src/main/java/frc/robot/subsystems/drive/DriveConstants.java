@@ -78,7 +78,7 @@ public class DriveConstants {
           * wheelRadiusMeters;
 
   // Drive encoder configuration
-  public static final boolean driveInverted = false;
+  public static final boolean driveInverted = true;
   public static final double driveEncoderPositionFactor =
       2 * Math.PI / driveMotorReduction; // Rotor Rotations ->
   // Wheel Radians
@@ -89,8 +89,8 @@ public class DriveConstants {
   // Drive PID configuration
   public static final double driveKp = 0.0;
   public static final double driveKd = 0.0;
-  public static final double driveKs = 0.0;
-  public static final double driveKv = 0.1;
+  public static final double driveKs = 0.11468;
+  public static final double driveKv = 0.13085;
   public static final double driveSimP = 0.05;
   public static final double driveSimD = 0.0;
   public static final double driveSimKs = 0.04307;
