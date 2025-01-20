@@ -1,7 +1,6 @@
 package frc.robot.subsystems.elevator;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -12,7 +11,6 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
 
 // See
 // https://github.com/wpilibsuite/allwpilib/blob/main/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/elevatorsimulation/subsystems/Elevator.java
@@ -21,12 +19,12 @@ import edu.wpi.first.wpilibj.simulation.EncoderSim;
 
 public class ElevatorIOSim implements ElevatorIO {
 
-    
-
   // Initialize elevator SPARK. We will use MAXMotion position control for the elevator, so we also
   // need to initialize the closed loop controller and encoder.
-  private SparkMax elevatorMotor = new SparkMax(ElevatorConstants.ElevatorCanId, MotorType.kBrushless);
-  private SparkClosedLoopController elevatorClosedLoopController = elevatorMotor.getClosedLoopController();
+  private SparkMax elevatorMotor =
+      new SparkMax(ElevatorConstants.ElevatorCanId, MotorType.kBrushless);
+  private SparkClosedLoopController elevatorClosedLoopController =
+      elevatorMotor.getClosedLoopController();
   private RelativeEncoder elevatorEncoder = elevatorMotor.getEncoder();
 
   private double elevatorCurrentTarget = 0.0;
@@ -46,8 +44,6 @@ public class ElevatorIOSim implements ElevatorIO {
           ElevatorConstants.kMinElevatorHeightMeters,
           0.0,
           0.0);
-
-
 
   public ElevatorIOSim() {
     elevatorMotor.configure(
@@ -75,18 +71,10 @@ public class ElevatorIOSim implements ElevatorIO {
         RobotController.getBatteryVoltage(),
         0.02);
 
-    // elevatorAppliedVolts =
-    //     elevatorController.calculate(
-    //         motorSim.getAngularPositionRotations(),
-    //         this.requestedPosition * ElevatorConstants.motorReduction);
-    // motorSim.setInputVoltage(MathUtil.clamp(elevatorAppliedVolts, -12.0, 12.0));
-    // motorSim.update(0.02);
-
     inputs.setpoint = this.elevatorCurrentTarget;
     inputs.positionRad = elevatorEncoder.getPosition();
-    // inputs.positionRad = motorSim.getAngularPositionRad();
-    inputs.positionRotations = m_elevatorSim.getPositionMeters();
-    inputs.velocityRadPerSec =
+    inputs.elevatorHeight = m_elevatorSim.getPositionMeters();
+    inputs.elevatorHeightCalc =
         (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
             * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI);
     inputs.appliedVolts = elevatorMotorSim.getAppliedOutput() * RobotController.getBatteryVoltage();
