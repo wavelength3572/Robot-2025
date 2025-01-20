@@ -1,6 +1,7 @@
 package frc.robot.subsystems.elevator;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -11,6 +12,7 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 
 // See
 // https://github.com/wpilibsuite/allwpilib/blob/main/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/elevatorsimulation/subsystems/Elevator.java
@@ -18,19 +20,20 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 // https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/robot-simulation/physics-sim.html
 
 public class ElevatorIOSim implements ElevatorIO {
+
+    
+
   // Initialize elevator SPARK. We will use MAXMotion position control for the elevator, so we also
   // need to initialize the closed loop controller and encoder.
-  private SparkMax elevatorMotor =
-      new SparkMax(ElevatorConstants.ElevatorCanId, MotorType.kBrushless);
-  private SparkClosedLoopController elevatorClosedLoopController =
-      elevatorMotor.getClosedLoopController();
+  private SparkMax elevatorMotor = new SparkMax(ElevatorConstants.ElevatorCanId, MotorType.kBrushless);
+  private SparkClosedLoopController elevatorClosedLoopController = elevatorMotor.getClosedLoopController();
   private RelativeEncoder elevatorEncoder = elevatorMotor.getEncoder();
-
-  private final DCMotor elevatorMotorModel = DCMotor.getNEO(1);
-  private final SparkMaxSim elevatorMotorSim;
 
   private double elevatorCurrentTarget = 0.0;
 
+  // Simulation setup and variables
+  private final DCMotor elevatorMotorModel = DCMotor.getNEO(2);
+  private SparkMaxSim elevatorMotorSim;
   private final ElevatorSim m_elevatorSim =
       new ElevatorSim(
           elevatorMotorModel,
@@ -43,6 +46,8 @@ public class ElevatorIOSim implements ElevatorIO {
           ElevatorConstants.kMinElevatorHeightMeters,
           0.0,
           0.0);
+
+
 
   public ElevatorIOSim() {
     elevatorMotor.configure(
