@@ -46,15 +46,15 @@ public class DriveConstants {
   // Device CAN IDs
   public static final int pigeonCanId = 19;
 
-  public static final int frontLeftDriveCanId = 2;
-  public static final int backLeftDriveCanId = 4;
-  public static final int frontRightDriveCanId = 3;
-  public static final int backRightDriveCanId = 5;
+  public static final int frontLeftDriveCanId = 5; 
+  public static final int backLeftDriveCanId = 8; 
+  public static final int frontRightDriveCanId = 3; 
+  public static final int backRightDriveCanId =  6; 
 
-  public static final int frontLeftTurnCanId = 6;
-  public static final int backLeftTurnCanId = 8;
-  public static final int frontRightTurnCanId = 7;
-  public static final int backRightTurnCanId = 9;
+  public static final int frontLeftTurnCanId = 9;                       
+  public static final int backLeftTurnCanId = 4; 
+  public static final int frontRightTurnCanId = 7; 
+  public static final int backRightTurnCanId = 2; 
 
   public static final int frontLeftCANCoderId = 10;
   public static final int backLeftCANCoderId = 12;
@@ -78,7 +78,7 @@ public class DriveConstants {
           * wheelRadiusMeters;
 
   // Drive encoder configuration
-  public static final boolean driveInverted = true;
+  public static final boolean driveInverted = false;
   public static final double driveEncoderPositionFactor =
       2 * Math.PI / driveMotorReduction; // Rotor Rotations ->
   // Wheel Radians
