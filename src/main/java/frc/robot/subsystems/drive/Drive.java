@@ -28,6 +28,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -44,7 +45,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.Constants.ReefFaces;
+import frc.robot.commands.DriveToPose;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.ReefAlignmentUtils;
+import frc.robot.util.ReefAlignmentUtils.ReefFaceSelection;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -70,6 +75,8 @@ public class Drive extends SubsystemBase {
       };
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+
+  private ReefFaceSelection reefFaceSelection;
 
   public Drive(
       GyroIO gyroIO,
@@ -125,6 +132,14 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
+    reefFaceSelection =
+        ReefAlignmentUtils.findClosestReefFaceAndRejectOthers(getPose(), Constants.REEF_FACES);
+
+    Logger.recordOutput("Alignment/ClosestDistance", reefFaceSelection.getAcceptedDistance());
+    Logger.recordOutput("Alignment/AcceptedFace", reefFaceSelection.getAcceptedFace());
+    Logger.recordOutput("Alignment/RejectedFaces", reefFaceSelection.getRejectedFaces()); 
+    Logger.recordOutput("Alignment/AcceptedFaceID", reefFaceSelection.getAcceptedFaceId());
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -354,5 +369,37 @@ public class Drive extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
+  }
+
+  public void driveToLeftPole() {
+    driveToPole(true);
+  }
+
+  public void driveToRightPole() {
+    driveToPole(false);
+  }
+
+  public void driveToPole(boolean isLeftPole) {
+
+    // Get the ID of closest tag
+    Integer faceId = reefFaceSelection.getAcceptedFaceId();
+    if (faceId != null) {
+      Rotation2d bestOrientation =
+          ReefAlignmentUtils.pickClosestOrientationForFace(getPose(), faceId);
+      Logger.recordOutput("Alignment/bestOrientation", bestOrientation.getDegrees());
+
+      Translation2d poleTranslation;
+      if (isLeftPole) {
+        Constants.ReefBranches left = ReefFaces.fromId(faceId).getLeftPole();
+        poleTranslation = left.getTranslation();
+      } else {
+        Constants.ReefBranches right = ReefFaces.fromId(faceId).getRightPole();
+        poleTranslation = right.getTranslation();
+      }
+
+      Pose2d targetPose = new Pose2d(poleTranslation, bestOrientation);
+
+      new DriveToPose(this, targetPose).schedule();
+    }
   }
 }

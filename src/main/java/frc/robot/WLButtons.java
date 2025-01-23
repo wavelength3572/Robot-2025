@@ -38,5 +38,8 @@ public class WLButtons {
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 WLDrive, oi::getTranslateX, oi::getTranslateY, () -> new Rotation2d()));
+    // Drive to Pole
+    oi.getRightJoyLeftButton().onTrue(Commands.runOnce(WLDrive::driveToLeftPole, WLDrive));
+    oi.getRightJoyRightButton().onTrue(Commands.runOnce(WLDrive::driveToRightPole, WLDrive));
   }
 }
