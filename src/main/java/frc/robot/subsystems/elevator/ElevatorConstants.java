@@ -3,7 +3,8 @@ package frc.robot.subsystems.elevator;
 import edu.wpi.first.math.util.Units;
 
 public class ElevatorConstants {
-  public static final int ElevatorCanId = 99;
+  public static final int leaderCanId = 99;
+  public static final int followerCanId = 98;
   public static final int currentLimit = 40;
   public static final double kElevatorGearing = 20.0;
   public static final double kElevatorDrumRadius = Units.inchesToMeters(2.25) / 2.0;

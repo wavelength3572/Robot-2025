@@ -6,15 +6,17 @@ public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
     public double setpoint = 0.0;
-    public double positionRad = 0.0;
     public double elevatorHeight = 0.0;
     public double elevatorHeightCalc = 0.0;
     public double positionRotations = 0.0;
-    public double velocityRadPerSec = 0.0;
+    public double velocityRPM = 0.0;
     public double appliedVolts = 0.0;
     public double currentAmps = 0.0;
     public double pidOutput = 0.0;
     public double feedforwardOutput = 0.0;
+
+    public double followerPositionRotations = 0.0;
+    public double followerVelocityRPM = 0.0;
   }
 
   /** Update the set of loggable inputs. */

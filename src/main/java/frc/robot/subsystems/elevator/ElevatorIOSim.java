@@ -22,7 +22,7 @@ public class ElevatorIOSim implements ElevatorIO {
   // Initialize elevator SPARK. We will use MAXMotion position control for the elevator, so we also
   // need to initialize the closed loop controller and encoder.
   private SparkMax elevatorMotor =
-      new SparkMax(ElevatorConstants.ElevatorCanId, MotorType.kBrushless);
+      new SparkMax(ElevatorConstants.leaderCanId, MotorType.kBrushless);
   private SparkClosedLoopController elevatorClosedLoopController =
       elevatorMotor.getClosedLoopController();
   private RelativeEncoder elevatorEncoder = elevatorMotor.getEncoder();
@@ -47,7 +47,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
   public ElevatorIOSim() {
     elevatorMotor.configure(
-        ElevatorConfigs.ElevatorSubsystem.elevatorConfig,
+        ElevatorConfigs.ElevatorSubsystem.leaderConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     elevatorEncoder.setPosition(0);
@@ -72,7 +72,7 @@ public class ElevatorIOSim implements ElevatorIO {
         0.02);
 
     inputs.setpoint = this.elevatorCurrentTarget;
-    inputs.positionRad = elevatorEncoder.getPosition();
+    inputs.positionRotations = elevatorEncoder.getPosition();
     inputs.elevatorHeight = m_elevatorSim.getPositionMeters();
     inputs.elevatorHeightCalc =
         (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)

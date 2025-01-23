@@ -23,7 +23,7 @@ public class ElevatorIOPPCSim implements ElevatorIO {
   // Initialize elevator SPARK. We will use MAXMotion position control for the elevator, so we also
   // need to initialize the closed loop controller and encoder.
   private SparkMax elevatorMotor =
-      new SparkMax(ElevatorConstants.ElevatorCanId, MotorType.kBrushless);
+      new SparkMax(ElevatorConstants.leaderCanId, MotorType.kBrushless);
   private RelativeEncoder elevatorEncoder = elevatorMotor.getEncoder();
 
   private double elevatorCurrentTarget = 0.0;
@@ -61,7 +61,7 @@ public class ElevatorIOPPCSim implements ElevatorIO {
 
   public ElevatorIOPPCSim() {
     elevatorMotor.configure(
-        ElevatorConfigs.ElevatorSubsystem.elevatorConfig,
+        ElevatorConfigs.ElevatorSubsystem.leaderConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     elevatorEncoder.setPosition(0);
