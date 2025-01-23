@@ -20,4 +20,8 @@ public class Elevator extends SubsystemBase {
   public void setPosition(Double requestedPosition) {
     io.setPosition(requestedPosition);
   }
+
+  public double getHeightInMeters() {
+    return io.getHeightInMeters();
+  }
 }

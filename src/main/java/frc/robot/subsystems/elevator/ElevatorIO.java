@@ -13,6 +13,8 @@ public interface ElevatorIO {
     public double velocityRadPerSec = 0.0;
     public double appliedVolts = 0.0;
     public double currentAmps = 0.0;
+    public double pidOutput = 0.0;
+    public double feedforwardOutput = 0.0;
   }
 
   /** Update the set of loggable inputs. */
@@ -22,4 +24,8 @@ public interface ElevatorIO {
   public default void setVoltage(double volts) {}
 
   public default void setPosition(double requestedPosition) {}
+
+  public default double getHeightInMeters() {
+    return 0.0;
+  }
 }

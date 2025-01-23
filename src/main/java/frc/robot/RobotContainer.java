@@ -28,7 +28,8 @@ import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.elevator.ElevatorConstants;
+import frc.robot.subsystems.elevator.ElevatorIOPPCSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
@@ -52,10 +53,11 @@ public class RobotContainer {
   private OperatorInterface oi = new OperatorInterface() {};
 
   private LoggedMechanism2d scoringSystem = new LoggedMechanism2d(.8382, 2.0);
-  private LoggedMechanismRoot2d root = scoringSystem.getRoot("Base", 0.0, .00);
+  private LoggedMechanismRoot2d root = scoringSystem.getRoot("Base", 0.51, 0.0);
   private LoggedMechanismLigament2d m_elevator =
       root.append(
-          new LoggedMechanismLigament2d("Elevator", .25, 90, 2, new Color8Bit(Color.kBlue)));
+          new LoggedMechanismLigament2d(
+              "Elevator", ElevatorConstants.kGroundToElevator, 90, 2, new Color8Bit(Color.kBlue)));
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -95,7 +97,7 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
-        elevator = new Elevator(new ElevatorIOSim() {});
+        elevator = new Elevator(new ElevatorIOPPCSim() {});
         break;
 
       default:
@@ -188,6 +190,8 @@ public class RobotContainer {
   }
 
   public LoggedMechanism2d getElevator() {
+    // Update the Elevator 2D Mech
+    m_elevator.setLength(ElevatorConstants.kGroundToElevator + elevator.getHeightInMeters());
     return scoringSystem;
   }
 }

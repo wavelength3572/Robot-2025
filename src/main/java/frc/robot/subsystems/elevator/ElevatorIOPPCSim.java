@@ -2,13 +2,14 @@ package frc.robot.subsystems.elevator;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 
@@ -17,14 +18,12 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 // and
 // https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/robot-simulation/physics-sim.html
 
-public class ElevatorIOSim implements ElevatorIO {
+public class ElevatorIOPPCSim implements ElevatorIO {
 
   // Initialize elevator SPARK. We will use MAXMotion position control for the elevator, so we also
   // need to initialize the closed loop controller and encoder.
   private SparkMax elevatorMotor =
       new SparkMax(ElevatorConstants.ElevatorCanId, MotorType.kBrushless);
-  private SparkClosedLoopController elevatorClosedLoopController =
-      elevatorMotor.getClosedLoopController();
   private RelativeEncoder elevatorEncoder = elevatorMotor.getEncoder();
 
   private double elevatorCurrentTarget = 0.0;
@@ -32,6 +31,21 @@ public class ElevatorIOSim implements ElevatorIO {
   // Simulation setup and variables
   private final DCMotor elevatorMotorModel = DCMotor.getNEO(2);
   private SparkMaxSim elevatorMotorSim;
+
+  // Standard classes for controlling our elevator
+  private final ProfiledPIDController m_controller =
+      new ProfiledPIDController(
+          ElevatorConstants.kElevatorKp,
+          ElevatorConstants.kElevatorKi,
+          ElevatorConstants.kElevatorKd,
+          new TrapezoidProfile.Constraints(2.45, 2.45));
+  ElevatorFeedforward m_feedforward =
+      new ElevatorFeedforward(
+          ElevatorConstants.kElevatorkS,
+          ElevatorConstants.kElevatorkG,
+          ElevatorConstants.kElevatorkV,
+          ElevatorConstants.kElevatorkA);
+
   private final ElevatorSim m_elevatorSim =
       new ElevatorSim(
           elevatorMotorModel,
@@ -45,7 +59,7 @@ public class ElevatorIOSim implements ElevatorIO {
           0.0,
           0.0);
 
-  public ElevatorIOSim() {
+  public ElevatorIOPPCSim() {
     elevatorMotor.configure(
         ElevatorConfigs.ElevatorSubsystem.elevatorConfig,
         ResetMode.kResetSafeParameters,
@@ -56,9 +70,6 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
-    elevatorClosedLoopController.setReference(
-        elevatorCurrentTarget, ControlType.kMAXMotionPositionControl);
-
     m_elevatorSim.setInput(elevatorMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
     m_elevatorSim.update(0.020);
 
@@ -71,14 +82,23 @@ public class ElevatorIOSim implements ElevatorIO {
         RobotController.getBatteryVoltage(),
         0.02);
 
+    m_controller.setGoal(elevatorCurrentTarget);
+    // With the setpoint value we run PID control like normal
+    double pidOutput = m_controller.calculate(elevatorEncoder.getPosition());
+    double feedforwardOutput = m_feedforward.calculate(m_controller.getSetpoint().velocity);
+    elevatorMotor.set((pidOutput + feedforwardOutput) / 12.0);
+    // elevatorMotorSim.setAppliedOutput((pidOutput + feedforwardOutput) / 12.0);
+
     inputs.setpoint = this.elevatorCurrentTarget;
-    inputs.positionRad = elevatorEncoder.getPosition();
+    inputs.positionRotations = elevatorEncoder.getPosition();
     inputs.elevatorHeight = m_elevatorSim.getPositionMeters();
     inputs.elevatorHeightCalc =
         (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
             * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI);
     inputs.appliedVolts = elevatorMotorSim.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = elevatorMotorSim.getMotorCurrent();
+    inputs.pidOutput = pidOutput;
+    inputs.feedforwardOutput = feedforwardOutput;
   }
 
   @Override
