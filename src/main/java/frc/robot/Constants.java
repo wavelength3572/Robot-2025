@@ -41,17 +41,28 @@ public final class Constants {
   }
 
   // Example: 6 reef-face positions as a static array
-  public static final Map<Integer, Translation2d> REEF_FACES = new HashMap<>();
+  public static final Map<Integer, Translation2d> REEF_FACES_FRONT = new HashMap<>();
 
   static {
-    REEF_FACES.put(17, new Translation2d(4.073905999999999, 3.3063179999999996));
-    REEF_FACES.put(18, new Translation2d(3.6576, 4.0259));
-    REEF_FACES.put(19, new Translation2d(4.073905999999999, 4.745482));
-    REEF_FACES.put(20, new Translation2d(4.904739999999999, 4.745482));
-    REEF_FACES.put(21, new Translation2d(5.321046, 4.0259));
-    REEF_FACES.put(22, new Translation2d(4.904739999999999, 3.3063179999999996));
+    REEF_FACES_FRONT.put(17, new Translation2d(4.073905999999999, 3.3063179999999996));
+    REEF_FACES_FRONT.put(18, new Translation2d(3.6576, 4.0259));
+    REEF_FACES_FRONT.put(19, new Translation2d(4.073905999999999, 4.745482));
+    REEF_FACES_FRONT.put(20, new Translation2d(4.904739999999999, 4.745482));
+    REEF_FACES_FRONT.put(21, new Translation2d(5.321046, 4.0259));
+    REEF_FACES_FRONT.put(22, new Translation2d(4.904739999999999, 3.3063179999999996));
   }
-  ;
+  
+  public static final Map<Integer, Translation2d> REEF_FACES_BACK = new HashMap<>();
+  static {
+    REEF_FACES_BACK.put(17, new Translation2d(3.86, 2.92));
+    REEF_FACES_BACK.put(18, new Translation2d(0,0));
+    REEF_FACES_BACK.put(19, new Translation2d(0,0));
+    REEF_FACES_BACK.put(20, new Translation2d(0,0));
+    REEF_FACES_BACK.put(21, new Translation2d(0,0));
+    REEF_FACES_BACK.put(22, new Translation2d(0,0));
+  }
+
+
 
   public static final Map<Integer, Rotation2d[]> REEF_FACE_ORIENTATION = new HashMap<>();
 

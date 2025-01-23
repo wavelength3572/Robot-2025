@@ -133,11 +133,11 @@ public class Drive extends SubsystemBase {
   @Override
   public void periodic() {
     reefFaceSelection =
-        ReefAlignmentUtils.findClosestReefFaceAndRejectOthers(getPose(), Constants.REEF_FACES);
+        ReefAlignmentUtils.findClosestReefFaceAndRejectOthers(getPose(), Constants.REEF_FACES_FRONT);
 
     Logger.recordOutput("Alignment/ClosestDistance", reefFaceSelection.getAcceptedDistance());
     Logger.recordOutput("Alignment/AcceptedFace", reefFaceSelection.getAcceptedFace());
-    Logger.recordOutput("Alignment/RejectedFaces", reefFaceSelection.getRejectedFaces()); 
+    Logger.recordOutput("Alignment/RejectedFaces", reefFaceSelection.getRejectedFaces());
     Logger.recordOutput("Alignment/AcceptedFaceID", reefFaceSelection.getAcceptedFaceId());
 
     odometryLock.lock(); // Prevents odometry updates while reading data
