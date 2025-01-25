@@ -33,6 +33,7 @@ import frc.robot.subsystems.elevator.ElevatorIOPPCSim;
 import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
@@ -75,7 +76,9 @@ public class RobotContainer {
                 new ModuleIOSpark(1),
                 new ModuleIOSpark(2),
                 new ModuleIOSpark(3));
-        vision = null;
+        vision =
+            new Vision(
+                drive::addVisionMeasurement, new VisionIOPhotonVision(camera1Name, robotToCamera1));
         // vision =
         //     new Vision(
         //         drive::addVisionMeasurement,
