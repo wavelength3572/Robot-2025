@@ -3,11 +3,13 @@ package frc.robot.util;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
 import frc.robot.Constants.ChosenOrientation;
-import frc.robot.Constants.ReefOrientationType;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class ReefAlignmentUtils {
 
@@ -45,16 +47,29 @@ public class ReefAlignmentUtils {
     }
   }
 
-  public static ReefFaceSelection findClosestReefFaceAndRejectOthers(
-      Pose2d robotPose, Map<Integer, Translation2d> aprilTag) {
-    // Edge case: If no faces exist
-    if (aprilTag.isEmpty()) {
+  public static ReefFaceSelection findClosestReefFaceAndRejectOthers(Pose2d robotPose) {
+    // 1. Pick the correct AprilTag map based on alliance
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+
+    Map<Integer, Translation2d> aprilTagMap;
+    if (alliance.get() == Alliance.Blue) {
+      aprilTagMap = Constants.BLUE_APRIL_TAGS;
+    } else if (alliance.get() == Alliance.Red) {
+      aprilTagMap = Constants.RED_APRIL_TAGS;
+    } else {
+      // e.g. Alliance.Invalid or something else
+      // Return a neutral "none found" result or handle as an error
       return new ReefFaceSelection(null, null, Double.NaN, new Translation2d[0]);
     }
 
-    // 1. Compute distances: faceId -> distance
+    // 2. Edge case: If no faces exist for that alliance
+    if (aprilTagMap.isEmpty()) {
+      return new ReefFaceSelection(null, null, Double.NaN, new Translation2d[0]);
+    }
+
+    // 3. Compute distances: faceId -> distance from robotPose
     Map<Integer, Double> distanceMap = new HashMap<>();
-    for (Map.Entry<Integer, Translation2d> entry : aprilTag.entrySet()) {
+    for (Map.Entry<Integer, Translation2d> entry : aprilTagMap.entrySet()) {
       int faceId = entry.getKey();
       Translation2d faceTranslation = entry.getValue();
 
@@ -65,7 +80,7 @@ public class ReefAlignmentUtils {
       distanceMap.put(faceId, distance);
     }
 
-    // 2. Find the minimum-distance entry (accepted)
+    // 4. Find the minimum-distance entry (accepted face)
     Map.Entry<Integer, Double> minEntry = null;
     for (Map.Entry<Integer, Double> entry : distanceMap.entrySet()) {
       if (minEntry == null || entry.getValue() < minEntry.getValue()) {
@@ -73,54 +88,68 @@ public class ReefAlignmentUtils {
       }
     }
 
-    // Sanity check (should never be null if reefFaces is not empty)
+    // 5. Sanity check
     if (minEntry == null) {
       return new ReefFaceSelection(null, null, Double.NaN, new Translation2d[0]);
     }
 
-    // 3. Accepted face data
     int acceptedFaceId = minEntry.getKey();
     double acceptedDistance = minEntry.getValue();
-    Translation2d acceptedFace = aprilTag.get(acceptedFaceId);
+    Translation2d acceptedFace = aprilTagMap.get(acceptedFaceId);
 
-    // 4. Build array of "rejected" faces
-    distanceMap.remove(acceptedFaceId); // remove the accepted face from distanceMap
-
-    // The remaining keys in distanceMap are "rejected"
+    // 6. Build array of "rejected" faces
+    distanceMap.remove(acceptedFaceId); // remove accepted face
     Translation2d[] rejectedFaces =
-        distanceMap.keySet().stream()
-            .map(aprilTag::get) // convert faceId -> Translation2d
-            .toArray(Translation2d[]::new);
+        distanceMap.keySet().stream().map(aprilTagMap::get).toArray(Translation2d[]::new);
 
-    // 5. Return the result (now includes acceptedFaceId)
+    // 7. Return the result
     return new ReefFaceSelection(acceptedFaceId, acceptedFace, acceptedDistance, rejectedFaces);
   }
 
   public static ChosenOrientation pickClosestOrientationForFace(Pose2d robotPose, int faceId) {
-    Rotation2d currentHeading = robotPose.getRotation();
-    Rotation2d[] possibleOrients = Constants.REEF_FACE_ORIENTATION_BLUE.get(faceId);
+    // 1) Get current alliance as an Optional
+    Optional<Alliance> allianceOpt = DriverStation.getAlliance();
 
+    // 2) Pick the correct orientation map based on alliance
+    Map<Integer, Rotation2d[]> orientationMap;
+    if (allianceOpt.isPresent() && allianceOpt.get() == Alliance.Blue) {
+      orientationMap = Constants.REEF_FACE_ORIENTATION_BLUE;
+    } else if (allianceOpt.isPresent() && allianceOpt.get() == Alliance.Red) {
+      orientationMap = Constants.REEF_FACE_ORIENTATION_RED;
+    } else {
+      // e.g. Alliance.Invalid or empty Optional
+      // Decide how you want to handle this case:
+      //  (a) default to BLUE,
+      //  (b) return a "neutral" orientation,
+      //  (c) throw an exception, etc.
+      // Here, let's just default to BLUE:
+      orientationMap = Constants.REEF_FACE_ORIENTATION_BLUE;
+    }
+
+    // 3) Retrieve the possible orientations for this faceId
+    Rotation2d currentHeading = robotPose.getRotation();
+    Rotation2d[] possibleOrients = orientationMap.get(faceId);
+
+    // 4) If no orientation data, provide a fallback
     if (possibleOrients == null || possibleOrients.length < 2) {
-      // No valid orientation data, fallback or error
-      // Return a "neutral" result that indicates no data was available
-      // Here, for example, we'll return the current heading as angle and `FRONT` by default
+      // Return a "neutral" result indicating no data is available
       return new ChosenOrientation(currentHeading, Constants.ReefOrientationType.FRONT);
     }
 
-    // orientationA is the "front"
+    // 5) orientationA is the "front", orientationB is the "back"
     Rotation2d orientationA = possibleOrients[0];
-    // orientationB is the "back"
     Rotation2d orientationB = possibleOrients[1];
 
     double diffA = Math.abs(currentHeading.minus(orientationA).getRadians());
     double diffB = Math.abs(currentHeading.minus(orientationB).getRadians());
 
+    // 6) Pick whichever orientation is closer
     if (diffA <= diffB) {
-      // Closer to the 'front' orientation
-      return new ChosenOrientation(orientationA, ReefOrientationType.FRONT);
+      // Closer to "front" orientation
+      return new ChosenOrientation(orientationA, Constants.ReefOrientationType.FRONT);
     } else {
-      // Closer to the 'back' orientation
-      return new ChosenOrientation(orientationB, ReefOrientationType.BACK);
+      // Closer to "back" orientation
+      return new ChosenOrientation(orientationB, Constants.ReefOrientationType.BACK);
     }
   }
 }

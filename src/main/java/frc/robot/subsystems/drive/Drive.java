@@ -47,11 +47,13 @@ import frc.robot.Constants;
 import frc.robot.Constants.ChosenOrientation;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.ReefFacesBlue;
+import frc.robot.Constants.ReefFacesRed;
 import frc.robot.Constants.ReefOrientationType;
 import frc.robot.commands.DriveToPose;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.ReefAlignmentUtils;
 import frc.robot.util.ReefAlignmentUtils.ReefFaceSelection;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -134,14 +136,15 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
-    reefFaceSelection =
-        ReefAlignmentUtils.findClosestReefFaceAndRejectOthers(getPose(), Constants.BLUE_APRIL_TAGS);
 
-    Logger.recordOutput("Alignment/ClosestDistance", reefFaceSelection.getAcceptedDistance());
-    Logger.recordOutput("Alignment/AcceptedFace", reefFaceSelection.getAcceptedFace());
-    Logger.recordOutput("Alignment/RejectedFaces", reefFaceSelection.getRejectedFaces());
-    Logger.recordOutput("Alignment/AcceptedFaceID", reefFaceSelection.getAcceptedFaceId());
+    if (DriverStation.getAlliance().isPresent()) {
+      reefFaceSelection = ReefAlignmentUtils.findClosestReefFaceAndRejectOthers(getPose());
 
+      Logger.recordOutput("Alignment/ClosestDistance", reefFaceSelection.getAcceptedDistance());
+      Logger.recordOutput("Alignment/AcceptedFace", reefFaceSelection.getAcceptedFace());
+      Logger.recordOutput("Alignment/RejectedFaces", reefFaceSelection.getRejectedFaces());
+      Logger.recordOutput("Alignment/AcceptedFaceID", reefFaceSelection.getAcceptedFaceId());
+    }
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -382,41 +385,82 @@ public class Drive extends SubsystemBase {
   }
 
   public void driveToPole(boolean isLeftPole) {
-    // Get the ID of closest tag
+    // 1) Get the ID of the closest reef face
     Integer faceId = reefFaceSelection.getAcceptedFaceId();
-    if (faceId != null) {
+    if (faceId == null) {
+      // No valid face? Do nothing or handle error
+      return;
+    }
 
-      // 1. Get the chosen orientation (contains BOTH the angle and front/back info)
-      ChosenOrientation chosen =
-          ReefAlignmentUtils.pickClosestOrientationForFace(getPose(), faceId);
+    // 2) Check which alliance we're on
+    Optional<Alliance> alliance = DriverStation.getAlliance();
 
-      // Log the results for debugging
-      Logger.recordOutput("Alignment/chosenAngleDeg", chosen.rotation2D().getDegrees());
-      Logger.recordOutput("Alignment/orientationType", chosen.orientationType().toString());
+    // 3) Pick the best orientation for the face
+    //    (If you have separate orientation data for red/blue, you can do
+    //    an if-else to pick from the correct map, or unify it in the method.)
+    ChosenOrientation chosen = ReefAlignmentUtils.pickClosestOrientationForFace(getPose(), faceId);
 
-      // 2. Based on "front" or "back", pick the correct Translation2d for the left/right pole.
-      Translation2d poleTranslation;
-      if (chosen.orientationType() == ReefOrientationType.FRONT) {
-        // Use front branch translations
-        if (isLeftPole) {
-          poleTranslation = ReefFacesBlue.fromId(faceId).getLeftPole().getFrontTranslation();
-        } else {
-          poleTranslation = ReefFacesBlue.fromId(faceId).getRightPole().getFrontTranslation();
-        }
-      } else {
-        // Use back branch translations
-        if (isLeftPole) {
-          poleTranslation = ReefFacesBlue.fromId(faceId).getLeftPole().getBackTranslation();
-        } else {
-          poleTranslation = ReefFacesBlue.fromId(faceId).getRightPole().getBackTranslation();
-        }
+    // 4) Log the results for debugging
+    Logger.recordOutput("Alignment/chosenAngleDeg", chosen.rotation2D().getDegrees());
+    Logger.recordOutput("Alignment/orientationType", chosen.orientationType().toString());
+    Logger.recordOutput("Alignment/faceId", faceId);
+
+    // 5) Based on alliance + orientation, pick the correct coordinate
+    Translation2d poleTranslation;
+
+    if (alliance.get() == Alliance.Blue) {
+      // ---- Using BLUE data ----
+      ReefFacesBlue blueFace = ReefFacesBlue.fromId(faceId);
+      if (blueFace == null) {
+        // Possibly there's no matching face for this ID on blue
+        return;
       }
 
-      // 3. Create a target pose with the chosen orientation
-      Pose2d targetPose = new Pose2d(poleTranslation, chosen.rotation2D());
+      // Choose front/back
+      if (chosen.orientationType() == ReefOrientationType.FRONT) {
+        // Choose left/right
+        poleTranslation =
+            isLeftPole
+                ? blueFace.getLeftPole().getFrontTranslation()
+                : blueFace.getRightPole().getFrontTranslation();
+      } else {
+        poleTranslation =
+            isLeftPole
+                ? blueFace.getLeftPole().getBackTranslation()
+                : blueFace.getRightPole().getBackTranslation();
+      }
 
-      // 4. Schedule the command that drives to that pose
-      new DriveToPose(this, targetPose).schedule();
+    } else if (alliance.get() == Alliance.Red) {
+      // ---- Using RED data ----
+      ReefFacesRed redFace = ReefFacesRed.fromId(faceId);
+      if (redFace == null) {
+        // Possibly there's no matching face for this ID on red
+        return;
+      }
+
+      // Choose front/back
+      if (chosen.orientationType() == ReefOrientationType.FRONT) {
+        poleTranslation =
+            isLeftPole
+                ? redFace.getLeftPole().getFrontTranslation()
+                : redFace.getRightPole().getFrontTranslation();
+      } else {
+        poleTranslation =
+            isLeftPole
+                ? redFace.getLeftPole().getBackTranslation()
+                : redFace.getRightPole().getBackTranslation();
+      }
+
+    } else {
+      // If Alliance.Invalid or something unexpected
+      Logger.recordOutput("Alignment/Error", "Unknown alliance!");
+      return;
     }
+
+    // 6) Build the target pose using the chosen orientation
+    Pose2d targetPose = new Pose2d(poleTranslation, chosen.rotation2D());
+
+    // 7) Schedule a command to drive to that pose
+    new DriveToPose(this, targetPose).schedule();
   }
 }

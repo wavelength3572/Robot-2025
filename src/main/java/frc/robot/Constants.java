@@ -40,13 +40,11 @@ public final class Constants {
     REPLAY
   }
 
-  // Example: 6 reef-face positions as a static array
   public static final Map<Integer, Translation2d> BLUE_APRIL_TAGS = new HashMap<>(); // Blue
-
   public static final Map<Integer, Translation2d> RED_APRIL_TAGS = new HashMap<>(); // Red
 
   static {
-    // ---------------- BLUE TAGS ----------------
+    // ---------------- BLUE REEF APRIL TAGS ----------------
     BLUE_APRIL_TAGS.put(17, new Translation2d(4.073905999999999, 3.3063179999999996));
     BLUE_APRIL_TAGS.put(18, new Translation2d(3.6576, 4.0259));
     BLUE_APRIL_TAGS.put(19, new Translation2d(4.073905999999999, 4.745482));
@@ -54,13 +52,13 @@ public final class Constants {
     BLUE_APRIL_TAGS.put(21, new Translation2d(5.321046, 4.0259));
     BLUE_APRIL_TAGS.put(22, new Translation2d(4.904739999999999, 3.3063179999999996));
 
-    // ---------------- RED TAGS ----------------//FIX VALUES!!!!!
-    RED_APRIL_TAGS.put(6, new Translation2d(4.073905999999999, 3.3063179999999996));
-    RED_APRIL_TAGS.put(7, new Translation2d(3.6576, 4.0259));
-    RED_APRIL_TAGS.put(8, new Translation2d(4.073905999999999, 4.745482));
-    RED_APRIL_TAGS.put(9, new Translation2d(4.904739999999999, 4.745482));
-    RED_APRIL_TAGS.put(10, new Translation2d(5.321046, 4.0259));
-    RED_APRIL_TAGS.put(11, new Translation2d(4.904739999999999, 3.3063179999999996));
+    // ---------------- RED REEF APRIL TAGS ----------------
+    RED_APRIL_TAGS.put(6, new Translation2d(13.474446, 3.3063179999999996));
+    RED_APRIL_TAGS.put(7, new Translation2d(13.890498, 4.0259));
+    RED_APRIL_TAGS.put(8, new Translation2d(13.47444, 4.745482));
+    RED_APRIL_TAGS.put(9, new Translation2d(12.643358, 4.745482));
+    RED_APRIL_TAGS.put(10, new Translation2d(12.227305999999999, 4.0259));
+    RED_APRIL_TAGS.put(11, new Translation2d(12.643358, 3.3063179999999996));
   }
 
   public enum ReefOrientationType {
@@ -214,27 +212,28 @@ public final class Constants {
     }
   }
 
-  // -------------- RED BRANCHES ----------------- //FIX VALUES!!!
   public enum ReefBranchesRed {
-    BRANCH_A(new Translation2d(3.2385, 4.3807), new Translation2d(3.2385, 3.9997)),
-    BRANCH_B(new Translation2d(3.2385, 4.0521), new Translation2d(3.2385, 3.6711)),
-    BRANCH_C(new Translation2d(3.5566, 3.1201), new Translation2d(3.8866, 2.9296)),
-    BRANCH_D(new Translation2d(3.7863, 2.9875), new Translation2d(4.1712, 2.7652)),
-    BRANCH_E(new Translation2d(4.8075, 2.7652), new Translation2d(5.1374, 2.9557)),
-    BRANCH_F(new Translation2d(5.0921, 2.9296), new Translation2d(5.4220, 3.1201)),
-    BRANCH_G(new Translation2d(5.7402, 3.6711), new Translation2d(5.7402, 4.0521)),
-    BRANCH_H(new Translation2d(5.7402, 3.9997), new Translation2d(5.7402, 4.3807)),
-    BRANCH_I(new Translation2d(5.4220, 4.9317), new Translation2d(5.0921, 5.1222)),
-    BRANCH_J(new Translation2d(5.1374, 5.0961), new Translation2d(4.8075, 5.2866)),
-    BRANCH_K(new Translation2d(4.1712, 5.2866), new Translation2d(3.8412, 5.0961)),
-    BRANCH_L(new Translation2d(3.8866, 5.1222), new Translation2d(3.5566, 4.9317));
+    // Give each Red branch a matching Blue branch in parentheses
+    BRANCH_A(ReefBranchesBlue.BRANCH_A),
+    BRANCH_B(ReefBranchesBlue.BRANCH_B),
+    BRANCH_C(ReefBranchesBlue.BRANCH_C),
+    BRANCH_D(ReefBranchesBlue.BRANCH_D),
+    BRANCH_E(ReefBranchesBlue.BRANCH_E),
+    BRANCH_F(ReefBranchesBlue.BRANCH_F),
+    BRANCH_G(ReefBranchesBlue.BRANCH_G),
+    BRANCH_H(ReefBranchesBlue.BRANCH_H),
+    BRANCH_I(ReefBranchesBlue.BRANCH_I),
+    BRANCH_J(ReefBranchesBlue.BRANCH_J),
+    BRANCH_K(ReefBranchesBlue.BRANCH_K),
+    BRANCH_L(ReefBranchesBlue.BRANCH_L);
 
     private final Translation2d frontTranslation;
     private final Translation2d backTranslation;
 
-    ReefBranchesRed(Translation2d frontTrans, Translation2d backTrans) {
-      this.frontTranslation = frontTrans;
-      this.backTranslation = backTrans;
+    /** Constructor takes the matching "blue" branch, then mirrors its front/back translations. */
+    ReefBranchesRed(ReefBranchesBlue blueBranch) {
+      this.frontTranslation = reflectBlueToRed(blueBranch.getFrontTranslation());
+      this.backTranslation = reflectBlueToRed(blueBranch.getBackTranslation());
     }
 
     public Translation2d getFrontTranslation() {
@@ -243,6 +242,12 @@ public final class Constants {
 
     public Translation2d getBackTranslation() {
       return backTranslation;
+    }
+
+    // The same mirror logic as above; you can inline it if you prefer
+    private static Translation2d reflectBlueToRed(Translation2d blueCoord) {
+      double fieldWidth = 17.55;
+      return new Translation2d(fieldWidth - blueCoord.getX(), blueCoord.getY());
     }
   }
 
@@ -302,5 +307,23 @@ public final class Constants {
       }
       return null; // or throw
     }
+  }
+
+  /**
+   * Reflects a "blue side" coordinate across the field's vertical center line (x=8.775 on a
+   * 17.55m-wide field).
+   *
+   * @param blueCoord the (x,y) on blue side
+   * @return the corresponding (x,y) on red side
+   */
+  public static Translation2d reflectBlueToRed(Translation2d blueCoord) {
+    double fieldWidthX = 17.55; // total field length in X meters
+    double xBlue = blueCoord.getX();
+    double yBlue = blueCoord.getY();
+
+    double xRed = fieldWidthX - xBlue; // reflect in X
+    double yRed = yBlue; // Y stays the same
+
+    return new Translation2d(xRed, yRed);
   }
 }
