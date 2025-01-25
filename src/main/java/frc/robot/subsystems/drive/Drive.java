@@ -44,8 +44,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.Constants.ChosenOrientation;
 import frc.robot.Constants.Mode;
-import frc.robot.Constants.ReefFaces;
+import frc.robot.Constants.ReefFacesBlue;
+import frc.robot.Constants.ReefOrientationType;
 import frc.robot.commands.DriveToPose;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.ReefAlignmentUtils;
@@ -133,7 +135,7 @@ public class Drive extends SubsystemBase {
   @Override
   public void periodic() {
     reefFaceSelection =
-        ReefAlignmentUtils.findClosestReefFaceAndRejectOthers(getPose(), Constants.REEF_FACES_FRONT);
+        ReefAlignmentUtils.findClosestReefFaceAndRejectOthers(getPose(), Constants.BLUE_APRIL_TAGS);
 
     Logger.recordOutput("Alignment/ClosestDistance", reefFaceSelection.getAcceptedDistance());
     Logger.recordOutput("Alignment/AcceptedFace", reefFaceSelection.getAcceptedFace());
@@ -380,25 +382,40 @@ public class Drive extends SubsystemBase {
   }
 
   public void driveToPole(boolean isLeftPole) {
-
     // Get the ID of closest tag
     Integer faceId = reefFaceSelection.getAcceptedFaceId();
     if (faceId != null) {
-      Rotation2d bestOrientation =
-          ReefAlignmentUtils.pickClosestOrientationForFace(getPose(), faceId);
-      Logger.recordOutput("Alignment/bestOrientation", bestOrientation.getDegrees());
 
+      // 1. Get the chosen orientation (contains BOTH the angle and front/back info)
+      ChosenOrientation chosen =
+          ReefAlignmentUtils.pickClosestOrientationForFace(getPose(), faceId);
+
+      // Log the results for debugging
+      Logger.recordOutput("Alignment/chosenAngleDeg", chosen.rotation2D().getDegrees());
+      Logger.recordOutput("Alignment/orientationType", chosen.orientationType().toString());
+
+      // 2. Based on "front" or "back", pick the correct Translation2d for the left/right pole.
       Translation2d poleTranslation;
-      if (isLeftPole) {
-        Constants.ReefBranches left = ReefFaces.fromId(faceId).getLeftPole();
-        poleTranslation = left.getTranslation();
+      if (chosen.orientationType() == ReefOrientationType.FRONT) {
+        // Use front branch translations
+        if (isLeftPole) {
+          poleTranslation = ReefFacesBlue.fromId(faceId).getLeftPole().getFrontTranslation();
+        } else {
+          poleTranslation = ReefFacesBlue.fromId(faceId).getRightPole().getFrontTranslation();
+        }
       } else {
-        Constants.ReefBranches right = ReefFaces.fromId(faceId).getRightPole();
-        poleTranslation = right.getTranslation();
+        // Use back branch translations
+        if (isLeftPole) {
+          poleTranslation = ReefFacesBlue.fromId(faceId).getLeftPole().getBackTranslation();
+        } else {
+          poleTranslation = ReefFacesBlue.fromId(faceId).getRightPole().getBackTranslation();
+        }
       }
 
-      Pose2d targetPose = new Pose2d(poleTranslation, bestOrientation);
+      // 3. Create a target pose with the chosen orientation
+      Pose2d targetPose = new Pose2d(poleTranslation, chosen.rotation2D());
 
+      // 4. Schedule the command that drives to that pose
       new DriveToPose(this, targetPose).schedule();
     }
   }

@@ -41,99 +41,149 @@ public final class Constants {
   }
 
   // Example: 6 reef-face positions as a static array
-  public static final Map<Integer, Translation2d> REEF_FACES_FRONT = new HashMap<>();
+  public static final Map<Integer, Translation2d> BLUE_APRIL_TAGS = new HashMap<>(); // Blue
+
+  public static final Map<Integer, Translation2d> RED_APRIL_TAGS = new HashMap<>(); // Red
 
   static {
-    REEF_FACES_FRONT.put(17, new Translation2d(4.073905999999999, 3.3063179999999996));
-    REEF_FACES_FRONT.put(18, new Translation2d(3.6576, 4.0259));
-    REEF_FACES_FRONT.put(19, new Translation2d(4.073905999999999, 4.745482));
-    REEF_FACES_FRONT.put(20, new Translation2d(4.904739999999999, 4.745482));
-    REEF_FACES_FRONT.put(21, new Translation2d(5.321046, 4.0259));
-    REEF_FACES_FRONT.put(22, new Translation2d(4.904739999999999, 3.3063179999999996));
+    // ---------------- BLUE TAGS ----------------
+    BLUE_APRIL_TAGS.put(17, new Translation2d(4.073905999999999, 3.3063179999999996));
+    BLUE_APRIL_TAGS.put(18, new Translation2d(3.6576, 4.0259));
+    BLUE_APRIL_TAGS.put(19, new Translation2d(4.073905999999999, 4.745482));
+    BLUE_APRIL_TAGS.put(20, new Translation2d(4.904739999999999, 4.745482));
+    BLUE_APRIL_TAGS.put(21, new Translation2d(5.321046, 4.0259));
+    BLUE_APRIL_TAGS.put(22, new Translation2d(4.904739999999999, 3.3063179999999996));
+
+    // ---------------- RED TAGS ----------------//FIX VALUES!!!!!
+    RED_APRIL_TAGS.put(6, new Translation2d(4.073905999999999, 3.3063179999999996));
+    RED_APRIL_TAGS.put(7, new Translation2d(3.6576, 4.0259));
+    RED_APRIL_TAGS.put(8, new Translation2d(4.073905999999999, 4.745482));
+    RED_APRIL_TAGS.put(9, new Translation2d(4.904739999999999, 4.745482));
+    RED_APRIL_TAGS.put(10, new Translation2d(5.321046, 4.0259));
+    RED_APRIL_TAGS.put(11, new Translation2d(4.904739999999999, 3.3063179999999996));
   }
-  
-  public static final Map<Integer, Translation2d> REEF_FACES_BACK = new HashMap<>();
-  static {
-    REEF_FACES_BACK.put(17, new Translation2d(3.86, 2.92));
-    REEF_FACES_BACK.put(18, new Translation2d(0,0));
-    REEF_FACES_BACK.put(19, new Translation2d(0,0));
-    REEF_FACES_BACK.put(20, new Translation2d(0,0));
-    REEF_FACES_BACK.put(21, new Translation2d(0,0));
-    REEF_FACES_BACK.put(22, new Translation2d(0,0));
+
+  public enum ReefOrientationType {
+    FRONT,
+    BACK
   }
 
+  /**
+   * A result that includes both the chosen angle and which orientation (front/back) it came from.
+   */
+  public record ChosenOrientation(Rotation2d rotation2D, ReefOrientationType orientationType) {}
 
+  /** Orientation data for BLUE reef faces, keyed by faceId 17–22. */
+  public static final Map<Integer, Rotation2d[]> REEF_FACE_ORIENTATION_BLUE = new HashMap<>();
 
-  public static final Map<Integer, Rotation2d[]> REEF_FACE_ORIENTATION = new HashMap<>();
+  /** Orientation data for RED reef faces, keyed by faceId 6–11. */
+  public static final Map<Integer, Rotation2d[]> REEF_FACE_ORIENTATION_RED = new HashMap<>();
 
   static {
-    REEF_FACE_ORIENTATION.put(
+    // ---------------- BLUE Orientation ----------------
+    REEF_FACE_ORIENTATION_BLUE.put(
         17,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(150)), new Rotation2d(Math.toRadians(-30))
+          new Rotation2d(Math.toRadians(-30)), new Rotation2d(Math.toRadians(150))
         });
-    REEF_FACE_ORIENTATION.put(
+    REEF_FACE_ORIENTATION_BLUE.put(
         18,
-        new Rotation2d[] {new Rotation2d(Math.toRadians(90)), new Rotation2d(Math.toRadians(-90))});
-    REEF_FACE_ORIENTATION.put(
+        new Rotation2d[] {new Rotation2d(Math.toRadians(-90)), new Rotation2d(Math.toRadians(90))});
+    REEF_FACE_ORIENTATION_BLUE.put(
         19,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(30)), new Rotation2d(Math.toRadians(-150))
+          new Rotation2d(Math.toRadians(-150)), new Rotation2d(Math.toRadians(30))
         });
-    REEF_FACE_ORIENTATION.put(
+    REEF_FACE_ORIENTATION_BLUE.put(
         20,
         new Rotation2d[] {
           new Rotation2d(Math.toRadians(150)), new Rotation2d(Math.toRadians(-30))
         });
-    REEF_FACE_ORIENTATION.put(
+    REEF_FACE_ORIENTATION_BLUE.put(
         21,
         new Rotation2d[] {new Rotation2d(Math.toRadians(90)), new Rotation2d(Math.toRadians(-90))});
-    REEF_FACE_ORIENTATION.put(
+    REEF_FACE_ORIENTATION_BLUE.put(
         22,
         new Rotation2d[] {
           new Rotation2d(Math.toRadians(30)), new Rotation2d(Math.toRadians(-150))
         });
-    Collections.unmodifiableMap(REEF_FACE_ORIENTATION);
+    Collections.unmodifiableMap(REEF_FACE_ORIENTATION_BLUE);
+
+    // ---------------- RED Orientation ----------------
+    REEF_FACE_ORIENTATION_RED.put(
+        6,
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(30)), new Rotation2d(Math.toRadians(-150))
+        });
+    REEF_FACE_ORIENTATION_RED.put(
+        7,
+        new Rotation2d[] {new Rotation2d(Math.toRadians(90)), new Rotation2d(Math.toRadians(-90))});
+    REEF_FACE_ORIENTATION_RED.put(
+        8,
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(150)), new Rotation2d(Math.toRadians(-30))
+        });
+    REEF_FACE_ORIENTATION_RED.put(
+        9,
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(-150)), new Rotation2d(Math.toRadians(30))
+        });
+    REEF_FACE_ORIENTATION_RED.put(
+        10,
+        new Rotation2d[] {new Rotation2d(Math.toRadians(-90)), new Rotation2d(Math.toRadians(90))});
+    REEF_FACE_ORIENTATION_RED.put(
+        11,
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(-30)), new Rotation2d(Math.toRadians(150))
+        });
+    Collections.unmodifiableMap(REEF_FACE_ORIENTATION_RED);
   }
 
-  public enum ReefBranches {
-    BRANCH_A(new Translation2d(3.2385, 4.3807)),
-    BRANCH_B(new Translation2d(3.2385, 4.0521)),
-    BRANCH_C(new Translation2d(3.5566, 3.1201)),
-    BRANCH_D(new Translation2d(3.7863, 2.9875)),
-    BRANCH_E(new Translation2d(4.8075, 2.7652)),
-    BRANCH_F(new Translation2d(5.0921, 2.9296)),
-    BRANCH_G(new Translation2d(5.7402, 3.6711)),
-    BRANCH_H(new Translation2d(5.7402, 3.9997)),
-    BRANCH_I(new Translation2d(5.4220, 4.9317)),
-    BRANCH_J(new Translation2d(5.1374, 5.0961)),
-    BRANCH_K(new Translation2d(4.1712, 5.2866)),
-    BRANCH_L(new Translation2d(3.8866, 5.1222));
+  // -------------- BLUE BRANCHES -----------------
+  public enum ReefBranchesBlue {
+    BRANCH_A(new Translation2d(3.2385, 4.3807), new Translation2d(3.2385, 3.9997)),
+    BRANCH_B(new Translation2d(3.2385, 4.0521), new Translation2d(3.2385, 3.6711)),
+    BRANCH_C(new Translation2d(3.5566, 3.1201), new Translation2d(3.8866, 2.9296)),
+    BRANCH_D(new Translation2d(3.7863, 2.9875), new Translation2d(4.1712, 2.7652)),
+    BRANCH_E(new Translation2d(4.8075, 2.7652), new Translation2d(5.1374, 2.9557)),
+    BRANCH_F(new Translation2d(5.0921, 2.9296), new Translation2d(5.4220, 3.1201)),
+    BRANCH_G(new Translation2d(5.7402, 3.6711), new Translation2d(5.7402, 4.0521)),
+    BRANCH_H(new Translation2d(5.7402, 3.9997), new Translation2d(5.7402, 4.3807)),
+    BRANCH_I(new Translation2d(5.4220, 4.9317), new Translation2d(5.0921, 5.1222)),
+    BRANCH_J(new Translation2d(5.1374, 5.0961), new Translation2d(4.8075, 5.2866)),
+    BRANCH_K(new Translation2d(4.1712, 5.2866), new Translation2d(3.8412, 5.0961)),
+    BRANCH_L(new Translation2d(3.8866, 5.1222), new Translation2d(3.5566, 4.9317));
 
-    private final Translation2d translation;
+    private final Translation2d frontTranslation;
+    private final Translation2d backTranslation;
 
-    ReefBranches(Translation2d translation) {
-      this.translation = translation;
+    ReefBranchesBlue(Translation2d frontTranslation, Translation2d backTranslation) {
+      this.frontTranslation = frontTranslation;
+      this.backTranslation = backTranslation;
     }
 
-    public Translation2d getTranslation() {
-      return translation;
+    public Translation2d getFrontTranslation() {
+      return frontTranslation;
+    }
+
+    public Translation2d getBackTranslation() {
+      return backTranslation;
     }
   }
 
-  public enum ReefFaces {
-    FACE_17(17, ReefBranches.BRANCH_C, ReefBranches.BRANCH_D),
-    FACE_18(18, ReefBranches.BRANCH_A, ReefBranches.BRANCH_B),
-    FACE_19(19, ReefBranches.BRANCH_K, ReefBranches.BRANCH_L),
-    FACE_20(20, ReefBranches.BRANCH_I, ReefBranches.BRANCH_J),
-    FACE_21(21, ReefBranches.BRANCH_G, ReefBranches.BRANCH_H),
-    FACE_22(22, ReefBranches.BRANCH_E, ReefBranches.BRANCH_F);
+  public enum ReefFacesBlue {
+    FACE_17(17, ReefBranchesBlue.BRANCH_C, ReefBranchesBlue.BRANCH_D),
+    FACE_18(18, ReefBranchesBlue.BRANCH_A, ReefBranchesBlue.BRANCH_B),
+    FACE_19(19, ReefBranchesBlue.BRANCH_K, ReefBranchesBlue.BRANCH_L),
+    FACE_20(20, ReefBranchesBlue.BRANCH_I, ReefBranchesBlue.BRANCH_J),
+    FACE_21(21, ReefBranchesBlue.BRANCH_G, ReefBranchesBlue.BRANCH_H),
+    FACE_22(22, ReefBranchesBlue.BRANCH_E, ReefBranchesBlue.BRANCH_F);
 
     private final int faceId;
-    private final ReefBranches leftPole;
-    private final ReefBranches rightPole;
+    private final ReefBranchesBlue leftPole;
+    private final ReefBranchesBlue rightPole;
 
-    ReefFaces(int faceId, ReefBranches leftPole, ReefBranches rightPole) {
+    ReefFacesBlue(int faceId, ReefBranchesBlue leftPole, ReefBranchesBlue rightPole) {
       this.faceId = faceId;
       this.leftPole = leftPole;
       this.rightPole = rightPole;
@@ -143,24 +193,114 @@ public final class Constants {
       return faceId;
     }
 
-    public ReefBranches getLeftPole() {
+    public ReefBranchesBlue getLeftPole() {
       return leftPole;
     }
 
-    public ReefBranches getRightPole() {
+    public ReefBranchesBlue getRightPole() {
       return rightPole;
     }
 
     /**
      * Find the ReefFaces enum constant matching the given faceId, or return null if none matches.
      */
-    public static ReefFaces fromId(int faceId) {
-      for (ReefFaces face : values()) {
+    public static ReefFacesBlue fromId(int faceId) {
+      for (ReefFacesBlue face : values()) {
         if (face.faceId == faceId) {
           return face;
         }
       }
       return null; // or throw an IllegalArgumentException
+    }
+  }
+
+  // -------------- RED BRANCHES ----------------- //FIX VALUES!!!
+  public enum ReefBranchesRed {
+    BRANCH_A(new Translation2d(3.2385, 4.3807), new Translation2d(3.2385, 3.9997)),
+    BRANCH_B(new Translation2d(3.2385, 4.0521), new Translation2d(3.2385, 3.6711)),
+    BRANCH_C(new Translation2d(3.5566, 3.1201), new Translation2d(3.8866, 2.9296)),
+    BRANCH_D(new Translation2d(3.7863, 2.9875), new Translation2d(4.1712, 2.7652)),
+    BRANCH_E(new Translation2d(4.8075, 2.7652), new Translation2d(5.1374, 2.9557)),
+    BRANCH_F(new Translation2d(5.0921, 2.9296), new Translation2d(5.4220, 3.1201)),
+    BRANCH_G(new Translation2d(5.7402, 3.6711), new Translation2d(5.7402, 4.0521)),
+    BRANCH_H(new Translation2d(5.7402, 3.9997), new Translation2d(5.7402, 4.3807)),
+    BRANCH_I(new Translation2d(5.4220, 4.9317), new Translation2d(5.0921, 5.1222)),
+    BRANCH_J(new Translation2d(5.1374, 5.0961), new Translation2d(4.8075, 5.2866)),
+    BRANCH_K(new Translation2d(4.1712, 5.2866), new Translation2d(3.8412, 5.0961)),
+    BRANCH_L(new Translation2d(3.8866, 5.1222), new Translation2d(3.5566, 4.9317));
+
+    private final Translation2d frontTranslation;
+    private final Translation2d backTranslation;
+
+    ReefBranchesRed(Translation2d frontTrans, Translation2d backTrans) {
+      this.frontTranslation = frontTrans;
+      this.backTranslation = backTrans;
+    }
+
+    public Translation2d getFrontTranslation() {
+      return frontTranslation;
+    }
+
+    public Translation2d getBackTranslation() {
+      return backTranslation;
+    }
+  }
+
+  public enum ReefFacesRed {
+    FACE_6(
+        6,
+        ReefBranchesRed.BRANCH_K,
+        ReefBranchesRed.BRANCH_L), // CHECK The placement of the branches (L or R)
+    FACE_7(
+        7,
+        ReefBranchesRed.BRANCH_A,
+        ReefBranchesRed.BRANCH_B), // CHECK The placement of the branches (L or R)
+    FACE_8(
+        8,
+        ReefBranchesRed.BRANCH_C,
+        ReefBranchesRed.BRANCH_D), // CHECK The placement of the branches (L or R)
+    FACE_9(
+        9,
+        ReefBranchesRed.BRANCH_E,
+        ReefBranchesRed.BRANCH_F), // CHECK The placement of the branches (L or R)
+    FACE_10(
+        10,
+        ReefBranchesRed.BRANCH_G,
+        ReefBranchesRed.BRANCH_H), // CHECK The placement of the branches (L or R)
+    FACE_11(
+        11,
+        ReefBranchesRed.BRANCH_I,
+        ReefBranchesRed.BRANCH_J); // CHECK The placement of the branches (L or R)
+
+    private final int faceId;
+    private final ReefBranchesRed leftPole;
+    private final ReefBranchesRed rightPole;
+
+    ReefFacesRed(int faceId, ReefBranchesRed leftPole, ReefBranchesRed rightPole) {
+      this.faceId = faceId;
+      this.leftPole = leftPole;
+      this.rightPole = rightPole;
+    }
+
+    public int getFaceId() {
+      return faceId;
+    }
+
+    public ReefBranchesRed getLeftPole() {
+      return leftPole;
+    }
+
+    public ReefBranchesRed getRightPole() {
+      return rightPole;
+    }
+
+    public static ReefFacesRed fromId(int faceId) {
+      for (ReefFacesRed face : values()) {
+        if (face.faceId == faceId) {
+          return face;
+        }
+      }
+      return null; // or throw
     }
   }
 }
