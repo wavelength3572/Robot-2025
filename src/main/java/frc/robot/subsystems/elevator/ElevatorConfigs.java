@@ -14,7 +14,10 @@ public final class ElevatorConfigs {
 
     static {
       // Configure basic settings of the elevator motor
-      leaderConfig.idleMode(IdleMode.kCoast).smartCurrentLimit(50).voltageCompensation(12);
+      leaderConfig
+          .idleMode(IdleMode.kBrake)
+          .smartCurrentLimit(ElevatorConstants.elevatorCurrentLimit)
+          .voltageCompensation(12);
       /*
        * Configure the closed loop controller. We want to make sure we set the
        * feedback sensor as the primary encoder.
@@ -23,25 +26,20 @@ public final class ElevatorConfigs {
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // Set PID values for position control
-          .p(0.05)
+          .p(0.2)
           .outputRange(-1, 1)
           .maxMotion
           // Set MAXMotion parameters for position control
-          .maxVelocity(4200)
-          .maxAcceleration(6000)
-          .allowedClosedLoopError(0.5);
+          .maxVelocity(1500)
+          .maxAcceleration(1500)
+          .allowedClosedLoopError(0.1);
 
       followerConfig
           // Configure basic settings of the elevator motor
-          .idleMode(IdleMode.kCoast)
-          .smartCurrentLimit(50)
+          .idleMode(IdleMode.kBrake)
+          .smartCurrentLimit(ElevatorConstants.elevatorCurrentLimit)
           .voltageCompensation(12)
-          .follow(leaderCanId);
-      /*
-       * Configure the closed loop controller. We want to make sure we set the
-       * feedback sensor as the primary encoder.
-       */
-
+          .follow(leaderCanId, true);
     }
   }
 }
