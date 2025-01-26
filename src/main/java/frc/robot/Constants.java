@@ -239,27 +239,27 @@ public final class Constants {
     FACE_6(
         6,
         ReefBranchesRed.BRANCH_K,
-        ReefBranchesRed.BRANCH_L), // CHECK The placement of the branches (L or R)
+        ReefBranchesRed.BRANCH_L),
     FACE_7(
         7,
         ReefBranchesRed.BRANCH_A,
-        ReefBranchesRed.BRANCH_B), // CHECK The placement of the branches (L or R)
+        ReefBranchesRed.BRANCH_B), 
     FACE_8(
         8,
         ReefBranchesRed.BRANCH_C,
-        ReefBranchesRed.BRANCH_D), // CHECK The placement of the branches (L or R)
+        ReefBranchesRed.BRANCH_D),
     FACE_9(
         9,
         ReefBranchesRed.BRANCH_E,
-        ReefBranchesRed.BRANCH_F), // CHECK The placement of the branches (L or R)
+        ReefBranchesRed.BRANCH_F),
     FACE_10(
         10,
         ReefBranchesRed.BRANCH_G,
-        ReefBranchesRed.BRANCH_H), // CHECK The placement of the branches (L or R)
+        ReefBranchesRed.BRANCH_H),
     FACE_11(
         11,
         ReefBranchesRed.BRANCH_I,
-        ReefBranchesRed.BRANCH_J); // CHECK The placement of the branches (L or R)
+        ReefBranchesRed.BRANCH_J);
 
     private final int faceId;
     private final ReefBranchesRed leftPole;

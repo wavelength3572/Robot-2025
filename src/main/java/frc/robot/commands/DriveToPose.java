@@ -47,6 +47,8 @@ public class DriveToPose extends Command {
     this(drivetrain, () -> pose);
   }
 
+    //needs to be cancellable by driver
+
   public DriveToPose(Drive drivetrain, Supplier<Pose2d> poseSupplier) {
     this.drivetrain = drivetrain;
     this.poseSupplier = poseSupplier;
