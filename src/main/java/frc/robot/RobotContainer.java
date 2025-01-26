@@ -19,9 +19,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.drive.*;
@@ -99,14 +99,23 @@ public class RobotContainer {
 
     SmartDashboard.putData(
         "DriveToClosestLEFTPole",
-        Commands.runOnce(
-            () -> drive.driveToPole(true), // This is your "run once" action
-            drive));
+        DriveToCommands.driveToPole(
+            drive, // The Drive subsystem
+            true, // isLeftPole = true
+            () -> 0.0, // Default X joystick input (stationary for dashboard testing)
+            () -> 0.0, // Default Y joystick input
+            () -> 0.0 // Default rotation joystick input
+            ));
+
     SmartDashboard.putData(
         "DriveToClosestRIGHTPole",
-        Commands.runOnce(
-            () -> drive.driveToPole(false), // This is your "run once" action
-            drive));
+        DriveToCommands.driveToPole(
+            drive, // The Drive subsystem
+            false, // isLeftPole = false
+            () -> 0.0, // Default X joystick input (stationary for dashboard testing)
+            () -> 0.0, // Default Y joystick input
+            () -> 0.0 // Default rotation joystick input
+            ));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

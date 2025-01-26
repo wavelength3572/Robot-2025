@@ -7,6 +7,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
 import frc.robot.Constants.ChosenOrientation;
+import frc.robot.Constants.ReefFacesBlue;
+import frc.robot.Constants.ReefFacesRed;
+import frc.robot.subsystems.drive.Drive;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -119,9 +122,9 @@ public class ReefAlignmentUtils {
     } else {
       // e.g. Alliance.Invalid or empty Optional
       // Decide how you want to handle this case:
-      //  (a) default to BLUE,
-      //  (b) return a "neutral" orientation,
-      //  (c) throw an exception, etc.
+      // (a) default to BLUE,
+      // (b) return a "neutral" orientation,
+      // (c) throw an exception, etc.
       // Here, let's just default to BLUE:
       orientationMap = Constants.REEF_FACE_ORIENTATION_BLUE;
     }
@@ -151,5 +154,68 @@ public class ReefAlignmentUtils {
       // Closer to "back" orientation
       return new ChosenOrientation(orientationB, Constants.ReefOrientationType.BACK);
     }
+  }
+
+  /**
+   * Calculates the target pose for driving to a pole based on the alliance, face ID, and pole
+   * selection.
+   *
+   * @param drive The drive subsystem, providing the current pose and reef face data.
+   * @param faceId The ID of the reef face to align with.
+   * @param isLeftPole True for the left pole, false for the right pole.
+   * @param alliance The current alliance of the robot.
+   * @return The calculated target pose, or null if a valid pose cannot be determined.
+   */
+  public static Pose2d calculateTargetPose(
+      Drive drive,
+      int faceId,
+      boolean isLeftPole,
+      Optional<DriverStation.Alliance> alliance,
+      ChosenOrientation chosen) {
+    Translation2d poleTranslation;
+
+    if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue) {
+      // Use Blue reef data
+      ReefFacesBlue blueFace = ReefFacesBlue.fromId(faceId);
+      if (blueFace == null) {
+        System.out.println("ReefAlignmentUtils: No matching Blue face for face ID: " + faceId);
+        return null;
+      }
+
+      // Determine the pole translation based on the front/back and left/right
+      // selection
+      poleTranslation =
+          (chosen.orientationType() == Constants.ReefOrientationType.FRONT)
+              ? (isLeftPole
+                  ? blueFace.getLeftPole().getFrontTranslation()
+                  : blueFace.getRightPole().getFrontTranslation())
+              : (isLeftPole
+                  ? blueFace.getLeftPole().getBackTranslation()
+                  : blueFace.getRightPole().getBackTranslation());
+    } else if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
+      // Use Red reef data
+      ReefFacesRed redFace = ReefFacesRed.fromId(faceId);
+      if (redFace == null) {
+        System.out.println("ReefAlignmentUtils: No matching Red face for face ID: " + faceId);
+        return null;
+      }
+
+      // Determine the pole translation based on the front/back and left/right
+      // selection
+      poleTranslation =
+          (chosen.orientationType() == Constants.ReefOrientationType.FRONT)
+              ? (isLeftPole
+                  ? redFace.getLeftPole().getFrontTranslation()
+                  : redFace.getRightPole().getFrontTranslation())
+              : (isLeftPole
+                  ? redFace.getLeftPole().getBackTranslation()
+                  : redFace.getRightPole().getBackTranslation());
+    } else {
+      System.out.println("ReefAlignmentUtils: Invalid or unknown alliance.");
+      return null;
+    }
+
+    // Return the target pose with the chosen orientation
+    return new Pose2d(poleTranslation, chosen.rotation2D());
   }
 }

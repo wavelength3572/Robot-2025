@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.drive.Drive;
 
@@ -24,7 +25,14 @@ public class WLButtons {
     WLDrive = drive;
 
     WLDrive.setDefaultCommand(
-        DriveCommands.joystickDrive(drive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
+        DriveCommands.joystickHybridDrive(
+            drive,
+            oi::getTranslateX,
+            oi::getTranslateY,
+            oi::getRotate,
+            drive::getPose,
+            drive::getReefFaceSelection,
+            2.0));
 
     configureDriverButtons();
   }
@@ -39,7 +47,13 @@ public class WLButtons {
             DriveCommands.joystickDriveAtAngle(
                 WLDrive, oi::getTranslateX, oi::getTranslateY, () -> new Rotation2d()));
     // Drive to Pole
-    oi.getRightJoyLeftButton().onTrue(Commands.runOnce(WLDrive::driveToLeftPole, WLDrive));
-    oi.getRightJoyRightButton().onTrue(Commands.runOnce(WLDrive::driveToRightPole, WLDrive));
+    oi.getRightJoyLeftButton()
+        .onTrue(
+            DriveToCommands.driveToPole(
+                WLDrive, true, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
+    oi.getRightJoyRightButton()
+        .onTrue(
+            DriveToCommands.driveToPole(
+                WLDrive, false, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
   }
 }

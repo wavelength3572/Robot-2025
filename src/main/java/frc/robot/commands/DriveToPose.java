@@ -8,13 +8,19 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveToPose extends Command {
+  private static final double JOYSTICK_DEADBAND = 0.1; // Adjust as needed
   private double TIMEOUT_TIME = 8.0;
+
   private final Drive drivetrain;
   private final Supplier<Pose2d> poseSupplier;
+  private final DoubleSupplier xJoystickSupplier;
+  private final DoubleSupplier yJoystickSupplier;
+  private final DoubleSupplier rotationJoystickSupplier;
 
   private double targetX;
   private double targetY;
@@ -43,22 +49,23 @@ public class DriveToPose extends Command {
           new TrapezoidProfile.Constraints(Math.toRadians(360), Math.toRadians(360)));
 
   /** Drives to the specified pose under full software control. */
-  public DriveToPose(Drive drivetrain, Pose2d pose) {
-    this(drivetrain, () -> pose);
-  }
-
-    //needs to be cancellable by driver
-
-  public DriveToPose(Drive drivetrain, Supplier<Pose2d> poseSupplier) {
+  public DriveToPose(
+      Drive drivetrain,
+      Supplier<Pose2d> poseSupplier,
+      DoubleSupplier xJoystickSupplier,
+      DoubleSupplier yJoystickSupplier,
+      DoubleSupplier rotationJoystickSupplier) {
     this.drivetrain = drivetrain;
     this.poseSupplier = poseSupplier;
+    this.xJoystickSupplier = xJoystickSupplier;
+    this.yJoystickSupplier = yJoystickSupplier;
+    this.rotationJoystickSupplier = rotationJoystickSupplier;
     addRequirements(drivetrain);
   }
 
   @Override
   public void initialize() {
     currentPose = drivetrain.getPose();
-    // Reset all controllers
     driveControllerX.reset(currentPose.getX());
     driveControllerY.reset(currentPose.getY());
     thetaController.reset(currentPose.getRotation().getRadians());
@@ -71,9 +78,9 @@ public class DriveToPose extends Command {
     targetX = targetPose.getX();
     targetY = targetPose.getY();
     targetTheta = targetPose.getRotation().getRadians();
-    driveControllerX.setGoal(poseSupplier.get().getX());
-    driveControllerY.setGoal(poseSupplier.get().getY());
-    thetaController.setGoal(poseSupplier.get().getRotation().getRadians());
+    driveControllerX.setGoal(targetX);
+    driveControllerY.setGoal(targetY);
+    thetaController.setGoal(targetTheta);
 
     driveControllerX.setTolerance(.7);
     driveControllerY.setTolerance(1.0);
@@ -86,36 +93,15 @@ public class DriveToPose extends Command {
 
   @Override
   public void execute() {
-    Logger.recordOutput("DriveToPose/XatGoal", driveControllerX.atGoal());
-    Logger.recordOutput("DriveToPose/YatGoal", driveControllerY.atGoal());
-    Logger.recordOutput("DriveToPose/ThetaatGoal", thetaController.atGoal());
-    Logger.recordOutput("DriveToPose/driveControllerXError", driveControllerX.getPositionError());
-    Logger.recordOutput("DriveToPose/driveControllerYError", driveControllerY.getPositionError());
-    Logger.recordOutput("DriveToPose/thetaControllerError", thetaController.getPositionError());
-    // UpdateTunableNumbers();
-
-    // Get current and target pose
     currentPose = drivetrain.getPose();
 
-    double currentX = currentPose.getX();
-    double currentY = currentPose.getY();
+    double driveXVelocity = driveControllerX.calculate(currentPose.getX(), targetX);
+    double driveYVelocity = driveControllerY.calculate(currentPose.getY(), targetY);
 
-    Logger.recordOutput("DriveToPose/currentX", currentX);
-    Logger.recordOutput("DriveToPose/currentY", currentY);
-
-    // Directly calculate X and Y velocities without unnecessary squaring
-    double driveXVelocity = driveControllerX.calculate(currentX, targetX);
-    double driveYVelocity = driveControllerY.calculate(currentY, targetY);
-
-    // Determine the final velocities considering the drivetrain maximum speed
-    // limits
     double maxLinearSpeed = drivetrain.getMaxLinearSpeedMetersPerSec();
     double scaledXVelocity = driveXVelocity * maxLinearSpeed;
     double scaledYVelocity = driveYVelocity * maxLinearSpeed;
 
-    Logger.recordOutput("DriveToPose/currentTheta", currentPose.getRotation().getDegrees());
-
-    // Calculate rotational velocity
     double thetaVelocity =
         thetaController.calculate(currentPose.getRotation().getRadians(), targetTheta);
     double maxAngularSpeed = drivetrain.getMaxAngularSpeedRadPerSec();
@@ -134,27 +120,32 @@ public class DriveToPose extends Command {
     timeoutTimer.stop();
   }
 
+  @Override
+  public boolean isFinished() {
+    // Check if the driver moves either joystick or rotates the robot
+    if (Math.abs(xJoystickSupplier.getAsDouble()) > JOYSTICK_DEADBAND
+        || Math.abs(yJoystickSupplier.getAsDouble()) > JOYSTICK_DEADBAND
+        || Math.abs(rotationJoystickSupplier.getAsDouble()) > JOYSTICK_DEADBAND) {
+      Logger.recordOutput("DriveToPose/CanceledByJoystick", true);
+      return true;
+    }
+
+    // Check if the robot has reached the goal
+    if (atGoal()) {
+      return true;
+    }
+
+    // Check if the command has timed out
+    if (timeoutTimer.hasElapsed(TIMEOUT_TIME)) {
+      Logger.recordOutput("DriveToPose/Timeout", true);
+      return true;
+    }
+
+    return false;
+  }
+
   /** Checks if the robot is stopped at the final pose. */
   public boolean atGoal() {
     return driveControllerX.atGoal() && driveControllerY.atGoal() && thetaController.atGoal();
-  }
-
-  @Override
-  public boolean isFinished() {
-
-    double difference =
-        poseSupplier.get().getTranslation().minus(drivetrain.getPose().getTranslation()).getNorm();
-    Logger.recordOutput("DriveToPose/Difference", difference);
-
-    if (atGoal()) {
-      return true;
-    } else if (timeoutTimer.hasElapsed(TIMEOUT_TIME)) {
-      System.out.println("Ran out of time to complete Drive to Pose");
-      return true;
-    }
-    // else if (difference > VisionConstants.MIN_DISTANCE_FOR_DRIVE_TO_POSE){
-    //   return true;
-    // }
-    return false;
   }
 }

@@ -45,9 +45,9 @@ public final class Constants {
 
   static {
     // ---------------- BLUE REEF APRIL TAGS ----------------
-    BLUE_APRIL_TAGS.put(17, new Translation2d(4.073905999999999, 3.3063179999999996)); 
+    BLUE_APRIL_TAGS.put(17, new Translation2d(4.073905999999999, 3.3063179999999996));
     BLUE_APRIL_TAGS.put(18, new Translation2d(3.6576, 4.0259)); // 7
-    BLUE_APRIL_TAGS.put(19, new Translation2d(4.073905999999999, 4.745482)); 
+    BLUE_APRIL_TAGS.put(19, new Translation2d(4.073905999999999, 4.745482));
     BLUE_APRIL_TAGS.put(20, new Translation2d(4.904739999999999, 4.745482));
     BLUE_APRIL_TAGS.put(21, new Translation2d(5.321046, 4.0259));
     BLUE_APRIL_TAGS.put(22, new Translation2d(4.904739999999999, 3.3063179999999996));
@@ -81,43 +81,59 @@ public final class Constants {
     // ---------------- BLUE Orientation ----------------
     REEF_FACE_ORIENTATION_BLUE.put(
         17,
-        new Rotation2d[] { new Rotation2d(Math.toRadians(-30)), new Rotation2d(Math.toRadians(150)) });
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(-30)), new Rotation2d(Math.toRadians(150))
+        });
     REEF_FACE_ORIENTATION_BLUE.put(
         18,
-        new Rotation2d[] { new Rotation2d(Math.toRadians(-90)), new Rotation2d(Math.toRadians(90)) });
+        new Rotation2d[] {new Rotation2d(Math.toRadians(-90)), new Rotation2d(Math.toRadians(90))});
     REEF_FACE_ORIENTATION_BLUE.put(
         19,
-        new Rotation2d[] { new Rotation2d(Math.toRadians(-150)), new Rotation2d(Math.toRadians(30))});
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(-150)), new Rotation2d(Math.toRadians(30))
+        });
     REEF_FACE_ORIENTATION_BLUE.put(
         20,
-        new Rotation2d[] { new Rotation2d(Math.toRadians(150)), new Rotation2d(Math.toRadians(-30))});
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(150)), new Rotation2d(Math.toRadians(-30))
+        });
     REEF_FACE_ORIENTATION_BLUE.put(
         21,
-        new Rotation2d[] { new Rotation2d(Math.toRadians(90)), new Rotation2d(Math.toRadians(-90)) });
+        new Rotation2d[] {new Rotation2d(Math.toRadians(90)), new Rotation2d(Math.toRadians(-90))});
     REEF_FACE_ORIENTATION_BLUE.put(
-        22, 
-        new Rotation2d[] { new Rotation2d(Math.toRadians(30)), new Rotation2d(Math.toRadians(-150))});
+        22,
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(30)), new Rotation2d(Math.toRadians(-150))
+        });
     Collections.unmodifiableMap(REEF_FACE_ORIENTATION_BLUE);
 
     // ---------------- RED Orientation ----------------
     REEF_FACE_ORIENTATION_RED.put(
         6,
-        new Rotation2d[] { new Rotation2d(Math.toRadians(-150)), new Rotation2d(Math.toRadians(30))});
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(-150)), new Rotation2d(Math.toRadians(30))
+        });
     REEF_FACE_ORIENTATION_RED.put(
         7,
         new Rotation2d[] {new Rotation2d(Math.toRadians(-90)), new Rotation2d(Math.toRadians(90))});
     REEF_FACE_ORIENTATION_RED.put(
         8,
-        new Rotation2d[] { new Rotation2d(Math.toRadians(-30)), new Rotation2d(Math.toRadians(150))});
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(-30)), new Rotation2d(Math.toRadians(150))
+        });
     REEF_FACE_ORIENTATION_RED.put(
         9,
-        new Rotation2d[] { new Rotation2d(Math.toRadians(30)), new Rotation2d(Math.toRadians(-150))});
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(30)), new Rotation2d(Math.toRadians(-150))
+        });
     REEF_FACE_ORIENTATION_RED.put(
         10,
         new Rotation2d[] {new Rotation2d(Math.toRadians(90)), new Rotation2d(Math.toRadians(-90))});
     REEF_FACE_ORIENTATION_RED.put(
         11,
-        new Rotation2d[] { new Rotation2d(Math.toRadians(150)), new Rotation2d(Math.toRadians(-30))});
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(150)), new Rotation2d(Math.toRadians(-30))
+        });
     Collections.unmodifiableMap(REEF_FACE_ORIENTATION_RED);
   }
 
@@ -236,30 +252,12 @@ public final class Constants {
   }
 
   public enum ReefFacesRed {
-    FACE_6(
-        6,
-        ReefBranchesRed.BRANCH_K,
-        ReefBranchesRed.BRANCH_L),
-    FACE_7(
-        7,
-        ReefBranchesRed.BRANCH_A,
-        ReefBranchesRed.BRANCH_B), 
-    FACE_8(
-        8,
-        ReefBranchesRed.BRANCH_C,
-        ReefBranchesRed.BRANCH_D),
-    FACE_9(
-        9,
-        ReefBranchesRed.BRANCH_E,
-        ReefBranchesRed.BRANCH_F),
-    FACE_10(
-        10,
-        ReefBranchesRed.BRANCH_G,
-        ReefBranchesRed.BRANCH_H),
-    FACE_11(
-        11,
-        ReefBranchesRed.BRANCH_I,
-        ReefBranchesRed.BRANCH_J);
+    FACE_6(6, ReefBranchesRed.BRANCH_K, ReefBranchesRed.BRANCH_L),
+    FACE_7(7, ReefBranchesRed.BRANCH_A, ReefBranchesRed.BRANCH_B),
+    FACE_8(8, ReefBranchesRed.BRANCH_C, ReefBranchesRed.BRANCH_D),
+    FACE_9(9, ReefBranchesRed.BRANCH_E, ReefBranchesRed.BRANCH_F),
+    FACE_10(10, ReefBranchesRed.BRANCH_G, ReefBranchesRed.BRANCH_H),
+    FACE_11(11, ReefBranchesRed.BRANCH_I, ReefBranchesRed.BRANCH_J);
 
     private final int faceId;
     private final ReefBranchesRed leftPole;
