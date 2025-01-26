@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants.ChosenOrientation;
+import frc.robot.commands.CommandConstants.ChosenOrientation;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.ReefAlignmentUtils;
 import java.util.Optional;
@@ -38,13 +38,34 @@ public class DriveToCommands {
       boolean isLeftPole,
       DoubleSupplier xJoystickSupplier,
       DoubleSupplier yJoystickSupplier,
-      DoubleSupplier rotationJoystickSupplier) {
+      DoubleSupplier rotationJoystickSupplier,
+      double distanceThresholdMeters) {
     return Commands.runOnce(
         () -> {
+          // Get the closest reef face selection
+          ReefAlignmentUtils.ReefFaceSelection selection = drive.getReefFaceSelection();
+
+          // Check if a valid face is found
+          if (selection == null || selection.getAcceptedFaceId() == null) {
+            System.out.println("No valid reef face found. Cannot drive to pole.");
+            return;
+          }
+
+          // Check if the accepted face is within the distance threshold
+          double closestDistance = selection.getAcceptedDistance();
+          if (closestDistance > distanceThresholdMeters) {
+            System.out.println(
+                "Closest reef face is too far: "
+                    + closestDistance
+                    + " meters (threshold: "
+                    + distanceThresholdMeters
+                    + " meters).");
+            return;
+          }
+
           // Calculate the target pole pose
           Pose2d targetPose = calculatePolePose(drive, isLeftPole);
           if (targetPose != null) {
-            // Schedule the DriveToPose command
             System.out.println("Target pose calculated: " + targetPose);
             createDriveToPose(
                     drive,
