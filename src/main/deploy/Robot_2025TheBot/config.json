@@ -1,0 +1,58 @@
+{
+  "name": "2025RealBot",
+  "rotations": [
+    {
+      "axis": "x",
+      "degrees": 90
+    },
+    {
+      "axis": "z",
+      "degrees": -90
+    }
+  ],
+  "position": [
+    0,
+    0,
+    0.00
+  ],
+  "cameras": [
+    {
+      "name": "Front Left",
+      "fov": 70,
+      "resolution": [
+        800,
+        600
+      ],
+      "position": [
+        0.26985,
+        0.26981,
+        0.22155
+      ],
+      "rotations": [
+        {
+          "axis": "z",
+          "degrees": 90
+        }
+      ]
+    },
+    {
+      "name": "Front Right",
+      "fov": 70,
+      "resolution": [
+        800,
+        600
+      ],
+      "position": [
+        0.26985,
+        -0.26981,
+        0.22155
+      ],
+      "rotations": [
+        {
+          "axis": "z",
+          "degrees": -90
+        }
+      ]
+    }
+  ]
+}
