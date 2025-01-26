@@ -299,14 +299,15 @@ public class DriveCommands {
     double gyroDelta = 0.0;
   }
 
-  public static Command joystickHybridDrive(
+  public static Command joystickSmartDrive(
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier,
       Supplier<Pose2d> robotPoseSupplier,
       Supplier<ReefAlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
-      double distanceThresholdMeters) {
+      double distanceThresholdMeters,
+      Supplier<Boolean> hasCoralSupplier) { // Add a supplier for hasCoral state
 
     // Create PID controller for orientation alignment
     ProfiledPIDController angleController =
@@ -338,32 +339,38 @@ public class DriveCommands {
                         * drive.getMaxAngularSpeedRadPerSec();
                 isManualOverride.set(true); // Mark override as active
               } else {
-                // No manual input, check if we need to snap back or align automatically
-                ReefAlignmentUtils.ReefFaceSelection selection = reefFaceSelectionSupplier.get();
-                if (selection != null
-                    && selection.getAcceptedFaceId() != null
-                    && selection.getAcceptedDistance()
-                        <= distanceThresholdMeters) { // Check threshold
-                  if (isManualOverride.get()) {
-                    // Manual override just ended, snap back to closest face
+                // Check if we have coral
+                if (hasCoralSupplier.get()) {
+                  // No manual input, check if we need to snap back or align automatically
+                  ReefAlignmentUtils.ReefFaceSelection selection = reefFaceSelectionSupplier.get();
+                  if (selection != null
+                      && selection.getAcceptedFaceId() != null
+                      && selection.getAcceptedDistance()
+                          <= distanceThresholdMeters) { // Check threshold
+                    if (isManualOverride.get()) {
+                      // Manual override just ended, snap back to closest face
+                      ChosenOrientation chosenOrientation =
+                          ReefAlignmentUtils.pickClosestOrientationForFace(
+                              robotPoseSupplier.get(), selection.getAcceptedFaceId());
+                      angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
+                      angleController.setGoal(chosenOrientation.rotation2D().getRadians());
+                      isManualOverride.set(false); // Reset override flag
+                    }
+
+                    // Use PID controller to align to the closest face
                     ChosenOrientation chosenOrientation =
                         ReefAlignmentUtils.pickClosestOrientationForFace(
                             robotPoseSupplier.get(), selection.getAcceptedFaceId());
-                    angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
-                    angleController.setGoal(chosenOrientation.rotation2D().getRadians());
-                    isManualOverride.set(false); // Reset override flag
+                    omega =
+                        angleController.calculate(
+                            robotPoseSupplier.get().getRotation().getRadians(),
+                            chosenOrientation.rotation2D().getRadians());
+                  } else {
+                    // No valid face within threshold, stop rotation
+                    omega = 0.0;
                   }
-
-                  // Use PID controller to align to the closest face
-                  ChosenOrientation chosenOrientation =
-                      ReefAlignmentUtils.pickClosestOrientationForFace(
-                          robotPoseSupplier.get(), selection.getAcceptedFaceId());
-                  omega =
-                      angleController.calculate(
-                          robotPoseSupplier.get().getRotation().getRadians(),
-                          chosenOrientation.rotation2D().getRadians());
                 } else {
-                  // No valid face within threshold, stop rotation
+                  // No coral, stop automatic rotation
                   omega = 0.0;
                 }
               }

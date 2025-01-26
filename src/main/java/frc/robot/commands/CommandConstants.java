@@ -13,7 +13,9 @@ import java.util.Map;
  */
 public final class CommandConstants {
 
-  public static final double THRESHOLD_DISTANCE = 3.0;
+  public static final double THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE = 3.0; // meters
+  public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF = 2.0; // meters
+  public static final double OFFSET_FROM_REEF = .25; // meters
 
   public static final Map<Integer, Translation2d> BLUE_APRIL_TAGS = new HashMap<>(); // Blue
   public static final Map<Integer, Translation2d> RED_APRIL_TAGS = new HashMap<>(); // Red

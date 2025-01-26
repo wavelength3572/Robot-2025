@@ -156,66 +156,62 @@ public class ReefAlignmentUtils {
     }
   }
 
-  /**
-   * Calculates the target pose for driving to a pole based on the alliance, face ID, and pole
-   * selection.
-   *
-   * @param drive The drive subsystem, providing the current pose and reef face data.
-   * @param faceId The ID of the reef face to align with.
-   * @param isLeftPole True for the left pole, false for the right pole.
-   * @param alliance The current alliance of the robot.
-   * @return The calculated target pose, or null if a valid pose cannot be determined.
-   */
   public static Pose2d calculateTargetPose(
       Drive drive,
       int faceId,
       boolean isLeftPole,
       Optional<DriverStation.Alliance> alliance,
-      ChosenOrientation chosen) {
+      ChosenOrientation chosen,
+      double offsetMeters) { // Added offset parameter
     Translation2d poleTranslation;
 
     if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue) {
-      // Use Blue reef data
       ReefFacesBlue blueFace = ReefFacesBlue.fromId(faceId);
       if (blueFace == null) {
-        System.out.println("ReefAlignmentUtils: No matching Blue face for face ID: " + faceId);
+        System.out.println("Invalid face ID for Blue alliance.");
         return null;
       }
-
-      // Determine the pole translation based on the front/back and left/right
-      // selection
+      // Select left/right and front/back
       poleTranslation =
-          (chosen.orientationType() == CommandConstants.ReefOrientationType.FRONT)
-              ? (isLeftPole
+          isLeftPole
+              ? chosen.orientationType() == CommandConstants.ReefOrientationType.FRONT
                   ? blueFace.getLeftPole().getFrontTranslation()
-                  : blueFace.getRightPole().getFrontTranslation())
-              : (isLeftPole
-                  ? blueFace.getLeftPole().getBackTranslation()
-                  : blueFace.getRightPole().getBackTranslation());
+                  : blueFace.getLeftPole().getBackTranslation()
+              : chosen.orientationType() == CommandConstants.ReefOrientationType.FRONT
+                  ? blueFace.getRightPole().getFrontTranslation()
+                  : blueFace.getRightPole().getBackTranslation();
+
     } else if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
-      // Use Red reef data
       ReefFacesRed redFace = ReefFacesRed.fromId(faceId);
       if (redFace == null) {
-        System.out.println("ReefAlignmentUtils: No matching Red face for face ID: " + faceId);
+        System.out.println("Invalid face ID for Red alliance.");
         return null;
       }
-
-      // Determine the pole translation based on the front/back and left/right
-      // selection
+      // Select left/right and front/back
       poleTranslation =
-          (chosen.orientationType() == CommandConstants.ReefOrientationType.FRONT)
-              ? (isLeftPole
+          isLeftPole
+              ? chosen.orientationType() == CommandConstants.ReefOrientationType.FRONT
                   ? redFace.getLeftPole().getFrontTranslation()
-                  : redFace.getRightPole().getFrontTranslation())
-              : (isLeftPole
-                  ? redFace.getLeftPole().getBackTranslation()
-                  : redFace.getRightPole().getBackTranslation());
+                  : redFace.getLeftPole().getBackTranslation()
+              : chosen.orientationType() == CommandConstants.ReefOrientationType.FRONT
+                  ? redFace.getRightPole().getFrontTranslation()
+                  : redFace.getRightPole().getBackTranslation();
     } else {
-      System.out.println("ReefAlignmentUtils: Invalid or unknown alliance.");
+      System.out.println("Unknown alliance. Cannot calculate target pose.");
       return null;
     }
 
-    // Return the target pose with the chosen orientation
-    return new Pose2d(poleTranslation, chosen.rotation2D());
+    // Calculate offset vector
+    Translation2d offsetVector =
+        new Translation2d(
+            chosen.rotation2D().getCos() * offsetMeters * -1.0, // X-component
+            chosen.rotation2D().getSin() * offsetMeters * -1.0 // Y-component
+            );
+
+    // Apply offset to the pole translation
+    Translation2d adjustedTranslation = poleTranslation.plus(offsetVector);
+
+    // Return the target pose with adjusted translation and chosen rotation
+    return new Pose2d(adjustedTranslation, chosen.rotation2D());
   }
 }

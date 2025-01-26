@@ -24,8 +24,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandConstants;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.DriveToCommands;
+import frc.robot.commands.ElevatorCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.drive.*;
@@ -135,24 +135,24 @@ public class RobotContainer {
           "Elevator 2", ElevatorCommands.setElevatorPositionFromDashboard(elevator));
     }
     SmartDashboard.putData(
-      "DriveToClosestLEFTPole",
-      DriveToCommands.driveToPole(
-          drive, // The Drive subsystem
-          true, // isLeftPole = true
-          () -> 0.0, // Default X joystick input (stationary for dashboard testing)
-          () -> 0.0, // Default Y joystick input
-          () -> 0.0, // Default rotation joystick input
-          CommandConstants.THRESHOLD_DISTANCE));
+        "DriveToClosestLEFTPole",
+        DriveToCommands.driveToPole(
+            drive, // The Drive subsystem
+            true, // isLeftPole = true
+            () -> 0.0, // Default X joystick input (stationary for dashboard testing)
+            () -> 0.0, // Default Y joystick input
+            () -> 0.0, // Default rotation joystick input
+            CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
-  SmartDashboard.putData(
-      "DriveToClosestRIGHTPole",
-      DriveToCommands.driveToPole(
-          drive, // The Drive subsystem
-          false, // isLeftPole = false
-          () -> 0.0, // Default X joystick input (stationary for dashboard testing)
-          () -> 0.0, // Default Y joystick input
-          () -> 0.0, // Default rotation joystick input
-          CommandConstants.THRESHOLD_DISTANCE));
+    SmartDashboard.putData(
+        "DriveToClosestRIGHTPole",
+        DriveToCommands.driveToPole(
+            drive, // The Drive subsystem
+            false, // isLeftPole = false
+            () -> 0.0, // Default X joystick input (stationary for dashboard testing)
+            () -> 0.0, // Default Y joystick input
+            () -> 0.0, // Default rotation joystick input
+            CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
     // autoChooser = new LoggedDashboardChooser<>("Auto");
@@ -191,7 +191,7 @@ public class RobotContainer {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     oi = OISelector.findOperatorInterface();
 
-    WLButtons.configureButtonBindings(oi, drive);
+    WLButtons.configureButtonBindings(oi, drive, elevator);
 
     // Configure some robot defaults based on current state of Controller Switches.
     // if (oi.getFieldRelativeButton().getAsBoolean()) {
