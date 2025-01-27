@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.CommandConstants;
 import frc.robot.commands.DriveCommands;
@@ -15,8 +14,7 @@ public class WLButtons {
   private static Drive WLDrive;
   private static Elevator WLElevator;
 
-  public WLButtons() {
-  }
+  public WLButtons() {}
 
   public static void configureTestModeButtonBindings(
       OperatorInterface operatorInterface, Drive drive) {
@@ -30,16 +28,25 @@ public class WLButtons {
     WLDrive = drive;
     WLElevator = elevator;
 
-    WLDrive.setDefaultCommand(
-        DriveCommands.joystickSmartDrive(
-            drive,
-            oi::getTranslateX,
-            oi::getTranslateY,
-            oi::getRotate,
-            drive::getPose,
-            drive::getReefFaceSelection,
-            CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
-            elevator::hasCoral));
+    if (oi.getButtonH().getAsBoolean()) {
+      WLDrive.setDriveModeSmart();
+      WLDrive.setDefaultCommand(
+          DriveCommands.joystickSmartDrive(
+              drive,
+              oi::getTranslateX,
+              oi::getTranslateY,
+              oi::getRotate,
+              drive::getPose,
+              drive::getReefFaceSelection,
+              CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
+              elevator::hasCoral));
+
+    } else {
+      WLDrive.setDriveModeNormal();
+      WLDrive.setDefaultCommand(
+          DriveCommands.joystickDrive(
+              WLDrive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
+    }
 
     configureDriverButtons();
   }
@@ -49,17 +56,34 @@ public class WLButtons {
     // Gyro Reset
     oi.getResetGyroButton().onTrue(Commands.runOnce(WLDrive::zeroGyroscope, WLDrive));
 
-    // While this switch is flipped Smart Drive is off
     oi.getButtonH()
-        .whileTrue(
-            DriveCommands.joystickDrive(
-                WLDrive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
-
-    // // Angle Drive Button
-    // oi.getButtonH()
-    //     .whileTrue(
-    //         DriveCommands.joystickDriveAtAngle(
-    //             WLDrive, oi::getTranslateX, oi::getTranslateY, () -> new Rotation2d()));
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  WLDrive.setDriveModeNormal();
+                  WLDrive.setDefaultCommand(
+                      DriveCommands.joystickDrive(
+                          WLDrive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
+                },
+                WLDrive // optional requirement
+                ))
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  WLDrive.setDriveModeSmart();
+                  WLDrive.setDefaultCommand(
+                      DriveCommands.joystickSmartDrive(
+                          WLDrive,
+                          oi::getTranslateX,
+                          oi::getTranslateY,
+                          oi::getRotate,
+                          WLDrive::getPose,
+                          WLDrive::getReefFaceSelection,
+                          CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
+                          WLElevator::hasCoral));
+                },
+                WLDrive // optional requirement
+                ));
 
     // Drive to Pole
     oi.getRightJoyLeftButton()
@@ -82,6 +106,11 @@ public class WLButtons {
                 oi::getRotate,
                 CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
+
+  if(oi.getButtonV().getAsBoolean()){
+    WLElevator.setHasCoral();
+  }else WLElevator.clearHasCoral();
+  
     oi.getButtonV()
         .onTrue(Commands.runOnce(WLElevator::setHasCoral, WLElevator))
         .onFalse(Commands.runOnce(WLElevator::clearHasCoral, WLElevator));

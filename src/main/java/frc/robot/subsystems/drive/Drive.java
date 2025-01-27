@@ -53,6 +53,8 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
+
+  private boolean isDriveModeSmart = false;
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -371,5 +373,18 @@ public class Drive extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
+  }
+
+  public void setDriveModeSmart() {
+    isDriveModeSmart = true;
+  }
+
+  public void setDriveModeNormal() {
+    isDriveModeSmart = false;
+  }
+
+  @AutoLogOutput(key = "Alignment/isSmartDrive")
+  public boolean isDriveModeSmart() {
+    return isDriveModeSmart;
   }
 }
