@@ -128,7 +128,7 @@ public final class Constants {
         });
     REEF_FACE_ORIENTATION_RED.put(
         10,
-        new Rotation2d[] {new Rotation2d(Math.toRadians(-90)), new Rotation2d(Math.toRadians(90))});
+        new Rotation2d[] {new Rotation2d(Math.toRadians(90)), new Rotation2d(Math.toRadians(-90))});
     REEF_FACE_ORIENTATION_RED.put(
         11,
         new Rotation2d[] {
@@ -218,8 +218,8 @@ public final class Constants {
     BRANCH_B(ReefBranchesBlue.BRANCH_B),
     BRANCH_C(ReefBranchesBlue.BRANCH_C),
     BRANCH_D(ReefBranchesBlue.BRANCH_D),
-    BRANCH_E(ReefBranchesBlue.BRANCH_E),
-    BRANCH_F(ReefBranchesBlue.BRANCH_F),
+    BRANCH_E(ReefBranchesBlue.BRANCH_L),
+    BRANCH_F(ReefBranchesBlue.BRANCH_K),
     BRANCH_G(ReefBranchesBlue.BRANCH_G),
     BRANCH_H(ReefBranchesBlue.BRANCH_H),
     BRANCH_I(ReefBranchesBlue.BRANCH_I),
