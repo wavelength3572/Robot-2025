@@ -28,12 +28,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.CommandConstants.ChosenOrientation;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.util.ReefAlignmentUtils;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -294,5 +297,104 @@ public class DriveCommands {
     double[] positions = new double[4];
     Rotation2d lastAngle = new Rotation2d();
     double gyroDelta = 0.0;
+  }
+
+  public static Command joystickSmartDrive(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier,
+      Supplier<Pose2d> robotPoseSupplier,
+      Supplier<ReefAlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
+      double distanceThresholdMeters,
+      Supplier<Boolean> hasCoralSupplier) { // Add a supplier for hasCoral state
+
+    // Create PID controller for orientation alignment
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+    // Track whether the robot is in manual override mode
+    AtomicBoolean isManualOverride = new AtomicBoolean(false);
+
+    return Commands.run(
+            () -> {
+              // Get linear velocity from joystick inputs
+              Translation2d linearVelocity =
+                  getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+
+              // Get manual rotation input and apply deadband
+              double manualOmega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+
+              // Determine angular velocity (omega)
+              double omega;
+              if (Math.abs(manualOmega) > 0.0) {
+                // Manual override: use joystick for rotation
+                omega =
+                    Math.copySign(manualOmega * manualOmega, manualOmega)
+                        * drive.getMaxAngularSpeedRadPerSec();
+                isManualOverride.set(true); // Mark override as active
+              } else {
+                // Check if we have coral
+                if (hasCoralSupplier.get()) {
+                  // No manual input, check if we need to snap back or align automatically
+                  ReefAlignmentUtils.ReefFaceSelection selection = reefFaceSelectionSupplier.get();
+                  if (selection != null
+                      && selection.getAcceptedFaceId() != null
+                      && selection.getAcceptedDistance()
+                          <= distanceThresholdMeters) { // Check threshold
+                    if (isManualOverride.get()) {
+                      // Manual override just ended, snap back to closest face
+                      ChosenOrientation chosenOrientation =
+                          ReefAlignmentUtils.pickClosestOrientationForFace(
+                              robotPoseSupplier.get(), selection.getAcceptedFaceId());
+                      angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
+                      angleController.setGoal(chosenOrientation.rotation2D().getRadians());
+                      isManualOverride.set(false); // Reset override flag
+                    }
+
+                    // Use PID controller to align to the closest face
+                    ChosenOrientation chosenOrientation =
+                        ReefAlignmentUtils.pickClosestOrientationForFace(
+                            robotPoseSupplier.get(), selection.getAcceptedFaceId());
+                    omega =
+                        angleController.calculate(
+                            robotPoseSupplier.get().getRotation().getRadians(),
+                            chosenOrientation.rotation2D().getRadians());
+                  } else {
+                    // No valid face within threshold, stop rotation
+                    omega = 0.0;
+                  }
+                } else {
+                  // No coral, stop automatic rotation
+                  omega = 0.0;
+                }
+              }
+
+              // Send the calculated speeds to the drivetrain
+              ChassisSpeeds speeds =
+                  new ChassisSpeeds(
+                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                      omega);
+              boolean isFlipped =
+                  DriverStation.getAlliance().isPresent()
+                      && DriverStation.getAlliance().get() == Alliance.Red;
+              drive.runVelocity(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      speeds,
+                      isFlipped
+                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                          : drive.getRotation()));
+            },
+            drive)
+
+        // Reset PID controller when auto-alignment resumes
+        .beforeStarting(
+            () -> angleController.reset(robotPoseSupplier.get().getRotation().getRadians()));
   }
 }

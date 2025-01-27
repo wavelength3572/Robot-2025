@@ -35,31 +35,30 @@ public class DriveConstants {
 
   // Zeroed rotation values for each module, see setup instructions
   // Rotation2d(2.520);
-  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(2.52);
+  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(1.636);
   // Rotation2d(-1.132);
-  public static final Rotation2d frontRightZeroRotation = new Rotation2d(-1.132);
-  // Rotation2d(0.954);
-  public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.954);
+  public static final Rotation2d frontRightZeroRotation = new Rotation2d(2.0187);
+  public static final Rotation2d backLeftZeroRotation = new Rotation2d(-2.1785);
   // Rotation2d(1.621);
-  public static final Rotation2d backRightZeroRotation = new Rotation2d(1.621);
+  public static final Rotation2d backRightZeroRotation = new Rotation2d(2.5226);
 
   // Device CAN IDs
   public static final int pigeonCanId = 19;
 
-  public static final int frontLeftDriveCanId = 2;
-  public static final int backLeftDriveCanId = 4;
+  public static final int frontLeftDriveCanId = 5;
+  public static final int backLeftDriveCanId = 8;
   public static final int frontRightDriveCanId = 3;
-  public static final int backRightDriveCanId = 5;
+  public static final int backRightDriveCanId = 6;
 
-  public static final int frontLeftTurnCanId = 6;
-  public static final int backLeftTurnCanId = 8;
+  public static final int frontLeftTurnCanId = 9;
+  public static final int backLeftTurnCanId = 4;
   public static final int frontRightTurnCanId = 7;
-  public static final int backRightTurnCanId = 9;
+  public static final int backRightTurnCanId = 2;
 
-  public static final int frontLeftCANCoderId = 10;
+  public static final int frontLeftCANCoderId = 13;
   public static final int backLeftCANCoderId = 12;
   public static final int frontRightCANCoderId = 11;
-  public static final int backRightCANCoderId = 13;
+  public static final int backRightCANCoderId = 10;
 
   // Drive motor configuration
   public static final int driveMotorCurrentLimit = 50;
@@ -78,7 +77,7 @@ public class DriveConstants {
           * wheelRadiusMeters;
 
   // Drive encoder configuration
-  public static final boolean driveInverted = true;
+  public static final boolean driveInverted = false;
   public static final double driveEncoderPositionFactor =
       2 * Math.PI / driveMotorReduction; // Rotor Rotations ->
   // Wheel Radians
@@ -89,8 +88,8 @@ public class DriveConstants {
   // Drive PID configuration
   public static final double driveKp = 0.0;
   public static final double driveKd = 0.0;
-  public static final double driveKs = 0.0;
-  public static final double driveKv = 0.1;
+  public static final double driveKs = 0.11468;
+  public static final double driveKv = 0.13085;
   public static final double driveSimP = 0.05;
   public static final double driveSimD = 0.0;
   public static final double driveSimKs = 0.04307;
