@@ -106,11 +106,10 @@ public class WLButtons {
                 oi::getRotate,
                 CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
+    if (oi.getButtonV().getAsBoolean()) {
+      WLElevator.setHasCoral();
+    } else WLElevator.clearHasCoral();
 
-  if(oi.getButtonV().getAsBoolean()){
-    WLElevator.setHasCoral();
-  }else WLElevator.clearHasCoral();
-  
     oi.getButtonV()
         .onTrue(Commands.runOnce(WLElevator::setHasCoral, WLElevator))
         .onFalse(Commands.runOnce(WLElevator::clearHasCoral, WLElevator));

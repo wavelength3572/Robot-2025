@@ -15,7 +15,7 @@ public final class CommandConstants {
 
   public static final double THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE = 3.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF = 2.0; // meters
-  public static final double OFFSET_FROM_REEF = .25; // meters
+  public static final double OFFSET_FROM_REEF = 0; // meters
 
   public static final Map<Integer, Translation2d> BLUE_APRIL_TAGS = new HashMap<>(); // Blue
   public static final Map<Integer, Translation2d> RED_APRIL_TAGS = new HashMap<>(); // Red
@@ -59,28 +59,30 @@ public final class CommandConstants {
     REEF_FACE_ORIENTATION_BLUE.put(
         17,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(-30)), new Rotation2d(Math.toRadians(150))
+          new Rotation2d(Math.toRadians(60)), new Rotation2d(Math.toRadians(-120)) // 60, -120
         });
     REEF_FACE_ORIENTATION_BLUE.put(
         18,
-        new Rotation2d[] {new Rotation2d(Math.toRadians(-90)), new Rotation2d(Math.toRadians(90))});
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(0)), new Rotation2d(Math.toRadians(180))
+        }); // 180, -180
     REEF_FACE_ORIENTATION_BLUE.put(
         19,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(-150)), new Rotation2d(Math.toRadians(30))
+          new Rotation2d(Math.toRadians(-60)), new Rotation2d(Math.toRadians(120)) // 120, -60
         });
     REEF_FACE_ORIENTATION_BLUE.put(
         20,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(150)), new Rotation2d(Math.toRadians(-30))
+          new Rotation2d(Math.toRadians(-120)), new Rotation2d(Math.toRadians(60))
         });
     REEF_FACE_ORIENTATION_BLUE.put(
         21,
-        new Rotation2d[] {new Rotation2d(Math.toRadians(90)), new Rotation2d(Math.toRadians(-90))});
+        new Rotation2d[] {new Rotation2d(Math.toRadians(180)), new Rotation2d(Math.toRadians(0))});
     REEF_FACE_ORIENTATION_BLUE.put(
         22,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(30)), new Rotation2d(Math.toRadians(-150))
+          new Rotation2d(Math.toRadians(120)), new Rotation2d(Math.toRadians(-60))
         });
     Collections.unmodifiableMap(REEF_FACE_ORIENTATION_BLUE);
 

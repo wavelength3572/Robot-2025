@@ -80,7 +80,8 @@ public class RobotContainer {
                 new ModuleIOSpark(3));
         vision =
             new Vision(
-                drive::addVisionMeasurement, new VisionIOPhotonVision(camera1Name, robotToCamera1));
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVision(frontRightCam, robotToBackRightCam));
         // vision =
         //     new Vision(
         //         drive::addVisionMeasurement,
@@ -101,8 +102,12 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
-                new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
+                new VisionIOPhotonVisionSim(frontRightCam, robotToFrontRightCam, drive::getPose),
+                new VisionIOPhotonVisionSim(backRightCam, robotToBackRightCam, drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    elevatorFrontCam, robotToElevatorFrontCam, drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    elevatorBackCam, robotToElevatorBackCam, drive::getPose));
         elevator = new Elevator(new ElevatorIOPPCSim() {});
         break;
 
