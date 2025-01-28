@@ -8,6 +8,9 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -84,6 +87,13 @@ public class ElevatorIOSim implements ElevatorIO {
   @Override
   public void setPosition(double requestedPosition) {
     this.elevatorCurrentTarget = requestedPosition;
+  }
+
+  @Override
+  public void setFeedForward(double ffValue) {
+    final SparkMaxConfig leaderConfig = new SparkMaxConfig();
+    leaderConfig.closedLoop.velocityFF(ffValue);
+
   }
 
   @Override
