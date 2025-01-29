@@ -39,6 +39,8 @@ public class WLButtons {
               drive::getPose,
               drive::getReefFaceSelection,
               CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
+              drive::getCoralStationSelection,
+              CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
               elevator::hasCoral));
 
     } else {
@@ -80,6 +82,8 @@ public class WLButtons {
                           WLDrive::getPose,
                           WLDrive::getReefFaceSelection,
                           CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
+                          WLDrive::getCoralStationSelection,
+                          CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
                           WLElevator::hasCoral));
                 },
                 WLDrive // optional requirement

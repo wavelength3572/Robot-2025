@@ -1,16 +1,15 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.CommandConstants.ChosenOrientation;
+import frc.robot.commands.CommandConstants.ReefChosenOrientation;
 import frc.robot.commands.CommandConstants.ReefFacesBlue;
 import frc.robot.commands.CommandConstants.ReefFacesRed;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.util.ReefAlignmentUtils;
+import frc.robot.util.AlignmentUtils;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -47,7 +46,7 @@ public class DriveToCommands {
     return Commands.runOnce(
         () -> {
           // Get the closest reef face selection
-          ReefAlignmentUtils.ReefFaceSelection selection = drive.getReefFaceSelection();
+          AlignmentUtils.ReefFaceSelection selection = drive.getReefFaceSelection();
 
           // Check if a valid face is found
           if (selection == null || selection.getAcceptedFaceId() == null) {
@@ -68,12 +67,7 @@ public class DriveToCommands {
           }
 
           // Calculate the target pole pose
-          Pose2d targetPose =
-              calculatePolePose(
-                  drive,
-                  selection.getAcceptedFaceId(),
-                  isLeftPole,
-                  CommandConstants.OFFSET_FROM_REEF);
+          Pose2d targetPose = calculatePolePose(drive, selection.getAcceptedFaceId(), isLeftPole);
           if (targetPose != null) {
             System.out.println("Target pose calculated: " + targetPose);
             createDriveToPose(
@@ -90,8 +84,7 @@ public class DriveToCommands {
         drive);
   }
 
-  public static Pose2d calculatePolePose(
-      Drive drive, int faceId, boolean isLeftPole, double offsetMeters) {
+  public static Pose2d calculatePolePose(Drive drive, int faceId, boolean isLeftPole) {
     Translation2d poleTranslation;
 
     Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
@@ -104,8 +97,8 @@ public class DriveToCommands {
       }
 
       // Select left/right and front/back
-      ChosenOrientation chosen =
-          ReefAlignmentUtils.pickClosestOrientationForFace(drive.getPose(), faceId);
+      ReefChosenOrientation chosen =
+          AlignmentUtils.pickClosestOrientationForReef(drive.getPose(), faceId);
       poleTranslation =
           isLeftPole
               ? chosen.orientationType() == CommandConstants.ReefOrientationType.FRONT
@@ -114,17 +107,6 @@ public class DriveToCommands {
               : chosen.orientationType() == CommandConstants.ReefOrientationType.FRONT
                   ? blueFace.getRightPole().getFrontTranslation()
                   : blueFace.getRightPole().getBackTranslation();
-
-      // Apply offset with inversion for BACK orientation
-      Rotation2d faceNormal = chosen.rotation2D().plus(Rotation2d.fromDegrees(90)); // Normal vector
-      double invertedOffset =
-          chosen.orientationType() == CommandConstants.ReefOrientationType.BACK
-              ? offsetMeters
-              : -offsetMeters;
-      Translation2d offsetVector =
-          new Translation2d(
-              faceNormal.getCos() * invertedOffset, faceNormal.getSin() * invertedOffset);
-      poleTranslation = poleTranslation.plus(offsetVector);
 
       // Return the pose with proper orientation
       return new Pose2d(poleTranslation, chosen.rotation2D());
@@ -137,8 +119,8 @@ public class DriveToCommands {
       }
 
       // Select left/right and front/back
-      ChosenOrientation chosen =
-          ReefAlignmentUtils.pickClosestOrientationForFace(drive.getPose(), faceId);
+      ReefChosenOrientation chosen =
+          AlignmentUtils.pickClosestOrientationForReef(drive.getPose(), faceId);
       poleTranslation =
           isLeftPole
               ? chosen.orientationType() == CommandConstants.ReefOrientationType.FRONT
@@ -147,17 +129,6 @@ public class DriveToCommands {
               : chosen.orientationType() == CommandConstants.ReefOrientationType.FRONT
                   ? redFace.getRightPole().getFrontTranslation()
                   : redFace.getRightPole().getBackTranslation();
-
-      // Apply offset with inversion for BACK orientation
-      Rotation2d faceNormal = chosen.rotation2D().plus(Rotation2d.fromDegrees(90)); // Normal vector
-      double invertedOffset =
-          chosen.orientationType() == CommandConstants.ReefOrientationType.BACK
-              ? offsetMeters
-              : -offsetMeters;
-      Translation2d offsetVector =
-          new Translation2d(
-              faceNormal.getCos() * invertedOffset, faceNormal.getSin() * invertedOffset);
-      poleTranslation = poleTranslation.plus(offsetVector);
 
       // Return the pose with proper orientation
       return new Pose2d(poleTranslation, chosen.rotation2D());

@@ -44,9 +44,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.util.AlignmentUtils;
+import frc.robot.util.AlignmentUtils.CoralStationSelection;
+import frc.robot.util.AlignmentUtils.ReefFaceSelection;
 import frc.robot.util.LocalADStarAK;
-import frc.robot.util.ReefAlignmentUtils;
-import frc.robot.util.ReefAlignmentUtils.ReefFaceSelection;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -76,6 +77,7 @@ public class Drive extends SubsystemBase {
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
   private ReefFaceSelection reefFaceSelection;
+  private CoralStationSelection coralStationSelection;
 
   public Drive(
       GyroIO gyroIO,
@@ -133,17 +135,18 @@ public class Drive extends SubsystemBase {
     return reefFaceSelection;
   }
 
+  public CoralStationSelection getCoralStationSelection() {
+    return coralStationSelection;
+  }
+
   @Override
   public void periodic() {
 
     if (DriverStation.getAlliance().isPresent()) {
-      reefFaceSelection = ReefAlignmentUtils.findClosestReefFaceAndRejectOthers(getPose());
-
-      Logger.recordOutput("Alignment/ClosestDistance", reefFaceSelection.getAcceptedDistance());
-      Logger.recordOutput("Alignment/AcceptedFace", reefFaceSelection.getAcceptedFace());
-      Logger.recordOutput("Alignment/RejectedFaces", reefFaceSelection.getRejectedFaces());
-      Logger.recordOutput("Alignment/AcceptedFaceID", reefFaceSelection.getAcceptedFaceId());
+      reefFaceSelection = AlignmentUtils.findClosestReefFaceAndRejectOthers(getPose());
+      coralStationSelection = AlignmentUtils.findClosestCoralStation(getPose());
     }
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);

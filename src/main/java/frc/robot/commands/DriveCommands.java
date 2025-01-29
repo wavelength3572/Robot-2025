@@ -28,10 +28,11 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.CommandConstants.ChosenOrientation;
+import frc.robot.commands.CommandConstants.ReefChosenOrientation;
+import frc.robot.commands.CommandConstants.StationChosenOrientation;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.util.ReefAlignmentUtils;
+import frc.robot.util.AlignmentUtils;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -305,8 +307,10 @@ public class DriveCommands {
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier,
       Supplier<Pose2d> robotPoseSupplier,
-      Supplier<ReefAlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
-      double distanceThresholdMeters,
+      Supplier<AlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
+      double reefDistanceThresholdMeters,
+      Supplier<AlignmentUtils.CoralStationSelection> stationSelectionSupplier,
+      double stationDistanceThresholdMeters,
       Supplier<Boolean> hasCoralSupplier) { // Add a supplier for hasCoral state
 
     // Create PID controller for orientation alignment
@@ -342,15 +346,15 @@ public class DriveCommands {
                 // Check if we have coral
                 if (hasCoralSupplier.get()) {
                   // No manual input, check if we need to snap back or align automatically
-                  ReefAlignmentUtils.ReefFaceSelection selection = reefFaceSelectionSupplier.get();
+                  AlignmentUtils.ReefFaceSelection selection = reefFaceSelectionSupplier.get();
                   if (selection != null
                       && selection.getAcceptedFaceId() != null
                       && selection.getAcceptedDistance()
-                          <= distanceThresholdMeters) { // Check threshold
+                          <= reefDistanceThresholdMeters) { // Check threshold
                     if (isManualOverride.get()) {
                       // Manual override just ended, snap back to closest face
-                      ChosenOrientation chosenOrientation =
-                          ReefAlignmentUtils.pickClosestOrientationForFace(
+                      ReefChosenOrientation chosenOrientation =
+                          AlignmentUtils.pickClosestOrientationForReef(
                               robotPoseSupplier.get(), selection.getAcceptedFaceId());
                       angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
                       angleController.setGoal(chosenOrientation.rotation2D().getRadians());
@@ -358,8 +362,8 @@ public class DriveCommands {
                     }
 
                     // Use PID controller to align to the closest face
-                    ChosenOrientation chosenOrientation =
-                        ReefAlignmentUtils.pickClosestOrientationForFace(
+                    ReefChosenOrientation chosenOrientation =
+                        AlignmentUtils.pickClosestOrientationForReef(
                             robotPoseSupplier.get(), selection.getAcceptedFaceId());
                     omega =
                         angleController.calculate(
@@ -369,9 +373,40 @@ public class DriveCommands {
                     // No valid face within threshold, stop rotation
                     omega = 0.0;
                   }
-                } else {
-                  // No coral, stop automatic rotation
-                  omega = 0.0;
+
+                } else { // No coral, Align to CoralStation if in Threshold distance
+                  // No manual input, check if we need to snap back or align automatically
+                  AlignmentUtils.CoralStationSelection selection = stationSelectionSupplier.get();
+                  if (selection != null
+                      && selection.getAcceptedStationId() != null
+                      && selection.getAcceptedDistance()
+                          <= stationDistanceThresholdMeters) { // Check threshold
+                    if (isManualOverride.get()) {
+                      // Manual override just ended, snap back to closest station
+                      StationChosenOrientation chosenOrientation =
+                          AlignmentUtils.pickClosestOrientationForStation(
+                              robotPoseSupplier.get(), selection.getAcceptedStationId());
+                      angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
+                      angleController.setGoal(chosenOrientation.rotation2D().getRadians());
+                      isManualOverride.set(false); // Reset override flag
+                    }
+
+                    // Use PID controller to align to the closest station
+                    StationChosenOrientation chosenOrientation =
+                        AlignmentUtils.pickClosestOrientationForStation(
+                            robotPoseSupplier.get(), selection.getAcceptedStationId());
+
+                    Logger.recordOutput(
+                        "Alignment/CoralStation/Omega",
+                        chosenOrientation.rotation2D().getDegrees());
+                    omega =
+                        angleController.calculate(
+                            robotPoseSupplier.get().getRotation().getRadians(),
+                            chosenOrientation.rotation2D().getRadians());
+                  } else {
+                    // No valid station within threshold, stop rotation
+                    omega = 0.0;
+                  }
                 }
               }
 

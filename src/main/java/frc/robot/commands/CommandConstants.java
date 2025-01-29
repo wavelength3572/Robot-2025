@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,27 +16,27 @@ public final class CommandConstants {
 
   public static final double THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE = 3.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF = 2.0; // meters
-  public static final double OFFSET_FROM_REEF = 0; // meters
+  public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION = 2.0; // meters
 
-  public static final Map<Integer, Translation2d> BLUE_APRIL_TAGS = new HashMap<>(); // Blue
-  public static final Map<Integer, Translation2d> RED_APRIL_TAGS = new HashMap<>(); // Red
+  public static final Map<Integer, Translation2d> BLUE_REEF_APRIL_TAGS = new HashMap<>(); // Blue
+  public static final Map<Integer, Translation2d> RED_REEF_APRIL_TAGS = new HashMap<>(); // Red
 
   static {
     // ---------------- BLUE REEF APRIL TAGS ----------------
-    BLUE_APRIL_TAGS.put(17, new Translation2d(4.073905999999999, 3.3063179999999996));
-    BLUE_APRIL_TAGS.put(18, new Translation2d(3.6576, 4.0259)); // 7
-    BLUE_APRIL_TAGS.put(19, new Translation2d(4.073905999999999, 4.745482));
-    BLUE_APRIL_TAGS.put(20, new Translation2d(4.904739999999999, 4.745482));
-    BLUE_APRIL_TAGS.put(21, new Translation2d(5.321046, 4.0259));
-    BLUE_APRIL_TAGS.put(22, new Translation2d(4.904739999999999, 3.3063179999999996));
+    BLUE_REEF_APRIL_TAGS.put(17, new Translation2d(4.073905999999999, 3.3063179999999996));
+    BLUE_REEF_APRIL_TAGS.put(18, new Translation2d(3.6576, 4.0259)); // 7
+    BLUE_REEF_APRIL_TAGS.put(19, new Translation2d(4.073905999999999, 4.745482));
+    BLUE_REEF_APRIL_TAGS.put(20, new Translation2d(4.904739999999999, 4.745482));
+    BLUE_REEF_APRIL_TAGS.put(21, new Translation2d(5.321046, 4.0259));
+    BLUE_REEF_APRIL_TAGS.put(22, new Translation2d(4.904739999999999, 3.3063179999999996));
 
     // ---------------- RED REEF APRIL TAGS ----------------
-    RED_APRIL_TAGS.put(6, new Translation2d(13.474446, 3.3063179999999996));
-    RED_APRIL_TAGS.put(7, new Translation2d(13.890498, 4.0259));
-    RED_APRIL_TAGS.put(8, new Translation2d(13.47444, 4.745482));
-    RED_APRIL_TAGS.put(9, new Translation2d(12.643358, 4.745482));
-    RED_APRIL_TAGS.put(10, new Translation2d(12.227305999999999, 4.0259));
-    RED_APRIL_TAGS.put(11, new Translation2d(12.643358, 3.3063179999999996));
+    RED_REEF_APRIL_TAGS.put(6, new Translation2d(13.474446, 3.3063179999999996));
+    RED_REEF_APRIL_TAGS.put(7, new Translation2d(13.890498, 4.0259));
+    RED_REEF_APRIL_TAGS.put(8, new Translation2d(13.47444, 4.745482));
+    RED_REEF_APRIL_TAGS.put(9, new Translation2d(12.643358, 4.745482));
+    RED_REEF_APRIL_TAGS.put(10, new Translation2d(12.227305999999999, 4.0259));
+    RED_REEF_APRIL_TAGS.put(11, new Translation2d(12.643358, 3.3063179999999996));
   }
 
   public enum ReefOrientationType {
@@ -46,7 +47,7 @@ public final class CommandConstants {
   /**
    * A result that includes both the chosen angle and which orientation (front/back) it came from.
    */
-  public record ChosenOrientation(Rotation2d rotation2D, ReefOrientationType orientationType) {}
+  public record ReefChosenOrientation(Rotation2d rotation2D, ReefOrientationType orientationType) {}
 
   /** Orientation data for BLUE reef faces, keyed by faceId 17–22. */
   public static final Map<Integer, Rotation2d[]> REEF_FACE_ORIENTATION_BLUE = new HashMap<>();
@@ -286,5 +287,66 @@ public final class CommandConstants {
     double yRed = yBlue; // Y stays the same
 
     return new Translation2d(xRed, yRed);
+  }
+
+  public record StationChosenOrientation(
+      Rotation2d rotation2D, StationOrientationType orientationType) {}
+
+  public enum StationOrientationType {
+    FRONT,
+    BACK
+  }
+
+  public static final Map<Integer, Translation2d> BLUE_CORALSTATION_APRIL_TAGS =
+      new HashMap<>(); // Blue
+  public static final Map<Integer, Translation2d> RED_CORALSTATION_APRIL_TAGS =
+      new HashMap<>(); // Red
+
+  static {
+    // ---------------- BLUE CORAL STATION APRIL TAGS ----------------
+    BLUE_CORALSTATION_APRIL_TAGS.put(
+        12, new Translation2d(Units.inchesToMeters(33.51), Units.inchesToMeters(25.8)));
+    BLUE_CORALSTATION_APRIL_TAGS.put(
+        13, new Translation2d(Units.inchesToMeters(33.51), Units.inchesToMeters(291.2)));
+
+    // ---------------- RED CORAL STATION APRIL TAGS ----------------
+    RED_CORALSTATION_APRIL_TAGS.put(
+        1, new Translation2d(Units.inchesToMeters(657.37), Units.inchesToMeters(25.8)));
+    RED_CORALSTATION_APRIL_TAGS.put(
+        2, new Translation2d(Units.inchesToMeters(657.37), Units.inchesToMeters(291.2)));
+  }
+
+  /** Orientation data for BLUE reef faces, keyed by faceId 12-13 */
+  public static final Map<Integer, Rotation2d[]> CORAL_STATION_ORIENTATION_BLUE = new HashMap<>();
+
+  /** Orientation data for RED reef faces, keyed by faceId 1-2 */
+  public static final Map<Integer, Rotation2d[]> CORAL_STATION_ORIENTATION_RED = new HashMap<>();
+
+  static {
+    // ---------------- BLUE Orientation ----------------
+    CORAL_STATION_ORIENTATION_BLUE.put(
+        12,
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(54)), new Rotation2d(Math.toRadians(54 + 180))
+        });
+    CORAL_STATION_ORIENTATION_BLUE.put(
+        13,
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(306)), new Rotation2d(Math.toRadians(306 + 180))
+        }); // 180, -180
+    Collections.unmodifiableMap(CORAL_STATION_ORIENTATION_BLUE);
+
+    // ---------------- RED Orientation ----------------
+    CORAL_STATION_ORIENTATION_RED.put(
+        1,
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(126)), new Rotation2d(Math.toRadians(126 + 180))
+        });
+    CORAL_STATION_ORIENTATION_RED.put(
+        2,
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(234)), new Rotation2d(Math.toRadians(234 + 180))
+        });
+    Collections.unmodifiableMap(CORAL_STATION_ORIENTATION_RED);
   }
 }
