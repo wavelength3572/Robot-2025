@@ -26,12 +26,13 @@ public final class ElevatorConfigs {
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // Set PID values for position control
-          .p(0.2)
+          .p(0.01)
+          .d(.01)
           .outputRange(-1, 1)
           .maxMotion
           // Set MAXMotion parameters for position control
-          .maxVelocity(1500)
-          .maxAcceleration(1500)
+          .maxVelocity(4000)
+          .maxAcceleration(4000)
           .allowedClosedLoopError(0.1);
 
       followerConfig
