@@ -29,7 +29,7 @@ import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
-import frc.robot.subsystems.elevator.ElevatorIOPPCSim;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
@@ -78,7 +78,7 @@ public class RobotContainer {
                 new ModuleIOSpark(3));
         vision =
             new Vision(
-                drive::addVisionMeasurement, new VisionIOPhotonVision(camera1Name, robotToCamera1));
+                drive::addVisionMeasurement, new VisionIOPhotonVision(cameraBName, robotToCameraB));
         // vision =
         //     new Vision(
         //         drive::addVisionMeasurement,
@@ -99,9 +99,9 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
-                new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
-        elevator = new Elevator(new ElevatorIOPPCSim() {});
+                new VisionIOPhotonVisionSim(cameraAName, robotToCameraA, drive::getPose),
+                new VisionIOPhotonVisionSim(cameraBName, robotToCameraB, drive::getPose));
+        elevator = new Elevator(new ElevatorIOSim() {});
         break;
 
       default:
