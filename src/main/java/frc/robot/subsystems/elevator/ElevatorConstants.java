@@ -6,7 +6,7 @@ public class ElevatorConstants {
   public static final int leaderCanId = 21;
   public static final int followerCanId = 16;
   public static final int elevatorCurrentLimit = 50;
-  public static final double kElevatorGearing = 5.0;
+  public static final double kElevatorGearing = 9.0;
   public static final double kElevatorDrumRadius = Units.inchesToMeters(2.25) / 2.0;
   public static final double kCarriageMass = 7.0; // kg
 
@@ -15,9 +15,12 @@ public class ElevatorConstants {
 
   public static final double kGroundToElevator = Units.inchesToMeters(7.529); // m
 
-  public static final double kElevatorKp = 5;
+  public static final double kElevatorKp = .2;
   public static final double kElevatorKi = 0;
-  public static final double kElevatorKd = 0;
+  public static final double kElevatorKd = 0.01;
+  public static final double kElevatorKf = 0;
+  public static final double kElevatorVel = 4000;
+  public static final double kElevatorAcc = 8000;
 
   public static final double kElevatorkS = 0.0; // volts (V)
   public static final double kElevatorkG = 0.762; // volts (V)
