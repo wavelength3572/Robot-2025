@@ -19,8 +19,8 @@ public class ElevatorConstants {
   public static final double kElevatorKi = 0;
   public static final double kElevatorKd = 0.01;
   public static final double kElevatorKf = 0;
-  public static final double kElevatorVel = 4000;
-  public static final double kElevatorAcc = 8000;
+  public static final double kElevatorVel = 4500;
+  public static final double kElevatorAcc = 13500;
 
   public static final double kElevatorkS = 0.0; // volts (V)
   public static final double kElevatorkG = 0.762; // volts (V)
