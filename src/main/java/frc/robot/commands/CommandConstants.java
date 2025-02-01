@@ -5,19 +5,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.util.AlignmentUtils;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
- * This class defines the runtime mode used by AdvantageKit. The mode is always
- * "real" when running
- * on a roboRIO. Change the value of "simMode" to switch between "sim" (physics
- * sim) and "replay"
+ * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
+ * on a roboRIO. Change the value of "simMode" to switch between "sim" (physics sim) and "replay"
  * (log replay from a file).
  */
 public final class CommandConstants {
@@ -25,20 +19,23 @@ public final class CommandConstants {
   public static final double THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE = 3.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF = 2.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION = 2.0; // meters
+  public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE = 2.0; // meters
 
   public static Translation2d selectedCageTranslation = new Translation2d();
   // Assume these are your fixed cage positions defined somewhere (using WPILib's
   // coordinates)
-  private static Translation2d BLUE_CAGE_LEFT = new Translation2d(3.0, 1.5);
-  private static Translation2d BLUE_CAGE_MID = new Translation2d(3.0, 2.5);
-  private static Translation2d BLUE_CAGE_RIGHT = new Translation2d(3.0, 3.5);
+  private static Translation2d BLUE_CAGE_LEFT = new Translation2d(8.72, 7.28);
+  private static Translation2d BLUE_CAGE_MID = new Translation2d(8.72, 6.14);
+  private static Translation2d BLUE_CAGE_RIGHT = new Translation2d(8.72, 5.09);
 
-  private static Translation2d RED_CAGE_LEFT = new Translation2d(3.0, 1.5);
-  private static Translation2d RED_CAGE_MID = new Translation2d(3.0, 2.5);
-  private static Translation2d RED_CAGE_RIGHT = new Translation2d(3.0, 3.5);
+  private static Translation2d RED_CAGE_LEFT = new Translation2d(8.72, 3.03);
+  private static Translation2d RED_CAGE_MID = new Translation2d(8.72, 1.83);
+  private static Translation2d RED_CAGE_RIGHT = new Translation2d(8.72, 0.78);
 
   public enum CageTarget {
-    LEFT, MID, RIGHT
+    LEFT,
+    MID,
+    RIGHT
   }
 
   public static Translation2d getCage(CageTarget cageTarget) {
@@ -96,11 +93,9 @@ public final class CommandConstants {
   }
 
   /**
-   * A result that includes both the chosen angle and which orientation
-   * (front/back) it came from.
+   * A result that includes both the chosen angle and which orientation (front/back) it came from.
    */
-  public record ReefChosenOrientation(Rotation2d rotation2D, ReefOrientationType orientationType) {
-  }
+  public record ReefChosenOrientation(Rotation2d rotation2D, ReefOrientationType orientationType) {}
 
   /** Orientation data for BLUE reef faces, keyed by faceId 17–22. */
   public static final Map<Integer, Rotation2d[]> REEF_FACE_ORIENTATION_BLUE = new HashMap<>();
@@ -113,30 +108,30 @@ public final class CommandConstants {
     REEF_FACE_ORIENTATION_BLUE.put(
         17,
         new Rotation2d[] {
-            new Rotation2d(Math.toRadians(60)), new Rotation2d(Math.toRadians(-120)) // 60, -120
+          new Rotation2d(Math.toRadians(60)), new Rotation2d(Math.toRadians(-120)) // 60, -120
         });
     REEF_FACE_ORIENTATION_BLUE.put(
         18,
         new Rotation2d[] {
-            new Rotation2d(Math.toRadians(0)), new Rotation2d(Math.toRadians(180))
+          new Rotation2d(Math.toRadians(0)), new Rotation2d(Math.toRadians(180))
         }); // 180, -180
     REEF_FACE_ORIENTATION_BLUE.put(
         19,
         new Rotation2d[] {
-            new Rotation2d(Math.toRadians(-60)), new Rotation2d(Math.toRadians(120)) // 120, -60
+          new Rotation2d(Math.toRadians(-60)), new Rotation2d(Math.toRadians(120)) // 120, -60
         });
     REEF_FACE_ORIENTATION_BLUE.put(
         20,
         new Rotation2d[] {
-            new Rotation2d(Math.toRadians(-120)), new Rotation2d(Math.toRadians(60))
+          new Rotation2d(Math.toRadians(-120)), new Rotation2d(Math.toRadians(60))
         });
     REEF_FACE_ORIENTATION_BLUE.put(
         21,
-        new Rotation2d[] { new Rotation2d(Math.toRadians(180)), new Rotation2d(Math.toRadians(0)) });
+        new Rotation2d[] {new Rotation2d(Math.toRadians(180)), new Rotation2d(Math.toRadians(0))});
     REEF_FACE_ORIENTATION_BLUE.put(
         22,
         new Rotation2d[] {
-            new Rotation2d(Math.toRadians(120)), new Rotation2d(Math.toRadians(-60))
+          new Rotation2d(Math.toRadians(120)), new Rotation2d(Math.toRadians(-60))
         });
     Collections.unmodifiableMap(REEF_FACE_ORIENTATION_BLUE);
 
@@ -144,25 +139,25 @@ public final class CommandConstants {
     REEF_FACE_ORIENTATION_RED.put(
         6,
         new Rotation2d[] {
-            new Rotation2d(Math.toRadians(-60)), new Rotation2d(Math.toRadians(120))
+          new Rotation2d(Math.toRadians(-60)), new Rotation2d(Math.toRadians(120))
         });
     REEF_FACE_ORIENTATION_RED.put(
         7,
-        new Rotation2d[] { new Rotation2d(Math.toRadians(0)), new Rotation2d(Math.toRadians(180)) });
+        new Rotation2d[] {new Rotation2d(Math.toRadians(0)), new Rotation2d(Math.toRadians(180))});
     REEF_FACE_ORIENTATION_RED.put(
         8,
-        new Rotation2d[] { new Rotation2d(Math.toRadians(60)), new Rotation2d(Math.toRadians(240)) });
+        new Rotation2d[] {new Rotation2d(Math.toRadians(60)), new Rotation2d(Math.toRadians(240))});
     REEF_FACE_ORIENTATION_RED.put(
         9,
         new Rotation2d[] {
-            new Rotation2d(Math.toRadians(120)), new Rotation2d(Math.toRadians(-60))
+          new Rotation2d(Math.toRadians(120)), new Rotation2d(Math.toRadians(-60))
         });
     REEF_FACE_ORIENTATION_RED.put(
         10,
-        new Rotation2d[] { new Rotation2d(Math.toRadians(180)), new Rotation2d(Math.toRadians(0)) });
+        new Rotation2d[] {new Rotation2d(Math.toRadians(180)), new Rotation2d(Math.toRadians(0))});
     REEF_FACE_ORIENTATION_RED.put(
         11,
-        new Rotation2d[] { new Rotation2d(Math.toRadians(240)), new Rotation2d(Math.toRadians(60)) });
+        new Rotation2d[] {new Rotation2d(Math.toRadians(240)), new Rotation2d(Math.toRadians(60))});
     Collections.unmodifiableMap(REEF_FACE_ORIENTATION_RED);
   }
 
@@ -229,8 +224,7 @@ public final class CommandConstants {
     }
 
     /**
-     * Find the ReefFaces enum constant matching the given faceId, or return null if
-     * none matches.
+     * Find the ReefFaces enum constant matching the given faceId, or return null if none matches.
      */
     public static ReefFacesBlue fromId(int faceId) {
       for (ReefFacesBlue face : values()) {
@@ -260,10 +254,7 @@ public final class CommandConstants {
     private final Translation2d frontTranslation;
     private final Translation2d backTranslation;
 
-    /**
-     * Constructor takes the matching "blue" branch, then mirrors its front/back
-     * translations.
-     */
+    /** Constructor takes the matching "blue" branch, then mirrors its front/back translations. */
     ReefBranchesRed(ReefBranchesBlue blueBranch) {
       this.frontTranslation = reflectBlueToRed(blueBranch.getFrontTranslation());
       this.backTranslation = reflectBlueToRed(blueBranch.getBackTranslation());
@@ -325,8 +316,7 @@ public final class CommandConstants {
   }
 
   /**
-   * Reflects a "blue side" coordinate across the field's vertical center line
-   * (x=8.775 on a
+   * Reflects a "blue side" coordinate across the field's vertical center line (x=8.775 on a
    * 17.55m-wide field).
    *
    * @param blueCoord the (x,y) on blue side
@@ -344,16 +334,17 @@ public final class CommandConstants {
   }
 
   public record StationChosenOrientation(
-      Rotation2d rotation2D, StationOrientationType orientationType) {
-  }
+      Rotation2d rotation2D, StationOrientationType orientationType) {}
 
   public enum StationOrientationType {
     FRONT,
     BACK
   }
 
-  public static final Map<Integer, Translation2d> BLUE_CORALSTATION_APRIL_TAGS = new HashMap<>(); // Blue
-  public static final Map<Integer, Translation2d> RED_CORALSTATION_APRIL_TAGS = new HashMap<>(); // Red
+  public static final Map<Integer, Translation2d> BLUE_CORALSTATION_APRIL_TAGS =
+      new HashMap<>(); // Blue
+  public static final Map<Integer, Translation2d> RED_CORALSTATION_APRIL_TAGS =
+      new HashMap<>(); // Red
 
   static {
     // ---------------- BLUE CORAL STATION APRIL TAGS ----------------
@@ -380,12 +371,12 @@ public final class CommandConstants {
     CORAL_STATION_ORIENTATION_BLUE.put(
         12,
         new Rotation2d[] {
-            new Rotation2d(Math.toRadians(54)), new Rotation2d(Math.toRadians(54 + 180))
+          new Rotation2d(Math.toRadians(54)), new Rotation2d(Math.toRadians(54 + 180))
         });
     CORAL_STATION_ORIENTATION_BLUE.put(
         13,
         new Rotation2d[] {
-            new Rotation2d(Math.toRadians(306)), new Rotation2d(Math.toRadians(306 + 180))
+          new Rotation2d(Math.toRadians(306)), new Rotation2d(Math.toRadians(306 + 180))
         }); // 180, -180
     Collections.unmodifiableMap(CORAL_STATION_ORIENTATION_BLUE);
 
@@ -393,12 +384,12 @@ public final class CommandConstants {
     CORAL_STATION_ORIENTATION_RED.put(
         1,
         new Rotation2d[] {
-            new Rotation2d(Math.toRadians(126)), new Rotation2d(Math.toRadians(126 + 180))
+          new Rotation2d(Math.toRadians(126)), new Rotation2d(Math.toRadians(126 + 180))
         });
     CORAL_STATION_ORIENTATION_RED.put(
         2,
         new Rotation2d[] {
-            new Rotation2d(Math.toRadians(234)), new Rotation2d(Math.toRadians(234 + 180))
+          new Rotation2d(Math.toRadians(234)), new Rotation2d(Math.toRadians(234 + 180))
         });
     Collections.unmodifiableMap(CORAL_STATION_ORIENTATION_RED);
   }

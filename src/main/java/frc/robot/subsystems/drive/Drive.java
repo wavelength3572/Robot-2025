@@ -44,7 +44,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.commands.CommandConstants;
 import frc.robot.util.AlignmentUtils;
+import frc.robot.util.AlignmentUtils.CageSelection;
 import frc.robot.util.AlignmentUtils.CoralStationSelection;
 import frc.robot.util.AlignmentUtils.ReefFaceSelection;
 import frc.robot.util.LocalADStarAK;
@@ -78,6 +80,7 @@ public class Drive extends SubsystemBase {
 
   private ReefFaceSelection reefFaceSelection;
   private CoralStationSelection coralStationSelection;
+  private CageSelection cageSelection;
 
   public Drive(
       GyroIO gyroIO,
@@ -139,12 +142,18 @@ public class Drive extends SubsystemBase {
     return coralStationSelection;
   }
 
+  public CageSelection getCageSelection() {
+    return cageSelection;
+  }
+
   @Override
   public void periodic() {
 
     if (DriverStation.getAlliance().isPresent()) {
       reefFaceSelection = AlignmentUtils.findClosestReefFaceAndRejectOthers(getPose());
       coralStationSelection = AlignmentUtils.findClosestCoralStation(getPose());
+      cageSelection =
+          AlignmentUtils.findCageRobotAngle(getPose(), CommandConstants.selectedCageTranslation);
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data

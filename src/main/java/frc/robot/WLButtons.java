@@ -1,9 +1,5 @@
 package frc.robot;
 
-import java.util.function.Supplier;
-
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.CommandConstants;
 import frc.robot.commands.DriveCommands;
@@ -19,8 +15,7 @@ public class WLButtons {
   private static Drive WLDrive;
   private static Elevator WLElevator;
 
-  public WLButtons() {
-  }
+  public WLButtons() {}
 
   public static void configureTestModeButtonBindings(
       OperatorInterface operatorInterface, Drive drive) {
@@ -47,6 +42,8 @@ public class WLButtons {
               CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
               drive::getCoralStationSelection,
               CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
+              drive::getCageSelection,
+              CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE,
               elevator::hasCoral));
 
     } else {
@@ -74,7 +71,7 @@ public class WLButtons {
                           WLDrive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
                 },
                 WLDrive // optional requirement
-            ))
+                ))
         .onTrue(
             Commands.runOnce(
                 () -> {
@@ -90,10 +87,12 @@ public class WLButtons {
                           CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
                           WLDrive::getCoralStationSelection,
                           CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
+                          WLDrive::getCageSelection,
+                          CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE,
                           WLElevator::hasCoral));
                 },
                 WLDrive // optional requirement
-            ));
+                ));
 
     // Drive to Pole
     oi.getRightJoyLeftButton()
@@ -118,8 +117,7 @@ public class WLButtons {
 
     if (oi.getButtonV().getAsBoolean()) {
       WLElevator.setHasCoral();
-    } else
-      WLElevator.clearHasCoral();
+    } else WLElevator.clearHasCoral();
 
     oi.getButtonV()
         .onTrue(Commands.runOnce(WLElevator::setHasCoral, WLElevator))
@@ -129,16 +127,10 @@ public class WLButtons {
       AlignmentUtils.setLeftCage();
     } else if (oi.getButtonFPosition1().getAsBoolean()) {
       AlignmentUtils.setMidCage();
-    } else
-      AlignmentUtils.setRightCage();
+    } else AlignmentUtils.setRightCage();
 
-    oi.getButtonFPosition0()
-        .onTrue(Commands.runOnce(AlignmentUtils::setLeftCage));
-    oi.getButtonFPosition1()
-        .onTrue(Commands.runOnce(AlignmentUtils::setMidCage));
-    oi.getButtonFPosition2()
-        .onTrue(Commands.runOnce(AlignmentUtils::setRightCage));
-
-    
+    oi.getButtonFPosition0().onTrue(Commands.runOnce(AlignmentUtils::setLeftCage));
+    oi.getButtonFPosition1().onTrue(Commands.runOnce(AlignmentUtils::setMidCage));
+    oi.getButtonFPosition2().onTrue(Commands.runOnce(AlignmentUtils::setRightCage));
   }
 }

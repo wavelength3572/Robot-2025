@@ -311,7 +311,7 @@ public class DriveCommands {
       double reefDistanceThresholdMeters,
       Supplier<AlignmentUtils.CoralStationSelection> stationSelectionSupplier,
       double stationDistanceThresholdMeters,
-      Supplier<Rotation2d> cageTranslationSupplier,
+      Supplier<AlignmentUtils.CageSelection> cageSelectionSupplier,
       double cageDistanceThresholdMeters,
       Supplier<Boolean> hasCoralSupplier) { // Add a supplier for hasCoral state
 
@@ -376,9 +376,14 @@ public class DriveCommands {
                     omega = 0.0;
                   }
 
-                } else { // No coral, Align to CoralStation if in Threshold distance
+                } else {
+                  // No coral
+
+                  // Align to CoralStation if in Threshold distance
                   // No manual input, check if we need to snap back or align automatically
-                  AlignmentUtils.CoralStationSelection coralStationSelection = stationSelectionSupplier.get();
+                  AlignmentUtils.CoralStationSelection coralStationSelection =
+                      stationSelectionSupplier.get();
+                  AlignmentUtils.CageSelection cageSelection = cageSelectionSupplier.get();
                   if (coralStationSelection != null
                       && coralStationSelection.getAcceptedStationId() != null
                       && coralStationSelection.getAcceptedDistance()
@@ -387,7 +392,8 @@ public class DriveCommands {
                       // Manual override just ended, snap back to closest station
                       StationChosenOrientation chosenOrientation =
                           AlignmentUtils.pickClosestOrientationForStation(
-                              robotPoseSupplier.get(), coralStationSelection.getAcceptedStationId());
+                              robotPoseSupplier.get(),
+                              coralStationSelection.getAcceptedStationId());
                       angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
                       angleController.setGoal(chosenOrientation.rotation2D().getRadians());
                       isManualOverride.set(false); // Reset override flag
@@ -405,18 +411,25 @@ public class DriveCommands {
                         angleController.calculate(
                             robotPoseSupplier.get().getRotation().getRadians(),
                             chosenOrientation.rotation2D().getRadians());
-                  } 
-                  else if(CommandConstants.selectedCageTranslation != null
-                  && DriverStation.getAlliance().isPresent()
-                  && CommandConstants.selectedCageDistance <= cageDistanceThresholdMeters) {
-                    // Create the rotation supplier by passing a pose supplier (for example,
-    // drive::getPose)
-    Supplier<Rotation2d> rotationSupplier = AlignmentUtils.createRotationSupplier(drive::getPose, selectedCage);
                   }
-                  else {
+                  // otherwise am I close enough to the cage
+                  else if (cageSelection != null
+                      && DriverStation.getAlliance().isPresent()
+                      && cageSelection.getDistanceToCage() <= cageDistanceThresholdMeters
+                      // && cageSelection.getRotationToCage().getDegrees() > -90
+                      // && cageSelection.getRotationToCage().getDegrees() < 90
+                      ) 
+                      {
+
+                    omega =
+                        angleController.calculate(
+                            robotPoseSupplier.get().getRotation().getRadians(),
+                            cageSelection.getRotationToCage().getRadians());
+
+                  } else {
                     // No valid station within threshold, stop rotation
                     omega = 0.0;
-                  } 
+                  }
                 }
               }
 
