@@ -5,12 +5,16 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.CommandConstants;
+import frc.robot.commands.CommandConstants.CageTarget;
 import frc.robot.commands.CommandConstants.ReefChosenOrientation;
 import frc.robot.commands.CommandConstants.StationChosenOrientation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -298,6 +302,79 @@ public class AlignmentUtils {
       // Closer to "back" orientation
       return new StationChosenOrientation(
           orientationB, CommandConstants.StationOrientationType.BACK);
+    }
+  } 
+
+  /**
+   * Creates a rotation supplier that computes the field-relative angle from the robot's current
+   * position to the specified cage target.
+   *
+   * <p>This helper method assumes the robot's pose is provided in WPILib coordinates (with the blue
+   * side origin at the bottom right) and returns the angle (as a Rotation2d) that points toward
+   * the cage target.
+   *
+   * @param poseSupplier A supplier for the current robot Pose2d.
+   * @param cageTarget   The target cage position as a Translation2d.
+   * @return A Supplier that returns the desired Rotation2d on each call.
+   */
+  public static Supplier<Rotation2d> createCageRotationSupplier(
+      Supplier<Pose2d> poseSupplier, Translation2d cageTarget) {
+    return () -> {
+      // Get the current robot pose
+      Pose2d currentPose = poseSupplier.get();
+      Translation2d currentTranslation = currentPose.getTranslation();
+
+      // Calculate the direction vector from the robot to the cage target
+      Translation2d direction = cageTarget.minus(currentTranslation);
+
+      // Compute the angle using atan2 (which handles WPILib's coordinate system correctly)
+      double angleRadians = Math.atan2(direction.getY(), direction.getX());
+
+      return new Rotation2d(angleRadians);
+    }; 
+  } 
+
+
+  public static void setLeftCage(){
+    CommandConstants.selectedCageTranslation = CommandConstants.getCage(CageTarget.LEFT);
+  } 
+  public static void setMidCage(){
+    CommandConstants.selectedCageTranslation = CommandConstants.getCage(CageTarget.MID);
+  } 
+  public static void setRightCage(){
+    CommandConstants.selectedCageTranslation = CommandConstants.getCage(CageTarget.RIGHT);
+  } 
+  public static class CageSelection {
+    private final CageTarget cageTarget;
+    private final Translation2d cageSelectionTranslation;
+    private final double distanceToCage;
+    private final Rotation2d rotationToCage;
+
+    public CageSelection(
+        CageTarget cageTarget,
+        Translation2d cageSelectionTranslation,
+        double distanceToCage,
+        Rotation2d rotationToCage) {
+      this.cageTarget = cageTarget;
+      this.cageSelectionTranslation = cageSelectionTranslation;
+      this.distanceToCage = distanceToCage;
+      this.rotationToCage = rotationToCage ;
+    }
+
+    public CageTarget getCageTarget() {
+      return cageTarget;
+    }
+
+    public Translation2d getCageSelectionTranslation() {
+      return cageSelectionTranslation;
+    }
+
+    public double getDistanceToCage() {
+      return distanceToCage;
+    }
+
+    public Rotation2d getRotationToCage() {
+      return rotationToCage;
     }
   }
 }

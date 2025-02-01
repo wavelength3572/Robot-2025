@@ -285,6 +285,10 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
+  public default Trigger getButtonFPosition1() {
+    return new Trigger(() -> false);
+  }
+
   public default Trigger getButtonFPosition0() {
     return new Trigger(() -> false);
   }
