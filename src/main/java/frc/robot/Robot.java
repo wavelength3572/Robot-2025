@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.CoralSystemCommands;
 import frc.robot.subsystems.drive.DriveConstants;
 import java.util.HashMap;
 import java.util.Map;
@@ -124,9 +125,7 @@ public class Robot extends LoggedRobot {
     // Return to normal thread priority
     Threads.setCurrentThreadPriority(false, 10);
 
-    Logger.recordOutput("Scoring System", robotContainer.getElevator());
-    Logger.recordOutput("Scoring System", robotContainer.getArm());
-
+    Logger.recordOutput("Scoring System", robotContainer.getCoralSubsystem().getVisualizer());
   }
 
   /** This function is called once when the robot is disabled. */
@@ -164,6 +163,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    CoralSystemCommands.holdArmAngle(robotContainer.getCoralSubsystem()).schedule();
   }
 
   /** This function is called periodically during operator control. */
@@ -184,6 +184,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {
+    DriverStationSim.setDsAttached(true);
     DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
   }
 

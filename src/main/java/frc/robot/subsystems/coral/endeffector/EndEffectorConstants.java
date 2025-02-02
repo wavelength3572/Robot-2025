@@ -1,7 +1,9 @@
 package frc.robot.subsystems.coral.endeffector;
 
 /** EndEffectorConstants defines hardware-specific constants for the end effector. */
-public final class EndEffectorConstants {
+public class EndEffectorConstants {
+
+  public static final double kEndEffectorLengthMeters = .08;
   // The CAN ID for the end effector motor.
   public static final int motorCanId = 5; // Change this to your actual CAN ID.
 
@@ -10,8 +12,4 @@ public final class EndEffectorConstants {
 
   // Whether the motor should be inverted.
   public static final boolean invertMotor = false;
-
-  private EndEffectorConstants() {
-    // Prevent instantiation.
-  }
 }

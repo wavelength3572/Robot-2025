@@ -83,4 +83,17 @@ public class ArmIOSpark implements ArmIO {
         .allowedClosedLoopError(0.1);
     armMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
+
+  @Override
+  public void holdArmAngle() {
+    // Read the current encoder position (in motor rotations)
+    double currentNative = armEncoder.getPosition();
+
+    // Update the internal target to match the current position
+    armCurrentTargetNative = currentNative;
+
+    // Ensure the closed-loop controller starts tracking this position
+    armClosedLoopController.setReference(
+        armCurrentTargetNative, ControlType.kMAXMotionPositionControl);
+  }
 }

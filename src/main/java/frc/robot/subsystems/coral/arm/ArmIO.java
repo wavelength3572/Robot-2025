@@ -22,6 +22,8 @@ public interface ArmIO {
 
   public default void setAngleDegrees(double requestedAngleDegrees) {}
 
+  public default void holdArmAngle() {}
+
   public default void setPIDValues(
       double kP, double kI, double kD, double VelocityMax, double AccelerationMax) {}
 

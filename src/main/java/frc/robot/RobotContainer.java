@@ -17,8 +17,6 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -29,12 +27,11 @@ import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.coral.CoralSubsystem;
+import frc.robot.subsystems.coral.CoralSystemPresetChooser;
 import frc.robot.subsystems.coral.arm.Arm;
-import frc.robot.subsystems.coral.arm.ArmConstants;
 import frc.robot.subsystems.coral.arm.ArmIOSim;
 import frc.robot.subsystems.coral.arm.ArmIOSpark;
 import frc.robot.subsystems.coral.elevator.Elevator;
-import frc.robot.subsystems.coral.elevator.ElevatorConstants;
 import frc.robot.subsystems.coral.elevator.ElevatorIOPPCSim;
 import frc.robot.subsystems.coral.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.coral.endeffector.EndEffector;
@@ -45,9 +42,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -67,26 +61,9 @@ public class RobotContainer {
 
   private OperatorInterface oi = new OperatorInterface() {};
 
-  private LoggedMechanism2d scoringSystem = new LoggedMechanism2d(.8382, 2.0);
-  private LoggedMechanismRoot2d root = scoringSystem.getRoot("Base", 0.51, 0.0);
-  private LoggedMechanismLigament2d m_elevator =
-      root.append(
-          new LoggedMechanismLigament2d(
-              "Elevator", ElevatorConstants.kGroundToElevator, 90, 2, new Color8Bit(Color.kBlue)));
-
-  // New arm visualization:
-  // For example, assume the arm has a fixed length defined in your constants:
-  private LoggedMechanismLigament2d m_arm =
-      m_elevator.append(
-          new LoggedMechanismLigament2d(
-              "Arm",
-              ArmConstants.kArmLengthMeters, // The physical length of your arm.
-              30, // Initial angle (in degrees).
-              2, // Thickness (example value)
-              new Color8Bit(Color.kRed)));
-
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+  private final CoralSystemPresetChooser coralSystemPresetChooser = new CoralSystemPresetChooser();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -156,17 +133,15 @@ public class RobotContainer {
     }
 
     if (elevator != null) {
-      elevator.setPosition(0.0);
       SmartDashboard.putNumber("Elevator Goal", 0.0);
-      SmartDashboard.putData("Elevator", CoralSystemCommands.setElevatorPositionFromDashboard(coralSubsystem));
+      SmartDashboard.putData(
+          "Elevator", CoralSystemCommands.setElevatorPositionFromDashboard(coralSubsystem));
     }
 
     if (arm != null) {
-      arm.setAngleDegrees(0.0);
-      SmartDashboard.putNumber("Arm Goal", 0.0);
+      SmartDashboard.putNumber("Arm Goal", 90.0);
       SmartDashboard.putData("Arm", CoralSystemCommands.setArmAngleFromDashboard(coralSubsystem));
     }
-
 
     SmartDashboard.putData(
         "DriveToClosestLEFTPole",
@@ -187,6 +162,12 @@ public class RobotContainer {
             () -> 0.0, // Default Y joystick input
             () -> 0.0, // Default rotation joystick input
             CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
+
+    SmartDashboard.putData(
+        "Coral Position",
+        CoralSystemCommands.getCoralSelectedPresetFromSmartDashboardCommand(
+            coralSubsystem, coralSystemPresetChooser));
+
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
     // autoChooser = new LoggedDashboardChooser<>("Auto");
@@ -226,43 +207,13 @@ public class RobotContainer {
     oi = OISelector.findOperatorInterface();
 
     WLButtons.configureButtonBindings(oi, drive, coralSubsystem);
-
-    // Configure some robot defaults based on current state of Controller Switches.
-    // if (oi.getFieldRelativeButton().getAsBoolean()) {
-    // System.out.println("Field Relative Button False");
-    // drive.disableFieldRelative();
-    // } else {
-    // System.out.println("Field Relative Button True");
-    // drive.enableFieldRelative();
-    // }
-
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
 
-  public LoggedMechanism2d getElevator() {
-    // Update the Elevator 2D Mech
-    m_elevator.setLength(ElevatorConstants.kGroundToElevator + elevator.getHeightInMeters());
-    return scoringSystem;
-  }
-
-  public LoggedMechanism2d getArm() {
-    // Update the Arm 2D Mech
-    m_arm.setAngle(arm.getAngleInDegrees());
-    return scoringSystem;
+  public CoralSubsystem getCoralSubsystem() {
+    return coralSubsystem;
   }
 }

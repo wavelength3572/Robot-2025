@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.coral.CoralSubsystem;
+import frc.robot.subsystems.coral.CoralSystemPresetChooser;
+import frc.robot.subsystems.coral.CoralSystemPresets;
 
 public class CoralSystemCommands {
 
@@ -50,5 +52,32 @@ public class CoralSystemCommands {
   public static Command setArmAngle(CoralSubsystem coralSubsystem, Double requestedAngle) {
     return Commands.runOnce(
         () -> coralSubsystem.getArm().setAngleDegrees(requestedAngle), coralSubsystem);
+  }
+
+  public static Command stow(CoralSubsystem coralSubsystem) {
+    return Commands.runOnce(
+        () -> {
+          coralSubsystem.getElevator().setPosition(CoralSystemPresets.STOW.getElevatorHeight());
+          coralSubsystem.getArm().setAngleDegrees(CoralSystemPresets.STOW.getArmAngle());
+        },
+        coralSubsystem);
+  }
+
+  public static Command getCoralSelectedPresetFromSmartDashboardCommand(
+      CoralSubsystem coralSubsystem, CoralSystemPresetChooser presetChooser) {
+    return Commands.runOnce(
+        () -> {
+          CoralSystemPresets preset = presetChooser.getSelected();
+          coralSubsystem.getElevator().setPosition(preset.getElevatorHeight());
+          coralSubsystem.getArm().setAngleDegrees(preset.getArmAngle());
+        },
+        coralSubsystem);
+  }
+  /**
+   * Creates a command that holds the current arm position. This is useful as a default command to
+   * prevent sudden movements.
+   */
+  public static Command holdArmAngle(CoralSubsystem coralSubsystem) {
+    return Commands.runOnce(coralSubsystem.getArm()::holdArmAngle, coralSubsystem);
   }
 }

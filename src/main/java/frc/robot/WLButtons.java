@@ -47,7 +47,7 @@ public class WLButtons {
               drive::getCageSelection,
               CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE,
               // Use the elevator from the coral subsystem
-              () -> coralSubsystem.getElevator().hasCoral()));
+              () -> coralSubsystem.haveCoral()));
     } else {
       WLDrive.setDriveModeNormal();
       WLDrive.setDefaultCommand(
@@ -90,7 +90,7 @@ public class WLButtons {
                           CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
                           WLDrive::getCageSelection,
                           CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE,
-                          () -> coralSubsystem.getElevator().hasCoral()));
+                          () -> coralSubsystem.haveCoral()));
                 },
                 WLDrive));
 
@@ -117,9 +117,8 @@ public class WLButtons {
 
     // Instead of directly using the elevator instance, we now use the coralSubsystem.
     oi.getButtonV()
-        .onTrue(Commands.runOnce(() -> coralSubsystem.getElevator().setHasCoral(), coralSubsystem))
-        .onFalse(
-            Commands.runOnce(() -> coralSubsystem.getElevator().clearHasCoral(), coralSubsystem));
+        .onTrue(Commands.runOnce(() -> coralSubsystem.setHaveCoral(), coralSubsystem))
+        .onFalse(Commands.runOnce(() -> coralSubsystem.setDoNotHaveCoral(), coralSubsystem));
 
     if (oi.getButtonFPosition0().getAsBoolean()) {
       AlignmentUtils.setLeftCage();

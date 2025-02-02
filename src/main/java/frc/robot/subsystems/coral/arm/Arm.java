@@ -32,7 +32,8 @@ public class Arm {
    */
   public void update() {
     // If any PID tunable values have changed, update the low-level IO.
-    // Note: We now pass in the velocity and acceleration constants from ArmConstants.
+    // Note: We now pass in the velocity and acceleration constants from
+    // ArmConstants.
     if (ArmKp.hasChanged(hashCode())
         || ArmKi.hasChanged(hashCode())
         || ArmKd.hasChanged(hashCode())) {
@@ -63,6 +64,10 @@ public class Arm {
     return io.getAngleInRadians();
   }
 
+  public void holdArmAngle() {
+    io.holdArmAngle();
+  }
+
   /**
    * Returns the current angle of the arm in degrees.
    *
@@ -70,5 +75,16 @@ public class Arm {
    */
   public double getAngleInDegrees() {
     return io.getAngleInDegrees();
+  }
+
+  public double getCalibratedAngleDegrees() {
+    return getAngleInDegrees() - ArmConstants.VISUALIZATION_CALIBRATION_OFFSET_DEGREES;
+  }
+
+  public void calibrateArmOffset() {
+    double currentAngle = getAngleInDegrees();
+    ArmConstants.VISUALIZATION_CALIBRATION_OFFSET_DEGREES = currentAngle;
+    Logger.recordOutput(
+        "Arm Angle Calibrated", ArmConstants.VISUALIZATION_CALIBRATION_OFFSET_DEGREES);
   }
 }

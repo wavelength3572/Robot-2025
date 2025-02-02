@@ -8,7 +8,7 @@ public final class ArmConfigs {
   public static final SparkMaxConfig armConfig = new SparkMaxConfig();
 
   static {
-    // Configure basic settings of the elevator motor
+    // Configure basic settings of the arm motor
     armConfig
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(ArmConstants.armCurrentLimit)

@@ -6,7 +6,6 @@ import org.littletonrobotics.junction.Logger;
 public class Elevator {
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-  private boolean hasCoral = false;
 
   private static final LoggedTunableNumber ElevatorkP =
       new LoggedTunableNumber("Elevator/kEp", ElevatorConstants.kElevatorKp);
@@ -42,7 +41,6 @@ public class Elevator {
     }
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
-    Logger.recordOutput("Alignment/hasCoral", hasCoral());
   }
 
   public void setPosition(Double requestedPosition) {
@@ -51,17 +49,5 @@ public class Elevator {
 
   public double getHeightInMeters() {
     return io.getHeightInMeters();
-  }
-
-  public boolean hasCoral() {
-    return hasCoral;
-  }
-
-  public void setHasCoral() {
-    this.hasCoral = true;
-  }
-
-  public void clearHasCoral() {
-    this.hasCoral = false;
   }
 }

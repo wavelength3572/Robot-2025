@@ -20,7 +20,10 @@ public class ArmIOSim implements ArmIO {
   private SparkFlex armMotor = new SparkFlex(ArmConstants.motorCanId, MotorType.kBrushless);
   private RelativeEncoder armEncoder = armMotor.getEncoder();
 
-  // Instead of storing the target in radians, store it in native units (motor rotations).
+  private boolean brakeModeEnabled = true; // Assume brake mode is on for simulation.
+
+  // Instead of storing the target in radians, store it in native units (motor
+  // rotations).
   private double armCurrentTargetNative = 0.0;
 
   // Simulation setup and variables
@@ -34,7 +37,7 @@ public class ArmIOSim implements ArmIO {
           ArmConstants.kArmKp,
           ArmConstants.kArmKi,
           ArmConstants.kArmKd,
-          new TrapezoidProfile.Constraints(2.45, 2.45)); // units should be tuned to native units
+          new TrapezoidProfile.Constraints(20, 40)); // units should be tuned to native units
 
   ArmFeedforward m_feedforward =
       new ArmFeedforward(
@@ -56,7 +59,14 @@ public class ArmIOSim implements ArmIO {
   public ArmIOSim() {
     armMotor.configure(
         ArmConfigs.armConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    armEncoder.setPosition(0);
+
+    // Instead of setting to 0, set the encoder to match your absolute position.
+    // For example, if the home angle is 90 degrees, convert that to native units.
+    double homeAngleNative =
+        (Units.degreesToRadians(ArmConstants.kArmHomeAngleDegrees) / (2.0 * Math.PI))
+            * ArmConstants.kArmGearing;
+    armEncoder.setPosition(homeAngleNative);
+
     armMotorSim = new SparkFlexSim(armMotor, armMotorModel);
   }
 
@@ -88,15 +98,17 @@ public class ArmIOSim implements ArmIO {
             m_controller.getSetpoint().position, m_controller.getSetpoint().velocity);
     armMotor.set((pidOutput + feedforwardOutput) / RobotController.getBatteryVoltage());
 
-    // For logging, convert native units (motor rotations) to physical arm angle in radians.
+    // For logging, convert native units (motor rotations) to physical arm angle in
+    // radians.
     double armAngleRadiansCalc = (currentNative / ArmConstants.kArmGearing) * (2.0 * Math.PI);
+
+    inputs.appliedVolts = armMotorSim.getAppliedOutput() * RobotController.getBatteryVoltage();
 
     inputs.setpoint = (armCurrentTargetNative / ArmConstants.kArmGearing) * (2.0 * Math.PI);
     inputs.encoderPositionRotations = armEncoder.getPosition();
     inputs.armAngleRad = simulatedArmRadians;
     inputs.armAngleRadCalc = armAngleRadiansCalc;
     inputs.motorVelocityRPM = armEncoder.getVelocity() / ArmConstants.kArmGearing;
-    inputs.appliedVolts = armMotorSim.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = armMotorSim.getMotorCurrent();
     inputs.pidOutput = pidOutput;
     inputs.feedforwardOutput = feedforwardOutput;
@@ -118,12 +130,15 @@ public class ArmIOSim implements ArmIO {
 
   @Override
   public void setBrakeMode(boolean enabled) {
-    // In simulation, brake mode might not be simulated.
+    // If SparkFlexSim supports it, you might have something like:
+    brakeModeEnabled = enabled;
+    // Otherwise, you can store a flag and adjust your simulation parameters accordingly.
   }
 
   @Override
   public double getAngleInRadians() {
-    // Convert the current encoder reading (motor rotations) to physical arm angle in radians.
+    // Convert the current encoder reading (motor rotations) to physical arm angle
+    // in radians.
     double armRotations = armEncoder.getPosition() / ArmConstants.kArmGearing;
     return armRotations * (2.0 * Math.PI);
   }
@@ -131,5 +146,22 @@ public class ArmIOSim implements ArmIO {
   @Override
   public double getAngleInDegrees() {
     return Units.radiansToDegrees(getAngleInRadians());
+  }
+
+  @Override
+  public void holdArmAngle() {
+    // Read the current encoder position (native units) from the simulation encoder.
+    double currentNative = armEncoder.getPosition();
+
+    // Update our internal target to be the current position.
+    armCurrentTargetNative = currentNative;
+
+    // Optionally, reset the PID controller’s internal state so it doesn’t wind up
+    // from previous errors.
+    m_controller.reset(currentNative);
+
+    // Log for debugging if desired:
+    System.out.println(
+        "ArmIOSim: Holding current angle. Current native position: " + currentNative);
   }
 }
