@@ -1,10 +1,9 @@
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.coral.elevator;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
-public class Elevator extends SubsystemBase {
+public class Elevator {
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
   private boolean hasCoral = false;
@@ -24,8 +23,11 @@ public class Elevator extends SubsystemBase {
     this.io = io;
   }
 
-  @Override
-  public void periodic() {
+  /**
+   * This update method replaces the periodic() method from the SubsystemBase. It should be called
+   * periodically from your higher-level CoralSubsystem.
+   */
+  public void update() {
     if (ElevatorkP.hasChanged(hashCode())
         || ElevatorkD.hasChanged(hashCode())
         || ElevatorkF.hasChanged(hashCode())

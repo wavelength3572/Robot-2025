@@ -316,6 +316,7 @@ public class AlignmentUtils {
    * @return A Supplier that returns the desired Rotation2d on each call.
    */
   public static CageSelection findCageRobotAngle(Pose2d robotPose, Translation2d cageTranslation) {
+
     // Calculate the direction vector from the robot to the cage target
     Translation2d direction = cageTranslation.minus(robotPose.getTranslation());
 

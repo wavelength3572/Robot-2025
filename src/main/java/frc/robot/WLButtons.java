@@ -5,15 +5,15 @@ import frc.robot.commands.CommandConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.util.AlignmentUtils;
 
 public class WLButtons {
 
   private static OperatorInterface oi;
   private static Drive WLDrive;
-  private static Elevator WLElevator;
+  private static CoralSubsystem coralSubsystem;
 
   public WLButtons() {}
 
@@ -23,12 +23,14 @@ public class WLButtons {
     WLDrive = drive;
   }
 
+  // Updated method signature to receive CoralSubsystem instead of Elevator.
   public static void configureButtonBindings(
-      OperatorInterface operatorInterface, Drive drive, Elevator elevator) {
+      OperatorInterface operatorInterface, Drive drive, CoralSubsystem coralSubsystem) {
     oi = operatorInterface;
     WLDrive = drive;
-    WLElevator = elevator;
+    WLButtons.coralSubsystem = coralSubsystem;
 
+    // Example of configuring drive defaults using WLDrive and coralSubsystem (if needed):
     if (oi.getButtonH().getAsBoolean()) {
       WLDrive.setDriveModeSmart();
       WLDrive.setDefaultCommand(
@@ -44,8 +46,8 @@ public class WLButtons {
               CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
               drive::getCageSelection,
               CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE,
-              elevator::hasCoral));
-
+              // Use the elevator from the coral subsystem
+              () -> coralSubsystem.getElevator().hasCoral()));
     } else {
       WLDrive.setDriveModeNormal();
       WLDrive.setDefaultCommand(
@@ -70,8 +72,7 @@ public class WLButtons {
                       DriveCommands.joystickDrive(
                           WLDrive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
                 },
-                WLDrive // optional requirement
-                ))
+                WLDrive))
         .onTrue(
             Commands.runOnce(
                 () -> {
@@ -89,10 +90,9 @@ public class WLButtons {
                           CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
                           WLDrive::getCageSelection,
                           CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE,
-                          WLElevator::hasCoral));
+                          () -> coralSubsystem.getElevator().hasCoral()));
                 },
-                WLDrive // optional requirement
-                ));
+                WLDrive));
 
     // Drive to Pole
     oi.getRightJoyLeftButton()
@@ -115,19 +115,19 @@ public class WLButtons {
                 oi::getRotate,
                 CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
-    if (oi.getButtonV().getAsBoolean()) {
-      WLElevator.setHasCoral();
-    } else WLElevator.clearHasCoral();
-
+    // Instead of directly using the elevator instance, we now use the coralSubsystem.
     oi.getButtonV()
-        .onTrue(Commands.runOnce(WLElevator::setHasCoral, WLElevator))
-        .onFalse(Commands.runOnce(WLElevator::clearHasCoral, WLElevator));
+        .onTrue(Commands.runOnce(() -> coralSubsystem.getElevator().setHasCoral(), coralSubsystem))
+        .onFalse(
+            Commands.runOnce(() -> coralSubsystem.getElevator().clearHasCoral(), coralSubsystem));
 
     if (oi.getButtonFPosition0().getAsBoolean()) {
       AlignmentUtils.setLeftCage();
     } else if (oi.getButtonFPosition1().getAsBoolean()) {
       AlignmentUtils.setMidCage();
-    } else AlignmentUtils.setRightCage();
+    } else {
+      AlignmentUtils.setRightCage();
+    }
 
     oi.getButtonFPosition0().onTrue(Commands.runOnce(AlignmentUtils::setLeftCage));
     oi.getButtonFPosition1().onTrue(Commands.runOnce(AlignmentUtils::setMidCage));

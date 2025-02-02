@@ -152,8 +152,10 @@ public class Drive extends SubsystemBase {
     if (DriverStation.getAlliance().isPresent()) {
       reefFaceSelection = AlignmentUtils.findClosestReefFaceAndRejectOthers(getPose());
       coralStationSelection = AlignmentUtils.findClosestCoralStation(getPose());
-      cageSelection =
-          AlignmentUtils.findCageRobotAngle(getPose(), CommandConstants.selectedCageTranslation);
+
+      if (CommandConstants.selectedCageTranslation != null)
+        cageSelection =
+            AlignmentUtils.findCageRobotAngle(getPose(), CommandConstants.selectedCageTranslation);
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data

@@ -416,10 +416,9 @@ public class DriveCommands {
                   else if (cageSelection != null
                       && DriverStation.getAlliance().isPresent()
                       && cageSelection.getDistanceToCage() <= cageDistanceThresholdMeters
-                      // && cageSelection.getRotationToCage().getDegrees() > -90
-                      // && cageSelection.getRotationToCage().getDegrees() < 90
-                      ) 
-                      {
+                  // && cageSelection.getRotationToCage().getDegrees() > -90
+                  // && cageSelection.getRotationToCage().getDegrees() < 90
+                  ) {
 
                     omega =
                         angleController.calculate(

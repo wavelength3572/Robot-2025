@@ -23,16 +23,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CommandConstants;
+import frc.robot.commands.CoralSystemCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
-import frc.robot.commands.ElevatorCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.coral.CoralSubsystem;
+import frc.robot.subsystems.coral.arm.Arm;
+import frc.robot.subsystems.coral.arm.ArmConstants;
+import frc.robot.subsystems.coral.arm.ArmIOSim;
+import frc.robot.subsystems.coral.arm.ArmIOSpark;
+import frc.robot.subsystems.coral.elevator.Elevator;
+import frc.robot.subsystems.coral.elevator.ElevatorConstants;
+import frc.robot.subsystems.coral.elevator.ElevatorIOPPCSim;
+import frc.robot.subsystems.coral.elevator.ElevatorIOSpark;
+import frc.robot.subsystems.coral.endeffector.EndEffector;
+import frc.robot.subsystems.coral.endeffector.EndEffectorIOSim;
+import frc.robot.subsystems.coral.endeffector.EndEffectorIOSpark;
 import frc.robot.subsystems.drive.*;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorConstants;
-import frc.robot.subsystems.elevator.ElevatorIOPPCSim;
-import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
@@ -53,6 +61,10 @@ public class RobotContainer {
   private final Vision vision;
   private final Drive drive;
   private final Elevator elevator;
+  private final Arm arm;
+  private final EndEffector endeffector;
+  private final CoralSubsystem coralSubsystem; // Contains elevator, arm, endeffector
+
   private OperatorInterface oi = new OperatorInterface() {};
 
   private LoggedMechanism2d scoringSystem = new LoggedMechanism2d(.8382, 2.0);
@@ -62,10 +74,20 @@ public class RobotContainer {
           new LoggedMechanismLigament2d(
               "Elevator", ElevatorConstants.kGroundToElevator, 90, 2, new Color8Bit(Color.kBlue)));
 
+  // New arm visualization:
+  // For example, assume the arm has a fixed length defined in your constants:
+  private final LoggedMechanismLigament2d m_arm =
+      m_elevator.append(
+          new LoggedMechanismLigament2d(
+              "Arm",
+              ArmConstants.armLength, // The physical length of your arm.
+              0, // Initial angle (in degrees).
+              2, // Thickness (example value)
+              new Color8Bit(Color.kRed)));
+
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     switch (Constants.currentMode) {
@@ -82,12 +104,11 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(backRightCam, robotToBackRightCam));
-        // vision =
-        //     new Vision(
-        //         drive::addVisionMeasurement,
-        //         new VisionIOPhotonVision(camera0Name, robotToCamera0),
-        //         new VisionIOPhotonVision(camera1Name, robotToCamera1));
-        elevator = new Elevator(new ElevatorIOSpark() {});
+
+        elevator = new Elevator(new ElevatorIOSpark());
+        arm = new Arm(new ArmIOSpark());
+        endeffector = new EndEffector(new EndEffectorIOSpark());
+        coralSubsystem = new CoralSubsystem(elevator, arm, endeffector);
         break;
 
       case SIM:
@@ -108,7 +129,11 @@ public class RobotContainer {
                     elevatorFrontCam, robotToElevatorFrontCam, drive::getPose),
                 new VisionIOPhotonVisionSim(
                     elevatorBackCam, robotToElevatorBackCam, drive::getPose));
-        elevator = new Elevator(new ElevatorIOPPCSim() {});
+
+        elevator = new Elevator(new ElevatorIOPPCSim());
+        arm = new Arm(new ArmIOSim());
+        endeffector = new EndEffector(new EndEffectorIOSim());
+        coralSubsystem = new CoralSubsystem(elevator, arm, endeffector);
         break;
 
       default:
@@ -123,6 +148,10 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         elevator = null;
+        arm = null;
+        endeffector = null;
+        coralSubsystem = null;
+
         break;
     }
 
@@ -130,14 +159,14 @@ public class RobotContainer {
       elevator.setPosition(0.0);
       SmartDashboard.putNumber("Elevator Goal", 0.0);
       SmartDashboard.putData(
-          "Elevator 2", ElevatorCommands.setElevatorPositionFromDashboard(elevator));
+          "Elevator 2", CoralSystemCommands.setElevatorPositionFromDashboard(coralSubsystem));
     }
 
     if (elevator != null) {
       elevator.setPosition(0.0);
       SmartDashboard.putNumber("Elevator Goal", 0.0);
       SmartDashboard.putData(
-          "Elevator 2", ElevatorCommands.setElevatorPositionFromDashboard(elevator));
+          "Elevator 2", CoralSystemCommands.setElevatorPositionFromDashboard(coralSubsystem));
     }
     SmartDashboard.putData(
         "DriveToClosestLEFTPole",
@@ -196,7 +225,7 @@ public class RobotContainer {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     oi = OISelector.findOperatorInterface();
 
-    WLButtons.configureButtonBindings(oi, drive, elevator);
+    WLButtons.configureButtonBindings(oi, drive, coralSubsystem);
 
     // Configure some robot defaults based on current state of Controller Switches.
     // if (oi.getFieldRelativeButton().getAsBoolean()) {

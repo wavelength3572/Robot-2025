@@ -18,6 +18,7 @@ import static frc.robot.subsystems.vision.VisionConstants.aprilTagLayout;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.function.Supplier;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -30,10 +31,16 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
   private final Supplier<Pose2d> poseSupplier;
   private final PhotonCameraSim cameraSim;
 
+  // Time tracking for limiting vision updates
+  private double lastUpdateTime = 0.0;
+  // Update interval in seconds (e.g., 50 ms)
+  private static final double UPDATE_INTERVAL = 0.05;
+
   /**
    * Creates a new VisionIOPhotonVisionSim.
    *
    * @param name The name of the camera.
+   * @param robotToCamera The transform from the robot to the camera.
    * @param poseSupplier Supplier for the robot pose to use in simulation.
    */
   public VisionIOPhotonVisionSim(
@@ -41,15 +48,17 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
     super(name, robotToCamera);
     this.poseSupplier = poseSupplier;
 
-    // Initialize vision sim
+    // Initialize the vision simulation (only once)
     if (visionSim == null) {
       visionSim = new VisionSystemSim("main");
       visionSim.addAprilTags(aprilTagLayout);
     }
 
-    // Add sim camera
-    var cameraProperties = new SimCameraProperties();
+    // Configure the simulated camera properties.
+    SimCameraProperties cameraProperties = new SimCameraProperties();
     cameraProperties.setCalibration(800, 600, Rotation2d.fromDegrees(70));
+
+    // Create the PhotonCameraSim instance.
     cameraSim = new PhotonCameraSim(camera, cameraProperties, aprilTagLayout);
     cameraSim.enableDrawWireframe(true);
     visionSim.addCamera(cameraSim, robotToCamera);
@@ -57,7 +66,13 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
 
   @Override
   public void updateInputs(VisionIOInputs inputs) {
-    visionSim.update(poseSupplier.get());
+    double now = Timer.getFPGATimestamp();
+    // Only update the vision simulation if the interval has elapsed.
+    if (now - lastUpdateTime >= UPDATE_INTERVAL) {
+      visionSim.update(poseSupplier.get());
+      lastUpdateTime = now;
+    }
+    // Call the superclass update to propagate any additional behavior.
     super.updateInputs(inputs);
   }
 }

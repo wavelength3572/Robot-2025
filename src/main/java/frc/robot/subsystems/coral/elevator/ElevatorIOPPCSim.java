@@ -1,4 +1,4 @@
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.coral.elevator;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkMaxSim;
@@ -102,8 +102,13 @@ public class ElevatorIOPPCSim implements ElevatorIO {
   }
 
   @Override
-  public void setPosition(double requestedPosition) {
-    this.elevatorCurrentTarget = requestedPosition;
+  public void setPosition(double requestedPositionMeters) {
+    // Convert the desired elevator height (in meters) to encoder rotations.
+    double rotationsGoal =
+        requestedPositionMeters
+            / ((ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI)
+                / ElevatorConstants.kElevatorGearing);
+    this.elevatorCurrentTarget = rotationsGoal;
   }
 
   @Override

@@ -1,6 +1,6 @@
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.coral.elevator;
 
-import static frc.robot.subsystems.elevator.ElevatorConstants.leaderCanId;
+import static frc.robot.subsystems.coral.elevator.ElevatorConstants.leaderCanId;
 
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
