@@ -477,10 +477,19 @@ public class DriveCommands {
   private static void resetAngleController(
       ProfiledPIDController angleController,
       Supplier<Pose2d> robotPoseSupplier,
-      Object chosenOrientation) {
+      ReefChosenOrientation chosenOrientation) {
 
     angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
-    angleController.setGoal(((Rotation2d) chosenOrientation).getRadians());
+    angleController.setGoal(chosenOrientation.rotation2D().getRadians());
+  }
+
+  private static void resetAngleController(
+      ProfiledPIDController angleController,
+      Supplier<Pose2d> robotPoseSupplier,
+      StationChosenOrientation chosenOrientation) {
+
+    angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
+    angleController.setGoal(chosenOrientation.rotation2D().getRadians());
   }
 
   private static void sendSpeedsToDrive(Drive drive, Translation2d linearVelocity, double omega) {

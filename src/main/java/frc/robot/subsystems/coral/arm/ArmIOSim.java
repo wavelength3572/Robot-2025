@@ -68,6 +68,7 @@ public class ArmIOSim implements ArmIO {
     armEncoder.setPosition(homeAngleNative);
 
     armMotorSim = new SparkFlexSim(armMotor, armMotorModel);
+    m_controller.setTolerance(.5);
   }
 
   @Override
@@ -163,5 +164,10 @@ public class ArmIOSim implements ArmIO {
     // Log for debugging if desired:
     System.out.println(
         "ArmIOSim: Holding current angle. Current native position: " + currentNative);
+  }
+
+  @Override
+  public boolean isAtGoal() {
+    return m_controller.atGoal();
   }
 }

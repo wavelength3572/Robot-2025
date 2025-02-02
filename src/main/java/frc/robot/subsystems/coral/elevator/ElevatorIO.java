@@ -33,4 +33,8 @@ public interface ElevatorIO {
 
   public default void setPIDValues(
       double kP, double kD, double kF, double VelocityMax, double AccelerationMax) {}
+
+  public default boolean isAtGoal() {
+    return false;
+  }
 }

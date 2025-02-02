@@ -50,4 +50,8 @@ public class Elevator {
   public double getHeightInMeters() {
     return io.getHeightInMeters();
   }
+
+  public boolean isAtGoal() {
+    return io.isAtGoal();
+  }
 }

@@ -10,6 +10,8 @@ public class CoralSystemPresetChooser {
     // Set a default option
     chooser.setDefaultOption("Stow", CoralSystemPresets.STOW);
 
+    chooser.addOption("Stow Low", CoralSystemPresets.STOW_LOW);
+
     // Add all your enum options
     chooser.addOption("Pickup", CoralSystemPresets.PICKUP);
     chooser.addOption("Score Level 1", CoralSystemPresets.SCORE_LEVEL_1);

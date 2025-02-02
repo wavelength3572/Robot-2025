@@ -87,4 +87,8 @@ public class Arm {
     Logger.recordOutput(
         "Arm Angle Calibrated", ArmConstants.VISUALIZATION_CALIBRATION_OFFSET_DEGREES);
   }
+
+  public boolean isAtGoal() {
+    return io.isAtGoal();
+  }
 }

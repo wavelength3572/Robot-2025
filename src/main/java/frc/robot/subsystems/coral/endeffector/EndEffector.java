@@ -45,5 +45,7 @@ public class EndEffector {
     io.runOpenLoop(output);
   }
 
-  // Optionally, you can add additional methods to delegate runVolts, stop, runSpeed, etc.
+  public void stop() {
+    io.stop();
+  }
 }

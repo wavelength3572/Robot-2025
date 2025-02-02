@@ -96,4 +96,10 @@ public class ArmIOSpark implements ArmIO {
     armClosedLoopController.setReference(
         armCurrentTargetNative, ControlType.kMAXMotionPositionControl);
   }
+
+  @Override
+  public boolean isAtGoal() {
+    double error = Math.abs(armEncoder.getPosition() - armCurrentTargetNative);
+    return error < 0.01;
+  }
 }

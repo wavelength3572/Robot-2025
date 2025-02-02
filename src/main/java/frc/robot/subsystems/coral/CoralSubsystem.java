@@ -1,8 +1,10 @@
 package frc.robot.subsystems.coral;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.coral.CoralSystemPresets.CoralState;
 import frc.robot.subsystems.coral.arm.Arm;
 import frc.robot.subsystems.coral.elevator.Elevator;
 import frc.robot.subsystems.coral.elevator.ElevatorConstants;
@@ -18,6 +20,8 @@ public class CoralSubsystem extends SubsystemBase {
   private final Arm arm;
   private final EndEffector endEffector;
 
+  private CoralState selectedScoringLevel = CoralState.PREPARE_L4_SCORE; // Default scoring level
+
   private boolean haveCoral = false;
   private boolean haveAlgae = false;
 
@@ -26,6 +30,7 @@ public class CoralSubsystem extends SubsystemBase {
   private final LoggedMechanismLigament2d elevatorLigament;
   private final LoggedMechanismLigament2d armLigament;
   private final LoggedMechanismLigament2d endEffectorLigament;
+  private final CoralStateMachine stateMachine; // Updated variable name
 
   /**
    * Constructs a CoralSubsystem with the provided subcomponents.
@@ -38,6 +43,9 @@ public class CoralSubsystem extends SubsystemBase {
     this.elevator = elevator;
     this.arm = arm;
     this.endEffector = endEffector;
+    this.stateMachine = new CoralStateMachine(this);
+
+    SmartDashboard.putString("Selected Scoring Level", selectedScoringLevel.name());
 
     // Create the 2D mechanism visualizer using constants.
     visualizer =
@@ -81,15 +89,24 @@ public class CoralSubsystem extends SubsystemBase {
   /** The periodic method updates all subcomponents and the visualization. */
   @Override
   public void periodic() {
+
     // Update subcomponents.
     elevator.update();
     arm.update();
     endEffector.update();
 
-    Logger.recordOutput("Alignment/haveCoral", haveCoral());
-
     // Refresh visualizer based on the current state.
     updateVisualizers();
+
+    // ✅ Log actual sensor readings
+    Logger.recordOutput("Coral/Elevator Actual Height", getElevator().getHeightInMeters());
+    Logger.recordOutput("Coral/Arm Actual Angle", getArm().getAngleInDegrees());
+
+    // ✅ Log coral possession status
+    Logger.recordOutput("Coral/Has Coral", haveCoral());
+
+    // ✅ Log the state machine status
+    stateMachine.update();
   }
 
   /** Updates the visualizer to reflect the current positions of the subcomponents. */
@@ -110,19 +127,18 @@ public class CoralSubsystem extends SubsystemBase {
     return visualizer;
   }
 
-  /**
-   * A high-level command to pick up a coral game piece. This command coordinates the three
-   * components by: - Lowering the elevator to the intake position, - Rotating the arm into
-   * position, - Activating the end effector to intake.
-   *
-   * @return a Command that runs the pickup sequence.
-   */
   public Command pickupCoral() {
     return Commands.runOnce(
         () -> {
-          elevator.setPosition(0.5); // Example: Lower elevator for intake.
-          arm.setAngleDegrees(90); // Example: Rotate arm for intake.
-          endEffector.runOpenLoop(1.0); // Activate end effector to intake.
+          stateMachine.setState(CoralState.PICKUP);
+
+          // Retrieve preset values
+          CoralSystemPresets preset = CoralSystemPresets.PICKUP;
+
+          // Apply the preset values
+          elevator.setPosition(preset.getElevatorHeight());
+          arm.setAngleDegrees(preset.getArmAngle());
+          endEffector.runOpenLoop(1.0); // Keep intake power manually controlled here
         });
   }
 
@@ -186,5 +202,70 @@ public class CoralSubsystem extends SubsystemBase {
 
   public void setDoNotHaveAlgae() {
     this.haveCoral = false;
+  }
+
+  public CoralStateMachine getStateMachine() {
+    return stateMachine;
+  }
+
+  /** Allows external commands to change the selected scoring level */
+  public void setSelectedScoringLevel(CoralState level) {
+    if (level == CoralState.L1_SCORE
+        || level == CoralState.L2_SCORE
+        || level == CoralState.L3_SCORE
+        || level == CoralState.L4_SCORE) {
+      selectedScoringLevel = level;
+      SmartDashboard.putString("Selected Scoring Level", level.name());
+    }
+  }
+
+  /** Gets the currently selected scoring level */
+  public CoralState getSelectedScoringLevel() {
+    return selectedScoringLevel;
+  }
+
+  public void cycleScoringLevel(boolean forward) {
+    // Define the sequence of scoring levels
+    CoralState[] scoringLevels = {
+      CoralState.PREPARE_L1_SCORE,
+      CoralState.PREPARE_L2_SCORE,
+      CoralState.PREPARE_L3_SCORE,
+      CoralState.PREPARE_L4_SCORE
+    };
+
+    // Find the index of the current level
+    int currentIndex = 0;
+    for (int i = 0; i < scoringLevels.length; i++) {
+      if (scoringLevels[i] == selectedScoringLevel) {
+        currentIndex = i;
+        break;
+      }
+    }
+
+    // Move to the next level based on direction
+    if (forward) {
+      selectedScoringLevel =
+          scoringLevels[(currentIndex + 1) % scoringLevels.length]; // Forward cycle
+    } else {
+      selectedScoringLevel =
+          scoringLevels[
+              (currentIndex - 1 + scoringLevels.length) % scoringLevels.length]; // Reverse
+      // cycle
+    }
+
+    // Update SmartDashboard
+    SmartDashboard.putString("Selected Scoring Level", selectedScoringLevel.name());
+
+    System.out.println("🔄 Scoring Level Changed: " + selectedScoringLevel);
+  }
+
+  /** Moves forward through the scoring levels (L1 → L2 → L3 → L4 → L1) */
+  public void cycleScoringLevelForward() {
+    cycleScoringLevel(true);
+  }
+
+  /** Moves backward through the scoring levels (L4 → L3 → L2 → L1 → L4) */
+  public void cycleScoringLevelBackward() {
+    cycleScoringLevel(false);
   }
 }

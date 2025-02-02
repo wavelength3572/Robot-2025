@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.CommandConstants;
+import frc.robot.commands.CoralSystemCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OperatorInterface;
@@ -30,7 +31,8 @@ public class WLButtons {
     WLDrive = drive;
     WLButtons.coralSubsystem = coralSubsystem;
 
-    // Example of configuring drive defaults using WLDrive and coralSubsystem (if needed):
+    // Example of configuring drive defaults using WLDrive and coralSubsystem (if
+    // needed):
     if (oi.getButtonH().getAsBoolean()) {
       WLDrive.setDriveModeSmart();
       WLDrive.setDefaultCommand(
@@ -115,9 +117,9 @@ public class WLButtons {
                 oi::getRotate,
                 CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
-    //FIX ME: Checks the button to tell if we have coral; make this use our sensor later
-    if(oi.getButtonV().getAsBoolean())
-    {
+    // FIX ME: Checks the button to tell if we have coral; make this use our sensor
+    // later
+    if (oi.getButtonV().getAsBoolean()) {
       coralSubsystem.setHaveCoral();
     } else coralSubsystem.setDoNotHaveCoral();
 
@@ -136,5 +138,18 @@ public class WLButtons {
     oi.getButtonFPosition0().onTrue(Commands.runOnce(AlignmentUtils::setLeftCage));
     oi.getButtonFPosition1().onTrue(Commands.runOnce(AlignmentUtils::setMidCage));
     oi.getButtonFPosition2().onTrue(Commands.runOnce(AlignmentUtils::setRightCage));
+
+    // Operator Type Buttons
+    oi.getRightJoyDownButton().onTrue(CoralSystemCommands.prepareToPickupCoral(coralSubsystem));
+
+    oi.getRightJoyUpButton().onTrue(CoralSystemCommands.prepareToScoreCoral(coralSubsystem));
+
+    // Operator button to cycle forward through scoring leve
+    oi.getLeftJoyUpButton()
+        .onTrue(Commands.runOnce(() -> coralSubsystem.cycleScoringLevelForward()));
+
+    // Operator button to cycle backward through scoring levels
+    oi.getLeftJoyDownButton()
+        .onTrue(Commands.runOnce(() -> coralSubsystem.cycleScoringLevelBackward()));
   }
 }

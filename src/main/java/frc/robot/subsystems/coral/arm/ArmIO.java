@@ -38,4 +38,8 @@ public interface ArmIO {
   public default double getAngleInDegrees() {
     return 0.0;
   }
+
+  public default boolean isAtGoal() {
+    return false;
+  }
 }

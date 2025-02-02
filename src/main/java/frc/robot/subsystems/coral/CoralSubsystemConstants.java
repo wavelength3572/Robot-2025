@@ -7,6 +7,9 @@ import frc.robot.subsystems.coral.elevator.ElevatorConstants;
 import frc.robot.subsystems.coral.endeffector.EndEffectorConstants;
 
 public final class CoralSubsystemConstants {
+
+  public static final double SAFE_CARRIAGE_POSITION = .7;
+
   // Visualizer dimensions
   public static final double VISUALIZER_WIDTH = 0.8382;
   public static final double VISUALIZER_HEIGHT = 2.0;

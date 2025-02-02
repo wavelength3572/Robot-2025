@@ -91,4 +91,10 @@ public class ElevatorIOSim implements ElevatorIO {
     return (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
         * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI);
   }
+
+  @Override
+  public boolean isAtGoal() {
+    return Math.abs(m_elevatorSim.getPositionMeters() - this.elevatorCurrentTarget)
+        < 0.05; // 5 cm tolerance
+  }
 }

@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.coral.CoralSystemPresetChooser;
 import frc.robot.subsystems.coral.CoralSystemPresets;
+import frc.robot.subsystems.coral.CoralSystemPresets.CoralState;
 
 public class CoralSystemCommands {
 
@@ -73,11 +74,65 @@ public class CoralSystemCommands {
         },
         coralSubsystem);
   }
+
   /**
    * Creates a command that holds the current arm position. This is useful as a default command to
    * prevent sudden movements.
    */
   public static Command holdArmAngle(CoralSubsystem coralSubsystem) {
     return Commands.runOnce(coralSubsystem.getArm()::holdArmAngle, coralSubsystem);
+  }
+
+  public static Command moveToState(CoralSubsystem coralSubsystem, CoralState targetState) {
+    return Commands.runOnce(
+        () -> {
+          // Use setState to ensure the FSM updates correctly
+          coralSubsystem.getStateMachine().setState(targetState);
+        },
+        coralSubsystem);
+  }
+
+  /** Moves the system to the pickup position. */
+  public static Command prepareToPickupCoral(CoralSubsystem coralSubsystem) {
+    return moveToState(coralSubsystem, CoralState.PICKUP);
+  }
+
+  /** Moves the system to the currently selected scoring position. */
+  public static Command prepareToScoreCoral(CoralSubsystem coralSubsystem) {
+    return Commands.runOnce(
+        () -> {
+          CoralState selectedLevel = coralSubsystem.getSelectedScoringLevel();
+          moveToState(coralSubsystem, selectedLevel).schedule();
+        });
+  }
+
+  /** Moves the system to the default stow position (STOW_LOW). */
+  public static Command prepareToStow(CoralSubsystem coralSubsystem) {
+    return moveToState(coralSubsystem, CoralState.STOW_LOW);
+  }
+
+  /** Moves the system to the front algae dislodge position. */
+  public static Command prepareToAlgaeDislodge(CoralSubsystem coralSubsystem) {
+    return moveToState(coralSubsystem, CoralState.FRONT_ALGAE_DISLODGE);
+  }
+
+  /** Releases the coral from the intake mechanism and stops after a delay. */
+  public static Command releaseCoral(CoralSubsystem coralSubsystem) {
+    return Commands.sequence(
+        Commands.runOnce(
+            () -> {
+              CoralState currentState = coralSubsystem.getStateMachine().getCurrentState();
+              if (currentState == CoralState.L1_SCORE
+                  || currentState == CoralState.L2_SCORE
+                  || currentState == CoralState.L3_SCORE
+                  || currentState == CoralState.L4_SCORE) {
+
+                coralSubsystem.getEndEffector().runOpenLoop(-1.0); // Eject coral
+                System.out.println("🦞 Coral Released!");
+              }
+            },
+            coralSubsystem),
+        Commands.waitSeconds(0.5),
+        Commands.runOnce(() -> coralSubsystem.getEndEffector().stop(), coralSubsystem));
   }
 }

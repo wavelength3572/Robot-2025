@@ -83,4 +83,9 @@ public class ElevatorIOSpark implements ElevatorIO {
     leaderMotor.configure(
         config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
+
+  @Override
+  public boolean isAtGoal() {
+    return Math.abs(leaderEncoder.getPosition() - this.elevatorCurrentTarget) < 0.05;
+  }
 }
