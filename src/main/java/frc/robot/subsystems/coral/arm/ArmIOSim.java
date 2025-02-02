@@ -1,92 +1,135 @@
 package frc.robot.subsystems.coral.arm;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
-/**
- * A simulation implementation of the Arm I/O.
- * This class implements the ArmIO interface (defined as a nested interface in the Arm class)
- * and simulates the arm's rotation using closed-loop PID control. It uses rotations as its
- * native unit (1 rotation = 360°).
- */
-public class ArmIOSim implements Arm.ArmIO {
+public class ArmIOSim implements ArmIO {
 
-  // Create a SparkMax instance to simulate the arm motor.
-  private final SparkMax armMotor = new SparkMax(ArmConstants.motorCanId, MotorType.kBrushless);
-  // Get the encoder from the motor (encoder units will be in rotations).
-  private final RelativeEncoder armEncoder = armMotor.getEncoder();
-  
-  // The target for the arm, expressed in rotations.
-  private double armTargetRotations = 0.0;
-  
-  // Simulation model for the arm motor. (For example, a NEO motor model.)
-  private final DCMotor armMotorModel = DCMotor.getNEO(1); // Adjust as needed.
-  private SparkMaxSim armMotorSim;
-  
-  
-  // PID controller for the arm (units: rotations).
-  private final ProfiledPIDController pidController =
+  // The motor and encoder remain the same.
+  private SparkFlex armMotor = new SparkFlex(ArmConstants.motorCanId, MotorType.kBrushless);
+  private RelativeEncoder armEncoder = armMotor.getEncoder();
+
+  // Instead of storing the target in radians, store it in native units (motor rotations).
+  private double armCurrentTargetNative = 0.0;
+
+  // Simulation setup and variables
+  private final DCMotor armMotorModel = DCMotor.getNEO(1);
+  private SparkFlexSim armMotorSim;
+
+  // Standard classes for controlling our arm.
+  // Note: The PID controller now works in native units.
+  private final ProfiledPIDController m_controller =
       new ProfiledPIDController(
           ArmConstants.kArmKp,
           ArmConstants.kArmKi,
           ArmConstants.kArmKd,
-          new TrapezoidProfile.Constraints(
-              ArmConstants.kMaxAngularVelocityRotations, 
-              ArmConstants.kMaxAngularAccelerationRotations));
+          new TrapezoidProfile.Constraints(2.45, 2.45)); // units should be tuned to native units
+
+  ArmFeedforward m_feedforward =
+      new ArmFeedforward(
+          ArmConstants.kArmkS, ArmConstants.kArmG, ArmConstants.kArmkV, ArmConstants.kArmkA);
+
+  private final SingleJointedArmSim m_armSim =
+      new SingleJointedArmSim(
+          DCMotor.getNEO(1),
+          ArmConstants.kArmGearing,
+          SingleJointedArmSim.estimateMOI(ArmConstants.kArmLengthMeters, ArmConstants.kArmMass),
+          ArmConstants.kArmLengthMeters,
+          Units.degreesToRadians(ArmConstants.kArmMinAngleDegrees),
+          Units.degreesToRadians(ArmConstants.kArmMaxAngleDegrees),
+          true,
+          Units.degreesToRadians(ArmConstants.kArmHomeAngleDegrees),
+          0.0,
+          0.0);
 
   public ArmIOSim() {
-    // Configure the motor using your Arm configuration.
     armMotor.configure(
-        ArmConfigs.ArmSubsystem, 
-        ResetMode.kResetSafeParameters, 
-        PersistMode.kPersistParameters);
-    // Reset the encoder to 0.
+        ArmConfigs.armConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     armEncoder.setPosition(0);
-    
-    // Create the simulation object for the SparkMax.
-    armMotorSim = new SparkMaxSim(armMotor, armMotorModel);
+    armMotorSim = new SparkFlexSim(armMotor, armMotorModel);
   }
 
   @Override
-  public void updateInputs() {
-    // Compute the voltage applied to the motor.
-    double appliedVolts = armMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
-    double dt = 0.020; // 20 ms timestep.
-    
-    // Update the simulation with the current voltage input.
-    armMotorSim.setInput(appliedVolts);
-    armMotorSim.update(dt);
+  public void updateInputs(ArmIOInputs inputs) {
+    // Update simulation dynamics.
+    m_armSim.setInput(armMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
+    m_armSim.update(0.020);
 
-    // Update the encoder with the simulated position (in rotations).
-    armEncoder.setPosition(armMotorSim.getPosition());
-    
-    // Update the PID controller: set the goal (in rotations) and calculate output.
-    pidController.setGoal(armTargetRotations);
-    double pidOutput = pidController.calculate(armEncoder.getPosition());
-    
-    // Command the motor with the PID output.
-    // Convert the output (volts) to a percent output by dividing by battery voltage.
-    double percentOutput = pidOutput / RobotController.getBatteryVoltage();
-    armMotor.set(percentOutput);
+    double armAngularVelocityRadPerSec = m_armSim.getVelocityRadPerSec(); // in rad/s
+    double armRPS = (armAngularVelocityRadPerSec / (2.0 * Math.PI)) * ArmConstants.kArmGearing;
+    double armRPM = armRPS * 60.0;
+
+    armMotorSim.iterate(armRPM, RobotController.getBatteryVoltage(), 0.02);
+
+    // **Manually update the encoder using the simulation's current angle:**
+    double simulatedArmRadians = m_armSim.getAngleRads();
+    double simulatedNative = (simulatedArmRadians / (2.0 * Math.PI)) * ArmConstants.kArmGearing;
+    armEncoder.setPosition(simulatedNative);
+
+    // Use native units for closed-loop control.
+    m_controller.setGoal(armCurrentTargetNative);
+
+    // Get current encoder reading in native units (motor rotations).
+    double currentNative = armEncoder.getPosition();
+    double pidOutput = m_controller.calculate(currentNative);
+    double feedforwardOutput =
+        m_feedforward.calculate(
+            m_controller.getSetpoint().position, m_controller.getSetpoint().velocity);
+    armMotor.set((pidOutput + feedforwardOutput) / RobotController.getBatteryVoltage());
+
+    // For logging, convert native units (motor rotations) to physical arm angle in radians.
+    double armAngleRadiansCalc = (currentNative / ArmConstants.kArmGearing) * (2.0 * Math.PI);
+
+    inputs.setpoint = (armCurrentTargetNative / ArmConstants.kArmGearing) * (2.0 * Math.PI);
+    inputs.encoderPositionRotations = armEncoder.getPosition();
+    inputs.armAngleRad = simulatedArmRadians;
+    inputs.armAngleRadCalc = armAngleRadiansCalc;
+    inputs.motorVelocityRPM = armEncoder.getVelocity() / ArmConstants.kArmGearing;
+    inputs.appliedVolts = armMotorSim.getAppliedOutput() * RobotController.getBatteryVoltage();
+    inputs.currentAmps = armMotorSim.getMotorCurrent();
+    inputs.pidOutput = pidOutput;
+    inputs.feedforwardOutput = feedforwardOutput;
+    inputs.armAngleDegrees = Units.radiansToDegrees(simulatedArmRadians);
+    inputs.armAngleDegreesCalc = Units.radiansToDegrees(armAngleRadiansCalc);
+  }
+
+  /**
+   * Set the target arm angle in radians (physical units). Converts the requested angle to native
+   * units (motor rotations) for closed-loop control.
+   */
+  @Override
+  public void setAngleDegrees(double requestedAngleDegrees) {
+    // Conversion: motor rotations = (requestedAngleRadians / (2π)) * gear ratio.
+    armCurrentTargetNative =
+        (Units.degreesToRadians(requestedAngleDegrees) / (2.0 * Math.PI))
+            * ArmConstants.kArmGearing;
   }
 
   @Override
-  public double getAngle() {
-    // Return the current arm angle in degrees (convert rotations to degrees).
-    return armEncoder.getPosition() * 360.0;
+  public void setBrakeMode(boolean enabled) {
+    // In simulation, brake mode might not be simulated.
   }
 
   @Override
-  public void setAngle(double angleDegrees) {
-    // Convert the desired angle (in degrees) to rotations.
-    armTargetRotations = angleDegrees / 360.0;
+  public double getAngleInRadians() {
+    // Convert the current encoder reading (motor rotations) to physical arm angle in radians.
+    double armRotations = armEncoder.getPosition() / ArmConstants.kArmGearing;
+    return armRotations * (2.0 * Math.PI);
+  }
+
+  @Override
+  public double getAngleInDegrees() {
+    return Units.radiansToDegrees(getAngleInRadians());
   }
 }

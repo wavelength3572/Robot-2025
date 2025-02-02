@@ -1,15 +1,24 @@
 package frc.robot.subsystems.coral.arm;
 
-/**
- * The Arm class is a component of the CoralSubsystem. It uses an injected ArmIO to perform
- * low-level control and sensor updates.
- */
+import frc.robot.util.LoggedTunableNumber;
+import org.littletonrobotics.junction.Logger;
+
 public class Arm {
+  // The low-level I/O for the arm (hardware or simulation)
   private final ArmIO io;
-  private double currentAngle;
+  // An inputs object for automatic logging
+  private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
+
+  // Tunable PID constants for the arm; these can be adjusted at runtime.
+  private static final LoggedTunableNumber ArmKp =
+      new LoggedTunableNumber("Arm/kP", ArmConstants.kArmKp);
+  private static final LoggedTunableNumber ArmKi =
+      new LoggedTunableNumber("Arm/kI", ArmConstants.kArmKi);
+  private static final LoggedTunableNumber ArmKd =
+      new LoggedTunableNumber("Arm/kD", ArmConstants.kArmKd);
 
   /**
-   * Constructs the Arm with the given I/O implementation.
+   * Constructs the Arm using the provided ArmIO implementation.
    *
    * @param io the ArmIO implementation (hardware or simulation)
    */
@@ -18,44 +27,48 @@ public class Arm {
   }
 
   /**
-   * Update method to be called periodically by the CoralSubsystem. This updates sensor inputs and
-   * stores the current angle.
+   * Update method that should be called periodically (by the CoralSubsystem, for example). This
+   * updates sensor inputs and logs them.
    */
   public void update() {
-    io.updateInputs();
-    currentAngle = io.getAngle();
+    // If any PID tunable values have changed, update the low-level IO.
+    // Note: We now pass in the velocity and acceleration constants from ArmConstants.
+    if (ArmKp.hasChanged(hashCode())
+        || ArmKi.hasChanged(hashCode())
+        || ArmKd.hasChanged(hashCode())) {
+      io.setPIDValues(
+          ArmKp.get(), ArmKi.get(), ArmKd.get(), ArmConstants.kArmVel, ArmConstants.kArmAcc);
+    }
+    // Update sensor inputs
+    io.updateInputs(inputs);
+    // Log the inputs for diagnostics.
+    Logger.processInputs("Arm", inputs);
   }
 
   /**
-   * Commands the arm to move toward the given angle.
+   * Commands the arm to move toward the specified target angle (in degrees).
    *
-   * @param angle the target angle (units as defined by your implementation)
+   * @param requestedAngleDegrees the target angle in degrees
    */
-  public void setAngle(double angle) {
-    io.setAngle(angle);
+  public void setAngleDegrees(double requestedAngleDegrees) {
+    io.setAngleDegrees(requestedAngleDegrees);
   }
 
   /**
-   * Returns the current angle of the arm.
+   * Returns the current angle of the arm in radians.
    *
-   * @return the current angle
+   * @return the current arm angle in radians
    */
-  public double getAngle() {
-    return currentAngle;
+  public double getAngleInRadians() {
+    return io.getAngleInRadians();
   }
 
   /**
-   * The ArmIO interface defines the low-level I/O operations for the arm. Implementations of this
-   * interface can be used for hardware or simulation.
+   * Returns the current angle of the arm in degrees.
+   *
+   * @return the current arm angle in degrees
    */
-  public interface ArmIO {
-    /** Update sensor inputs and internal state. */
-    void updateInputs();
-
-    /** Get the current arm angle (in radians or degrees as you define it). */
-    double getAngle();
-
-    /** Command the arm to move toward a specified angle. */
-    void setAngle(double angle);
+  public double getAngleInDegrees() {
+    return io.getAngleInDegrees();
   }
 }

@@ -40,14 +40,15 @@ public class CoralSystemCommands {
   public static Command setArmAngleFromDashboard(CoralSubsystem coralSubsystem) {
     return Commands.runOnce(
         () -> {
-          double goal = SmartDashboard.getNumber("Arm Angle Goal", 0);
-          coralSubsystem.getArm().setAngle(goal);
+          double goal = SmartDashboard.getNumber("Arm Goal", 0);
+          coralSubsystem.getArm().setAngleDegrees(goal);
         },
         coralSubsystem);
   }
 
   /** Set the arm angle to a specific requested value. The command requires the CoralSubsystem. */
   public static Command setArmAngle(CoralSubsystem coralSubsystem, Double requestedAngle) {
-    return Commands.runOnce(() -> coralSubsystem.getArm().setAngle(requestedAngle), coralSubsystem);
+    return Commands.runOnce(
+        () -> coralSubsystem.getArm().setAngleDegrees(requestedAngle), coralSubsystem);
   }
 }

@@ -46,7 +46,7 @@ public class CoralSubsystem extends SubsystemBase {
     return Commands.runOnce(
         () -> {
           elevator.setPosition(0.5); // Example: Lower elevator for intake.
-          arm.setAngle(0.3); // Example: Rotate arm for intake.
+          arm.setAngleDegrees(90); // Example: Rotate arm for intake.
           endEffector.runOpenLoop(1.0); // Activate end effector to intake.
         });
   }
@@ -62,7 +62,7 @@ public class CoralSubsystem extends SubsystemBase {
     return Commands.runOnce(
         () -> {
           elevator.setPosition(1.5); // Example: Raise elevator for dropoff.
-          arm.setAngle(1.0); // Example: Rotate arm for dropoff.
+          arm.setAngleDegrees(30); // Example: Rotate arm for dropoff.
           endEffector.runOpenLoop(-1.0); // Activate end effector to eject.
         });
   }

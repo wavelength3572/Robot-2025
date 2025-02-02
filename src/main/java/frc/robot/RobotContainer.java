@@ -76,12 +76,12 @@ public class RobotContainer {
 
   // New arm visualization:
   // For example, assume the arm has a fixed length defined in your constants:
-  private final LoggedMechanismLigament2d m_arm =
+  private LoggedMechanismLigament2d m_arm =
       m_elevator.append(
           new LoggedMechanismLigament2d(
               "Arm",
-              ArmConstants.armLength, // The physical length of your arm.
-              0, // Initial angle (in degrees).
+              ArmConstants.kArmLengthMeters, // The physical length of your arm.
+              30, // Initial angle (in degrees).
               2, // Thickness (example value)
               new Color8Bit(Color.kRed)));
 
@@ -158,16 +158,16 @@ public class RobotContainer {
     if (elevator != null) {
       elevator.setPosition(0.0);
       SmartDashboard.putNumber("Elevator Goal", 0.0);
-      SmartDashboard.putData(
-          "Elevator 2", CoralSystemCommands.setElevatorPositionFromDashboard(coralSubsystem));
+      SmartDashboard.putData("Elevator", CoralSystemCommands.setElevatorPositionFromDashboard(coralSubsystem));
     }
 
-    if (elevator != null) {
-      elevator.setPosition(0.0);
-      SmartDashboard.putNumber("Elevator Goal", 0.0);
-      SmartDashboard.putData(
-          "Elevator 2", CoralSystemCommands.setElevatorPositionFromDashboard(coralSubsystem));
+    if (arm != null) {
+      arm.setAngleDegrees(0.0);
+      SmartDashboard.putNumber("Arm Goal", 0.0);
+      SmartDashboard.putData("Arm", CoralSystemCommands.setArmAngleFromDashboard(coralSubsystem));
     }
+
+
     SmartDashboard.putData(
         "DriveToClosestLEFTPole",
         DriveToCommands.driveToPole(
@@ -257,6 +257,12 @@ public class RobotContainer {
   public LoggedMechanism2d getElevator() {
     // Update the Elevator 2D Mech
     m_elevator.setLength(ElevatorConstants.kGroundToElevator + elevator.getHeightInMeters());
+    return scoringSystem;
+  }
+
+  public LoggedMechanism2d getArm() {
+    // Update the Arm 2D Mech
+    m_arm.setAngle(arm.getAngleInDegrees());
     return scoringSystem;
   }
 }
