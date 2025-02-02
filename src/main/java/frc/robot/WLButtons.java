@@ -115,7 +115,12 @@ public class WLButtons {
                 oi::getRotate,
                 CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
-    // Instead of directly using the elevator instance, we now use the coralSubsystem.
+    //FIX ME: Checks the button to tell if we have coral; make this use our sensor later
+    if(oi.getButtonV().getAsBoolean())
+    {
+      coralSubsystem.setHaveCoral();
+    } else coralSubsystem.setDoNotHaveCoral();
+
     oi.getButtonV()
         .onTrue(Commands.runOnce(() -> coralSubsystem.setHaveCoral(), coralSubsystem))
         .onFalse(Commands.runOnce(() -> coralSubsystem.setDoNotHaveCoral(), coralSubsystem));

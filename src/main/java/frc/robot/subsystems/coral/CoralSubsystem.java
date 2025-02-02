@@ -21,8 +21,6 @@ public class CoralSubsystem extends SubsystemBase {
   private boolean haveCoral = false;
   private boolean haveAlgae = false;
 
-  // Visualization objects integrated into this subsystem.
-  // You can adjust the dimensions and initial angles as needed.
   private final LoggedMechanism2d visualizer;
   private final LoggedMechanismRoot2d root;
   private final LoggedMechanismLigament2d elevatorLigament;
