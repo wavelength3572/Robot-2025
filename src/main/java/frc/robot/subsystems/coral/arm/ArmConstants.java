@@ -11,8 +11,8 @@ public final class ArmConstants {
   public static final int armCurrentLimit = 50;
   public static final double kArmGearing = 100;
   public static final double kArmMomentOfInertia = 0.1;
-  public static final double kArmMass = 4; // kg
-  public static final double kArmLengthMeters = Units.inchesToMeters(15);
+  public static final double kArmMass = Units.lbsToKilograms(4.375); // kg
+  public static final double kArmLengthMeters = Units.inchesToMeters(16.25);
 
   public static final double kArmKp = .8;
   public static final double kArmKi = 0.0;
