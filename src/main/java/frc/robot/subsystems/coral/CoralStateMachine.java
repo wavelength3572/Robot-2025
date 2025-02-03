@@ -38,7 +38,7 @@ public class CoralStateMachine {
   private void applyPreset(CoralState state) {
     CoralSystemPresets preset = getPresetForState(state);
     if (preset == null) {
-      Logger.recordOutput("Coral/FSM ERROR", "❌ No preset found for state " + state);
+      Logger.recordOutput("Coral/FSM ERROR", " No preset found for state " + state);
       return;
     }
 
