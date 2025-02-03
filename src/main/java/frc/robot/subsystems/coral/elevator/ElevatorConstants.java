@@ -15,7 +15,7 @@ public class ElevatorConstants {
 
   public static final double kGroundToElevator = Units.inchesToMeters(7.529); // m
 
-  public static final double kElevatorKp = .2;
+  public static final double kElevatorKp = .6;
   public static final double kElevatorKi = 0;
   public static final double kElevatorKd = 0.01;
   public static final double kElevatorKf = 0;
