@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -30,7 +31,7 @@ public class ElevatorIOSim implements ElevatorIO {
   private double elevatorCurrentTarget = 0.0;
 
   // Simulation setup and variables
-  private final DCMotor elevatorMotorModel = DCMotor.getNEO(2);
+  private final DCMotor elevatorMotorModel = DCMotor.getNEO(1);
   private SparkMaxSim elevatorMotorSim;
   private final ElevatorSim m_elevatorSim =
       new ElevatorSim(
@@ -41,9 +42,7 @@ public class ElevatorIOSim implements ElevatorIO {
           ElevatorConstants.kMinElevatorHeightMeters,
           ElevatorConstants.kMaxElevatorHeightMeters,
           true,
-          ElevatorConstants.kMinElevatorHeightMeters,
-          0.0,
-          0.0);
+          ElevatorConstants.kMinElevatorHeightMeters);
 
   public ElevatorIOSim() {
     elevatorMotor.configure(
@@ -90,6 +89,22 @@ public class ElevatorIOSim implements ElevatorIO {
   public double getHeightInMeters() {
     return (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
         * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI);
+  }
+
+  @Override
+  public void setPIDValues(
+      double kP, double kD, double kF, double VelocityMax, double AccelerationMax) {
+    final SparkMaxConfig config = new SparkMaxConfig();
+    config
+        .closedLoop
+        .pidf(kP, 0.0, kD, kF)
+        .maxMotion
+        // Set MAXMotion parameters for position control
+        .maxVelocity(VelocityMax)
+        .maxAcceleration(AccelerationMax)
+        .allowedClosedLoopError(0.1);
+    elevatorMotor.configure(
+        config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   @Override

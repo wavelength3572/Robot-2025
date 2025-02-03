@@ -38,13 +38,14 @@ public class ElevatorIOPPCSim implements ElevatorIO {
           ElevatorConstants.kElevatorKp,
           ElevatorConstants.kElevatorKi,
           ElevatorConstants.kElevatorKd,
-          new TrapezoidProfile.Constraints(2.45, 2.45));
+          new TrapezoidProfile.Constraints(
+              ElevatorConstants.kElevatorVel, ElevatorConstants.kElevatorAcc));
   ElevatorFeedforward m_feedforward =
       new ElevatorFeedforward(
-          ElevatorConstants.kElevatorkS,
-          ElevatorConstants.kElevatorkG,
-          ElevatorConstants.kElevatorkV,
-          ElevatorConstants.kElevatorkA);
+          ElevatorConstants.kElevatorkS, // Static Friction
+          ElevatorConstants.kElevatorkG, // Gravity Feedforward
+          ElevatorConstants.kElevatorkV, // Cruise Voltage
+          ElevatorConstants.kElevatorkA); // Accleration Voltage
 
   private final ElevatorSim m_elevatorSim =
       new ElevatorSim(
