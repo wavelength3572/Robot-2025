@@ -11,7 +11,7 @@ public class ElevatorConstants {
   public static final double kCarriageMass = 7.0; // kg
 
   public static final double kMinElevatorHeightMeters = 0.0; // m
-  public static final double kMaxElevatorHeightMeters = Units.inchesToMeters(60.748); // m
+  public static final double kMaxElevatorHeightMeters = Units.inchesToMeters(64.5); // m
 
   public static final double kGroundToElevator = Units.inchesToMeters(7.529); // m
 

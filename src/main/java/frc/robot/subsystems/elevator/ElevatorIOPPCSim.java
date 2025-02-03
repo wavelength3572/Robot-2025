@@ -38,7 +38,8 @@ public class ElevatorIOPPCSim implements ElevatorIO {
           ElevatorConstants.kElevatorKp,
           ElevatorConstants.kElevatorKi,
           ElevatorConstants.kElevatorKd,
-          new TrapezoidProfile.Constraints(2.45, 2.45));
+          new TrapezoidProfile.Constraints(
+              ElevatorConstants.kElevatorVel, ElevatorConstants.kElevatorAcc));
   ElevatorFeedforward m_feedforward =
       new ElevatorFeedforward(
           ElevatorConstants.kElevatorkS, // Static Friction
