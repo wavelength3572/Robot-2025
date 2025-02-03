@@ -29,5 +29,7 @@ public final class ArmConstants {
   public static final double kArmkV = 0.5; // volt per velocity (V/(m/s))
   public static final double kArmkA = 0.5; // volt per acceleration (V/(m/s²))
 
+  public static final double kArmToleranceDegrees = 1;
+
   private ArmConstants() {}
 }

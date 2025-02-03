@@ -13,6 +13,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 
+// FIXME: why do we need two elevator sim?
+
 // See
 // https://github.com/wpilibsuite/allwpilib/blob/main/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/elevatorsimulation/subsystems/Elevator.java
 // and
@@ -20,7 +22,8 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 
 public class ElevatorIOPPCSim implements ElevatorIO {
 
-  // Initialize elevator SPARK. We will use MAXMotion position control for the elevator, so we also
+  // Initialize elevator SPARK. We will use MAXMotion position control for the
+  // elevator, so we also
   // need to initialize the closed loop controller and encoder.
   private SparkMax elevatorMotor =
       new SparkMax(ElevatorConstants.leaderCanId, MotorType.kBrushless);
@@ -83,16 +86,18 @@ public class ElevatorIOPPCSim implements ElevatorIO {
         RobotController.getBatteryVoltage(),
         0.02);
 
+    // The PID is run using rotations for the setpoint
     m_controller.setGoal(elevatorCurrentTarget);
-    // With the setpoint value we run PID control like normal
     double pidOutput = m_controller.calculate(elevatorEncoder.getPosition());
     double feedforwardOutput = m_feedforward.calculate(m_controller.getSetpoint().velocity);
     elevatorMotor.set((pidOutput + feedforwardOutput) / 12.0);
-    // elevatorMotorSim.setAppliedOutput((pidOutput + feedforwardOutput) / 12.0);
 
     inputs.setpoint = this.elevatorCurrentTarget;
+    inputs.setpointMeters =
+        (this.elevatorCurrentTarget / ElevatorConstants.kElevatorGearing)
+            * (2 * Math.PI * ElevatorConstants.kElevatorDrumRadius);
     inputs.positionRotations = elevatorEncoder.getPosition();
-    inputs.elevatorHeight = m_elevatorSim.getPositionMeters();
+    inputs.elevatorHeightMeters = m_elevatorSim.getPositionMeters();
     inputs.elevatorHeightCalc =
         (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
             * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI);

@@ -22,8 +22,7 @@ public class ArmIOSim implements ArmIO {
 
   private boolean brakeModeEnabled = true; // Assume brake mode is on for simulation.
 
-  // Instead of storing the target in radians, store it in native units (motor
-  // rotations).
+  // Instead of storing the target in radians, store it in native units (motor rotations).
   private double armCurrentTargetNative = 0.0;
 
   // Simulation setup and variables
@@ -105,7 +104,11 @@ public class ArmIOSim implements ArmIO {
 
     inputs.appliedVolts = armMotorSim.getAppliedOutput() * RobotController.getBatteryVoltage();
 
-    inputs.setpoint = (armCurrentTargetNative / ArmConstants.kArmGearing) * (2.0 * Math.PI);
+    inputs.armAngleRadSetpoint =
+        (armCurrentTargetNative / ArmConstants.kArmGearing) * (2.0 * Math.PI);
+    inputs.armAngleDegreesSetpoint =
+        Units.radiansToDegrees(
+            (armCurrentTargetNative / ArmConstants.kArmGearing) * (2.0 * Math.PI));
     inputs.encoderPositionRotations = armEncoder.getPosition();
     inputs.armAngleRad = simulatedArmRadians;
     inputs.armAngleRadCalc = armAngleRadiansCalc;
@@ -164,10 +167,5 @@ public class ArmIOSim implements ArmIO {
     // Log for debugging if desired:
     System.out.println(
         "ArmIOSim: Holding current angle. Current native position: " + currentNative);
-  }
-
-  @Override
-  public boolean isAtGoal() {
-    return m_controller.atGoal();
   }
 }

@@ -45,6 +45,11 @@ public class ElevatorIOSpark implements ElevatorIO {
         elevatorCurrentTarget, ControlType.kMAXMotionPositionControl);
 
     inputs.setpoint = this.elevatorCurrentTarget;
+
+    inputs.setpointMeters =
+        (this.elevatorCurrentTarget / ElevatorConstants.kElevatorGearing)
+            * (2 * Math.PI * ElevatorConstants.kElevatorDrumRadius);
+
     inputs.positionRotations = leaderEncoder.getPosition();
     inputs.velocityRPM = leaderEncoder.getVelocity();
     inputs.elevatorHeightCalc =
@@ -82,10 +87,5 @@ public class ElevatorIOSpark implements ElevatorIO {
         .allowedClosedLoopError(0.1);
     leaderMotor.configure(
         config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-  }
-
-  @Override
-  public boolean isAtGoal() {
-    return Math.abs(leaderEncoder.getPosition() - this.elevatorCurrentTarget) < 0.05;
   }
 }

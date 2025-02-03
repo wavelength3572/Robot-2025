@@ -70,9 +70,13 @@ public class ElevatorIOSim implements ElevatorIO {
         RobotController.getBatteryVoltage(),
         0.02);
 
-    inputs.setpoint = this.elevatorCurrentTarget;
+    inputs.setpointMeters =
+        (this.elevatorCurrentTarget / ElevatorConstants.kElevatorGearing)
+            * (2 * Math.PI * ElevatorConstants.kElevatorDrumRadius);
+    inputs.setpointMeters = this.elevatorCurrentTarget;
+
     inputs.positionRotations = elevatorEncoder.getPosition();
-    inputs.elevatorHeight = m_elevatorSim.getPositionMeters();
+    inputs.elevatorHeightMeters = m_elevatorSim.getPositionMeters();
     inputs.elevatorHeightCalc =
         (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
             * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI);
@@ -105,11 +109,5 @@ public class ElevatorIOSim implements ElevatorIO {
         .allowedClosedLoopError(0.1);
     elevatorMotor.configure(
         config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-  }
-
-  @Override
-  public boolean isAtGoal() {
-    return Math.abs(m_elevatorSim.getPositionMeters() - this.elevatorCurrentTarget)
-        < 0.05; // 5 cm tolerance
   }
 }

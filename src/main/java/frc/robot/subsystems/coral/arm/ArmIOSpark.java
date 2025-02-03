@@ -39,7 +39,11 @@ public class ArmIOSpark implements ArmIO {
         (armEncoder.getPosition() / ArmConstants.kArmGearing) * (2.0 * Math.PI);
 
     // For logging, you might want to report the physical angle in radians.
-    inputs.setpoint = (armCurrentTargetNative / ArmConstants.kArmGearing) * (2.0 * Math.PI);
+    inputs.armAngleRadSetpoint =
+        (armCurrentTargetNative / ArmConstants.kArmGearing) * (2.0 * Math.PI);
+    inputs.armAngleDegreesSetpoint =
+        Units.radiansToDegrees(
+            (armCurrentTargetNative / ArmConstants.kArmGearing) * (2.0 * Math.PI));
     inputs.encoderPositionRotations = armEncoder.getPosition();
     inputs.armAngleRadCalc = armAngleRadiansCalc;
     inputs.motorVelocityRPM = armEncoder.getVelocity() / ArmConstants.kArmGearing;
@@ -95,11 +99,5 @@ public class ArmIOSpark implements ArmIO {
     // Ensure the closed-loop controller starts tracking this position
     armClosedLoopController.setReference(
         armCurrentTargetNative, ControlType.kMAXMotionPositionControl);
-  }
-
-  @Override
-  public boolean isAtGoal() {
-    double error = Math.abs(armEncoder.getPosition() - armCurrentTargetNative);
-    return error < 0.01;
   }
 }

@@ -3,6 +3,9 @@ package frc.robot.subsystems.coral.elevator;
 import edu.wpi.first.math.util.Units;
 
 public class ElevatorConstants {
+
+  public static final double kSetpointThreshold = .1; // in meters
+
   public static final int leaderCanId = 21;
   public static final int followerCanId = 16;
   public static final int elevatorCurrentLimit = 50;

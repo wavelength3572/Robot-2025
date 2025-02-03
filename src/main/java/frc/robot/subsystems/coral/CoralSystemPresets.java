@@ -2,7 +2,7 @@ package frc.robot.subsystems.coral;
 
 public enum CoralSystemPresets {
   STOW(0, 90, CoralState.PREPARE_STOW),
-  STOW_LOW(.52, 270, CoralState.PREPARE_STOW_LOW),
+  STOW_LOW(.52, 235, CoralState.PREPARE_STOW_LOW),
   SAFE_CARRIAGE_POSITION(.52, Double.NaN, CoralState.PREPARE_SAFE_CARRIAGE_POSITION),
 
   PICKUP(0.826, 230, CoralState.PICKUP),

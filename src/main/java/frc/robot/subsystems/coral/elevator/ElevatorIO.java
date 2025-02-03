@@ -5,10 +5,17 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
+    /** Commanded elevator height in motor rotations */
     public double setpoint = 0.0;
-    public double elevatorHeight = 0.0;
+    /** Commanded elevator height in meters */
+    public double setpointMeters = 0.0;
+    /** Measured elevator height in meters (from sensor conversion) */
+    public double elevatorHeightMeters = 0.0;
+    /** Calculated elevator height in meters from raw encoder rotations */
     public double elevatorHeightCalc = 0.0;
+    /** Raw encoder reading in motor rotations (for reference) */
     public double positionRotations = 0.0;
+
     public double velocityRPM = 0.0;
     public double appliedVolts = 0.0;
     public double currentAmps = 0.0;

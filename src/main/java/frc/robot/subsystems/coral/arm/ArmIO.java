@@ -5,12 +5,15 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ArmIO {
   @AutoLog
   class ArmIOInputs {
-    public double setpoint = 0.0;
-    public double encoderPositionRotations = 0.0;
     public double armAngleDegrees = 0.0;
+    public double armAngleDegreesSetpoint = 0;
     public double armAngleDegreesCalc = 0.0;
+
     public double armAngleRad = 0.0;
     public double armAngleRadCalc = 0.0;
+    public double armAngleRadSetpoint = 0;
+
+    public double encoderPositionRotations = 0.0;
     public double motorVelocityRPM = 0.0;
     public double appliedVolts = 0.0;
     public double currentAmps = 0.0;
@@ -37,9 +40,5 @@ public interface ArmIO {
 
   public default double getAngleInDegrees() {
     return 0.0;
-  }
-
-  public default boolean isAtGoal() {
-    return false;
   }
 }

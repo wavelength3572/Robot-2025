@@ -39,6 +39,10 @@ public class Elevator {
           ElevatorVel.get(),
           ElevatorAcc.get());
     }
+
+    boolean goalReached = isAtGoal();
+    Logger.recordOutput("Elevator/AtGoal", goalReached);
+
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
   }
@@ -52,6 +56,7 @@ public class Elevator {
   }
 
   public boolean isAtGoal() {
-    return io.isAtGoal();
+    return Math.abs(inputs.elevatorHeightMeters - inputs.setpointMeters)
+        < ElevatorConstants.kSetpointThreshold;
   }
 }

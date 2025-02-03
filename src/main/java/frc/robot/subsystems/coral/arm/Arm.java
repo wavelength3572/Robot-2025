@@ -24,6 +24,7 @@ public class Arm {
    */
   public Arm(ArmIO io) {
     this.io = io;
+    setAngleDegrees(90); // set the initial angle of the arm to 90 degrees (straight up)
   }
 
   /**
@@ -89,6 +90,7 @@ public class Arm {
   }
 
   public boolean isAtGoal() {
-    return io.isAtGoal();
+    return Math.abs(inputs.armAngleDegrees - inputs.armAngleDegreesSetpoint)
+        < ArmConstants.kArmToleranceDegrees;
   }
 }
