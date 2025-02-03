@@ -85,13 +85,13 @@ public class Robot extends LoggedRobot {
 
     // Initialize URCL - Unofficial REV-Compatible Logger from AdvantageKit
     SparkCANIDMap.put(3, "DriveFrontRight");
-    SparkCANIDMap.put(2, "DriveFrontLeft");
-    SparkCANIDMap.put(5, "DriveBackRight");
-    SparkCANIDMap.put(4, "DriveBackLeft");
+    SparkCANIDMap.put(5, "DriveFrontLeft");
+    SparkCANIDMap.put(6, "DriveBackRight");
+    SparkCANIDMap.put(8, "DriveBackLeft");
     SparkCANIDMap.put(7, "TurnFrontRight");
-    SparkCANIDMap.put(6, "TurnFrontLeft");
-    SparkCANIDMap.put(9, "TurnBackRight");
-    SparkCANIDMap.put(8, "TurnBackLeft");
+    SparkCANIDMap.put(9, "TurnFrontLeft");
+    SparkCANIDMap.put(2, "TurnBackRight");
+    SparkCANIDMap.put(4, "TurnBackLeft");
     Logger.registerURCL(URCL.startExternal(SparkCANIDMap));
 
     // Start AdvantageKit logger
