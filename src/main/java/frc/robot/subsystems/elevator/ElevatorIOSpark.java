@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.RobotController;
 
 public class ElevatorIOSpark implements ElevatorIO {
@@ -65,5 +66,21 @@ public class ElevatorIOSpark implements ElevatorIO {
   public double getHeightInMeters() {
     return (leaderEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
         * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI);
+  }
+
+  @Override
+  public void setPIDValues(
+      double kP, double kD, double kF, double VelocityMax, double AccelerationMax) {
+    final SparkMaxConfig config = new SparkMaxConfig();
+    config
+        .closedLoop
+        .pidf(kP, 0.0, kD, kF)
+        .maxMotion
+        // Set MAXMotion parameters for position control
+        .maxVelocity(VelocityMax)
+        .maxAcceleration(AccelerationMax)
+        .allowedClosedLoopError(0.1);
+    leaderMotor.configure(
+        config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 }
