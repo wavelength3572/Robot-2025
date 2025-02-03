@@ -43,7 +43,7 @@ public class CoralSubsystem extends SubsystemBase {
     endEffector.update();
 
     // Refresh 2D visualization if enabled.
-    if (coralSubsystemVisualization2d != null) {
+    if (CoralSubsystemVisualization2d.ENABLE_2D_VISUALIZATION) {
       coralSubsystemVisualization2d.update(elevator, arm);
       SmartDashboard.putData("Coral 2D Visualizer", coralSubsystemVisualization2d.getVisualizer());
     }
