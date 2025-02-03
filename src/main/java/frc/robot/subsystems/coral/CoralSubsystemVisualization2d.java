@@ -1,7 +1,11 @@
 package frc.robot.subsystems.coral;
 
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.subsystems.coral.arm.Arm;
 import frc.robot.subsystems.coral.elevator.Elevator;
+import frc.robot.subsystems.coral.elevator.ElevatorConstants;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
@@ -17,6 +21,38 @@ public class CoralSubsystemVisualization2d {
   private LoggedMechanismLigament2d armLigament;
   private LoggedMechanismLigament2d endEffectorLigament;
 
+  // 2D Visualizer dimensions
+  public static final double VISUALIZER_WIDTH = 0.8382;
+  public static final double VISUALIZER_HEIGHT = 2.0;
+
+  // 2D Root configuration
+  public static final String ROOT_NAME = "Base";
+  public static final double ROOT_X_POSITION = VISUALIZER_WIDTH / 2.0;
+  public static final double ROOT_Y_POSITION = 0.0;
+
+  // 2D Elevator visualization parameters
+  // Replace the ElevatorConstants value with an appropriate literal (for example, 0.5 meters)
+  public static final double ELEVATOR_INITIAL_LENGTH = ElevatorConstants.kGroundToElevator;
+  public static final double ELEVATOR_ANGLE_DEGREES = 90.0;
+  public static final double ELEVATOR_THICKNESS = 2.0;
+  public static final Color8Bit ELEVATOR_COLOR = new Color8Bit(Color.kBlue);
+
+  // 2D Arm visualization parameters
+  // Replace the ArmConstants value with an appropriate literal (for example, 1.0 meters)
+  //   public static final double ARM_LENGTH = ArmConstants.kArmLengthMeters;
+  public static final double ARM_LENGTH = Units.inchesToMeters(12.25);
+
+  public static final double ARM_INITIAL_ANGLE_DEGREES = 0;
+  public static final double ARM_THICKNESS = 3.0;
+  public static final Color8Bit ARM_COLOR = new Color8Bit(Color.kRed);
+
+  // 2D EndEffector visualization parameters
+  // Replace the EndEffectorConstants value with an appropriate literal (for example, 0.3 meters)
+  public static final double ENDEFFECTOR_LENGTH = 0.2;
+  public static final double ENDEFFECTOR_INITIAL_ANGLE_DEGREES = -90.0;
+  public static final double ENDEFFECTOR_THICKNESS = 5.0;
+  public static final Color8Bit ENDEFFECTOR_COLOR = new Color8Bit(Color.kBlanchedAlmond);
+
   /**
    * Constructs the 2D visualization for the Coral subsystem.
    *
@@ -28,48 +64,38 @@ public class CoralSubsystemVisualization2d {
       return;
     }
 
-    // Create the 2D mechanism visualizer using constants.
-    visualizer =
-        new LoggedMechanism2d(
-            CoralSubsystemConstants.VISUALIZER_WIDTH, CoralSubsystemConstants.VISUALIZER_HEIGHT);
+    // Create the 2D mechanism visualizer using local constants.
+    visualizer = new LoggedMechanism2d(VISUALIZER_WIDTH, VISUALIZER_HEIGHT);
 
     // Create the root for the visualization.
-    root =
-        visualizer.getRoot(
-            CoralSubsystemConstants.ROOT_NAME,
-            CoralSubsystemConstants.ROOT_X_POSITION,
-            CoralSubsystemConstants.ROOT_Y_POSITION);
+    root = visualizer.getRoot(ROOT_NAME, ROOT_X_POSITION, ROOT_Y_POSITION);
 
-    // Create the elevator ligament. The length is based on an initial constant plus the elevator’s
-    // current height.
+    // Create the elevator ligament.
+    // The length is based on an initial constant plus the elevator’s current height.
     elevatorLigament =
         root.append(
             new LoggedMechanismLigament2d(
                 "Elevator",
-                CoralSubsystemConstants.ELEVATOR_INITIAL_LENGTH + elevator.getHeightInMeters(),
-                CoralSubsystemConstants.ELEVATOR_ANGLE_DEGREES,
-                CoralSubsystemConstants.ELEVATOR_THICKNESS,
-                CoralSubsystemConstants.ELEVATOR_COLOR));
+                ELEVATOR_INITIAL_LENGTH + elevator.getHeightInMeters(),
+                ELEVATOR_ANGLE_DEGREES,
+                ELEVATOR_THICKNESS,
+                ELEVATOR_COLOR));
 
     // Create the arm ligament.
     armLigament =
         elevatorLigament.append(
             new LoggedMechanismLigament2d(
-                "Arm",
-                CoralSubsystemConstants.ARM_LENGTH,
-                CoralSubsystemConstants.ARM_INITIAL_ANGLE_DEGREES,
-                CoralSubsystemConstants.ARM_THICKNESS,
-                CoralSubsystemConstants.ARM_COLOR));
+                "Arm", ARM_LENGTH, ARM_INITIAL_ANGLE_DEGREES, ARM_THICKNESS, ARM_COLOR));
 
     // Create the end effector ligament.
     endEffectorLigament =
         armLigament.append(
             new LoggedMechanismLigament2d(
                 "EndEffector",
-                CoralSubsystemConstants.ENDEFFECTOR_LENGTH,
-                CoralSubsystemConstants.ENDEFFECTOR_INITIAL_ANGLE_DEGREES,
-                CoralSubsystemConstants.ENDEFFECTOR_THICKNESS,
-                CoralSubsystemConstants.ENDEFFECTOR_COLOR));
+                ENDEFFECTOR_LENGTH,
+                ENDEFFECTOR_INITIAL_ANGLE_DEGREES,
+                ENDEFFECTOR_THICKNESS,
+                ENDEFFECTOR_COLOR));
   }
 
   /**
@@ -84,8 +110,7 @@ public class CoralSubsystemVisualization2d {
     }
 
     // Update the elevator ligament length: base length plus current height.
-    elevatorLigament.setLength(
-        CoralSubsystemConstants.ELEVATOR_INITIAL_LENGTH + elevator.getHeightInMeters());
+    elevatorLigament.setLength(ELEVATOR_INITIAL_LENGTH + elevator.getHeightInMeters());
 
     // Update the arm ligament angle based on the arm's calibrated angle.
     armLigament.setAngle(arm.getCalibratedAngleDegrees());

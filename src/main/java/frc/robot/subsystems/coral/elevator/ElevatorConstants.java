@@ -13,7 +13,7 @@ public class ElevatorConstants {
   public static final double kMinElevatorHeightMeters = 0.0; // m
   public static final double kMaxElevatorHeightMeters = Units.inchesToMeters(60.748); // m
 
-  public static final double kGroundToElevator = Units.inchesToMeters(7.529); // m
+  public static final double kGroundToElevator = Units.inchesToMeters(10.5); // m
 
   public static final double kElevatorKp = .6;
   public static final double kElevatorKi = 0;

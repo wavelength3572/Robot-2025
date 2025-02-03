@@ -45,6 +45,7 @@ public class CoralSubsystem extends SubsystemBase {
     // Refresh 2D visualization if enabled.
     if (coralSubsystemVisualization2d != null) {
       coralSubsystemVisualization2d.update(elevator, arm);
+      SmartDashboard.putData("Coral 2D Visualizer", coralSubsystemVisualization2d.getVisualizer());
     }
 
     // Log sensor readings and statuses.
@@ -57,19 +58,41 @@ public class CoralSubsystem extends SubsystemBase {
 
     // update dynamic poses for 3D visualization.
     double elevatorOffset = elevator.getHeightInMeters();
-    Pose3d elevatorDynamicPose = new Pose3d(0, -0.0908, elevatorOffset + 0.24, new Rotation3d(0, 0, 0));
+    Pose3d elevatorDynamicPose =
+        new Pose3d(0, -0.0908, elevatorOffset + 0.24, new Rotation3d(0, 0, 0));
     double armAngleRadians = Math.toRadians(arm.getCalibratedAngleDegrees());
-    Pose3d armDynamicPose =new Pose3d(0, -0.190, elevatorOffset + 0.262, new Rotation3d(0, armAngleRadians, Units.degreesToRadians(180)));
+    Pose3d armDynamicPose =
+        new Pose3d(
+            0,
+            -0.190,
+            elevatorOffset + 0.262,
+            new Rotation3d(0, armAngleRadians, Units.degreesToRadians(180)));
     Logger.recordOutput("FinalComponentPoses", new Pose3d[] {elevatorDynamicPose, armDynamicPose});
   }
 
-  public boolean haveCoral() {return haveCoral;}
-  public void setHaveCoral() {this.haveCoral = true;}  
-  public void setDoNotHaveCoral() {this.haveCoral = false;}
+  public boolean haveCoral() {
+    return haveCoral;
+  }
 
-  public boolean haveAlgae() {return haveAlgae;}
-  public void setHaveAlgae() {this.haveAlgae = true;}
-  public void setDoNotHaveAlgae() {this.haveAlgae = false;}
+  public void setHaveCoral() {
+    this.haveCoral = true;
+  }
+
+  public void setDoNotHaveCoral() {
+    this.haveCoral = false;
+  }
+
+  public boolean haveAlgae() {
+    return haveAlgae;
+  }
+
+  public void setHaveAlgae() {
+    this.haveAlgae = true;
+  }
+
+  public void setDoNotHaveAlgae() {
+    this.haveAlgae = false;
+  }
 
   public void setSelectedScoringLevel(CoralState level) {
     if (level == CoralState.L1_SCORE
@@ -120,9 +143,20 @@ public class CoralSubsystem extends SubsystemBase {
     cycleScoringLevel(false);
   }
 
-  //Getters
-  public Elevator getElevator() {return elevator;}
-  public Arm getArm() {return arm;}
-  public EndEffector getEndEffector() {return endEffector;}
-  public CoralStateMachine getStateMachine() {return stateMachine;}
+  // Getters
+  public Elevator getElevator() {
+    return elevator;
+  }
+
+  public Arm getArm() {
+    return arm;
+  }
+
+  public EndEffector getEndEffector() {
+    return endEffector;
+  }
+
+  public CoralStateMachine getStateMachine() {
+    return stateMachine;
+  }
 }
