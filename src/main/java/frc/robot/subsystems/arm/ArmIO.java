@@ -5,8 +5,9 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ArmIO {
   @AutoLog
   public static class ArmIOInputs {
-    public double setAngleDEG = 0.0;
-    public double armTargetEncoderRotations = 0.0;
+    public double targetAngleDEG = 0.0;
+    public double currentAngleDEG = 0.0;
+    public double targetEncoderRotations = 0.0;
     public double encoderRotations = 0.0;
     public double velocityRPM = 0.0;
     public double appliedVolts = 0.0;
@@ -25,5 +26,5 @@ public interface ArmIO {
     return 0.0;
   }
 
-  public default void setPIDValues(double kP, double kD, double kF) {}
+  public default void setPIDValues(double kP, double kD) {}
 }

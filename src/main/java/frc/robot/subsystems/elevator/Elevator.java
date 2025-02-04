@@ -51,7 +51,11 @@ public class Elevator {
   }
 
   public void setPosition(Double requestedPosition) {
-    io.setPosition(requestedPosition);
+    if (requestedPosition
+        < ElevatorConstants.kElevatorGearing
+            * (ElevatorConstants.kMaxElevatorHeightMeters
+                / (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI)))
+      io.setPosition(requestedPosition);
   }
 
   public double getHeightInMeters() {

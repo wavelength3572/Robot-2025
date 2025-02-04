@@ -22,8 +22,8 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.CoralSystemCommands;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.ElevatorCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.arm.Arm;
@@ -132,9 +132,9 @@ public class RobotContainer {
 
     if (elevator != null) {
       elevator.setPosition(0.0);
-      SmartDashboard.putNumber("Elevator Goal", 0.0);
+      SmartDashboard.putNumber("Elevator Goal (in)", 0.0);
       SmartDashboard.putData(
-          "Elevator 2", ElevatorCommands.setElevatorPositionFromDashboard(coralSystem));
+          "Set Eleveator", CoralSystemCommands.setElevatorPositionFromDashboard(coralSystem));
     }
 
     // Set up auto routines

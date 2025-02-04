@@ -1,5 +1,7 @@
 package frc.robot.subsystems.arm;
 
+import frc.robot.subsystems.elevator.ElevatorConstants;
+
 // See
 // https://github.com/wpilibsuite/allwpilib/blob/main/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/elevatorsimulation/subsystems/Elevator.java
 // and
@@ -16,8 +18,11 @@ public class ArmIOVirtualSim implements ArmIO {
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
-    inputs.setAngleDEG = this.armTargetDEG;
-    inputs.armTargetEncoderRotations = armVirtualEncoder;
+    inputs.targetAngleDEG = this.armTargetDEG;
+    inputs.currentAngleDEG =
+        (armVirtualEncoder / ElevatorConstants.kElevatorGearing)
+            * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI);
+    inputs.targetEncoderRotations = armTargetEncoderRotations;
     inputs.encoderRotations = armVirtualEncoder;
 
     if (armVirtualEncoder < armTargetEncoderRotations) {

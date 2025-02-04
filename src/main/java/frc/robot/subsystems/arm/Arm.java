@@ -11,8 +11,6 @@ public class Arm {
       new LoggedTunableNumber("Arm/kEp", ArmConstants.kArmKp);
   private static final LoggedTunableNumber ArmkD =
       new LoggedTunableNumber("Arm/kEd", ArmConstants.kArmKd);
-  private static final LoggedTunableNumber ArmkF =
-      new LoggedTunableNumber("Arm/kEf", ArmConstants.kArmKf);
 
   public Arm(ArmIO io) {
     this.io = io;
@@ -20,16 +18,16 @@ public class Arm {
 
   public void periodic() {
     if (ArmkP.hasChanged(hashCode())
-        || ArmkD.hasChanged(hashCode())
-        || ArmkF.hasChanged(hashCode())) {
-      io.setPIDValues(ArmkP.get(), ArmkD.get(), ArmkF.get());
+        || ArmkD.hasChanged(hashCode())) {
+      io.setPIDValues(ArmkP.get(), ArmkD.get());
     }
     io.updateInputs(inputs);
     Logger.processInputs("Arm", inputs);
   }
 
   public void setAngleDEG(Double requestedPosition) {
-    io.setAngleDEG(requestedPosition);
+    if (requestedPosition>=ArmConstants.armMinAngle && requestedPosition<=ArmConstants.armMaxAngle)
+      io.setAngleDEG(requestedPosition);
   }
 
   public double getAngleDEG() {

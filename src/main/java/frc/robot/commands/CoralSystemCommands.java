@@ -1,9 +1,9 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.coral.CoralSystem;
-import frc.robot.subsystems.coral.CoralSystemPresetChooser;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 
 public class CoralSystemCommands {
@@ -62,15 +62,23 @@ public class CoralSystemCommands {
   //       coralSubsystem);
   // }
 
-  public static Command getCoralSelectedPresetFromSmartDashboardCommand(
-      CoralSystem coralSubsystem, CoralSystemPresetChooser presetChooser) {
+  public static Command runPreset(CoralSystem coralSubsystem) {
     return Commands.runOnce(
         () -> {
-          CoralSystemPresets preset = presetChooser.getSelected();
+          CoralSystemPresets preset = coralSubsystem.getCoralSystemPresetChooser().getSelected();
           coralSubsystem.getElevator().setPositionMeters(preset.getElevatorHeight());
           coralSubsystem.getArm().setAngleDEG(preset.getArmAngle());
         },
         coralSubsystem);
+  }
+
+  /** Set the Elevator Position */
+  public static Command setElevatorPositionFromDashboard(CoralSystem coralSystem) {
+    return Commands.runOnce(
+        () -> {
+          coralSystem.getElevator().setPositionInches(SmartDashboard.getNumber("Elevator Goal", 0));
+        },
+        coralSystem);
   }
 
   /**
