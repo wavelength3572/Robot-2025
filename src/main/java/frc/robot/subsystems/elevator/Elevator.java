@@ -1,10 +1,10 @@
 package frc.robot.subsystems.elevator;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.util.Units;
 import frc.robot.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
-public class Elevator extends SubsystemBase {
+public class Elevator {
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
@@ -23,7 +23,6 @@ public class Elevator extends SubsystemBase {
     this.io = io;
   }
 
-  @Override
   public void periodic() {
     if (ElevatorkP.hasChanged(hashCode())
         || ElevatorkD.hasChanged(hashCode())
@@ -39,6 +38,16 @@ public class Elevator extends SubsystemBase {
     }
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
+  }
+
+  public void setPositionInches(Double requestedPosition) {
+    this.setPositionMeters(Units.inchesToMeters(requestedPosition));
+  }
+
+  public void setPositionMeters(Double requestedPosition) {
+    this.setPosition(
+        ElevatorConstants.kElevatorGearing
+            * (requestedPosition / (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI)));
   }
 
   public void setPosition(Double requestedPosition) {

@@ -26,6 +26,9 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmIOVirtualSim;
+import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
@@ -51,6 +54,8 @@ public class RobotContainer {
   private final Vision vision;
   private final Drive drive;
   private final Elevator elevator;
+  private final Arm arm;
+  private final CoralSystem coralSystem;
   private OperatorInterface oi = new OperatorInterface() {};
 
   private LoggedMechanism2d scoringSystem = new LoggedMechanism2d(.8382, 2.0);
@@ -85,6 +90,8 @@ public class RobotContainer {
         //         new VisionIOPhotonVision(camera0Name, robotToCamera0),
         //         new VisionIOPhotonVision(camera1Name, robotToCamera1));
         elevator = new Elevator(new ElevatorIOSpark() {});
+        arm = new Arm(new ArmIOVirtualSim() {});
+        coralSystem = new CoralSystem(elevator, arm);
         break;
 
       case SIM:
@@ -102,6 +109,8 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(cameraAName, robotToCameraA, drive::getPose),
                 new VisionIOPhotonVisionSim(cameraBName, robotToCameraB, drive::getPose));
         elevator = new Elevator(new ElevatorIOVirtualSim() {});
+        arm = new Arm(new ArmIOVirtualSim() {});
+        coralSystem = new CoralSystem(elevator, arm);
         break;
 
       default:
@@ -116,6 +125,8 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         elevator = null;
+        arm = null;
+        coralSystem = null;
         break;
     }
 
@@ -123,7 +134,7 @@ public class RobotContainer {
       elevator.setPosition(0.0);
       SmartDashboard.putNumber("Elevator Goal", 0.0);
       SmartDashboard.putData(
-          "Elevator 2", ElevatorCommands.setElevatorPositionFromDashboard(elevator));
+          "Elevator 2", ElevatorCommands.setElevatorPositionFromDashboard(coralSystem));
     }
 
     // Set up auto routines

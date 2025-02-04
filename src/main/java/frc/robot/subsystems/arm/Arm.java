@@ -1,10 +1,9 @@
 package frc.robot.subsystems.arm;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
-public class Arm extends SubsystemBase {
+public class Arm {
   private final ArmIO io;
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
 
@@ -19,7 +18,6 @@ public class Arm extends SubsystemBase {
     this.io = io;
   }
 
-  @Override
   public void periodic() {
     if (ArmkP.hasChanged(hashCode())
         || ArmkD.hasChanged(hashCode())
