@@ -1,5 +1,6 @@
 package frc.robot.subsystems.coral;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.*;
@@ -7,6 +8,7 @@ import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import lombok.Getter;
+import org.littletonrobotics.junction.Logger;
 
 public class CoralSystem extends SubsystemBase {
 
@@ -28,5 +30,9 @@ public class CoralSystem extends SubsystemBase {
     this.elevator.periodic();
     this.arm.periodic();
     this.intake.periodic();
+
+    Pose3d elevatorDynamicPose = this.elevator.getElevator3DPose();
+    Pose3d armDynamicPose = this.arm.getArm3DPose(elevator::getHeightInMeters);
+    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {elevatorDynamicPose, armDynamicPose});
   }
 }
