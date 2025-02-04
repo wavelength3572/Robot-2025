@@ -8,13 +8,20 @@ public class CoralSystem extends SubsystemBase {
 
   private Elevator elevator;
 
+  private final CoralSystemPresetChooser coralSystemPresetChooser;
+
   public Elevator getElevator() {
     return elevator;
   }
 
   private Arm arm;
 
+  public Arm getArm() {
+    return arm;
+  }
+
   public CoralSystem(Elevator elevator, Arm arm) {
+    coralSystemPresetChooser = new CoralSystemPresetChooser();
     this.elevator = elevator;
     this.arm = arm;
   }

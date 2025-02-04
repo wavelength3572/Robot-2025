@@ -28,7 +28,7 @@ public class Arm {
     Logger.processInputs("Arm", inputs);
   }
 
-  public void setPositionDEG(Double requestedPosition) {
+  public void setAngleDEG(Double requestedPosition) {
     io.setAngleDEG(requestedPosition);
   }
 
