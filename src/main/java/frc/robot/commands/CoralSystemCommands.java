@@ -135,4 +135,16 @@ public class CoralSystemCommands {
         Commands.waitSeconds(0.5),
         Commands.runOnce(() -> coralSubsystem.getEndEffector().stop(), coralSubsystem));
   }
+  
+  
+  public static Command goToLevelOne(CoralSubsystem coralSubsystem, CoralSystemPresetChooser presetChooser) {
+  return Commands.runOnce(
+      () -> {
+        CoralSystemPresets preset = presetChooser.getSelected();
+        coralSubsystem.getElevator().setPosition(preset.getElevatorHeight());
+        coralSubsystem.getArm().setAngleDegrees(preset.getArmAngle());
+      },
+      coralSubsystem);
+}
+
 }

@@ -35,4 +35,5 @@ public class CoralSystemPresetChooser {
   public CoralSystemPresets getSelected() {
     return chooser.getSelected();
   }
+  
 }

@@ -317,18 +317,37 @@ public class AlignmentUtils {
    */
   public static CageSelection findCageRobotAngle(Pose2d robotPose, Translation2d cageTranslation) {
 
+    if (DriverStation.getAlliance().isEmpty()) {
+      // error
+    }
+    CageSelection cageSelection;
     // Calculate the direction vector from the robot to the cage target
     Translation2d direction = cageTranslation.minus(robotPose.getTranslation());
 
-    // Compute the angle using atan2 (which handles WPILib's coordinate system correctly)
+    // Compute the angle using atan2 (which handles WPILib's coordinate system
+    // correctly)
     double angleRadians = Math.atan2(direction.getY(), direction.getX());
-
     double distanceToCage = robotPose.getTranslation().minus(cageTranslation).getNorm();
+    if (DriverStation.getAlliance().get() == Alliance.Blue
+        && robotPose.getX() < cageTranslation.getX()) {
+      cageSelection =
+          new CageSelection(cageTranslation, distanceToCage, new Rotation2d(angleRadians));
+
+    } else if (DriverStation.getAlliance().get() == Alliance.Red
+        && robotPose.getX() > cageTranslation.getX()) {
+
+      cageSelection =
+          new CageSelection(cageTranslation, distanceToCage, new Rotation2d(angleRadians));
+    } else {
+      angleRadians = robotPose.getRotation().getRadians();
+      cageSelection =
+          new CageSelection(cageTranslation, distanceToCage, new Rotation2d(angleRadians));
+    }
 
     Logger.recordOutput("Alignment/Cage/CageTranslation", cageTranslation);
     Logger.recordOutput("Alignment/Cage/CageDistance", distanceToCage);
     Logger.recordOutput("Alignment/Cage/angleToCage", Units.radiansToDegrees(angleRadians));
-    return new CageSelection(cageTranslation, distanceToCage, new Rotation2d(angleRadians));
+    return cageSelection;
   }
   ;
 

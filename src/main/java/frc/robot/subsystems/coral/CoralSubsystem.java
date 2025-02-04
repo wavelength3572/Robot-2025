@@ -53,6 +53,9 @@ public class CoralSubsystem extends SubsystemBase {
     Logger.recordOutput("Coral/Arm Actual Angle", arm.getAngleInDegrees());
     Logger.recordOutput("Coral/Has Coral", haveCoral());
 
+
+    
+
     // Update state machine.
     stateMachine.update();
 
