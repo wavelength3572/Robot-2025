@@ -39,6 +39,6 @@ public class ArmIOVirtualSim implements ArmIO {
 
   @Override
   public double getAngleDEG() {
-    return this.armTargetEncoderRotations * (1.0 / ArmConstants.kArmGearing) * 360.0;
+    return this.armVirtualEncoder * (1.0 / ArmConstants.kArmGearing) * 360.0;
   }
 }

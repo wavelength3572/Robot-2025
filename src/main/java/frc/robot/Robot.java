@@ -182,6 +182,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {
+    DriverStationSim.setDsAttached(true);
     DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
   }
 

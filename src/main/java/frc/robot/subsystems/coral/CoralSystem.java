@@ -1,6 +1,9 @@
 package frc.robot.subsystems.coral;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.*;
@@ -33,6 +36,10 @@ public class CoralSystem extends SubsystemBase {
 
     Pose3d elevatorDynamicPose = this.elevator.getElevator3DPose();
     Pose3d armDynamicPose = this.arm.getArm3DPose(elevator::getHeightInMeters);
-    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {elevatorDynamicPose, armDynamicPose});
+    Pose3d armCalibratedPose =
+        armDynamicPose.plus(
+            new Transform3d(0, 0, 0, new Rotation3d(0, Units.degreesToRadians(-90), 0)));
+    Logger.recordOutput(
+        "FinalComponentPoses", new Pose3d[] {elevatorDynamicPose, armCalibratedPose});
   }
 }
