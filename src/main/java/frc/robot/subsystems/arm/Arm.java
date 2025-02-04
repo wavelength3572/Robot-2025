@@ -17,8 +17,7 @@ public class Arm {
   }
 
   public void periodic() {
-    if (ArmkP.hasChanged(hashCode())
-        || ArmkD.hasChanged(hashCode())) {
+    if (ArmkP.hasChanged(hashCode()) || ArmkD.hasChanged(hashCode())) {
       io.setPIDValues(ArmkP.get(), ArmkD.get());
     }
     io.updateInputs(inputs);
@@ -26,8 +25,8 @@ public class Arm {
   }
 
   public void setAngleDEG(Double requestedPosition) {
-    if (requestedPosition>=ArmConstants.armMinAngle && requestedPosition<=ArmConstants.armMaxAngle)
-      io.setAngleDEG(requestedPosition);
+    if (requestedPosition >= ArmConstants.armMinAngle
+        && requestedPosition <= ArmConstants.armMaxAngle) io.setAngleDEG(requestedPosition);
   }
 
   public double getAngleDEG() {

@@ -2,12 +2,12 @@ package frc.robot.subsystems.arm;
 
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 
 public final class ArmConfigs {
 
   public static final class ArmSubsystem {
-    public static final SparkMaxConfig armConfig = new SparkMaxConfig();
+    public static final SparkFlexConfig armConfig = new SparkFlexConfig();
 
     static {
       // Configure basic settings of the elevator motor

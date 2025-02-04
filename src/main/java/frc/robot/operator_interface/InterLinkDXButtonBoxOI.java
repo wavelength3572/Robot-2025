@@ -235,12 +235,12 @@ public class InterLinkDXButtonBoxOI implements OperatorInterface {
 
   @Override
   public Trigger getButtonFPosition2() {
-    return interLinkJoystickJoystickButtons[8]; // Button F top right of front face - up position
+    return interLinkJoystickJoystickButtons[8]; // Button F top right of front face - down position
   }
 
   @Override
   public Trigger getButtonFPosition0() {
-    return interLinkJoystickJoystickButtons[9]; // Button F top right of front face - down position
+    return interLinkJoystickJoystickButtons[9]; // Button F top right of front face - up position
   }
 
   @Override

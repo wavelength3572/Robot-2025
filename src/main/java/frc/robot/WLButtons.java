@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.operator_interface.OperatorInterface;
@@ -33,10 +32,5 @@ public class WLButtons {
 
     // Gyro Reset
     oi.getResetGyroButton().onTrue(Commands.runOnce(WLDrive::zeroGyroscope, WLDrive));
-    // Angle Drive Button
-    oi.getAngleDriveButton()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                WLDrive, oi::getTranslateX, oi::getTranslateY, () -> new Rotation2d()));
   }
 }

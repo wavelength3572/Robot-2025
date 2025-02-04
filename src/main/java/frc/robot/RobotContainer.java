@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CoralSystemCommands;
 import frc.robot.commands.DriveCommands;
@@ -34,6 +35,9 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.elevator.ElevatorIOVirtualSim;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIOSpark;
+import frc.robot.subsystems.intake.IntakeIOVirtualSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
@@ -55,6 +59,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Elevator elevator;
   private final Arm arm;
+  private final Intake intake;
   private final CoralSystem coralSystem;
   private OperatorInterface oi = new OperatorInterface() {};
 
@@ -91,7 +96,8 @@ public class RobotContainer {
         //         new VisionIOPhotonVision(camera1Name, robotToCamera1));
         elevator = new Elevator(new ElevatorIOSpark() {});
         arm = new Arm(new ArmIOVirtualSim() {});
-        coralSystem = new CoralSystem(elevator, arm);
+        intake = new Intake(new IntakeIOSpark() {});
+        coralSystem = new CoralSystem(elevator, arm, intake);
         break;
 
       case SIM:
@@ -110,7 +116,8 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(cameraBName, robotToCameraB, drive::getPose));
         elevator = new Elevator(new ElevatorIOVirtualSim() {});
         arm = new Arm(new ArmIOVirtualSim() {});
-        coralSystem = new CoralSystem(elevator, arm);
+        intake = new Intake(new IntakeIOVirtualSim() {});
+        coralSystem = new CoralSystem(elevator, arm, intake);
         break;
 
       default:
@@ -127,6 +134,7 @@ public class RobotContainer {
         elevator = null;
         arm = null;
         coralSystem = null;
+        intake = null;
         break;
     }
 
@@ -176,6 +184,19 @@ public class RobotContainer {
     oi = OISelector.findOperatorInterface();
 
     WLButtons.configureButtonBindings(oi, drive);
+
+    oi.getButtonFPosition0()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  intake.setSpeed(0.03);
+                }));
+    oi.getButtonFPosition2()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  intake.setSpeed(-0.03);
+                }));
 
     // Configure some robot defaults based on current state of Controller Switches.
     // if (oi.getFieldRelativeButton().getAsBoolean()) {
