@@ -22,15 +22,16 @@ public class ArmIOSpark implements ArmIO {
   private SparkClosedLoopController armClosedLoopController = armMotor.getClosedLoopController();
   private RelativeEncoder armEncoder = armMotor.getEncoder();
 
-  private double armTargetDEG = 0.0;
-  private double armTargetEncoderRotations = 0.0;
+  private double armTargetDEG = ArmConstants.armStartAngle;
+  private double armTargetEncoderRotations =
+      ArmConstants.armStartAngle * ArmConstants.kArmGearing / 360.0;
 
   public ArmIOSpark() {
     armMotor.configure(
         ArmConfigs.ArmSubsystem.armConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
-    armEncoder.setPosition(0);
+    armEncoder.setPosition(ArmConstants.armStartAngle * ArmConstants.kArmGearing / 360.0);
   }
 
   @Override

@@ -142,7 +142,13 @@ public class RobotContainer {
       elevator.setPosition(0.0);
       SmartDashboard.putNumber("Elevator Goal (in)", 0.0);
       SmartDashboard.putData(
-          "Set Eleveator", CoralSystemCommands.setElevatorPositionFromDashboard(coralSystem));
+          "Set Elevator", CoralSystemCommands.setElevatorPositionFromDashboard(coralSystem));
+    }
+
+    if (arm != null) {
+      SmartDashboard.putNumber("Arm Goal (DEG)", 90.0);
+      SmartDashboard.putData(
+          "Set Arm", CoralSystemCommands.setArmPositionFromDashboard(coralSystem));
     }
 
     // Set up auto routines
@@ -185,13 +191,13 @@ public class RobotContainer {
 
     WLButtons.configureButtonBindings(oi, drive);
 
-    oi.getButtonFPosition0()
+    oi.getButtonFPosition0() // Push
         .onTrue(
             Commands.runOnce(
                 () -> {
                   intake.setSpeed(0.03);
                 }));
-    oi.getButtonFPosition2()
+    oi.getButtonFPosition2() // Pull
         .onTrue(
             Commands.runOnce(
                 () -> {

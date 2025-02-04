@@ -72,11 +72,22 @@ public class CoralSystemCommands {
         coralSubsystem);
   }
 
+  /** Set the Arm Position */
+  public static Command setArmPositionFromDashboard(CoralSystem coralSystem) {
+    return Commands.runOnce(
+        () -> {
+          coralSystem.getArm().setAngleDEG(SmartDashboard.getNumber("Arm Goal (DEG)", 90.0));
+        },
+        coralSystem);
+  }
+
   /** Set the Elevator Position */
   public static Command setElevatorPositionFromDashboard(CoralSystem coralSystem) {
     return Commands.runOnce(
         () -> {
-          coralSystem.getElevator().setPositionInches(SmartDashboard.getNumber("Elevator Goal", 0));
+          coralSystem
+              .getElevator()
+              .setPositionInches(SmartDashboard.getNumber("Elevator Goal (in)", 0));
         },
         coralSystem);
   }

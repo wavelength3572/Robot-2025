@@ -1,16 +1,15 @@
 package frc.robot.subsystems.arm;
 
-import frc.robot.subsystems.elevator.ElevatorConstants;
-
 // See
 // https://github.com/wpilibsuite/allwpilib/blob/main/wpilibjExamples/src/main/java/edu/wpi/first/wpilibj/examples/elevatorsimulation/subsystems/Elevator.java
 // and
 // https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/robot-simulation/physics-sim.html
 
 public class ArmIOVirtualSim implements ArmIO {
-  private double armTargetDEG = 0.0;
-  private double armTargetEncoderRotations = 0.0;
-  private double armVirtualEncoder = 0.0;
+  private double armTargetDEG = ArmConstants.armStartAngle;
+  private double armTargetEncoderRotations =
+      ArmConstants.armStartAngle * ArmConstants.kArmGearing / 360.0;
+  private double armVirtualEncoder = ArmConstants.armStartAngle * ArmConstants.kArmGearing / 360.0;
 
   // Simulation setup and variables
 
@@ -19,17 +18,15 @@ public class ArmIOVirtualSim implements ArmIO {
   @Override
   public void updateInputs(ArmIOInputs inputs) {
     inputs.targetAngleDEG = this.armTargetDEG;
-    inputs.currentAngleDEG =
-        (armVirtualEncoder / ElevatorConstants.kElevatorGearing)
-            * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI);
+    inputs.currentAngleDEG = armVirtualEncoder * 360.0 / ArmConstants.kArmGearing;
     inputs.targetEncoderRotations = armTargetEncoderRotations;
     inputs.encoderRotations = armVirtualEncoder;
 
     if (armVirtualEncoder < armTargetEncoderRotations) {
-      if (armTargetEncoderRotations - armVirtualEncoder > 1.0) armVirtualEncoder += 1.0;
+      if (armTargetEncoderRotations - armVirtualEncoder > 0.2) armVirtualEncoder += 0.2;
       else armVirtualEncoder = armTargetEncoderRotations;
     } else if (armVirtualEncoder > armTargetEncoderRotations) {
-      if (armVirtualEncoder - armTargetEncoderRotations > 1.0) armVirtualEncoder -= 1.0;
+      if (armVirtualEncoder - armTargetEncoderRotations > 0.2) armVirtualEncoder -= 0.2;
       else armVirtualEncoder = armTargetEncoderRotations;
     }
   }
