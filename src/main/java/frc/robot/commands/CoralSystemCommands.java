@@ -14,7 +14,7 @@ public class CoralSystemCommands {
     return Commands.runOnce(
         () -> {
           CoralSystemPresets preset = coralSystem.getCoralSystemPresetChooser().getSelected();
-          coralSystem.getElevator().setPositionMeters(preset.getElevatorHeight());
+          coralSystem.getElevator().setPositionInches(preset.getElevatorHeight());
           coralSystem.getArm().setAngleDEG(preset.getArmAngle());
         },
         coralSystem);
@@ -39,5 +39,4 @@ public class CoralSystemCommands {
         },
         coralSystem);
   }
-
 }

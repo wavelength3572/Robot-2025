@@ -2,7 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.CommandConstants;
-import frc.robot.commands.CoralSystemCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OperatorInterface;
@@ -16,8 +15,7 @@ public class WLButtons {
   private static Drive WLDrive;
   private static CoralSystem coralSystem;
 
-  public WLButtons() {
-  }
+  public WLButtons() {}
 
   public static void configureTestModeButtonBindings(
       OperatorInterface operatorInterface, Drive drive) {
@@ -120,8 +118,7 @@ public class WLButtons {
 
     if (oi.getButtonV().getAsBoolean()) {
       coralSystem.setCoralInRobot(true);
-    } else
-      coralSystem.setCoralInRobot(false);
+    } else coralSystem.setCoralInRobot(false);
 
     oi.getButtonV()
         .onTrue(Commands.runOnce(() -> coralSystem.setCoralInRobot(true), coralSystem))
@@ -138,6 +135,5 @@ public class WLButtons {
     oi.getButtonFPosition0().onTrue(Commands.runOnce(AlignmentUtils::setLeftCage));
     oi.getButtonFPosition1().onTrue(Commands.runOnce(AlignmentUtils::setMidCage));
     oi.getButtonFPosition2().onTrue(Commands.runOnce(AlignmentUtils::setRightCage));
-
   }
 }

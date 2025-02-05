@@ -11,6 +11,7 @@ import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.intake.Intake;
 import lombok.Getter;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class CoralSystem extends SubsystemBase {
@@ -19,11 +20,10 @@ public class CoralSystem extends SubsystemBase {
   @Getter private final CoralSystemPresetChooser coralSystemPresetChooser;
   @Getter private Arm arm;
   @Getter private Intake intake;
-
-  @Getter public boolean coralInRobot;
+  @AutoLogOutput @Getter public boolean coralInRobot;
 
   public CoralSystem(Elevator elevator, Arm arm, Intake intake) {
-    coralSystemPresetChooser = new CoralSystemPresetChooser();
+    coralSystemPresetChooser = new CoralSystemPresetChooser(this);
     this.elevator = elevator;
     this.arm = arm;
     this.intake = intake;
@@ -37,6 +37,8 @@ public class CoralSystem extends SubsystemBase {
     this.arm.periodic();
     this.intake.periodic();
 
+    coralSystemPresetChooser.checkAndUpdate();
+
     Pose3d elevatorDynamicPose = this.elevator.getElevator3DPose();
     Pose3d armDynamicPose = this.arm.getArm3DPose(elevator::getHeightInMeters);
     Pose3d armCalibratedPose =
@@ -47,7 +49,6 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public void setCoralInRobot(Boolean coralInRobot) {
-    this.coralInRobot=coralInRobot;
+    this.coralInRobot = coralInRobot;
   }
-
 }
