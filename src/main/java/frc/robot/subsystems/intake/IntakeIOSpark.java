@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -13,6 +14,7 @@ public class IntakeIOSpark implements IntakeIO {
   // need to initialize the closed loop controller and encoder.
   private SparkMax intakeMotor = new SparkMax(IntakeConstants.canId, MotorType.kBrushless);
   private RelativeEncoder intakeEncoder = intakeMotor.getEncoder();
+  private AbsoluteEncoder armEncoder = intakeMotor.getAbsoluteEncoder();
   private Double requestedSpeed = 0.0;
 
   public IntakeIOSpark() {
@@ -29,6 +31,7 @@ public class IntakeIOSpark implements IntakeIO {
     inputs.velocityRPM = intakeEncoder.getVelocity();
     inputs.appliedVolts = intakeMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = intakeMotor.getOutputCurrent();
+    inputs.Arm_TBE = armEncoder.getPosition();
   }
 
   @Override

@@ -26,5 +26,6 @@ public interface ArmIO {
     return 0.0;
   }
 
-  public default void setPIDValues(double kP, double kD) {}
+  public default void setPIDValues(
+      double kP, double kD, double kF, double VelocityMax, double AccelerationMax) {}
 }

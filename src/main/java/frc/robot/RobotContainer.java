@@ -28,6 +28,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.ArmIOMMSpark;
 import frc.robot.subsystems.arm.ArmIOVirtualSim;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.drive.*;
@@ -36,6 +37,7 @@ import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.elevator.ElevatorIOVirtualSim;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIOSpark;
 import frc.robot.subsystems.intake.IntakeIOVirtualSim;
 import frc.robot.subsystems.vision.Vision;
@@ -95,7 +97,7 @@ public class RobotContainer {
                 new VisionIOPhotonVision(elevatorBackCam, robotToElevatorBackCam));
 
         elevator = new Elevator(new ElevatorIOSpark() {});
-        arm = new Arm(new ArmIOVirtualSim() {});
+        arm = new Arm(new ArmIOMMSpark() {});
         intake = new Intake(new IntakeIOSpark() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
         break;
@@ -199,13 +201,23 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  intake.setSpeed(0.03);
+                  intake.setSpeed(IntakeConstants.intakeOutSpeed);
+                }))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  intake.setSpeed(0.0);
                 }));
     oi.getButtonFPosition2() // Pull
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  intake.setSpeed(-0.03);
+                  intake.setSpeed(IntakeConstants.intakeInSpeed);
+                }))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  intake.setSpeed(0.0);
                 }));
 
     // Configure some robot defaults based on current state of Controller Switches.
