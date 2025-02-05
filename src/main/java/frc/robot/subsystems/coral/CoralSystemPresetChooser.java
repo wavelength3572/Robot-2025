@@ -7,10 +7,6 @@ public class CoralSystemPresetChooser {
   private final SendableChooser<CoralSystemPresets> chooser = new SendableChooser<>();
 
   public CoralSystemPresetChooser() {
-    // Set a default option
-    chooser.setDefaultOption("Stow", CoralSystemPresets.STOW);
-
-    chooser.addOption("Stow Low", CoralSystemPresets.STOW_LOW);
 
     // Add all your enum options
     chooser.addOption("Pickup", CoralSystemPresets.PICKUP);
@@ -22,10 +18,6 @@ public class CoralSystemPresetChooser {
         "Front Algae Dislodge Level 1", CoralSystemPresets.FRONT_ALGAE_DISLODGE_LEVEL_1);
     chooser.addOption(
         "Front Algae Dislodge Level 2", CoralSystemPresets.FRONT_ALGAE_DISLODGE_LEVEL_2);
-    chooser.addOption(
-        "Back Algae Dislodge Level 1", CoralSystemPresets.BACK_ALGAE_DISLODGE_LEVEL_1);
-    chooser.addOption(
-        "Back Algae Dislodge Level 2", CoralSystemPresets.BACK_ALGAE_DISLODGE_LEVEL_2);
 
     // Publish the chooser to the dashboard
     SmartDashboard.putData("Coral Position Chooser", chooser);
