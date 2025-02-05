@@ -88,12 +88,12 @@ public class RobotContainer {
                 new ModuleIOSpark(3));
         vision =
             new Vision(
-                drive::addVisionMeasurement, 
+                drive::addVisionMeasurement,
                 new VisionIOPhotonVision(frontRightCam, robotToFrontRightCam),
                 new VisionIOPhotonVision(backRightCam, robotToBackRightCam),
                 new VisionIOPhotonVision(elevatorFrontCam, robotToElevatorFrontCam),
                 new VisionIOPhotonVision(elevatorBackCam, robotToElevatorBackCam));
-     
+
         elevator = new Elevator(new ElevatorIOSpark() {});
         arm = new Arm(new ArmIOVirtualSim() {});
         intake = new Intake(new IntakeIOSpark() {});
@@ -114,10 +114,12 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(frontRightCam, robotToFrontRightCam, drive::getPose),
                 new VisionIOPhotonVisionSim(backRightCam, robotToBackRightCam, drive::getPose),
-                new VisionIOPhotonVisionSim(elevatorFrontCam, robotToElevatorFrontCam, drive::getPose),
-                new VisionIOPhotonVisionSim(elevatorBackCam, robotToElevatorBackCam, drive::getPose));
+                new VisionIOPhotonVisionSim(
+                    elevatorFrontCam, robotToElevatorFrontCam, drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    elevatorBackCam, robotToElevatorBackCam, drive::getPose));
         elevator = new Elevator(new ElevatorIOVirtualSim() {});
-        arm = new Arm(new ArmIOVirtualSim() {}); 
+        arm = new Arm(new ArmIOVirtualSim() {});
         intake = new Intake(new IntakeIOVirtualSim() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
         break;

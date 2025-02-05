@@ -61,15 +61,28 @@ public final class VisionConstants {
           0.26985,
           0.26981,
           0.22155,
-          new Rotation3d(0.0, Rotation2d.fromDegrees(-15).getRadians(), 0.0));
-
+          new Rotation3d(
+              0.0,
+              Rotation2d.fromDegrees(-15).getRadians(),
+              Rotation2d.fromDegrees(180).getRadians()));
   public static Transform3d robotToElevatorFrontCam =
-      new Transform3d(
-          0.26985, -0.1, 0.5, new Rotation3d(0.0, 0.0, Rotation2d.fromDegrees(60).getRadians()));
+      new Transform3d( // Comments in inches
+          0.26985, // 9.75 (Center of robot to edge of elevator frame) + 1.25(Elevator frame to
+          // Camera lens)
+          -0.0809625, // 11/16 (Elevator frame side to mid lens)+ 2.5(Center of robot to elevator
+          // frame side)
+          0.47625, // 15(Top of Frame to mid lens) + 3.75 (Ground to top of frame)
+          new Rotation3d(0.0, 0.0, Rotation2d.fromDegrees(60).getRadians()));
 
   public static Transform3d robotToElevatorBackCam =
       new Transform3d(
-          -0.26985, -0.1, 0.5, new Rotation3d(0.0, 0.0, Rotation2d.fromDegrees(120).getRadians()));
+          -0.26985, // 9.75 (Center of robot to edge of elevator frame) + 1.25(Elevator frame to
+          // Camera lens)
+          -0.0809625, // 11/16 (Elevator frame side to mid lens)+ 2.5(Center of robot to elevator
+          // frame
+          // side)
+          0.47625, // 15(Top of Frame to mid lens) + 3.75 (Ground to top of frame) -inches
+          new Rotation3d(0.0, 0.0, Rotation2d.fromDegrees(120).getRadians()));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
