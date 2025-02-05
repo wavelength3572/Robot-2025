@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.CommandConstants;
 import frc.robot.commands.CoralSystemCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
@@ -166,7 +165,7 @@ public class RobotContainer {
             () -> 0.0, // Default X joystick input (stationary for dashboard testing)
             () -> 0.0, // Default Y joystick input
             () -> 0.0, // Default rotation joystick input
-            CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
+            FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
     SmartDashboard.putData(
         "DriveToClosestRIGHTPole",
@@ -176,7 +175,7 @@ public class RobotContainer {
             () -> 0.0, // Default X joystick input (stationary for dashboard testing)
             () -> 0.0, // Default Y joystick input
             () -> 0.0, // Default rotation joystick input
-            CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
+            FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

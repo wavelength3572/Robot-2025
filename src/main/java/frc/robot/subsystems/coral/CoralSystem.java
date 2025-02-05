@@ -22,6 +22,14 @@ public class CoralSystem extends SubsystemBase {
   @Getter private Intake intake;
   @AutoLogOutput @Getter public boolean coralInRobot;
 
+  @Getter
+  private CoralSystemPresets targetCoralPreset =
+      CoralSystemPresets.STARTUP; // Default startup position
+
+  @Getter
+  private CoralSystemPresets currentCoralPreset =
+      CoralSystemPresets.STARTUP; // Tracks last reached preset
+
   public CoralSystem(Elevator elevator, Arm arm, Intake intake) {
     coralSystemPresetChooser = new CoralSystemPresetChooser(this);
     this.elevator = elevator;
@@ -37,6 +45,10 @@ public class CoralSystem extends SubsystemBase {
     this.arm.periodic();
     this.intake.periodic();
 
+    Logger.recordOutput("CoralSystem/ElevatorAtGoal", elevator.isAtGoal());
+    Logger.recordOutput("CoralSystem/ArmAtGoal", arm.isAtGoal());
+    Logger.recordOutput("CoralSystem/AtGoal", isAtGoal());
+
     coralSystemPresetChooser.checkAndUpdate();
 
     Pose3d elevatorDynamicPose = this.elevator.getElevator3DPose();
@@ -46,6 +58,21 @@ public class CoralSystem extends SubsystemBase {
             new Transform3d(0, 0, 0, new Rotation3d(0, Units.degreesToRadians(-90), 0)));
     Logger.recordOutput(
         "FinalComponentPoses", new Pose3d[] {elevatorDynamicPose, armCalibratedPose});
+
+    // Pose3d coralPose;
+    // Pose3d stagedCoralPose = new Pose3d();
+    // Pose3d robotCoralPose = new Pose3d(1.5, 1.5, 1.5, new Rotation3d(0, 0, 0)); // Fake robot position
+
+    // if (isCoralInRobot()) {
+    //   // Coral is part of the robot
+    //   // coralPose = attachCoralToRobot(armCalibratedPose);
+    //   // Logger.recordOutput("FinalComponentPoses", new Pose3d[] {elevatorDynamicPose, armCalibratedPose, coralPose});
+    //   Logger.recordOutput("FieldObjects/Coral0", robotCoralPose);
+    // } else {
+    //   // coralPose = getNeutralCoralPose();
+    //   // Logger.recordOutput("FinalComponentPoses", new Pose3d[] {elevatorDynamicPose, armCalibratedPose, coralPose});
+    //   Logger.recordOutput("FieldObjects/Coral0", stagedCoralPose);
+    // }
   }
 
   public void setCoralInRobot(Boolean coralInRobot) {
@@ -53,11 +80,27 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public boolean isAtGoal() {
-    return this.elevator.atGoal();
+    boolean atGoal = elevator.isAtGoal() && arm.isAtGoal();
+    if (atGoal) currentCoralPreset = targetCoralPreset;
+    return atGoal;
   }
 
-public boolean isAtStowPosition() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'isAtStowPosition'");
-}
+  public void setTargetPreset(CoralSystemPresets preset) {
+    this.targetCoralPreset = preset;
+  }
+
+  /** Calculates and returns the coral's pose when attached to the robot */
+  private Pose3d attachCoralToRobot(Pose3d armPose) {
+    return new Pose3d(
+        armPose.getX(), // Adjust forward/backward offset
+        armPose.getY(), // Keep Y same
+        armPose.getZ(), // Adjust height
+        armPose.getRotation() // Rotate with arm
+        );
+  }
+
+  /** Returns a "neutral" pose when coral is not attached to the robot */
+  private Pose3d getNeutralCoralPose() {
+    return new Pose3d(0, 0, -10, new Rotation3d(0, 0, 0)); // Place far below field level
+  }
 }

@@ -20,4 +20,6 @@ public class ArmConstants {
   public static final double kArmkG = 0.0; // volts (V)
   public static final double kArmkV = 0.762; // volt per velocity (V/(m/s))
   public static final double kArmkA = 0.0; // volt per acceleration (V/(m/s²))
+
+  public static final double kSetpointThresholdDEG = 1;
 }

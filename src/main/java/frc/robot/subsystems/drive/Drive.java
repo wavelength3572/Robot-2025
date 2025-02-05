@@ -44,7 +44,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.commands.CommandConstants;
+import frc.robot.FieldConstants;
 import frc.robot.util.AlignmentUtils;
 import frc.robot.util.AlignmentUtils.CageSelection;
 import frc.robot.util.AlignmentUtils.CoralStationSelection;
@@ -153,9 +153,9 @@ public class Drive extends SubsystemBase {
       reefFaceSelection = AlignmentUtils.findClosestReefFaceAndRejectOthers(getPose());
       coralStationSelection = AlignmentUtils.findClosestCoralStation(getPose());
 
-      if (CommandConstants.selectedCageTranslation != null)
+      if (FieldConstants.selectedCageTranslation != null)
         cageSelection =
-            AlignmentUtils.findCageRobotAngle(getPose(), CommandConstants.selectedCageTranslation);
+            AlignmentUtils.findCageRobotAngle(getPose(), FieldConstants.selectedCageTranslation);
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data

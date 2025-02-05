@@ -6,10 +6,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.commands.CommandConstants;
-import frc.robot.commands.CommandConstants.CageTarget;
-import frc.robot.commands.CommandConstants.ReefChosenOrientation;
-import frc.robot.commands.CommandConstants.StationChosenOrientation;
+import frc.robot.FieldConstants;
+import frc.robot.FieldConstants.CageTarget;
+import frc.robot.FieldConstants.ReefChosenOrientation;
+import frc.robot.FieldConstants.StationChosenOrientation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -59,9 +59,9 @@ public class AlignmentUtils {
 
     Map<Integer, Translation2d> aprilTagMap;
     if (alliance.get() == Alliance.Blue) {
-      aprilTagMap = CommandConstants.BLUE_REEF_APRIL_TAGS;
+      aprilTagMap = FieldConstants.BLUE_REEF_APRIL_TAGS;
     } else if (alliance.get() == Alliance.Red) {
-      aprilTagMap = CommandConstants.RED_REEF_APRIL_TAGS;
+      aprilTagMap = FieldConstants.RED_REEF_APRIL_TAGS;
     } else {
       // e.g. Alliance.Invalid or something else
       // Return a neutral "none found" result or handle as an error
@@ -124,9 +124,9 @@ public class AlignmentUtils {
     // 2) Pick the correct orientation map based on alliance
     Map<Integer, Rotation2d[]> orientationMap;
     if (allianceOpt.isPresent() && allianceOpt.get() == Alliance.Blue) {
-      orientationMap = CommandConstants.REEF_FACE_ORIENTATION_BLUE;
+      orientationMap = FieldConstants.REEF_FACE_ORIENTATION_BLUE;
     } else if (allianceOpt.isPresent() && allianceOpt.get() == Alliance.Red) {
-      orientationMap = CommandConstants.REEF_FACE_ORIENTATION_RED;
+      orientationMap = FieldConstants.REEF_FACE_ORIENTATION_RED;
     } else {
       // e.g. Alliance.Invalid or empty Optional
       // Decide how you want to handle this case:
@@ -134,7 +134,7 @@ public class AlignmentUtils {
       // (b) return a "neutral" orientation,
       // (c) throw an exception, etc.
       // Here, let's just default to BLUE:
-      orientationMap = CommandConstants.REEF_FACE_ORIENTATION_BLUE;
+      orientationMap = FieldConstants.REEF_FACE_ORIENTATION_BLUE;
     }
 
     // 3) Retrieve the possible orientations for this faceId
@@ -144,7 +144,7 @@ public class AlignmentUtils {
     // 4) If no orientation data, provide a fallback
     if (possibleOrients == null || possibleOrients.length < 2) {
       // Return a "neutral" result indicating no data is available
-      return new ReefChosenOrientation(currentHeading, CommandConstants.ReefOrientationType.FRONT);
+      return new ReefChosenOrientation(currentHeading, FieldConstants.ReefOrientationType.FRONT);
     }
 
     // 5) orientationA is the "front", orientationB is the "back"
@@ -157,10 +157,10 @@ public class AlignmentUtils {
     // 6) Pick whichever orientation is closer
     if (diffA <= diffB) {
       // Closer to "front" orientation
-      return new ReefChosenOrientation(orientationA, CommandConstants.ReefOrientationType.FRONT);
+      return new ReefChosenOrientation(orientationA, FieldConstants.ReefOrientationType.FRONT);
     } else {
       // Closer to "back" orientation
-      return new ReefChosenOrientation(orientationB, CommandConstants.ReefOrientationType.BACK);
+      return new ReefChosenOrientation(orientationB, FieldConstants.ReefOrientationType.BACK);
     }
   }
 
@@ -204,9 +204,9 @@ public class AlignmentUtils {
 
     Map<Integer, Translation2d> aprilTagMap;
     if (alliance.get() == Alliance.Blue) {
-      aprilTagMap = CommandConstants.BLUE_CORALSTATION_APRIL_TAGS;
+      aprilTagMap = FieldConstants.BLUE_CORALSTATION_APRIL_TAGS;
     } else if (alliance.get() == Alliance.Red) {
-      aprilTagMap = CommandConstants.RED_CORALSTATION_APRIL_TAGS;
+      aprilTagMap = FieldConstants.RED_CORALSTATION_APRIL_TAGS;
     } else {
       // e.g. Alliance.Invalid or something else
       // Return a neutral "none found" result or handle as an error
@@ -260,9 +260,9 @@ public class AlignmentUtils {
     // 2) Pick the correct orientation map based on alliance
     Map<Integer, Rotation2d[]> orientationMap;
     if (allianceOpt.isPresent() && allianceOpt.get() == Alliance.Blue) {
-      orientationMap = CommandConstants.CORAL_STATION_ORIENTATION_BLUE;
+      orientationMap = FieldConstants.CORAL_STATION_ORIENTATION_BLUE;
     } else if (allianceOpt.isPresent() && allianceOpt.get() == Alliance.Red) {
-      orientationMap = CommandConstants.CORAL_STATION_ORIENTATION_RED;
+      orientationMap = FieldConstants.CORAL_STATION_ORIENTATION_RED;
     } else {
       // e.g. Alliance.Invalid or empty Optional
       // Decide how you want to handle this case:
@@ -270,7 +270,7 @@ public class AlignmentUtils {
       // (b) return a "neutral" orientation,
       // (c) throw an exception, etc.
       // Here, let's just default to BLUE:
-      orientationMap = CommandConstants.CORAL_STATION_ORIENTATION_BLUE;
+      orientationMap = FieldConstants.CORAL_STATION_ORIENTATION_BLUE;
     }
 
     // 3) Retrieve the possible orientations for this faceId
@@ -281,7 +281,7 @@ public class AlignmentUtils {
     if (possibleOrients == null || possibleOrients.length < 2) {
       // Return a "neutral" result indicating no data is available
       return new StationChosenOrientation(
-          currentHeading, CommandConstants.StationOrientationType.FRONT);
+          currentHeading, FieldConstants.StationOrientationType.FRONT);
     }
 
     // 5) orientationA is the "front", orientationB is the "back"
@@ -295,11 +295,10 @@ public class AlignmentUtils {
     if (diffA <= diffB) {
       // Closer to "front" orientation
       return new StationChosenOrientation(
-          orientationA, CommandConstants.StationOrientationType.FRONT);
+          orientationA, FieldConstants.StationOrientationType.FRONT);
     } else {
       // Closer to "back" orientation
-      return new StationChosenOrientation(
-          orientationB, CommandConstants.StationOrientationType.BACK);
+      return new StationChosenOrientation(orientationB, FieldConstants.StationOrientationType.BACK);
     }
   }
 
@@ -352,15 +351,15 @@ public class AlignmentUtils {
   ;
 
   public static void setLeftCage() {
-    CommandConstants.selectedCageTranslation = CommandConstants.getCage(CageTarget.LEFT);
+    FieldConstants.selectedCageTranslation = FieldConstants.getCage(CageTarget.LEFT);
   }
 
   public static void setMidCage() {
-    CommandConstants.selectedCageTranslation = CommandConstants.getCage(CageTarget.MID);
+    FieldConstants.selectedCageTranslation = FieldConstants.getCage(CageTarget.MID);
   }
 
   public static void setRightCage() {
-    CommandConstants.selectedCageTranslation = CommandConstants.getCage(CageTarget.RIGHT);
+    FieldConstants.selectedCageTranslation = FieldConstants.getCage(CageTarget.RIGHT);
   }
 
   public static class CageSelection {

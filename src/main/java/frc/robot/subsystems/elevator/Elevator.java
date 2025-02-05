@@ -40,9 +40,6 @@ public class Elevator {
     }
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
-
-    boolean isAtGoal = isAtGoal();
-    Logger.recordOutput("Elevator/AtGoal", isAtGoal);
   }
 
   public void setPositionInches(Double requestedPosition) {

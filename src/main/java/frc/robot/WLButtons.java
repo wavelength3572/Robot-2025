@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.CommandConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OperatorInterface;
@@ -42,11 +41,11 @@ public class WLButtons {
               oi::getRotate,
               drive::getPose,
               drive::getReefFaceSelection,
-              CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
+              FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
               drive::getCoralStationSelection,
-              CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
+              FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
               drive::getCageSelection,
-              CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE,
+              FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE,
               // Use the elevator from the coral subsystem
               () -> coralSystem.isCoralInRobot()));
     } else {
@@ -86,11 +85,11 @@ public class WLButtons {
                           oi::getRotate,
                           WLDrive::getPose,
                           WLDrive::getReefFaceSelection,
-                          CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
+                          FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
                           WLDrive::getCoralStationSelection,
-                          CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
+                          FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
                           WLDrive::getCageSelection,
-                          CommandConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE,
+                          FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE,
                           () -> coralSystem.isCoralInRobot()));
                 },
                 WLDrive));
@@ -104,7 +103,7 @@ public class WLButtons {
                 oi::getTranslateX,
                 oi::getTranslateY,
                 oi::getRotate,
-                CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
+                FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
     oi.getRightJoyRightButton()
         .onTrue(
@@ -114,7 +113,7 @@ public class WLButtons {
                 oi::getTranslateX,
                 oi::getTranslateY,
                 oi::getRotate,
-                CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
+                FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
     if (oi.getButtonV().getAsBoolean()) {
       coralSystem.setCoralInRobot(true);

@@ -5,9 +5,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.CommandConstants.ReefChosenOrientation;
-import frc.robot.commands.CommandConstants.ReefFacesBlue;
-import frc.robot.commands.CommandConstants.ReefFacesRed;
+import frc.robot.FieldConstants;
+import frc.robot.FieldConstants.ReefChosenOrientation;
+import frc.robot.FieldConstants.ReefFacesBlue;
+import frc.robot.FieldConstants.ReefFacesRed;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AlignmentUtils;
 import java.util.Optional;
@@ -101,10 +102,10 @@ public class DriveToCommands {
           AlignmentUtils.pickClosestOrientationForReef(drive.getPose(), faceId);
       poleTranslation =
           isLeftPole
-              ? chosen.orientationType() == CommandConstants.ReefOrientationType.FRONT
+              ? chosen.orientationType() == FieldConstants.ReefOrientationType.FRONT
                   ? blueFace.getLeftPole().getFrontTranslation()
                   : blueFace.getLeftPole().getBackTranslation()
-              : chosen.orientationType() == CommandConstants.ReefOrientationType.FRONT
+              : chosen.orientationType() == FieldConstants.ReefOrientationType.FRONT
                   ? blueFace.getRightPole().getFrontTranslation()
                   : blueFace.getRightPole().getBackTranslation();
 
@@ -123,10 +124,10 @@ public class DriveToCommands {
           AlignmentUtils.pickClosestOrientationForReef(drive.getPose(), faceId);
       poleTranslation =
           isLeftPole
-              ? chosen.orientationType() == CommandConstants.ReefOrientationType.FRONT
+              ? chosen.orientationType() == FieldConstants.ReefOrientationType.FRONT
                   ? redFace.getLeftPole().getFrontTranslation()
                   : redFace.getLeftPole().getBackTranslation()
-              : chosen.orientationType() == CommandConstants.ReefOrientationType.FRONT
+              : chosen.orientationType() == FieldConstants.ReefOrientationType.FRONT
                   ? redFace.getRightPole().getFrontTranslation()
                   : redFace.getRightPole().getBackTranslation();
 

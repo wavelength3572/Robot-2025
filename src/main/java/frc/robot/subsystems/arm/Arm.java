@@ -47,6 +47,10 @@ public class Arm {
     return io.getAngleDEG();
   }
 
+  public double getSetpointDEG() {
+    return inputs.targetAngleDEG;
+  }
+
   public Pose3d getArm3DPose(Supplier<Double> elevatorOffset) {
     double armAngleRadians = Math.toRadians(getAngleDEG());
     return new Pose3d(
@@ -54,5 +58,9 @@ public class Arm {
         -0.190,
         elevatorOffset.get() + 0.262,
         new Rotation3d(0, armAngleRadians, Units.degreesToRadians(180)));
+  }
+
+  public boolean isAtGoal() {
+    return Math.abs(getAngleDEG() - getSetpointDEG()) < ArmConstants.kSetpointThresholdDEG;
   }
 }
