@@ -5,6 +5,7 @@ import static frc.robot.subsystems.elevator.ElevatorConstants.leaderCanId;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import frc.robot.subsystems.arm.ArmConstants;
 
 public final class ElevatorConfigs {
 
@@ -33,7 +34,7 @@ public final class ElevatorConfigs {
           // Set MAXMotion parameters for position control
           .maxVelocity(ElevatorConstants.kElevatorVel)
           .maxAcceleration(ElevatorConstants.kElevatorAcc)
-          .allowedClosedLoopError(0.1);
+          .allowedClosedLoopError(ArmConstants.kAllowableError);
 
       followerConfig
           // Configure basic settings of the elevator motor

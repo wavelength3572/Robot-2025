@@ -15,14 +15,24 @@ public class Arm {
       new LoggedTunableNumber("Arm/kEp", ArmConstants.kArmKp);
   private static final LoggedTunableNumber ArmkD =
       new LoggedTunableNumber("Arm/kEd", ArmConstants.kArmKd);
+  private static final LoggedTunableNumber ArmkF =
+      new LoggedTunableNumber("Arm/kEf", ArmConstants.kArmKf);
+  private static final LoggedTunableNumber ArmVel =
+      new LoggedTunableNumber("Arm/kEVel", ArmConstants.kArmVel);
+  private static final LoggedTunableNumber ArmAcc =
+      new LoggedTunableNumber("Arm/kEAcc", ArmConstants.kArmAcc);
 
   public Arm(ArmIO io) {
     this.io = io;
   }
 
   public void periodic() {
-    if (ArmkP.hasChanged(hashCode()) || ArmkD.hasChanged(hashCode())) {
-      io.setPIDValues(ArmkP.get(), ArmkD.get());
+    if (ArmkP.hasChanged(hashCode())
+        || ArmkD.hasChanged(hashCode())
+        || ArmkF.hasChanged(hashCode())
+        || ArmVel.hasChanged(hashCode())
+        || ArmAcc.hasChanged(hashCode())) {
+      io.setPIDValues(ArmkP.get(), ArmkD.get(), ArmkF.get(), ArmVel.get(), ArmAcc.get());
     }
     io.updateInputs(inputs);
     Logger.processInputs("Arm", inputs);

@@ -1,19 +1,16 @@
 package frc.robot.subsystems.arm;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.util.Units;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj.RobotController;
 
-public class ArmIOSpark implements ArmIO {
+public class ArmIOMMSpark implements ArmIO {
 
   // Initialize elevator SPARK. We will use MAXMotion position control for the elevator, so we also
   // need to initialize the closed loop controller and encoder.
@@ -25,7 +22,7 @@ public class ArmIOSpark implements ArmIO {
   private double armTargetEncoderRotations =
       ArmConstants.armStartAngle * ArmConstants.kArmGearing / 360.0;
 
-  public ArmIOSpark() {
+  public ArmIOMMSpark() {
     armMotor.configure(
         ArmConfigs.ArmSubsystem.armConfig,
         ResetMode.kResetSafeParameters,
@@ -36,11 +33,7 @@ public class ArmIOSpark implements ArmIO {
   @Override
   public void updateInputs(ArmIOInputs inputs) {
     armClosedLoopController.setReference(
-        armTargetEncoderRotations,
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0,
-        ArmConstants.kArmkG * Math.cos(Units.degreesToRadians(armTargetDEG)),
-        ArbFFUnits.kVoltage);
+        armTargetEncoderRotations, ControlType.kMAXMotionPositionControl);
     inputs.targetAngleDEG = armTargetDEG;
     inputs.currentAngleDEG = armEncoder.getPosition() * 360.0 / ArmConstants.kArmGearing;
     inputs.targetEncoderRotations = this.armTargetEncoderRotations;
@@ -69,8 +62,15 @@ public class ArmIOSpark implements ArmIO {
   @Override
   public void setPIDValues(
       double kP, double kD, double kF, double VelocityMax, double AccelerationMax) {
-    final SparkMaxConfig config = new SparkMaxConfig();
-    config.closedLoop.pidf(kP, 0.0, kD, 0.0);
+    final SparkFlexConfig config = new SparkFlexConfig();
+    config
+        .closedLoop
+        .pidf(kP, 0.0, kD, kF)
+        .maxMotion
+        // Set MAXMotion parameters for position control
+        .maxVelocity(VelocityMax)
+        .maxAcceleration(AccelerationMax)
+        .allowedClosedLoopError(0.1);
     armMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 }
