@@ -20,11 +20,14 @@ public class CoralSystem extends SubsystemBase {
   @Getter private Arm arm;
   @Getter private Intake intake;
 
+  @Getter public boolean coralInRobot;
+
   public CoralSystem(Elevator elevator, Arm arm, Intake intake) {
     coralSystemPresetChooser = new CoralSystemPresetChooser();
     this.elevator = elevator;
     this.arm = arm;
     this.intake = intake;
+
     SmartDashboard.putData("Set Coral Config", CoralSystemCommands.runPreset(this));
   }
 
@@ -42,4 +45,9 @@ public class CoralSystem extends SubsystemBase {
     Logger.recordOutput(
         "FinalComponentPoses", new Pose3d[] {elevatorDynamicPose, armCalibratedPose});
   }
+
+  public void setCoralInRobot(Boolean coralInRobot) {
+    this.coralInRobot=coralInRobot;
+  }
+
 }

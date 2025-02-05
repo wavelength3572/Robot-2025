@@ -31,7 +31,6 @@ import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIOMMSpark;
 import frc.robot.subsystems.arm.ArmIOVirtualSim;
-import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresetChooser;
 import frc.robot.subsystems.drive.*;
@@ -170,11 +169,6 @@ public class RobotContainer {
             () -> 0.0, // Default rotation joystick input
             CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
-    SmartDashboard.putData(
-        "Coral Position",
-        CoralSystemCommands.getCoralSelectedPresetFromSmartDashboardCommand(
-            coralSubsystem, coralSystemPresetChooser));
-
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
     // autoChooser = new LoggedDashboardChooser<>("Auto");
@@ -213,7 +207,7 @@ public class RobotContainer {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     oi = OISelector.findOperatorInterface();
 
-    WLButtons.configureButtonBindings(oi, drive);
+    WLButtons.configureButtonBindings(oi, drive, coralSystem);
 
     oi.getButtonFPosition0() // Push
         .onTrue(
@@ -263,9 +257,5 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
-  }
-
-  public CoralSubsystem getCoralSubsystem() {
-    return coralSubsystem;
   }
 }

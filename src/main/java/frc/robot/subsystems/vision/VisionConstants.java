@@ -47,10 +47,6 @@ public final class VisionConstants {
   public static String backRightCam = "CAMERA_B";
   public static String elevatorFrontCam = "CAMERA_C";
   public static String elevatorBackCam = "CAMERA_D";
-  public static String frontRightCam = "CAMERA_A";
-  public static String backRightCam = "CAMERA_B";
-  public static String elevatorFrontCam = "CAMERA_C";
-  public static String elevatorBackCam = "CAMERA_D";
 
   // Robot to camera transforms
   public static Transform3d robotToFrontRightCam =
@@ -101,10 +97,6 @@ public final class VisionConstants {
   // (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors =
       new double[] {
-        1.0, // FrontRight
-        1.0, // BackRight
-        1.0, // ElevatorFront
-        1.0 // ElevatorBack
         1.0, // FrontRight
         1.0, // BackRight
         1.0, // ElevatorFront
