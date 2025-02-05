@@ -40,6 +40,9 @@ public class Elevator {
     }
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
+
+    boolean isAtGoal = isAtGoal();
+    Logger.recordOutput("Elevator/AtGoal", isAtGoal);
   }
 
   public void setPositionInches(Double requestedPosition) {
@@ -60,6 +63,19 @@ public class Elevator {
       io.setPosition(requestedPosition);
   }
 
+  public double getSetpointInInches() {
+    return Units.metersToInches(getSetpointInMeters());
+  }
+
+  public double getSetpointInMeters() {
+    return (inputs.setpoint * ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI)
+        / ElevatorConstants.kElevatorGearing;
+  }
+
+  public double getHeightInInches() {
+    return Units.metersToInches(getHeightInMeters());
+  }
+
   public double getHeightInMeters() {
     return io.getHeightInMeters();
   }
@@ -68,5 +84,10 @@ public class Elevator {
     // update dynamic poses for 3D visualization.
     double elevatorOffset = this.getHeightInMeters();
     return new Pose3d(0, -0.0908, elevatorOffset + 0.24, new Rotation3d(0, 0, 0));
+  }
+
+  public boolean isAtGoal() {
+    return Math.abs(getHeightInInches() - getSetpointInInches())
+        < ElevatorConstants.kSetpointThresholdINCHES;
   }
 }

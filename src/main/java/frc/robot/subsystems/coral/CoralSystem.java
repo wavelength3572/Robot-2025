@@ -51,4 +51,13 @@ public class CoralSystem extends SubsystemBase {
   public void setCoralInRobot(Boolean coralInRobot) {
     this.coralInRobot = coralInRobot;
   }
+
+  public boolean isAtGoal() {
+    return this.elevator.atGoal();
+  }
+
+public boolean isAtStowPosition() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'isAtStowPosition'");
+}
 }

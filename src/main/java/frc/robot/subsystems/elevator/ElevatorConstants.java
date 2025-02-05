@@ -26,4 +26,6 @@ public class ElevatorConstants {
   public static final double kElevatorkG = 0.762; // volts (V)
   public static final double kElevatorkV = 0.762; // volt per velocity (V/(m/s))
   public static final double kElevatorkA = 0.0; // volt per acceleration (V/(m/s²))
+
+  public static final double kSetpointThresholdINCHES = 0.5;
 }
