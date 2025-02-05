@@ -28,14 +28,19 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.CommandConstants.ReefChosenOrientation;
+import frc.robot.commands.CommandConstants.StationChosenOrientation;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.util.AlignmentUtils;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -294,5 +299,213 @@ public class DriveCommands {
     double[] positions = new double[4];
     Rotation2d lastAngle = new Rotation2d();
     double gyroDelta = 0.0;
+  }
+
+  public static Command joystickSmartDrive(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier,
+      Supplier<Pose2d> robotPoseSupplier,
+      Supplier<AlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
+      double reefDistanceThresholdMeters,
+      Supplier<AlignmentUtils.CoralStationSelection> stationSelectionSupplier,
+      double stationDistanceThresholdMeters,
+      Supplier<AlignmentUtils.CageSelection> cageSelectionSupplier,
+      double cageDistanceThresholdMeters,
+      Supplier<Boolean> hasCoralSupplier) {
+
+    ProfiledPIDController angleController = createAngleController();
+    AtomicBoolean isManualOverride = new AtomicBoolean(false);
+
+    return Commands.run(
+            () -> {
+              Translation2d linearVelocity =
+                  getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+              double manualOmega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+              double omega =
+                  determineOmega(
+                      drive,
+                      manualOmega,
+                      hasCoralSupplier.get(),
+                      robotPoseSupplier,
+                      reefFaceSelectionSupplier,
+                      reefDistanceThresholdMeters,
+                      stationSelectionSupplier,
+                      stationDistanceThresholdMeters,
+                      cageSelectionSupplier,
+                      cageDistanceThresholdMeters,
+                      angleController,
+                      isManualOverride);
+
+              sendSpeedsToDrive(drive, linearVelocity, omega);
+            },
+            drive)
+        .beforeStarting(
+            () -> angleController.reset(robotPoseSupplier.get().getRotation().getRadians()));
+  }
+
+  private static ProfiledPIDController createAngleController() {
+    ProfiledPIDController controller =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    controller.enableContinuousInput(-Math.PI, Math.PI);
+    return controller;
+  }
+
+  private static double determineOmega(
+      Drive drive,
+      double manualOmega,
+      boolean hasCoral,
+      Supplier<Pose2d> robotPoseSupplier,
+      Supplier<AlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
+      double reefDistanceThresholdMeters,
+      Supplier<AlignmentUtils.CoralStationSelection> stationSelectionSupplier,
+      double stationDistanceThresholdMeters,
+      Supplier<AlignmentUtils.CageSelection> cageSelectionSupplier,
+      double cageDistanceThresholdMeters,
+      ProfiledPIDController angleController,
+      AtomicBoolean isManualOverride) {
+
+    if (Math.abs(manualOmega) > 0.0) {
+      isManualOverride.set(true);
+      return Math.copySign(manualOmega * manualOmega, manualOmega)
+          * drive.getMaxAngularSpeedRadPerSec();
+    }
+
+    if (hasCoral) {
+      return alignToReef(
+          robotPoseSupplier,
+          reefFaceSelectionSupplier,
+          reefDistanceThresholdMeters,
+          angleController,
+          isManualOverride);
+    }
+
+    return alignToCoralStationOrCage(
+        robotPoseSupplier,
+        stationSelectionSupplier,
+        stationDistanceThresholdMeters,
+        cageSelectionSupplier,
+        cageDistanceThresholdMeters,
+        angleController,
+        isManualOverride);
+  }
+
+  private static double alignToReef(
+      Supplier<Pose2d> robotPoseSupplier,
+      Supplier<AlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
+      double reefDistanceThresholdMeters,
+      ProfiledPIDController angleController,
+      AtomicBoolean isManualOverride) {
+
+    AlignmentUtils.ReefFaceSelection selection = reefFaceSelectionSupplier.get();
+    if (selection != null
+        && selection.getAcceptedFaceId() != null
+        && selection.getAcceptedDistance() <= reefDistanceThresholdMeters) {
+
+      if (isManualOverride.get()) {
+        ReefChosenOrientation chosenOrientation =
+            AlignmentUtils.pickClosestOrientationForReef(
+                robotPoseSupplier.get(), selection.getAcceptedFaceId());
+        resetAngleController(angleController, robotPoseSupplier, chosenOrientation);
+        isManualOverride.set(false);
+      }
+
+      ReefChosenOrientation chosenOrientation =
+          AlignmentUtils.pickClosestOrientationForReef(
+              robotPoseSupplier.get(), selection.getAcceptedFaceId());
+
+      return angleController.calculate(
+          robotPoseSupplier.get().getRotation().getRadians(),
+          chosenOrientation.rotation2D().getRadians());
+    }
+
+    return 0.0;
+  }
+
+  private static double alignToCoralStationOrCage(
+      Supplier<Pose2d> robotPoseSupplier,
+      Supplier<AlignmentUtils.CoralStationSelection> stationSelectionSupplier,
+      double stationDistanceThresholdMeters,
+      Supplier<AlignmentUtils.CageSelection> cageSelectionSupplier,
+      double cageDistanceThresholdMeters,
+      ProfiledPIDController angleController,
+      AtomicBoolean isManualOverride) {
+
+    AlignmentUtils.CoralStationSelection stationSelection = stationSelectionSupplier.get();
+    AlignmentUtils.CageSelection cageSelection = cageSelectionSupplier.get();
+
+    if (stationSelection != null
+        && stationSelection.getAcceptedStationId() != null
+        && stationSelection.getAcceptedDistance() <= stationDistanceThresholdMeters) {
+
+      if (isManualOverride.get()) {
+        StationChosenOrientation chosenOrientation =
+            AlignmentUtils.pickClosestOrientationForStation(
+                robotPoseSupplier.get(), stationSelection.getAcceptedStationId());
+        resetAngleController(angleController, robotPoseSupplier, chosenOrientation);
+        isManualOverride.set(false);
+      }
+
+      StationChosenOrientation chosenOrientation =
+          AlignmentUtils.pickClosestOrientationForStation(
+              robotPoseSupplier.get(), stationSelection.getAcceptedStationId());
+
+      Logger.recordOutput(
+          "Alignment/CoralStation/Omega", chosenOrientation.rotation2D().getDegrees());
+      return angleController.calculate(
+          robotPoseSupplier.get().getRotation().getRadians(),
+          chosenOrientation.rotation2D().getRadians());
+    }
+
+    if (cageSelection != null
+        && DriverStation.getAlliance().isPresent()
+        && cageSelection.getDistanceToCage() <= cageDistanceThresholdMeters) {
+
+      return angleController.calculate(
+          robotPoseSupplier.get().getRotation().getRadians(),
+          cageSelection.getRotationToCage().getRadians());
+    }
+
+    return 0.0;
+  }
+
+  private static void resetAngleController(
+      ProfiledPIDController angleController,
+      Supplier<Pose2d> robotPoseSupplier,
+      ReefChosenOrientation chosenOrientation) {
+
+    angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
+    angleController.setGoal(chosenOrientation.rotation2D().getRadians());
+  }
+
+  private static void resetAngleController(
+      ProfiledPIDController angleController,
+      Supplier<Pose2d> robotPoseSupplier,
+      StationChosenOrientation chosenOrientation) {
+
+    angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
+    angleController.setGoal(chosenOrientation.rotation2D().getRadians());
+  }
+
+  private static void sendSpeedsToDrive(Drive drive, Translation2d linearVelocity, double omega) {
+    ChassisSpeeds speeds =
+        new ChassisSpeeds(
+            linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+            linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+            omega);
+
+    boolean isFlipped =
+        DriverStation.getAlliance().isPresent()
+            && DriverStation.getAlliance().get() == Alliance.Red;
+
+    drive.runVelocity(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            speeds,
+            isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation()));
   }
 }

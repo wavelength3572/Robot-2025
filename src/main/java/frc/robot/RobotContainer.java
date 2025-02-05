@@ -17,20 +17,23 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.CommandConstants;
 import frc.robot.commands.CoralSystemCommands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.DriveToCommands;
+import frc.robot.commands.ElevatorCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIOMMSpark;
 import frc.robot.subsystems.arm.ArmIOVirtualSim;
+import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.coral.CoralSystem;
+import frc.robot.subsystems.coral.CoralSystemPresetChooser;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
@@ -44,9 +47,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -65,17 +65,10 @@ public class RobotContainer {
   private final CoralSystem coralSystem;
   private OperatorInterface oi = new OperatorInterface() {};
 
-  private LoggedMechanism2d scoringSystem = new LoggedMechanism2d(.8382, 2.0);
-  private LoggedMechanismRoot2d root = scoringSystem.getRoot("Base", 0.51, 0.0);
-  private LoggedMechanismLigament2d m_elevator =
-      root.append(
-          new LoggedMechanismLigament2d(
-              "Elevator", ElevatorConstants.kGroundToElevator, 90, 2, new Color8Bit(Color.kBlue)));
-
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+  private final CoralSystemPresetChooser coralSystemPresetChooser = new CoralSystemPresetChooser();
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     switch (Constants.currentMode) {
@@ -156,6 +149,31 @@ public class RobotContainer {
       SmartDashboard.putData(
           "Set Arm", CoralSystemCommands.setArmPositionFromDashboard(coralSystem));
     }
+
+ SmartDashboard.putData(
+        "DriveToClosestLEFTPole",
+        DriveToCommands.driveToPole(
+            drive, // The Drive subsystem
+            true, // isLeftPole = true
+            () -> 0.0, // Default X joystick input (stationary for dashboard testing)
+            () -> 0.0, // Default Y joystick input
+            () -> 0.0, // Default rotation joystick input
+            CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
+
+    SmartDashboard.putData(
+        "DriveToClosestRIGHTPole",
+        DriveToCommands.driveToPole(
+            drive, // The Drive subsystem
+            false, // isLeftPole = false
+            () -> 0.0, // Default X joystick input (stationary for dashboard testing)
+            () -> 0.0, // Default Y joystick input
+            () -> 0.0, // Default rotation joystick input
+            CommandConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
+
+    SmartDashboard.putData(
+        "Coral Position",
+        CoralSystemCommands.getCoralSelectedPresetFromSmartDashboardCommand(
+            coralSubsystem, coralSystemPresetChooser));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -247,9 +265,7 @@ public class RobotContainer {
     return autoChooser.get();
   }
 
-  public LoggedMechanism2d getElevator() {
-    // Update the Elevator 2D Mech
-    m_elevator.setLength(ElevatorConstants.kGroundToElevator + elevator.getHeightInMeters());
-    return scoringSystem;
+  public CoralSubsystem getCoralSubsystem() {
+    return coralSubsystem;
   }
 }

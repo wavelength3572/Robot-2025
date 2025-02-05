@@ -44,6 +44,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.commands.CommandConstants;
+import frc.robot.util.AlignmentUtils;
+import frc.robot.util.AlignmentUtils.CageSelection;
+import frc.robot.util.AlignmentUtils.CoralStationSelection;
+import frc.robot.util.AlignmentUtils.ReefFaceSelection;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -51,6 +56,8 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
+
+  private boolean isDriveModeSmart = false;
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -70,6 +77,10 @@ public class Drive extends SubsystemBase {
       };
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+
+  private ReefFaceSelection reefFaceSelection;
+  private CoralStationSelection coralStationSelection;
+  private CageSelection cageSelection;
 
   public Drive(
       GyroIO gyroIO,
@@ -123,8 +134,30 @@ public class Drive extends SubsystemBase {
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
 
+  public ReefFaceSelection getReefFaceSelection() {
+    return reefFaceSelection;
+  }
+
+  public CoralStationSelection getCoralStationSelection() {
+    return coralStationSelection;
+  }
+
+  public CageSelection getCageSelection() {
+    return cageSelection;
+  }
+
   @Override
   public void periodic() {
+
+    if (DriverStation.getAlliance().isPresent()) {
+      reefFaceSelection = AlignmentUtils.findClosestReefFaceAndRejectOthers(getPose());
+      coralStationSelection = AlignmentUtils.findClosestCoralStation(getPose());
+
+      if (CommandConstants.selectedCageTranslation != null)
+        cageSelection =
+            AlignmentUtils.findCageRobotAngle(getPose(), CommandConstants.selectedCageTranslation);
+    }
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -354,5 +387,18 @@ public class Drive extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
+  }
+
+  public void setDriveModeSmart() {
+    isDriveModeSmart = true;
+  }
+
+  public void setDriveModeNormal() {
+    isDriveModeSmart = false;
+  }
+
+  @AutoLogOutput(key = "Alignment/isSmartDrive")
+  public boolean isDriveModeSmart() {
+    return isDriveModeSmart;
   }
 }
