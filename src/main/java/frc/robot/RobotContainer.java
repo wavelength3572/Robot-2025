@@ -45,6 +45,8 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.Visualizer;
+import lombok.Getter;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
@@ -64,6 +66,8 @@ public class RobotContainer {
   private final Arm arm;
   private final Intake intake;
   private final CoralSystem coralSystem;
+  @Getter private Visualizer visualizer;
+
   private OperatorInterface oi = new OperatorInterface() {};
 
   // Dashboard inputs
@@ -143,6 +147,13 @@ public class RobotContainer {
         intake = null;
         break;
     }
+
+    visualizer =
+        new Visualizer(
+            drive::getPose,
+            elevator::getHeightInMeters,
+            arm::getAngleDEG,
+            coralSystem::isCoralInRobot);
 
     if (elevator != null) {
       elevator.setPosition(0.0);
