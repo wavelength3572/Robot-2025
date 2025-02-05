@@ -88,12 +88,12 @@ public class RobotContainer {
                 new ModuleIOSpark(3));
         vision =
             new Vision(
-                drive::addVisionMeasurement, new VisionIOPhotonVision(cameraBName, robotToCameraB));
-        // vision =
-        //     new Vision(
-        //         drive::addVisionMeasurement,
-        //         new VisionIOPhotonVision(camera0Name, robotToCamera0),
-        //         new VisionIOPhotonVision(camera1Name, robotToCamera1));
+                drive::addVisionMeasurement, 
+                new VisionIOPhotonVision(frontRightCam, robotToFrontRightCam),
+                new VisionIOPhotonVision(backRightCam, robotToBackRightCam),
+                new VisionIOPhotonVision(elevatorFrontCam, robotToElevatorFrontCam),
+                new VisionIOPhotonVision(elevatorBackCam, robotToElevatorBackCam));
+     
         elevator = new Elevator(new ElevatorIOSpark() {});
         arm = new Arm(new ArmIOVirtualSim() {});
         intake = new Intake(new IntakeIOSpark() {});
@@ -112,10 +112,12 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(cameraAName, robotToCameraA, drive::getPose),
-                new VisionIOPhotonVisionSim(cameraBName, robotToCameraB, drive::getPose));
+                new VisionIOPhotonVisionSim(frontRightCam, robotToFrontRightCam, drive::getPose),
+                new VisionIOPhotonVisionSim(backRightCam, robotToBackRightCam, drive::getPose),
+                new VisionIOPhotonVisionSim(elevatorFrontCam, robotToElevatorFrontCam, drive::getPose),
+                new VisionIOPhotonVisionSim(elevatorBackCam, robotToElevatorBackCam, drive::getPose));
         elevator = new Elevator(new ElevatorIOVirtualSim() {});
-        arm = new Arm(new ArmIOVirtualSim() {});
+        arm = new Arm(new ArmIOVirtualSim() {}); 
         intake = new Intake(new IntakeIOVirtualSim() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
         break;

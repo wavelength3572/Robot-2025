@@ -40,20 +40,36 @@ public final class VisionConstants {
     }
   }
 
+  // _________________________________________________________________________________________________
+
   // Camera names, must match names configured on coprocessor
-  public static String cameraAName = "CAMERA_A";
-  public static String cameraBName = "CAMERA_B";
+  public static String frontRightCam = "CAMERA_A";
+  public static String backRightCam = "CAMERA_B";
+  public static String elevatorFrontCam = "CAMERA_C";
+  public static String elevatorBackCam = "CAMERA_D";
 
   // Robot to camera transforms
-  public static Transform3d robotToCameraA =
+  public static Transform3d robotToFrontRightCam =
       new Transform3d(
           0.26985,
           -0.26981,
           0.22155,
-          new Rotation3d(
-              0.0, Rotation2d.fromDegrees(0).getRadians(), Rotation2d.fromDegrees(0).getRadians()));
-  public static Transform3d robotToCameraB =
-      new Transform3d(0.26985, 0.26981, 0.22155, new Rotation3d(0.0, 0.0, 0.0));
+          new Rotation3d(0.0, Rotation2d.fromDegrees(-15).getRadians(), 0.0));
+
+  public static Transform3d robotToBackRightCam =
+      new Transform3d(
+          0.26985,
+          0.26981,
+          0.22155,
+          new Rotation3d(0.0, Rotation2d.fromDegrees(-15).getRadians(), 0.0));
+
+  public static Transform3d robotToElevatorFrontCam =
+      new Transform3d(
+          0.26985, -0.1, 0.5, new Rotation3d(0.0, 0.0, Rotation2d.fromDegrees(60).getRadians()));
+
+  public static Transform3d robotToElevatorBackCam =
+      new Transform3d(
+          -0.26985, -0.1, 0.5, new Rotation3d(0.0, 0.0, Rotation2d.fromDegrees(120).getRadians()));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
@@ -68,8 +84,10 @@ public final class VisionConstants {
   // (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors =
       new double[] {
-        1.0, // Camera 0
-        1.0 // Camera 1
+        1.0, // FrontRight
+        1.0, // BackRight
+        1.0, // ElevatorFront
+        1.0 // ElevatorBack
       };
 
   // Multipliers to apply for MegaTag 2 observations
