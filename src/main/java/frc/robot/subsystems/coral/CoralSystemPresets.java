@@ -16,9 +16,9 @@ public enum CoralSystemPresets {
   // SCORE_LEVEL_3_Straight(Units.inchesToMeters(), 90, CoralState.PREPARE_L2_SCORE),
   // highest height 65 inches
 
-  private final double elevatorHeight;
-  private final double armAngle;
-  private final CoralState state;
+  @Getter private final double elevatorHeight;
+  @Getter private final double armAngle;
+  @Getter private final CoralState state;
   @Getter private final double elevatorFF;
   @Getter private final double armFF;
 
@@ -33,18 +33,6 @@ public enum CoralSystemPresets {
     this.state = state;
     this.elevatorFF = elevatorFF;
     this.armFF = armFF;
-  }
-
-  public double getElevatorHeight() {
-    return elevatorHeight;
-  }
-
-  public double getArmAngle() {
-    return armAngle;
-  }
-
-  public CoralState getState() {
-    return state;
   }
 
   public enum CoralState {
