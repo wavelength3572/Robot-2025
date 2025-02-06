@@ -61,16 +61,19 @@ public class CoralSystem extends SubsystemBase {
 
     // Pose3d coralPose;
     // Pose3d stagedCoralPose = new Pose3d();
-    // Pose3d robotCoralPose = new Pose3d(1.5, 1.5, 1.5, new Rotation3d(0, 0, 0)); // Fake robot position
+    // Pose3d robotCoralPose = new Pose3d(1.5, 1.5, 1.5, new Rotation3d(0, 0, 0)); // Fake robot
+    // position
 
     // if (isCoralInRobot()) {
     //   // Coral is part of the robot
     //   // coralPose = attachCoralToRobot(armCalibratedPose);
-    //   // Logger.recordOutput("FinalComponentPoses", new Pose3d[] {elevatorDynamicPose, armCalibratedPose, coralPose});
+    //   // Logger.recordOutput("FinalComponentPoses", new Pose3d[] {elevatorDynamicPose,
+    // armCalibratedPose, coralPose});
     //   Logger.recordOutput("FieldObjects/Coral0", robotCoralPose);
     // } else {
     //   // coralPose = getNeutralCoralPose();
-    //   // Logger.recordOutput("FinalComponentPoses", new Pose3d[] {elevatorDynamicPose, armCalibratedPose, coralPose});
+    //   // Logger.recordOutput("FinalComponentPoses", new Pose3d[] {elevatorDynamicPose,
+    // armCalibratedPose, coralPose});
     //   Logger.recordOutput("FieldObjects/Coral0", stagedCoralPose);
     // }
   }
@@ -87,6 +90,8 @@ public class CoralSystem extends SubsystemBase {
 
   public void setTargetPreset(CoralSystemPresets preset) {
     this.targetCoralPreset = preset;
+    elevator.setTargetPreset(preset);
+    arm.setTargetPreset(preset);
   }
 
   /** Calculates and returns the coral's pose when attached to the robot */

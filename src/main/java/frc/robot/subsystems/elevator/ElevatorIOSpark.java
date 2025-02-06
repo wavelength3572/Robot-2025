@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 
 public class ElevatorIOSpark implements ElevatorIO {
@@ -48,8 +49,9 @@ public class ElevatorIOSpark implements ElevatorIO {
     inputs.positionRotations = leaderEncoder.getPosition();
     inputs.velocityRPM = leaderEncoder.getVelocity();
     inputs.elevatorHeightCalc =
-        (leaderEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
-            * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI);
+        Units.metersToInches(
+            (leaderEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
+                * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI));
     inputs.appliedVolts = leaderMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = leaderMotor.getOutputCurrent();
 
