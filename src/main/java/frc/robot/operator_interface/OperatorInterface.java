@@ -293,6 +293,18 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
+  public default Trigger getButtonGPosition2() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getButtonGPosition1() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getButtonGPosition0() {
+    return new Trigger(() -> false);
+  }
+
   public default Trigger getButtonCPosition0() {
     return new Trigger(() -> false);
   }

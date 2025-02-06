@@ -71,30 +71,29 @@ public class Visualizer {
         elevatorHeight + 0.262,
         new Rotation3d(0, armAngleRadians, Units.degreesToRadians(180)));
   }
+
   private Pose3d attachCoralToRobot(Pose2d robotPose2d, Pose3d armPoseInRobotFrame) {
     // (1) Convert the 2D robot pose (x, y, yaw) to a full 3D Pose3d.
     Rotation3d robotYaw = new Rotation3d(0, 0, robotPose2d.getRotation().getRadians());
     Pose3d robotPose3d = new Pose3d(robotPose2d.getX(), robotPose2d.getY(), 0.0, robotYaw);
-  
+
     // (2) Build a Transform3d that represents how to go from the robot frame to the arm frame.
     //     If armPoseInRobotFrame is the arm’s Pose3d in robot coords, then
     //       robotToArm = new Transform3d(/*from*/ origin, /*to*/ armPoseInRobotFrame)
     Transform3d robotToArm = new Transform3d(new Pose3d(), armPoseInRobotFrame);
-  
+
     // (3) Build the final offset from the arm to the coral (local translation & rotation).
     //     This is the "fine tuning" that says, "the coral is 0.202 m forward from the pivot, etc."
-    Transform3d armToCoral = new Transform3d(
-        new Translation3d(-.21, -.0155, 0.3135),
-        new Rotation3d(0, 0,0)
-    );
-  
+    Transform3d armToCoral =
+        new Transform3d(new Translation3d(-.21, -.0155, 0.3135), new Rotation3d(0, 0, 0));
+
     // (4) Compose them:
     //     fieldToCoral = fieldToRobot * robotToArm * armToCoral
-    Pose3d coralInField = robotPose3d
-        .transformBy(robotToArm)    // robot -> arm
-        .transformBy(armToCoral);   // arm   -> coral
-  
+    Pose3d coralInField =
+        robotPose3d
+            .transformBy(robotToArm) // robot -> arm
+            .transformBy(armToCoral); // arm   -> coral
+
     return coralInField;
   }
-  
 }

@@ -16,12 +16,13 @@ package frc.robot;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CoralSystemCommands;
 import frc.robot.commands.DriveCommands;
@@ -38,7 +39,6 @@ import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.elevator.ElevatorIOVirtualSim;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIOSpark;
 import frc.robot.subsystems.intake.IntakeIOVirtualSim;
 import frc.robot.subsystems.vision.Vision;
@@ -61,7 +61,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Vision vision;
-  private final Drive drive;
+  @Getter private final Drive drive;
   private final Elevator elevator;
   private final Arm arm;
   private final Intake intake;
@@ -192,6 +192,9 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
     // autoChooser = new LoggedDashboardChooser<>("Auto");
 
+    NamedCommands.registerCommand("TurnOffVision", DriveCommands.turnOffVision(drive));
+    NamedCommands.registerCommand("TurnOnVision", DriveCommands.turnOnVision(drive));
+
     // Set up SysId routines
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -227,29 +230,6 @@ public class RobotContainer {
     oi = OISelector.findOperatorInterface();
 
     WLButtons.configureButtonBindings(oi, drive, coralSystem);
-
-    oi.getButtonFPosition0() // Push
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  intake.setSpeed(IntakeConstants.intakeOutSpeed);
-                }))
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  intake.setSpeed(0.0);
-                }));
-    oi.getButtonFPosition2() // Pull
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  intake.setSpeed(IntakeConstants.intakeInSpeed);
-                }))
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  intake.setSpeed(0.0);
-                }));
   }
 
   /**

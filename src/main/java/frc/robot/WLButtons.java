@@ -6,6 +6,7 @@ import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.util.AlignmentUtils;
 
 public class WLButtons {
@@ -123,16 +124,39 @@ public class WLButtons {
         .onTrue(Commands.runOnce(() -> coralSystem.setCoralInRobot(true), coralSystem))
         .onFalse(Commands.runOnce(() -> coralSystem.setCoralInRobot(false), coralSystem));
 
-    if (oi.getButtonFPosition0().getAsBoolean()) {
+    oi.getButtonFPosition0() // Push Intake
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  coralSystem.getIntake().setSpeed(IntakeConstants.intakeOutSpeed);
+                }))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  coralSystem.getIntake().setSpeed(0.0);
+                }));
+    oi.getButtonFPosition2() // Pull Intake
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  coralSystem.getIntake().setSpeed(IntakeConstants.intakeInSpeed);
+                }))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  coralSystem.getIntake().setSpeed(0.0);
+                }));
+
+    if (oi.getButtonGPosition0().getAsBoolean()) {
       AlignmentUtils.setLeftCage();
-    } else if (oi.getButtonFPosition1().getAsBoolean()) {
+    } else if (oi.getButtonGPosition1().getAsBoolean()) {
       AlignmentUtils.setMidCage();
     } else {
       AlignmentUtils.setRightCage();
     }
 
-    oi.getButtonFPosition0().onTrue(Commands.runOnce(AlignmentUtils::setLeftCage));
-    oi.getButtonFPosition1().onTrue(Commands.runOnce(AlignmentUtils::setMidCage));
-    oi.getButtonFPosition2().onTrue(Commands.runOnce(AlignmentUtils::setRightCage));
+    oi.getButtonGPosition0().onTrue(Commands.runOnce(AlignmentUtils::setLeftCage));
+    oi.getButtonGPosition1().onTrue(Commands.runOnce(AlignmentUtils::setMidCage));
+    oi.getButtonGPosition2().onTrue(Commands.runOnce(AlignmentUtils::setRightCage));
   }
 }

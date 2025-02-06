@@ -140,6 +140,25 @@ public class InterLinkDXOI implements OperatorInterface {
   }
 
   @Override
+  public Trigger getButtonGPosition2() {
+    return interLinkJoystickJoystickButtons[10]; // Button G top right of front face - down position
+  }
+
+  @Override
+  public Trigger getButtonGPosition1() {
+    // Returns true when neither button[10] nor button[11] is active.
+    return new Trigger(
+        () ->
+            !interLinkJoystickJoystickButtons[10].getAsBoolean()
+                && !interLinkJoystickJoystickButtons[11].getAsBoolean());
+  }
+
+  @Override
+  public Trigger getButtonGPosition0() {
+    return interLinkJoystickJoystickButtons[11]; // Button G top right of front face - up position
+  }
+
+  @Override
   public Trigger getButtonCPosition0() {
     return interLinkJoystickJoystickButtons[4]; // Button C top left of front face - up position
   }

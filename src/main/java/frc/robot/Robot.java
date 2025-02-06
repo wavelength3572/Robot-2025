@@ -14,10 +14,13 @@
 package frc.robot;
 
 import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.DriveConstants;
 import java.util.HashMap;
 import java.util.Map;
@@ -130,7 +133,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    robotContainer.getDrive().setPose(new Pose2d(7.146, 1, new Rotation2d(Math.PI)));
+  }
 
   /** This function is called periodically when disabled. */
   @Override
@@ -163,6 +168,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    DriveCommands.turnOnVision(robotContainer.getDrive()).schedule();
   }
 
   /** This function is called periodically during operator control. */
