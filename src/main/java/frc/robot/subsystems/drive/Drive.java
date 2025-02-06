@@ -409,6 +409,14 @@ public class Drive extends SubsystemBase {
     return isDriveModeSmart;
   }
 
+  public void toggleDriveMode() {
+    if (isDriveModeSmart) {
+      setDriveModeNormal();
+    } else {
+      setDriveModeSmart();
+    }
+  }
+
   public void setVisionOn() {
     isVisionOn = true;
   }
