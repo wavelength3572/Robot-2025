@@ -1,6 +1,7 @@
 package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
@@ -38,6 +39,16 @@ public class Elevator {
     }
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
+  }
+
+  public void setTargetPreset(CoralSystemPresets preset) {
+    io.setPIDValues(
+        ElevatorkP.get(),
+        ElevatorkD.get(),
+        preset.getElevatorFF(),
+        ElevatorVel.get(),
+        ElevatorAcc.get());
+    setPositionInches(preset.getElevatorHeight());
   }
 
   public void setPositionInches(Double requestedPosition) {

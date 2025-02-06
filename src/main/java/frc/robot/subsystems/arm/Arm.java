@@ -1,5 +1,6 @@
 package frc.robot.subsystems.arm;
 
+import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
@@ -32,6 +33,11 @@ public class Arm {
     }
     io.updateInputs(inputs);
     Logger.processInputs("Arm", inputs);
+  }
+
+  public void setTargetPreset(CoralSystemPresets preset) {
+    io.setPIDValues(ArmkP.get(), ArmkD.get(), preset.getArmFF(), ArmVel.get(), ArmAcc.get());
+    setAngleDEG(preset.getArmAngle());
   }
 
   public void setAngleDEG(Double requestedPosition) {

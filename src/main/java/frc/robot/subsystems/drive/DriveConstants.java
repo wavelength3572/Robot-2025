@@ -74,7 +74,8 @@ public class DriveConstants {
           / driveMotorReduction
           * 2.0
           * Math.PI
-          * wheelRadiusMeters;
+          * wheelRadiusMeters
+          * 0.95; // Max is 95% of theoretical max
 
   // Drive encoder configuration
   public static final boolean driveInverted = false;
@@ -121,7 +122,7 @@ public class DriveConstants {
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 
   // PathPlanner configuration
-  public static final double robotMassKg = 54.43;
+  public static final double robotMassKg = Units.lbsToKilograms(100.0);
   public static final double robotMOI = 6.883;
   public static final double wheelCOF = 1.0; // From
   // https://www.vexrobotics.com/colsonperforma.html#attr-vex_resources

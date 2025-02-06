@@ -280,10 +280,6 @@ public class ModuleIOSpark implements ModuleIO {
 
   @Override
   public void setTurnPosition(Rotation2d rotation) {
-    // double setpoint =
-    //     MathUtil.inputModulus(
-    //         rotation.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
-    // turnController.setReference(setpoint, ControlType.kPosition);
     turnController.setReference(rotation.getRadians(), ControlType.kPosition);
   }
 }
