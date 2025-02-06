@@ -16,13 +16,12 @@ package frc.robot;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.CoralSystemCommands;
 import frc.robot.commands.DriveCommands;
@@ -188,12 +187,12 @@ public class RobotContainer {
             () -> 0.0, // Default rotation joystick input
             FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
+    SmartDashboard.putData(
+        "Toggle Vision", Commands.runOnce(drive::toggleVision).ignoringDisable(true));
+
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
     // autoChooser = new LoggedDashboardChooser<>("Auto");
-
-    NamedCommands.registerCommand("TurnOffVision", DriveCommands.turnOffVision(drive));
-    NamedCommands.registerCommand("TurnOnVision", DriveCommands.turnOnVision(drive));
 
     // Set up SysId routines
     autoChooser.addOption(

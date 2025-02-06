@@ -508,13 +508,4 @@ public class DriveCommands {
             speeds,
             isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation()));
   }
-
-  public static Command turnOffVision(Drive drive) {
-    return Commands.runOnce(drive::setVisionOff, drive);
-  }
-
-  public static Command turnOnVision(Drive drive) {
-    return Commands.runOnce(drive::setVisionOn, drive);
-  }
-
 }

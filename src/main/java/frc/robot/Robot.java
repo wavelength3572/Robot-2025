@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.DriveConstants;
 import java.util.HashMap;
 import java.util.Map;
@@ -168,7 +167,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    DriveCommands.turnOnVision(robotContainer.getDrive()).schedule();
+    robotContainer.getDrive().setVisionOn();
   }
 
   /** This function is called periodically during operator control. */
