@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
@@ -30,31 +32,9 @@ public class WLButtons {
     WLDrive = drive;
     WLButtons.coralSystem = coralSystem;
 
-    // Example of configuring drive defaults using WLDrive and coralSubsystem (if
-    // needed):
-    if (oi.getButtonH().getAsBoolean()) {
-      WLDrive.setDriveModeSmart();
-      WLDrive.setDefaultCommand(
-          DriveCommands.joystickSmartDrive(
-              drive,
-              oi::getTranslateX,
-              oi::getTranslateY,
-              oi::getRotate,
-              drive::getPose,
-              drive::getReefFaceSelection,
-              FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
-              drive::getCoralStationSelection,
-              FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
-              drive::getCageSelection,
-              FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE,
-              // Use the elevator from the coral subsystem
-              () -> coralSystem.isCoralInRobot()));
-    } else {
-      WLDrive.setDriveModeNormal();
-      WLDrive.setDefaultCommand(
-          DriveCommands.joystickDrive(
-              WLDrive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
-    }
+    WLDrive.setDriveModeNormal();
+    WLDrive.setDefaultCommand(
+        DriveCommands.joystickDrive(WLDrive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
 
     configureDriverButtons();
   }
@@ -64,36 +44,16 @@ public class WLButtons {
     // Gyro Reset
     oi.getResetGyroButton().onTrue(Commands.runOnce(WLDrive::zeroGyroscope, WLDrive));
 
-    oi.getButtonH()
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  WLDrive.setDriveModeNormal();
-                  WLDrive.setDefaultCommand(
-                      DriveCommands.joystickDrive(
-                          WLDrive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
-                },
-                WLDrive))
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  WLDrive.setDriveModeSmart();
-                  WLDrive.setDefaultCommand(
-                      DriveCommands.joystickSmartDrive(
-                          WLDrive,
-                          oi::getTranslateX,
-                          oi::getTranslateY,
-                          oi::getRotate,
-                          WLDrive::getPose,
-                          WLDrive::getReefFaceSelection,
-                          FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
-                          WLDrive::getCoralStationSelection,
-                          FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
-                          WLDrive::getCageSelection,
-                          FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE,
-                          () -> coralSystem.isCoralInRobot()));
-                },
-                WLDrive));
+    // Then create the toggle command
+    final Command toggleDriveModeCmd =
+        DriveCommands.toggleSmartDriveCmd(
+            WLDrive,
+            oi::getTranslateX,
+            oi::getTranslateY,
+            oi::getRotate,
+            coralSystem::isCoralInRobot);
+
+    SmartDashboard.putData("Toggle Smart Drive", toggleDriveModeCmd);
 
     // Drive to Pole
     oi.getRightJoyLeftButton()

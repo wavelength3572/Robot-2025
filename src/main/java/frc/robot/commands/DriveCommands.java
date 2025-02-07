@@ -28,6 +28,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.FieldConstants;
 import frc.robot.FieldConstants.ReefChosenOrientation;
 import frc.robot.FieldConstants.StationChosenOrientation;
 import frc.robot.subsystems.drive.Drive;
@@ -507,5 +509,38 @@ public class DriveCommands {
         ChassisSpeeds.fromFieldRelativeSpeeds(
             speeds,
             isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation()));
+  }
+
+  public static InstantCommand toggleSmartDriveCmd(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier,
+      Supplier<Boolean> hasCoralSupplier) {
+    return new InstantCommand(
+        () -> {
+          if (drive.isDriveModeSmart()) {
+            drive.setDriveModeNormal();
+            drive.setDefaultCommand(
+                DriveCommands.joystickDrive(drive, xSupplier, ySupplier, omegaSupplier));
+          } else {
+            drive.setDriveModeSmart();
+            drive.setDefaultCommand(
+                DriveCommands.joystickSmartDrive(
+                    drive,
+                    xSupplier,
+                    ySupplier,
+                    omegaSupplier,
+                    drive::getPose,
+                    drive::getReefFaceSelection,
+                    FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
+                    drive::getCoralStationSelection,
+                    FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
+                    drive::getCageSelection,
+                    FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE,
+                    hasCoralSupplier));
+          }
+        },
+        drive);
   }
 }
