@@ -5,15 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "TurnOnVision"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "TestMovement"
+            "pathName": "Straight+Score"
           }
         }
       ]
