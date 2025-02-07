@@ -6,14 +6,14 @@ public class ArmConstants {
   public static final double kArmGearing = 48.0; // 16:1 (Motor Gearing) * 48:16 (Sprockets)
 
   public static final double armStartAngle = 90.0; // Degrees
-  public static final double armMinAngle = -5.0; // Degrees
+  public static final double armMinAngle = -45.0; // Degrees
   public static final double armMaxAngle = 240.0; // Degrees
 
   public static final double kArmKp = .3;
   public static final double kArmKd = 0.00;
   public static final double kArmKf = 0;
-  public static final double kArmVel = 1000;
-  public static final double kArmAcc = 2000;
+  public static final double kArmVel = 600;
+  public static final double kArmAcc = 600;
   public static final double kAllowableError = .05;
 
   public static final double kArmkS = 0.0; // volts (V)
