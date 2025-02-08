@@ -55,26 +55,41 @@ public class WLButtons {
 
     SmartDashboard.putData("Toggle Smart Drive", toggleDriveModeCmd);
 
-    // Drive to Pole
     oi.getRightJoyLeftButton()
         .onTrue(
-            DriveToCommands.driveToPole(
-                WLDrive,
-                true,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                oi::getRotate,
-                FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
+            Commands.runOnce(
+                () -> {
+                  if (coralSystem.isCoralInRobot()) {
+                    // If there's coral in the robot, drive to a pole
+                    DriveToCommands.driveToPole(
+                            WLDrive,
+                            /* isLeftPole = */ true,
+                            oi::getTranslateX,
+                            oi::getTranslateY,
+                            oi::getRotate,
+                            FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE)
+                        .schedule();
+                  }
+                },
+                WLDrive));
 
     oi.getRightJoyRightButton()
         .onTrue(
-            DriveToCommands.driveToPole(
-                WLDrive,
-                false,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                oi::getRotate,
-                FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
+            Commands.runOnce(
+                () -> {
+                  if (coralSystem.isCoralInRobot()) {
+                    // If there's coral in the robot, drive to a pole
+                    DriveToCommands.driveToPole(
+                            WLDrive,
+                            false,
+                            oi::getTranslateX,
+                            oi::getTranslateY,
+                            oi::getRotate,
+                            FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE)
+                        .schedule();
+                  }                   
+                },
+                WLDrive));
 
     if (oi.getButtonV().getAsBoolean()) {
       coralSystem.setCoralInRobot(true);

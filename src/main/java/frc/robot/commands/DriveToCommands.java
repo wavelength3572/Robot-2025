@@ -139,4 +139,101 @@ public class DriveToCommands {
       return null;
     }
   }
+
+  /**
+   * Drive to the closest coral station face (based on which station AprilTag is closest).
+   *
+   * @param drive The drivetrain subsystem.
+   * @param xJoystickSupplier The forward/back joystick input.
+   * @param yJoystickSupplier The left/right joystick input.
+   * @param rotationJoystickSupplier The rotation joystick input.
+   * @param distanceThresholdMeters If the station is farther than this threshold, do nothing.
+   */
+  public static Command driveToCoralStation(
+      Drive drive,
+      DoubleSupplier xJoystickSupplier,
+      DoubleSupplier yJoystickSupplier,
+      DoubleSupplier rotationJoystickSupplier,
+      double distanceThresholdMeters) {
+
+    return Commands.runOnce(
+        () -> {
+          // 1) Ask AlignmentUtils which station face is closest:
+          AlignmentUtils.CoralStationSelection selection =
+              AlignmentUtils.findClosestCoralStation(drive.getPose());
+
+          if (selection == null || selection.getAcceptedStationId() == null) {
+            System.out.println("No valid coral station face found. Cannot drive to station.");
+            return;
+          }
+
+          // 2) Check distance threshold
+          double closestDistance = selection.getAcceptedDistance();
+          if (closestDistance > distanceThresholdMeters) {
+            System.out.println(
+                "Closest coral station is too far: "
+                    + closestDistance
+                    + " meters (threshold: "
+                    + distanceThresholdMeters
+                    + ")");
+            return;
+          }
+
+          // 3) Calculate target pose
+          Pose2d targetPose = calculateCoralStationPose(drive, selection.getAcceptedStationId());
+          if (targetPose != null) {
+            System.out.println("Target coral station pose: " + targetPose);
+
+            // 4) Schedule the actual "drive to pose" command
+            createDriveToPose(
+                    drive,
+                    () -> targetPose,
+                    xJoystickSupplier,
+                    yJoystickSupplier,
+                    rotationJoystickSupplier)
+                .schedule();
+          } else {
+            System.out.println("Failed to calculate coral station pose.");
+          }
+        },
+        drive);
+  }
+
+  /**
+   * Uses the station ID to look up the correct AprilTag translation and orientation, then returns
+   * the final Pose2d (position + heading) for the robot.
+   */
+  private static Pose2d calculateCoralStationPose(Drive drive, int stationId) {
+    // 1) Grab alliance
+    DriverStation.Alliance alliance = DriverStation.getAlliance().get();
+
+    // 2) Based on alliance, get the translation for the station
+    //    (We've already done the "closest station" logic. This method just
+    //     converts station ID to a final "pose to aim for.")
+    switch (alliance) {
+      case Blue -> {
+        Translation2d stationTranslation = new Translation2d(.94,1.1);
+      
+        // Pick an orientation
+        var chosenOrientation =
+            AlignmentUtils.pickClosestOrientationForStation(drive.getPose(), stationId);
+        return new Pose2d(stationTranslation, chosenOrientation.rotation2D());
+      }
+      case Red -> {
+        var stationTranslation = FieldConstants.RED_CORALSTATION_APRIL_TAGS.get(stationId);
+        if (stationTranslation == null) {
+          System.out.println("No known coral station for Red face ID: " + stationId);
+          return null;
+        }
+
+        var chosenOrientation =
+            AlignmentUtils.pickClosestOrientationForStation(drive.getPose(), stationId);
+        return new Pose2d(stationTranslation, chosenOrientation.rotation2D());
+      }
+      default -> {
+        System.out.println("Unknown alliance. Cannot calculate coral station pose.");
+        return null;
+      }
+    }
+  }
 }

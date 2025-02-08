@@ -1,5 +1,7 @@
 package frc.robot.subsystems.coral;
 
+import com.playingwithfusion.TimeOfFlight;
+import com.playingwithfusion.TimeOfFlight.RangingMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.*;
@@ -16,7 +18,10 @@ public class CoralSystem extends SubsystemBase {
   @Getter private final CoralSystemPresetChooser coralSystemPresetChooser;
   @Getter private Arm arm;
   @Getter private Intake intake;
-  @AutoLogOutput @Getter public boolean coralInRobot;
+
+  @Getter public boolean coralInRobot;
+
+  private TimeOfFlight timeOfFlight = new TimeOfFlight(31); // Back of Robot on Elevator
 
   @Getter
   private CoralSystemPresets targetCoralPreset =
@@ -31,6 +36,7 @@ public class CoralSystem extends SubsystemBase {
     this.elevator = elevator;
     this.arm = arm;
     this.intake = intake;
+    timeOfFlight.setRangingMode(RangingMode.Short, 20);
 
     SmartDashboard.putData("Set Coral Config", CoralSystemCommands.runPreset(this));
   }
@@ -60,5 +66,10 @@ public class CoralSystem extends SubsystemBase {
 
   public void setTargetPreset(CoralSystemPresets preset) {
     this.targetCoralPreset = preset;
+  }
+
+  @AutoLogOutput(key = "TOF")
+  public double getTimeOfFlightRange() {
+    return timeOfFlight.getRange();
   }
 }
