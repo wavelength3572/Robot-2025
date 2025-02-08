@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.LED.IndicatorLight;
+import frc.robot.subsystems.LED.IndicatorLight;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.IntakeConstants;
@@ -16,6 +18,7 @@ public class WLButtons {
   private static OperatorInterface oi;
   private static Drive WLDrive;
   private static CoralSystem coralSystem;
+  private static IndicatorLight WLIndicatorLight;
 
   public WLButtons() {}
 
@@ -27,10 +30,11 @@ public class WLButtons {
 
   // Updated method signature to receive CoralSubsystem instead of Elevator.
   public static void configureButtonBindings(
-      OperatorInterface operatorInterface, Drive drive, CoralSystem coralSystem) {
+      OperatorInterface operatorInterface, Drive drive, CoralSystem coralSystem, IndicatorLight indicatorLight) {
     oi = operatorInterface;
     WLDrive = drive;
     WLButtons.coralSystem = coralSystem;
+    WLIndicatorLight = indicatorLight;
 
     WLDrive.setDriveModeNormal();
     WLDrive.setDefaultCommand(
@@ -87,7 +91,7 @@ public class WLButtons {
                             oi::getRotate,
                             FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE)
                         .schedule();
-                  }                   
+                  }
                 },
                 WLDrive));
 

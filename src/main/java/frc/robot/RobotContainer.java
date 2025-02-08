@@ -28,6 +28,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.LED.IndicatorLight;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIOMMSpark;
 import frc.robot.subsystems.arm.ArmIOVirtualSim;
@@ -66,6 +67,7 @@ public class RobotContainer {
   private final Intake intake;
   private final CoralSystem coralSystem;
   @Getter private Visualizer visualizer;
+  private final IndicatorLight WLIndicatorLight;
 
   private OperatorInterface oi = new OperatorInterface() {};
 
@@ -96,13 +98,14 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(frontRightCam, robotToFrontRightCam),
                 new VisionIOPhotonVision(backRightCam, robotToBackRightCam));
-                // new VisionIOPhotonVision(elevatorFrontCam, robotToElevatorFrontCam),
-                // new VisionIOPhotonVision(elevatorBackCam, robotToElevatorBackCam));
+        // new VisionIOPhotonVision(elevatorFrontCam, robotToElevatorFrontCam),
+        // new VisionIOPhotonVision(elevatorBackCam, robotToElevatorBackCam));
 
         elevator = new Elevator(new ElevatorIOSpark() {});
         arm = new Arm(new ArmIOMMSpark() {});
         intake = new Intake(new IntakeIOSpark() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
+        WLIndicatorLight = new IndicatorLight();
         break;
 
       case SIM:
@@ -127,6 +130,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOVirtualSim() {});
         intake = new Intake(new IntakeIOVirtualSim() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
+        WLIndicatorLight = new IndicatorLight();
         break;
 
       default:
@@ -144,6 +148,7 @@ public class RobotContainer {
         arm = null;
         coralSystem = null;
         intake = null;
+        WLIndicatorLight = null;
         break;
     }
 
@@ -228,7 +233,7 @@ public class RobotContainer {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     oi = OISelector.findOperatorInterface();
 
-    WLButtons.configureButtonBindings(oi, drive, coralSystem);
+    WLButtons.configureButtonBindings(oi, drive, coralSystem,WLIndicatorLight);
   }
 
   /**
