@@ -7,7 +7,6 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
-import frc.robot.subsystems.LED.IndicatorLight;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.IntakeConstants;
@@ -30,7 +29,10 @@ public class WLButtons {
 
   // Updated method signature to receive CoralSubsystem instead of Elevator.
   public static void configureButtonBindings(
-      OperatorInterface operatorInterface, Drive drive, CoralSystem coralSystem, IndicatorLight indicatorLight) {
+      OperatorInterface operatorInterface,
+      Drive drive,
+      CoralSystem coralSystem,
+      IndicatorLight indicatorLight) {
     oi = operatorInterface;
     WLDrive = drive;
     WLButtons.coralSystem = coralSystem;

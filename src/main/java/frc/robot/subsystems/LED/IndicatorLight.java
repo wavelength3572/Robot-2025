@@ -1,6 +1,5 @@
 package frc.robot.subsystems.LED;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -9,9 +8,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.AddressableLEDSim;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.LED.IndicatorLightConstants.LED_EFFECTS;
-
 import java.util.Random;
 
 public class IndicatorLight extends SubsystemBase {
@@ -198,9 +195,9 @@ public class IndicatorLight extends SubsystemBase {
       case SEARCH_LIGHT:
         doSearchlightEffect();
         break;
-      // case DRIVE_TO_AMP:
-      //   doDrivingToAmpLighting();
-      //   break;
+        // case DRIVE_TO_AMP:
+        //   doDrivingToAmpLighting();
+        //   break;
       default:
         break;
     }
@@ -298,7 +295,9 @@ public class IndicatorLight extends SubsystemBase {
 
       for (int segment = 0; segment < numberOfSegments; segment++) {
         // Select a random color from the palette
-        int[] color = IndicatorLightConstants.colorPalette[random.nextInt(IndicatorLightConstants.colorPalette.length)];
+        int[] color =
+            IndicatorLightConstants.colorPalette[
+                random.nextInt(IndicatorLightConstants.colorPalette.length)];
 
         // Choose random start point and length
         int start = random.nextInt(wlLEDBuffer.getLength());
@@ -509,7 +508,8 @@ public class IndicatorLight extends SubsystemBase {
   public void doCycleCharacters() {
     if (effectTimer.get() >= CHARACTER_DISPLAY_INTERVAL) {
       setCharacterColors(
-        CharacterLights.ALL_CHARACTERS_COLORS[characterIndex],CharacterLights.ALL_CHARACTERS_LEDS_PER_COLOR[characterIndex]);
+          CharacterLights.ALL_CHARACTERS_COLORS[characterIndex],
+          CharacterLights.ALL_CHARACTERS_LEDS_PER_COLOR[characterIndex]);
 
       // Move to the next character, looping back if necessary
       characterIndex = (characterIndex + 1) % CharacterLights.ALL_CHARACTERS_COLORS.length;
@@ -584,11 +584,13 @@ public class IndicatorLight extends SubsystemBase {
   //   if (distance > 0) {
 
   //     // Ensure distance is within bounds
-  //     distance = Math.max(0, Math.min(distance, 125)); // Clamps distance between 0 and 100 inches
+  //     distance = Math.max(0, Math.min(distance, 125)); // Clamps distance between 0 and 100
+  // inches
 
   //     // Calculate overall brightness based on the inverse of the distance
   //     int maxBrightness = 255; // Max LED brightness
-  //     // Inverse proportionality: at 0 inches, brightness is max; at >100 inches, brightness is min
+  //     // Inverse proportionality: at 0 inches, brightness is max; at >100 inches, brightness is
+  // min
   //     // (0).
   //     int brightness = (int) (maxBrightness * (1 - (distance / 100)));
 
@@ -597,7 +599,8 @@ public class IndicatorLight extends SubsystemBase {
   //       int distanceFromCenter = Math.abs(center - i);
 
   //       // Calculate brightness for each LED
-  //       // This part ensures a smoother gradient by decreasing brightness linearly from the center
+  //       // This part ensures a smoother gradient by decreasing brightness linearly from the
+  // center
   //       // to the edges
   //       // Adjust 'gradientFactor' to control the spread of the max brightness area
   //       int gradientFactor = 10; // Control how quickly the brightness falls off from the center

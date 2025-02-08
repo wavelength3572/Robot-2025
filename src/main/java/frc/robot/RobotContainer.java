@@ -17,8 +17,6 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -35,7 +33,6 @@ import frc.robot.subsystems.arm.ArmIOVirtualSim;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.elevator.ElevatorIOVirtualSim;
 import frc.robot.subsystems.intake.Intake;
@@ -47,9 +44,6 @@ import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.Visualizer;
 import lombok.Getter;
-import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -68,18 +62,8 @@ public class RobotContainer {
   private final CoralSystem coralSystem;
   @Getter private Visualizer visualizer;
   private final IndicatorLight WLIndicatorLight;
-
   private OperatorInterface oi = new OperatorInterface() {};
-
-  // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
-
-  private LoggedMechanism2d scoringSystem = new LoggedMechanism2d(.8382, 2.0);
-  private LoggedMechanismRoot2d root = scoringSystem.getRoot("Base", 0.51, 0.0);
-  private LoggedMechanismLigament2d m_elevator =
-      root.append(
-          new LoggedMechanismLigament2d(
-              "Elevator", ElevatorConstants.kGroundToElevator, 90, 2, new Color8Bit(Color.kBlue)));
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -233,7 +217,7 @@ public class RobotContainer {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     oi = OISelector.findOperatorInterface();
 
-    WLButtons.configureButtonBindings(oi, drive, coralSystem,WLIndicatorLight);
+    WLButtons.configureButtonBindings(oi, drive, coralSystem, WLIndicatorLight);
   }
 
   /**
@@ -250,11 +234,5 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
-  }
-
-  public LoggedMechanism2d getElevator() {
-    // Update the Elevator 2D Mech
-    m_elevator.setLength(ElevatorConstants.kGroundToElevator + elevator.getHeightInMeters());
-    return scoringSystem;
   }
 }
