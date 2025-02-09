@@ -48,7 +48,8 @@ public class WLButtons {
   private static void configureDriverButtons() {
 
     // Gyro Reset
-    oi.getResetGyroButton().onTrue(Commands.runOnce(drive::zeroGyroscope, drive));
+    oi.getResetGyroButton()
+        .onTrue(Commands.runOnce(WLDrive::zeroGyroscope, WLDrive).ignoringDisable(true));
 
     // Then create the toggle command
     final Command toggleDriveModeCmd =
