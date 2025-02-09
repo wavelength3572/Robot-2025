@@ -49,7 +49,7 @@ public class WLButtons {
 
     // Gyro Reset
     oi.getResetGyroButton()
-        .onTrue(Commands.runOnce(WLDrive::zeroGyroscope, WLDrive).ignoringDisable(true));
+        .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
 
     // Then create the toggle command
     final Command toggleDriveModeCmd =

@@ -27,7 +27,10 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -45,6 +48,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.FieldConstants;
+import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.AlignmentUtils;
 import frc.robot.util.AlignmentUtils.CageSelection;
 import frc.robot.util.AlignmentUtils.CoralStationSelection;
@@ -64,25 +68,29 @@ public class Drive extends SubsystemBase {
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
-  private final Alert gyroDisconnectedAlert =
-      new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
+  private final Alert gyroDisconnectedAlert = new Alert("Disconnected gyro, using kinematics as fallback.",
+      AlertType.kError);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = new Rotation2d();
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
-        new SwerveModulePosition(),
-        new SwerveModulePosition(),
-        new SwerveModulePosition(),
-        new SwerveModulePosition()
+          new SwerveModulePosition(),
+          new SwerveModulePosition(),
+          new SwerveModulePosition(),
+          new SwerveModulePosition()
       };
-  private SwerveDrivePoseEstimator poseEstimator =
-      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+  private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kinematics, rawGyroRotation,
+      lastModulePositions, new Pose2d());
 
-  @Getter private ReefFaceSelection reefFaceSelection;
-  @Getter private CoralStationSelection coralStationSelection;
-  @Getter private CageSelection cageSelection;
-  @Getter private Boolean isVisionOn = true;
+  @Getter
+  private ReefFaceSelection reefFaceSelection;
+  @Getter
+  private CoralStationSelection coralStationSelection;
+  @Getter
+  private CageSelection cageSelection;
+  @Getter
+  private Boolean isVisionOn = true;
 
   public Drive(
       GyroIO gyroIO,
@@ -125,15 +133,14 @@ public class Drive extends SubsystemBase {
         });
 
     // Configure SysId
-    sysId =
-        new SysIdRoutine(
-            new SysIdRoutine.Config(
-                null,
-                null,
-                null,
-                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
-            new SysIdRoutine.Mechanism(
-                (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+    sysId = new SysIdRoutine(
+        new SysIdRoutine.Config(
+            null,
+            null,
+            null,
+            (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+        new SysIdRoutine.Mechanism(
+            (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
 
   @Override
@@ -141,13 +148,21 @@ public class Drive extends SubsystemBase {
 
     Logger.recordOutput("isVisionOn", isVisionOn);
 
+    Pose3d robotPose3D = convertPose2dTo3d(getPose());
+    
+    Logger.recordOutput("CamPoses/FrontRightCam", robotPose3D.transformBy(VisionConstants.robotToFrontRightCam));
+    Logger.recordOutput("CamPoses/BackRightCam", robotPose3D.transformBy(VisionConstants.robotToBackRightCam));
+    Logger.recordOutput("CamPoses/FrontElevatorCam", robotPose3D.transformBy(VisionConstants.robotToElevatorFrontCam));
+    Logger.recordOutput("CamPoses/BackElevatorCam", robotPose3D.transformBy(VisionConstants.robotToElevatorBackCam));
+
+    Logger.recordMetadata(getSubsystem(), getName());
+
     if (DriverStation.getAlliance().isPresent()) {
       reefFaceSelection = AlignmentUtils.findClosestReefFaceAndRejectOthers(getPose());
       coralStationSelection = AlignmentUtils.findClosestCoralStation(getPose());
 
       if (FieldConstants.selectedCageTranslation != null)
-        cageSelection =
-            AlignmentUtils.findCageRobotAngle(getPose(), FieldConstants.selectedCageTranslation);
+        cageSelection = AlignmentUtils.findCageRobotAngle(getPose(), FieldConstants.selectedCageTranslation);
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -172,8 +187,7 @@ public class Drive extends SubsystemBase {
     }
 
     // Update odometry
-    double[] sampleTimestamps =
-        modules[0].getOdometryTimestamps(); // All signals are sampled together
+    double[] sampleTimestamps = modules[0].getOdometryTimestamps(); // All signals are sampled together
     int sampleCount = sampleTimestamps.length;
     for (int i = 0; i < sampleCount; i++) {
       // Read wheel positions and deltas from each module
@@ -181,11 +195,10 @@ public class Drive extends SubsystemBase {
       SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
       for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
         modulePositions[moduleIndex] = modules[moduleIndex].getOdometryPositions()[i];
-        moduleDeltas[moduleIndex] =
-            new SwerveModulePosition(
-                modulePositions[moduleIndex].distanceMeters
-                    - lastModulePositions[moduleIndex].distanceMeters,
-                modulePositions[moduleIndex].angle);
+        moduleDeltas[moduleIndex] = new SwerveModulePosition(
+            modulePositions[moduleIndex].distanceMeters
+                - lastModulePositions[moduleIndex].distanceMeters,
+            modulePositions[moduleIndex].angle);
         lastModulePositions[moduleIndex] = modulePositions[moduleIndex];
       }
 
@@ -244,8 +257,10 @@ public class Drive extends SubsystemBase {
   }
 
   /**
-   * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
-   * return to their normal orientations the next time a nonzero velocity is requested.
+   * Stops the drive and turns the modules to an X arrangement to resist movement.
+   * The modules will
+   * return to their normal orientations the next time a nonzero velocity is
+   * requested.
    */
   public void stopWithX() {
     Rotation2d[] headings = new Rotation2d[4];
@@ -268,7 +283,10 @@ public class Drive extends SubsystemBase {
     return run(() -> runCharacterization(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction));
   }
 
-  /** Returns the module states (turn angles and drive velocities) for all of the modules. */
+  /**
+   * Returns the module states (turn angles and drive velocities) for all of the
+   * modules.
+   */
   @AutoLogOutput(key = "SwerveStates/Measured")
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
@@ -278,7 +296,10 @@ public class Drive extends SubsystemBase {
     return states;
   }
 
-  /** Returns the module positions (turn angles and drive positions) for all of the modules. */
+  /**
+   * Returns the module positions (turn angles and drive positions) for all of the
+   * modules.
+   */
   private SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] states = new SwerveModulePosition[4];
     for (int i = 0; i < 4; i++) {
@@ -328,10 +349,14 @@ public class Drive extends SubsystemBase {
   }
 
   /**
-   * Zeroes the gyroscope. This sets the current rotation of the robot to zero degrees. This method
-   * is intended to be invoked only when the alignment beteween the robot's rotation and the gyro is
-   * sufficiently different to make field-relative driving difficult. The robot needs to be
-   * positioned facing away from the driver, ideally aligned to a field wall before this method is
+   * Zeroes the gyroscope. This sets the current rotation of the robot to zero
+   * degrees. This method
+   * is intended to be invoked only when the alignment beteween the robot's
+   * rotation and the gyro is
+   * sufficiently different to make field-relative driving difficult. The robot
+   * needs to be
+   * positioned facing away from the driver, ideally aligned to a field wall
+   * before this method is
    * invoked.
    */
   public void zeroGyroscope() {
@@ -339,8 +364,10 @@ public class Drive extends SubsystemBase {
   }
 
   /**
-   * Sets the rotation of the robot to the specified value. This method should only be invoked when
-   * the rotation of the robot is known (e.g., at the start of an autonomous path). Zero degrees is
+   * Sets the rotation of the robot to the specified value. This method should
+   * only be invoked when
+   * the rotation of the robot is known (e.g., at the start of an autonomous
+   * path). Zero degrees is
    * facing away from the driver station; CCW is positive.
    *
    * @param expectedYaw the rotation of the robot (in degrees)
@@ -416,4 +443,32 @@ public class Drive extends SubsystemBase {
   public void toggleVision() {
     isVisionOn = !isVisionOn;
   }
+
+  /**
+     * Converts a 2D pose (Pose2d) into a 3D pose (Pose3d) by assuming:
+     * - The z-coordinate is 0.
+     * - Roll and pitch are 0.
+     * - Yaw comes directly from the Pose2d rotation.
+     *
+     * @param pose2d The 2D pose to convert.
+     * @return A Pose3d representing the same pose in 3D space.
+     */
+    public static Pose3d convertPose2dTo3d(Pose2d pose2d) {
+        // Create a 3D translation from the 2D translation; set z to 0.
+        Translation3d translation3d = new Translation3d(
+            pose2d.getTranslation().getX(),
+            pose2d.getTranslation().getY(),
+            0.0 // z-coordinate on the ground
+        );
+
+        // Create a 3D rotation with roll and pitch set to 0, and yaw from the 2D rotation.
+        Rotation3d rotation3d = new Rotation3d(
+            0.0, // roll
+            0.0, // pitch
+            pose2d.getRotation().getRadians() // yaw
+        );
+
+        // Combine translation and rotation into a Pose3d.
+        return new Pose3d(translation3d, rotation3d);
+    }
 }
