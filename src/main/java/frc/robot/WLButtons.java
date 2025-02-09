@@ -15,16 +15,16 @@ import frc.robot.util.AlignmentUtils;
 public class WLButtons {
 
   private static OperatorInterface oi;
-  private static Drive WLDrive;
+  private static Drive drive;
   private static CoralSystem coralSystem;
-  private static IndicatorLight WLIndicatorLight;
+  private static IndicatorLight indicatorLight;
 
   public WLButtons() {}
 
   public static void configureTestModeButtonBindings(
       OperatorInterface operatorInterface, Drive drive) {
     oi = operatorInterface;
-    WLDrive = drive;
+    WLButtons.drive = drive;
   }
 
   // Updated method signature to receive CoralSubsystem instead of Elevator.
@@ -33,14 +33,14 @@ public class WLButtons {
       Drive drive,
       CoralSystem coralSystem,
       IndicatorLight indicatorLight) {
-    oi = operatorInterface;
-    WLDrive = drive;
+    WLButtons.oi = operatorInterface;
+    WLButtons.drive = drive;
     WLButtons.coralSystem = coralSystem;
-    WLIndicatorLight = indicatorLight;
+    WLButtons.indicatorLight = indicatorLight;
 
-    WLDrive.setDriveModeNormal();
-    WLDrive.setDefaultCommand(
-        DriveCommands.joystickDrive(WLDrive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
+    drive.setDriveModeNormal();
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(drive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
 
     configureDriverButtons();
   }
@@ -48,12 +48,12 @@ public class WLButtons {
   private static void configureDriverButtons() {
 
     // Gyro Reset
-    oi.getResetGyroButton().onTrue(Commands.runOnce(WLDrive::zeroGyroscope, WLDrive));
+    oi.getResetGyroButton().onTrue(Commands.runOnce(drive::zeroGyroscope, drive));
 
     // Then create the toggle command
     final Command toggleDriveModeCmd =
         DriveCommands.toggleSmartDriveCmd(
-            WLDrive,
+            drive,
             oi::getTranslateX,
             oi::getTranslateY,
             oi::getRotate,
@@ -68,7 +68,7 @@ public class WLButtons {
                   if (coralSystem.isCoralInRobot()) {
                     // If there's coral in the robot, drive to a pole
                     DriveToCommands.driveToPole(
-                            WLDrive,
+                            drive,
                             /* isLeftPole = */ true,
                             oi::getTranslateX,
                             oi::getTranslateY,
@@ -77,7 +77,7 @@ public class WLButtons {
                         .schedule();
                   }
                 },
-                WLDrive));
+                drive));
 
     oi.getRightJoyRightButton()
         .onTrue(
@@ -86,7 +86,7 @@ public class WLButtons {
                   if (coralSystem.isCoralInRobot()) {
                     // If there's coral in the robot, drive to a pole
                     DriveToCommands.driveToPole(
-                            WLDrive,
+                            drive,
                             false,
                             oi::getTranslateX,
                             oi::getTranslateY,
@@ -95,7 +95,7 @@ public class WLButtons {
                         .schedule();
                   }
                 },
-                WLDrive));
+                drive));
 
     if (oi.getButtonV().getAsBoolean()) {
       coralSystem.setCoralInRobot(true);

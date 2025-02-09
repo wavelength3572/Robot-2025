@@ -15,7 +15,7 @@ import org.littletonrobotics.junction.Logger;
 public class CoralSystem extends SubsystemBase {
 
   @Getter private Elevator elevator;
-  @Getter private final CoralSystemPresetChooser coralSystemPresetChooser;
+  @Getter public final CoralSystemPresetChooser coralSystemPresetChooser;
   @Getter private Arm arm;
   @Getter private Intake intake;
 
@@ -24,11 +24,11 @@ public class CoralSystem extends SubsystemBase {
   private TimeOfFlight timeOfFlight = new TimeOfFlight(31); // Back of Robot on Elevator
 
   @Getter
-  private CoralSystemPresets targetCoralPreset =
+  public CoralSystemPresets targetCoralPreset =
       CoralSystemPresets.STARTUP; // Default startup position
 
   @Getter
-  private CoralSystemPresets currentCoralPreset =
+  public CoralSystemPresets currentCoralPreset =
       CoralSystemPresets.STARTUP; // Tracks last reached preset
 
   public CoralSystem(Elevator elevator, Arm arm, Intake intake) {

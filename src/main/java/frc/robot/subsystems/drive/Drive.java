@@ -79,9 +79,9 @@ public class Drive extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
-  private ReefFaceSelection reefFaceSelection;
-  private CoralStationSelection coralStationSelection;
-  private CageSelection cageSelection;
+  @Getter private ReefFaceSelection reefFaceSelection;
+  @Getter private CoralStationSelection coralStationSelection;
+  @Getter private CageSelection cageSelection;
   @Getter private Boolean isVisionOn = true;
 
   public Drive(
@@ -134,18 +134,6 @@ public class Drive extends SubsystemBase {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
-  }
-
-  public ReefFaceSelection getReefFaceSelection() {
-    return reefFaceSelection;
-  }
-
-  public CoralStationSelection getCoralStationSelection() {
-    return coralStationSelection;
-  }
-
-  public CageSelection getCageSelection() {
-    return cageSelection;
   }
 
   @Override

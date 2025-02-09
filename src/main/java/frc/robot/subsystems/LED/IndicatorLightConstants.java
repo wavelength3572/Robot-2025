@@ -33,8 +33,11 @@ public class IndicatorLightConstants {
     EXPLOSION,
     CHARACTERS,
     SEARCH_LIGHT,
-    DRIVE_TO_AMP,
-    AUTO_SPEAKER_TARGETING
+    DRIVE_TO_REEF,
+    AUTO_SPEAKER_TARGETING,
+    ELEVATOR_SELECTION_CHANGED,
+    ELEVATOR_TARGET_CHANGED,
+    ELEVATOR_CURRENT_CHANGED
   }
 
   // Define an array with 20 chosen colors (as RGB values)

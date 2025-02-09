@@ -61,12 +61,13 @@ public class RobotContainer {
   private final Intake intake;
   private final CoralSystem coralSystem;
   @Getter private Visualizer visualizer;
-  private final IndicatorLight WLIndicatorLight;
+  private final IndicatorLight indicatorLight;
   private OperatorInterface oi = new OperatorInterface() {};
-  private final LoggedDashboardChooser<Command> autoChooser;
+  private LoggedDashboardChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -89,7 +90,12 @@ public class RobotContainer {
         arm = new Arm(new ArmIOMMSpark() {});
         intake = new Intake(new IntakeIOSpark() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
-        WLIndicatorLight = new IndicatorLight();
+        indicatorLight = new IndicatorLight();
+        indicatorLight.setupLightingSuppliers(
+            coralSystem::getCurrentCoralPreset,
+            coralSystem.coralSystemPresetChooser::getSelected,
+            coralSystem::getTargetCoralPreset,
+            coralSystem::isCoralInRobot);
         break;
 
       case SIM:
@@ -114,7 +120,13 @@ public class RobotContainer {
         arm = new Arm(new ArmIOVirtualSim() {});
         intake = new Intake(new IntakeIOVirtualSim() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
-        WLIndicatorLight = new IndicatorLight();
+        indicatorLight = new IndicatorLight();
+        indicatorLight.setupLightingSuppliers(
+            coralSystem::getCurrentCoralPreset,
+            coralSystem.coralSystemPresetChooser::getSelected,
+            coralSystem::getTargetCoralPreset,
+            coralSystem::isCoralInRobot);
+
         break;
 
       default:
@@ -132,7 +144,7 @@ public class RobotContainer {
         arm = null;
         coralSystem = null;
         intake = null;
-        WLIndicatorLight = null;
+        indicatorLight = null;
         break;
     }
 
@@ -143,6 +155,33 @@ public class RobotContainer {
             arm::getAngleDEG,
             coralSystem::isCoralInRobot);
 
+    SetupSmartDashboardUI();
+    SetupAutoChooser();
+    updateOI();
+  }
+
+  /**
+   * This method scans for any changes to the connected joystick. If anything changed, it creates
+   * new OI objects and binds all of the buttons to commands.
+   */
+  public void updateOI() {
+    if (!OISelector.didJoysticksChange()) {
+      return;
+    }
+    normalModeOI();
+  }
+
+  public void normalModeOI() {
+    CommandScheduler.getInstance().getActiveButtonLoop().clear();
+    oi = OISelector.findOperatorInterface();
+    WLButtons.configureButtonBindings(oi, drive, coralSystem, indicatorLight);
+  }
+
+  public Command getAutonomousCommand() {
+    return autoChooser.get();
+  }
+
+  public void SetupSmartDashboardUI() {
     if (elevator != null) {
       elevator.setPosition(0.0);
       SmartDashboard.putNumber("Elevator Goal (in)", 0.0);
@@ -178,10 +217,11 @@ public class RobotContainer {
 
     SmartDashboard.putData(
         "Toggle Vision", Commands.runOnce(drive::toggleVision).ignoringDisable(true));
+  }
 
+  public void SetupAutoChooser() {
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-    // autoChooser = new LoggedDashboardChooser<>("Auto");
 
     // Set up SysId routines
     autoChooser.addOption(
@@ -198,41 +238,5 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-    updateOI();
-  }
-
-  /**
-   * This method scans for any changes to the connected joystick. If anything changed, it creates
-   * new OI objects and binds all of the buttons to commands.
-   */
-  public void updateOI() {
-    if (!OISelector.didJoysticksChange()) {
-      return;
-    }
-    normalModeOI();
-  }
-
-  public void normalModeOI() {
-    CommandScheduler.getInstance().getActiveButtonLoop().clear();
-    oi = OISelector.findOperatorInterface();
-
-    WLButtons.configureButtonBindings(oi, drive, coralSystem, WLIndicatorLight);
-  }
-
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    return autoChooser.get();
   }
 }
