@@ -42,7 +42,8 @@ public class WLButtons {
   private static void configureDriverButtons() {
 
     // Gyro Reset
-    oi.getResetGyroButton().onTrue(Commands.runOnce(WLDrive::zeroGyroscope, WLDrive));
+    oi.getResetGyroButton()
+        .onTrue(Commands.runOnce(WLDrive::zeroGyroscope, WLDrive).ignoringDisable(true));
 
     // Then create the toggle command
     final Command toggleDriveModeCmd =
@@ -87,7 +88,7 @@ public class WLButtons {
                             oi::getRotate,
                             FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE)
                         .schedule();
-                  }                   
+                  }
                 },
                 WLDrive));
 

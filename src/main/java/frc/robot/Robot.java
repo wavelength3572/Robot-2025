@@ -14,8 +14,6 @@
 package frc.robot;
 
 import edu.wpi.first.hal.AllianceStationID;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -133,7 +131,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    robotContainer.getDrive().setPose(new Pose2d(7.157, 7.547, new Rotation2d(Math.PI)));
+    // robotContainer.getDrive().setPose(new Pose2d(7.157, 7.547, new Rotation2d(Math.PI)));
   }
 
   /** This function is called periodically when disabled. */

@@ -61,8 +61,9 @@ public class DriveConstants {
   public static final int backRightCANCoderId = 10;
 
   // Drive motor configuration
-  public static final int driveMotorCurrentLimit = 50;
-  public static final double wheelRadiusMeters = Units.inchesToMeters(2.0);
+  public static final int driveMotorCurrentLimit =
+      35; // Hopefully the amps to prevent wheel slippage
+  public static final double wheelRadiusMeters = Units.inchesToMeters(1.895);
   public static final double driveMotorReduction =
       (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0); // Gear ratios for
   // SDS MK4i L2
@@ -89,8 +90,8 @@ public class DriveConstants {
   // Drive PID configuration
   public static final double driveKp = 0.0;
   public static final double driveKd = 0.0;
-  public static final double driveKs = 0.11468;
-  public static final double driveKv = 0.13085;
+  public static final double driveKs = 0.15772;
+  public static final double driveKv = 0.13628;
   public static final double driveSimP = 0.05;
   public static final double driveSimD = 0.0;
   public static final double driveSimKs = 0.04307;
@@ -101,7 +102,7 @@ public class DriveConstants {
 
   // Turn motor configuration
   public static final boolean turnInverted = true;
-  public static final int turnMotorCurrentLimit = 20;
+  public static final int turnMotorCurrentLimit = 50;
   public static final double turnMotorReduction = 150.0 / 7.0; // SDS MK4i L2
   public static final DCMotor turnGearbox = DCMotor.getNEO(1);
 
@@ -122,7 +123,7 @@ public class DriveConstants {
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 
   // PathPlanner configuration
-  public static final double robotMassKg = Units.lbsToKilograms(100.0);
+  public static final double robotMassKg = Units.lbsToKilograms(85.0 + 13.5); // Robot plus Battery
   public static final double robotMOI = 6.883;
   public static final double wheelCOF = 1.0; // From
   // https://www.vexrobotics.com/colsonperforma.html#attr-vex_resources

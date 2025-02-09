@@ -212,8 +212,8 @@ public class DriveToCommands {
     //     converts station ID to a final "pose to aim for.")
     switch (alliance) {
       case Blue -> {
-        Translation2d stationTranslation = new Translation2d(.94,1.1);
-      
+        Translation2d stationTranslation = new Translation2d(.94, 1.1);
+
         // Pick an orientation
         var chosenOrientation =
             AlignmentUtils.pickClosestOrientationForStation(drive.getPose(), stationId);
