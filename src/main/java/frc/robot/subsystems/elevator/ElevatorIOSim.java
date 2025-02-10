@@ -81,7 +81,7 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void setPosition(double requestedPosition) {
+  public void setPosition(double requestedPosition, double arbFF) {
     this.elevatorCurrentTarget = requestedPosition;
   }
 

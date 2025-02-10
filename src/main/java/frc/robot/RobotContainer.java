@@ -155,16 +155,7 @@ public class RobotContainer {
             coralSystem::isCoralInRobot);
 
     if (elevator != null) {
-      elevator.setPosition(0.0);
-      SmartDashboard.putNumber("Elevator Goal (in)", 0.0);
-      SmartDashboard.putData(
-          "Set Elevator", CoralSystemCommands.setElevatorPositionFromDashboard(coralSystem));
-    }
-
-    if (arm != null) {
-      SmartDashboard.putNumber("Arm Goal (DEG)", 90.0);
-      SmartDashboard.putData(
-          "Set Arm", CoralSystemCommands.setArmPositionFromDashboard(coralSystem));
+      elevator.setPositionInches(0.0);
     }
 
     SmartDashboard.putData(

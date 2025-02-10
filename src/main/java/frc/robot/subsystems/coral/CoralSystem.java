@@ -47,6 +47,8 @@ public class CoralSystem extends SubsystemBase {
     this.arm.periodic();
     this.intake.periodic();
 
+    coralInRobot = this.intake.getCoralInRobot();
+
     Logger.recordOutput("CoralSystem/ElevatorAtGoal", elevator.isAtGoal());
     Logger.recordOutput("CoralSystem/ArmAtGoal", arm.isAtGoal());
     Logger.recordOutput("CoralSystem/AtGoal", isAtGoal());
@@ -56,6 +58,7 @@ public class CoralSystem extends SubsystemBase {
 
   public void setCoralInRobot(Boolean coralInRobot) {
     this.coralInRobot = coralInRobot;
+    this.intake.setCoralInRobot(coralInRobot);
   }
 
   public boolean isAtGoal() {
@@ -66,6 +69,8 @@ public class CoralSystem extends SubsystemBase {
 
   public void setTargetPreset(CoralSystemPresets preset) {
     this.targetCoralPreset = preset;
+    this.elevator.setTargetPreset(preset);
+    this.arm.setTargetPreset(preset);
   }
 
   @AutoLogOutput(key = "TOF")

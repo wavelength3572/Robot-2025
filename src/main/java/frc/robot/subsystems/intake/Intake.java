@@ -18,4 +18,10 @@ public class Intake {
   public void setSpeed(Double requestedSpeed) {
     io.setSpeed(requestedSpeed);
   }
+
+  public boolean getCoralInRobot() {
+    return io.getCoralInRobot();
+  }
+
+  public void setCoralInRobot(boolean coralInRobot) {}
 }
