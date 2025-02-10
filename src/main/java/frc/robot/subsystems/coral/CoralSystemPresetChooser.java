@@ -41,8 +41,8 @@ public class CoralSystemPresetChooser {
     chooser.addOption("L2", CoralSystemPresets.SCORE_LEVEL_2);
     chooser.addOption("L3", CoralSystemPresets.SCORE_LEVEL_3);
     chooser.addOption("L4", CoralSystemPresets.SCORE_LEVEL_4);
-    chooser.addOption("Dislodge L1", CoralSystemPresets.DISLODGE_LEVEL_1);
-    chooser.addOption("Dislodge L2", CoralSystemPresets.DISLODGE_LEVEL_2);
+    chooser.addOption("Dislodge L1", CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1);
+    chooser.addOption("Dislodge L2", CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2);
     SmartDashboard.putData("Coral Position Chooser", chooser);
   }
 
