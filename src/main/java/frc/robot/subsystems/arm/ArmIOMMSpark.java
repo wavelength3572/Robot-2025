@@ -4,6 +4,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -22,6 +23,8 @@ public class ArmIOMMSpark implements ArmIO {
   private double armTargetEncoderRotations =
       ArmConstants.armStartAngle * ArmConstants.kArmGearing / 360.0;
 
+  private double armArbFF = 0.0;
+
   public ArmIOMMSpark() {
     armMotor.configure(
         ArmConfigs.ArmSubsystem.armConfig,
@@ -33,11 +36,12 @@ public class ArmIOMMSpark implements ArmIO {
   @Override
   public void updateInputs(ArmIOInputs inputs) {
     armClosedLoopController.setReference(
-        armTargetEncoderRotations, ControlType.kMAXMotionPositionControl);
+        armTargetEncoderRotations, ControlType.kMAXMotionPositionControl,ClosedLoopSlot.kSlot0,armArbFF);
     inputs.targetAngleDEG = armTargetDEG;
     inputs.currentAngleDEG = armEncoder.getPosition() * 360.0 / ArmConstants.kArmGearing;
     inputs.targetEncoderRotations = this.armTargetEncoderRotations;
     inputs.encoderRotations = armEncoder.getPosition();
+    inputs.armArbFF = this.armArbFF;
     inputs.velocityRPM = armEncoder.getVelocity();
     inputs.appliedVolts = armMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = armMotor.getOutputCurrent();
@@ -49,9 +53,10 @@ public class ArmIOMMSpark implements ArmIO {
   }
 
   @Override
-  public void setAngleDEG(double requestedPosition) {
+  public void setAngleDEG(double requestedPosition, double requestedArbFF) {
     this.armTargetDEG = requestedPosition;
     this.armTargetEncoderRotations = this.armTargetDEG * ArmConstants.kArmGearing / 360.0;
+    this.armArbFF = requestedArbFF;
   }
 
   @Override
@@ -61,11 +66,11 @@ public class ArmIOMMSpark implements ArmIO {
 
   @Override
   public void setPIDValues(
-      double kP, double kD, double kF, double VelocityMax, double AccelerationMax) {
+      double kP, double kD, double VelocityMax, double AccelerationMax) {
     final SparkFlexConfig config = new SparkFlexConfig();
     config
         .closedLoop
-        .pidf(kP, 0.0, kD, kF)
+        .pidf(kP, 0.0, kD, 0.0)
         .maxMotion
         // Set MAXMotion parameters for position control
         .maxVelocity(VelocityMax)

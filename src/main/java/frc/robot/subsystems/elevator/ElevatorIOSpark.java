@@ -4,6 +4,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -25,6 +26,7 @@ public class ElevatorIOSpark implements ElevatorIO {
   private RelativeEncoder followerEncoder = followerMotor.getEncoder();
 
   private double elevatorCurrentTarget = 0.0;
+  private double elevatorCurrentArbFF = 0.0;
 
   public ElevatorIOSpark() {
     leaderMotor.configure(
@@ -43,7 +45,7 @@ public class ElevatorIOSpark implements ElevatorIO {
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     elevatorClosedLoopController.setReference(
-        elevatorCurrentTarget, ControlType.kMAXMotionPositionControl);
+        elevatorCurrentTarget, ControlType.kMAXMotionPositionControl,ClosedLoopSlot.kSlot0,elevatorCurrentArbFF);
 
     inputs.setpoint = this.elevatorCurrentTarget;
     inputs.positionRotations = leaderEncoder.getPosition();
@@ -60,7 +62,8 @@ public class ElevatorIOSpark implements ElevatorIO {
   }
 
   @Override
-  public void setPosition(double requestedPosition) {
+  public void setPosition(double requestedPosition, double arbFF) {
+    this.elevatorCurrentArbFF = arbFF;
     this.elevatorCurrentTarget = requestedPosition;
   }
 

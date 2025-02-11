@@ -25,7 +25,7 @@ public interface ElevatorIO {
   /** Run open loop at the specified voltage. */
   public default void setVoltage(double volts) {}
 
-  public default void setPosition(double requestedPosition) {}
+  public default void setPosition(double requestedPosition, double arbFF) {}
 
   public default double getHeightInMeters() {
     return 0.0;

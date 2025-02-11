@@ -56,7 +56,7 @@ public class ArmIOSpark implements ArmIO {
   }
 
   @Override
-  public void setAngleDEG(double requestedPosition) {
+  public void setAngleDEG(double requestedPosition, double requestedArbFF) {
     this.armTargetDEG = requestedPosition;
     this.armTargetEncoderRotations = this.armTargetDEG * ArmConstants.kArmGearing / 360.0;
   }
@@ -68,7 +68,7 @@ public class ArmIOSpark implements ArmIO {
 
   @Override
   public void setPIDValues(
-      double kP, double kD, double kF, double VelocityMax, double AccelerationMax) {
+      double kP, double kD, double VelocityMax, double AccelerationMax) {
     final SparkMaxConfig config = new SparkMaxConfig();
     config.closedLoop.pidf(kP, 0.0, kD, 0.0);
     armMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
