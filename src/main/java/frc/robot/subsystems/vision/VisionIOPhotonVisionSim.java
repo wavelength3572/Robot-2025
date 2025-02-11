@@ -51,7 +51,7 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
     var cameraProperties = new SimCameraProperties();
     cameraProperties.setCalibration(640, 480, Rotation2d.fromDegrees(70));
     cameraSim = new PhotonCameraSim(camera, cameraProperties, aprilTagLayout);
-    cameraSim.enableDrawWireframe(true);
+    // cameraSim.enableDrawWireframe(true);
     visionSim.addCamera(cameraSim, robotToCamera);
   }
 

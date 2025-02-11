@@ -4,9 +4,9 @@ import lombok.Getter;
 
 public enum CoralSystemPresets {
   STARTUP(0, 90, CoralState.STARTUP, 0.0, 0.0),
-  STOW(22, 90, CoralState.STOW, 0.002, 0.0001),
-  PICKUP(36.0, 230, CoralState.PICKUP, 0.0007, 0.0),
-  SCORE_LEVEL_1(0.00000, 90, CoralState.L1_SCORE, 0.002, 0.0001),
+  STOW(22, 90, CoralState.STOW, 0.0, 0.0),
+  PICKUP(36.0, 230, CoralState.PICKUP, 0.0, 0.0),
+  SCORE_LEVEL_1(0.00000, 90, CoralState.L1_SCORE, 0.0, 0.0001),
   SCORE_LEVEL_2(21.0, 70, CoralState.L2_SCORE, 0.002, 0.002),
   SCORE_LEVEL_3(37, 70, CoralState.L3_SCORE, 0.001, 0.0001),
   SCORE_LEVEL_4(65, 55, CoralState.L4_SCORE, 0.0005, 0.0001),
