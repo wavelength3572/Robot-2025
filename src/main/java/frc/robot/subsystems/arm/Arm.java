@@ -8,12 +8,18 @@ public class Arm {
   private final ArmIO io;
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
 
-  private static final LoggedTunableNumber ArmPosDegrees = new LoggedTunableNumber("Arm/Goal (DEG)", 0.0);
-  private static final LoggedTunableNumber ArmkP = new LoggedTunableNumber("Arm/kEp", ArmConstants.kArmKp);
-  private static final LoggedTunableNumber ArmkD = new LoggedTunableNumber("Arm/kEd", ArmConstants.kArmKd);
-  private static final LoggedTunableNumber ArmkF = new LoggedTunableNumber("Arm/kEf", ArmConstants.kArmKf);
-  private static final LoggedTunableNumber ArmVel = new LoggedTunableNumber("Arm/kEVel", ArmConstants.kArmVel);
-  private static final LoggedTunableNumber ArmAcc = new LoggedTunableNumber("Arm/kEAcc", ArmConstants.kArmAcc);
+  private static final LoggedTunableNumber ArmPosDegrees =
+      new LoggedTunableNumber("Arm/Goal (DEG)", 0.0);
+  private static final LoggedTunableNumber ArmkP =
+      new LoggedTunableNumber("Arm/kEp", ArmConstants.kArmKp);
+  private static final LoggedTunableNumber ArmkD =
+      new LoggedTunableNumber("Arm/kEd", ArmConstants.kArmKd);
+  private static final LoggedTunableNumber ArmkF =
+      new LoggedTunableNumber("Arm/kEf", ArmConstants.kArmKf);
+  private static final LoggedTunableNumber ArmVel =
+      new LoggedTunableNumber("Arm/kEVel", ArmConstants.kArmVel);
+  private static final LoggedTunableNumber ArmAcc =
+      new LoggedTunableNumber("Arm/kEAcc", ArmConstants.kArmAcc);
 
   public Arm(ArmIO io) {
     this.io = io;
@@ -40,7 +46,7 @@ public class Arm {
   public void setAngleDEG(Double requestedPosition, double requestedArbFF) {
     if (requestedPosition >= ArmConstants.armMinAngle
         && requestedPosition <= ArmConstants.armMaxAngle)
-      io.setAngleDEG(requestedPosition,requestedArbFF);
+      io.setAngleDEG(requestedPosition, requestedArbFF);
   }
 
   public double getAngleDEG() {

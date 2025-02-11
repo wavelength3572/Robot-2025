@@ -67,8 +67,7 @@ public class ArmIOSpark implements ArmIO {
   }
 
   @Override
-  public void setPIDValues(
-      double kP, double kD, double VelocityMax, double AccelerationMax) {
+  public void setPIDValues(double kP, double kD, double VelocityMax, double AccelerationMax) {
     final SparkMaxConfig config = new SparkMaxConfig();
     config.closedLoop.pidf(kP, 0.0, kD, 0.0);
     armMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);

@@ -21,7 +21,8 @@ public class DislodgeSequenceCommand extends SequentialCommandGroup {
    */
   public DislodgeSequenceCommand(Drive drive, CoralSystem coralSystem, OperatorInterface oi) {
     addCommands(
-        // 1. Determine and set the final dislodge preset based on the current prepare preset.
+        // 1. Determine and set the final dislodge preset based on the current prepare
+        // preset.
         new InstantCommand(
             () -> {
               CoralSystemPresets currentPreset = coralSystem.getCurrentCoralPreset();
@@ -35,12 +36,11 @@ public class DislodgeSequenceCommand extends SequentialCommandGroup {
                 finalPreset = CoralSystemPresets.FINAL_DISLODGE_LEVEL_1;
               }
               coralSystem.setTargetPreset(finalPreset);
-              coralSystem.getElevator().setPositionInches(finalPreset.getElevatorHeight());
-              coralSystem.getArm().setAngleDEG(finalPreset.getArmAngle());
             },
             coralSystem),
 
-        // 2. Wait for a fixed delay (e.g., 0.2 seconds) to allow the mechanism to settle.
+        // 2. Wait for a fixed delay (e.g., 0.2 seconds) to allow the mechanism to
+        // settle.
         new WaitCommand(0.2),
 
         // 3. Drive backward 10 inches relative to the current pose.
@@ -66,10 +66,6 @@ public class DislodgeSequenceCommand extends SequentialCommandGroup {
         new InstantCommand(
             () -> {
               coralSystem.setTargetPreset(CoralSystemPresets.PICKUP);
-              coralSystem
-                  .getElevator()
-                  .setPositionInches(CoralSystemPresets.PICKUP.getElevatorHeight());
-              coralSystem.getArm().setAngleDEG(CoralSystemPresets.PICKUP.getArmAngle());
             },
             coralSystem));
   }

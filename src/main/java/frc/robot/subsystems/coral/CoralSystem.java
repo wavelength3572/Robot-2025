@@ -49,6 +49,7 @@ public class CoralSystem extends SubsystemBase {
 
     coralInRobot = this.intake.getCoralInRobot();
 
+    Logger.recordOutput("CoralSystem/CoralInRobot", coralInRobot);
     Logger.recordOutput("CoralSystem/ElevatorAtGoal", elevator.isAtGoal());
     Logger.recordOutput("CoralSystem/ArmAtGoal", arm.isAtGoal());
     Logger.recordOutput("CoralSystem/AtGoal", isAtGoal());

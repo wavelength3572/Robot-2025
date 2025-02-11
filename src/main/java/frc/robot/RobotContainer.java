@@ -151,10 +151,9 @@ public class RobotContainer {
             arm::getAngleDEG,
             coralSystem::isCoralInRobot);
 
-            if (elevator != null) {
-                elevator.setPositionInches(0.0);
-              }
-
+    if (elevator != null) {
+      elevator.setPositionInches(0.0);
+    }
 
     SetupAutoChooser();
     updateOI();

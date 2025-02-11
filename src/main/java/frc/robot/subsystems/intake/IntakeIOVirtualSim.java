@@ -10,6 +10,7 @@ public class IntakeIOVirtualSim implements IntakeIO {
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
     inputs.requestedSpeed = this.requestedSpeed;
+    inputs.coralInRobot = this.haveCoral;
   }
 
   @Override

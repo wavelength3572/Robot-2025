@@ -15,6 +15,7 @@ import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AlignmentUtils;
+import org.littletonrobotics.junction.Logger;
 
 public class AlgaeCommands {
 
@@ -32,12 +33,12 @@ public class AlgaeCommands {
         // True branch: run the sequence if conditions are met.
         new SequentialCommandGroup(
             // 1. Command the coral system to move to STOW.
-            CoralSystemCommands.SetStowPresetCommand(coralSystem),
+            new InstantCommand(() -> coralSystem.setTargetPreset(CoralSystemPresets.STOW)),
             // 2. Wait until the system reaches STOW.
             new WaitUntilCommand(coralSystem::isAtGoal),
             // 3. Command the coral system to move to the appropriate dislodge preset based
             // on the current face.
-            CoralSystemCommands.SetAppropriateDislodgePresetCommand(drive, coralSystem),
+            SetAppropriateDislodgePresetCommand(drive, coralSystem),
             // 4. Wait until the system reaches the dislodge preset.
             new WaitUntilCommand(coralSystem::isAtGoal),
             // 5. Finally, drive to the dislodge (algae removal) target pose.
@@ -99,8 +100,6 @@ public class AlgaeCommands {
                     finalPreset = CoralSystemPresets.FINAL_DISLODGE_LEVEL_1;
                   }
                   coralSystem.setTargetPreset(finalPreset);
-                  coralSystem.getElevator().setPositionInches(finalPreset.getElevatorHeight());
-                  coralSystem.getArm().setAngleDEG(finalPreset.getArmAngle());
                 },
                 coralSystem),
 
@@ -127,10 +126,6 @@ public class AlgaeCommands {
             new InstantCommand(
                 () -> {
                   coralSystem.setTargetPreset(CoralSystemPresets.PICKUP);
-                  coralSystem
-                      .getElevator()
-                      .setPositionInches(CoralSystemPresets.PICKUP.getElevatorHeight());
-                  coralSystem.getArm().setAngleDEG(CoralSystemPresets.PICKUP.getArmAngle());
                 },
                 coralSystem)),
 
@@ -157,5 +152,24 @@ public class AlgaeCommands {
 
           return isInDislodgePreset && noCoral;
         });
+  }
+
+  public static Command SetAppropriateDislodgePresetCommand(Drive drive, CoralSystem coralSystem) {
+    return Commands.runOnce(
+        () -> {
+          // Get the current reef face selection from the drive subsystem.
+          Integer faceId = drive.getReefFaceSelection().getAcceptedFaceId();
+          if (faceId == null) {
+            return;
+          }
+
+          CoralSystemPresets preset = FieldConstants.getDislodgePresetForFace(faceId);
+          if (preset != null) {
+            // Command the coral system to use the appropriate preset.
+            coralSystem.setTargetPreset(preset);
+            Logger.recordOutput("CoralSystem/DislodgePreset", preset.name());
+          }
+        },
+        coralSystem);
   }
 }
