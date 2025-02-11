@@ -29,6 +29,8 @@ public class IntakeIOSpark implements IntakeIO {
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
     haveCoral = intakeMotor.getForwardLimitSwitch().isPressed();
+    intakeMotor.set(requestedSpeed);
+
     inputs.requestedSpeed = this.requestedSpeed;
     inputs.velocityRPM = intakeEncoder.getVelocity();
     inputs.appliedVolts = intakeMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
@@ -40,11 +42,29 @@ public class IntakeIOSpark implements IntakeIO {
   @Override
   public void setSpeed(double speed) {
     this.requestedSpeed = speed;
-    intakeMotor.set(speed);
   }
 
   @Override
   public boolean getCoralInRobot() {
     return haveCoral;
+  }
+
+  @Override
+  public void pullCoral() {
+    if (haveCoral) {
+      stopIntake();
+    } else {
+      setSpeed(IntakeConstants.intakeInSpeed);
+    }
+  }
+
+  @Override
+  public void pushCoral() {
+    setSpeed(IntakeConstants.intakeOutSpeed);
+  }
+
+  @Override
+  public void stopIntake() {
+    setSpeed(0.0);
   }
 }

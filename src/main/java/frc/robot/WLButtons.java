@@ -8,7 +8,6 @@ import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.util.AlignmentUtils;
 
 public class WLButtons {
@@ -104,23 +103,25 @@ public class WLButtons {
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  coralSystem.getIntake().setSpeed(IntakeConstants.intakeOutSpeed);
+                  coralSystem.getIntake().pushCoral();
                 }))
         .onFalse(
             Commands.runOnce(
                 () -> {
-                  coralSystem.getIntake().setSpeed(0.0);
+                  coralSystem.getIntake().stopIntake();
+                  ;
                 }));
     oi.getButtonFPosition2() // Pull Intake
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  coralSystem.getIntake().setSpeed(IntakeConstants.intakeInSpeed);
+                  coralSystem.getIntake().pullCoral();
                 }))
         .onFalse(
             Commands.runOnce(
                 () -> {
-                  coralSystem.getIntake().setSpeed(0.0);
+                  coralSystem.getIntake().stopIntake();
+                  ;
                 }));
 
     if (oi.getButtonGPosition0().getAsBoolean()) {

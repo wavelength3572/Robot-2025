@@ -15,8 +15,16 @@ public class Intake {
     Logger.processInputs("Intake", inputs);
   }
 
-  public void setSpeed(Double requestedSpeed) {
-    io.setSpeed(requestedSpeed);
+  public void pushCoral() {
+    io.pushCoral();
+  }
+
+  public void pullCoral() {
+    io.pullCoral();
+  }
+
+  public void stopIntake() {
+    io.stopIntake();
   }
 
   public boolean getCoralInRobot() {
