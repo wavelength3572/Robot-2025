@@ -19,7 +19,9 @@ public interface IntakeIO {
   /** Run open loop at the specified speed. */
   public default void setSpeed(double requestedSpeed) {}
 
-  public default boolean getCoralInRobot() { return false;}
+  public default boolean getCoralInRobot() {
+    return false;
+  }
 
   public default void setCoralInRobot(boolean coralInRobot) {}
 }

@@ -23,5 +23,7 @@ public class Intake {
     return io.getCoralInRobot();
   }
 
-  public void setCoralInRobot(boolean coralInRobot) {}
+  public void setCoralInRobot(boolean coralInRobot) {
+    io.setCoralInRobot(coralInRobot);
+  }
 }

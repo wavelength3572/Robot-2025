@@ -1,10 +1,10 @@
 package frc.robot.subsystems.arm;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -36,7 +36,10 @@ public class ArmIOMMSpark implements ArmIO {
   @Override
   public void updateInputs(ArmIOInputs inputs) {
     armClosedLoopController.setReference(
-        armTargetEncoderRotations, ControlType.kMAXMotionPositionControl,ClosedLoopSlot.kSlot0,armArbFF);
+        armTargetEncoderRotations,
+        ControlType.kMAXMotionPositionControl,
+        ClosedLoopSlot.kSlot0,
+        armArbFF);
     inputs.targetAngleDEG = armTargetDEG;
     inputs.currentAngleDEG = armEncoder.getPosition() * 360.0 / ArmConstants.kArmGearing;
     inputs.targetEncoderRotations = this.armTargetEncoderRotations;
@@ -65,8 +68,7 @@ public class ArmIOMMSpark implements ArmIO {
   }
 
   @Override
-  public void setPIDValues(
-      double kP, double kD, double VelocityMax, double AccelerationMax) {
+  public void setPIDValues(double kP, double kD, double VelocityMax, double AccelerationMax) {
     final SparkFlexConfig config = new SparkFlexConfig();
     config
         .closedLoop
