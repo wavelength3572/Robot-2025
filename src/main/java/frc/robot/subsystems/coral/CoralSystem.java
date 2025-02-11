@@ -15,24 +15,36 @@ import org.littletonrobotics.junction.Logger;
 public class CoralSystem extends SubsystemBase {
 
   @Getter private Elevator elevator;
-  @Getter private final CoralSystemPresetChooser coralSystemPresetChooser;
   @Getter private Arm arm;
   @Getter private Intake intake;
+
+  @Getter private final CoralSystemPresetChooser coralSystemPresetChooser;
 
   @Getter public boolean coralInRobot;
 
   private TimeOfFlight timeOfFlight = new TimeOfFlight(31); // Back of Robot on Elevator
 
+  @AutoLogOutput(key = "CoralSystem/targetCoralPreset")
   @Getter
   private CoralSystemPresets targetCoralPreset =
       CoralSystemPresets.STARTUP; // Default startup position
 
+  @AutoLogOutput(key = "CoralSystem/currentCoralPreset")
   @Getter
   private CoralSystemPresets currentCoralPreset =
       CoralSystemPresets.STARTUP; // Tracks last reached preset
 
+  private enum CoralSystemMovementState {
+    STABLE,
+    SAFE_ARM,
+    MOVE_ELEVATOR,
+    MOVE_ARM_FINAL
+  }
+
+  private CoralSystemMovementState systemState = CoralSystemMovementState.STABLE;
+
   public CoralSystem(Elevator elevator, Arm arm, Intake intake) {
-    coralSystemPresetChooser = new CoralSystemPresetChooser(this);
+    coralSystemPresetChooser = new CoralSystemPresetChooser();
     this.elevator = elevator;
     this.arm = arm;
     this.intake = intake;
@@ -53,7 +65,48 @@ public class CoralSystem extends SubsystemBase {
     Logger.recordOutput("CoralSystem/ArmAtGoal", arm.isAtGoal());
     Logger.recordOutput("CoralSystem/AtGoal", isAtGoal());
 
-    coralSystemPresetChooser.checkAndUpdate();
+    switch (systemState) {
+      case STABLE:
+        // Do Nothing
+        break;
+      case SAFE_ARM:
+        // Move Arm to Safe
+        this.arm.setTargetPreset(CoralSystemPresets.STOW);
+        if (arm.isAtGoal()) {
+          systemState = CoralSystemMovementState.MOVE_ELEVATOR;
+          // Start moving elevator
+          this.elevator.setTargetPreset(targetCoralPreset);
+        }
+        break;
+      case MOVE_ELEVATOR:
+        this.elevator.setTargetPreset(targetCoralPreset);
+        if (elevator.isAtGoal()) {
+          systemState = CoralSystemMovementState.MOVE_ARM_FINAL;
+          // Start Moving arm
+          this.arm.setTargetPreset(targetCoralPreset);
+        }
+        break;
+      case MOVE_ARM_FINAL:
+        this.arm.setTargetPreset(targetCoralPreset);
+        if (arm.isAtGoal()) {
+          currentCoralPreset = targetCoralPreset;
+          systemState = CoralSystemMovementState.STABLE;
+        }
+        break;
+      default:
+        // do nothing
+        break;
+    }
+  }
+
+  public void setTargetPreset(CoralSystemPresets preset) {
+    if (preset != this.currentCoralPreset) {
+      this.targetCoralPreset = preset;
+      // Start Moving Arm to Safe
+      this.arm.setTargetPreset(CoralSystemPresets.STOW);
+      // Change state
+      systemState = CoralSystemMovementState.SAFE_ARM;
+    }
   }
 
   public void setCoralInRobot(Boolean coralInRobot) {
@@ -62,15 +115,7 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public boolean isAtGoal() {
-    boolean atGoal = elevator.isAtGoal() && arm.isAtGoal();
-    if (atGoal) currentCoralPreset = targetCoralPreset;
-    return atGoal;
-  }
-
-  public void setTargetPreset(CoralSystemPresets preset) {
-    this.targetCoralPreset = preset;
-    this.elevator.setTargetPreset(preset);
-    this.arm.setTargetPreset(preset);
+    return elevator.isAtGoal() && arm.isAtGoal();
   }
 
   @AutoLogOutput(key = "TOF")

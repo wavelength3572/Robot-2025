@@ -5,36 +5,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class CoralSystemPresetChooser {
   private SendableChooser<CoralSystemPresets> chooser = new SendableChooser<>();
-  private boolean hasReachedStow = false;
-  private final CoralSystem coralSystem;
 
-  public CoralSystemPresetChooser(CoralSystem coralSystem) {
-    this.coralSystem = coralSystem;
-    resetToStartupState();
+  public CoralSystemPresetChooser() {
+    setupChooser();
   }
 
-  /** Resets chooser to startup state where only "Stow" is available. */
-  private void resetToStartupState() {
+  private void setupChooser() {
     chooser = new SendableChooser<>(); // Clear previous options
-    chooser.setDefaultOption("Stow", CoralSystemPresets.STOW);
-    SmartDashboard.putData("Coral Position Chooser", chooser);
-  }
-
-  /** Checks if the system has physically reached "Stow" and updates chooser accordingly. */
-  public void checkAndUpdate() {
-    if (!hasReachedStow && coralSystem.getCurrentCoralPreset() == CoralSystemPresets.STOW) {
-      hasReachedStow = true;
-      enableAllOptions();
-    } else if (hasReachedStow && coralSystem.getCurrentCoralPreset() != CoralSystemPresets.STOW) {
-      // If we move away from Stow, reset back to only allowing Stow
-      hasReachedStow = false;
-      resetToStartupState();
-    }
-  }
-
-  /** Enables all preset options once the robot reaches "Stow." */
-  private void enableAllOptions() {
-    chooser = new SendableChooser<>();
     chooser.setDefaultOption("Stow", CoralSystemPresets.STOW);
     chooser.addOption("Pickup", CoralSystemPresets.PICKUP);
     chooser.addOption("L1", CoralSystemPresets.SCORE_LEVEL_1);
@@ -46,7 +23,6 @@ public class CoralSystemPresetChooser {
     SmartDashboard.putData("Coral Position Chooser", chooser);
   }
 
-  /** Returns the currently selected CoralSystemPreset. */
   public CoralSystemPresets getSelected() {
     return chooser.getSelected();
   }
