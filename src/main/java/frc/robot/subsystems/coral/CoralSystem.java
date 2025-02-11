@@ -15,9 +15,10 @@ import org.littletonrobotics.junction.Logger;
 public class CoralSystem extends SubsystemBase {
 
   @Getter private Elevator elevator;
-  @Getter private final CoralSystemPresetChooser coralSystemPresetChooser;
   @Getter private Arm arm;
   @Getter private Intake intake;
+
+  @Getter private final CoralSystemPresetChooser coralSystemPresetChooser;
 
   @Getter public boolean coralInRobot;
 
@@ -43,7 +44,7 @@ public class CoralSystem extends SubsystemBase {
   private CoralSystemMovementState systemState = CoralSystemMovementState.STABLE;
 
   public CoralSystem(Elevator elevator, Arm arm, Intake intake) {
-    coralSystemPresetChooser = new CoralSystemPresetChooser(this);
+    coralSystemPresetChooser = new CoralSystemPresetChooser();
     this.elevator = elevator;
     this.arm = arm;
     this.intake = intake;
@@ -93,6 +94,7 @@ public class CoralSystem extends SubsystemBase {
         }
         break;
       default:
+        // do nothing
         break;
     }
   }
@@ -113,8 +115,7 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public boolean isAtGoal() {
-    boolean atGoal = elevator.isAtGoal() && arm.isAtGoal();
-    return atGoal;
+    return elevator.isAtGoal() && arm.isAtGoal();
   }
 
   @AutoLogOutput(key = "TOF")
