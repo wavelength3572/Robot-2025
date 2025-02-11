@@ -4,7 +4,6 @@ import com.playingwithfusion.TimeOfFlight;
 import com.playingwithfusion.TimeOfFlight.RangingMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.BuildConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.elevator.Elevator;
@@ -15,36 +14,33 @@ import org.littletonrobotics.junction.Logger;
 
 public class CoralSystem extends SubsystemBase {
 
-  @Getter
-  private Elevator elevator;
-  @Getter
-  private final CoralSystemPresetChooser coralSystemPresetChooser;
-  @Getter
-  private Arm arm;
-  @Getter
-  private Intake intake;
+  @Getter private Elevator elevator;
+  @Getter private final CoralSystemPresetChooser coralSystemPresetChooser;
+  @Getter private Arm arm;
+  @Getter private Intake intake;
 
-  @Getter
-  public boolean coralInRobot;
+  @Getter public boolean coralInRobot;
 
   private TimeOfFlight timeOfFlight = new TimeOfFlight(31); // Back of Robot on Elevator
 
   @AutoLogOutput(key = "CoralSystem/targetCoralPreset")
   @Getter
-  private CoralSystemPresets targetCoralPreset = CoralSystemPresets.STARTUP; // Default startup position
+  private CoralSystemPresets targetCoralPreset =
+      CoralSystemPresets.STARTUP; // Default startup position
 
   @AutoLogOutput(key = "CoralSystem/currentCoralPreset")
   @Getter
-  private CoralSystemPresets currentCoralPreset = CoralSystemPresets.STARTUP; // Tracks last reached preset
+  private CoralSystemPresets currentCoralPreset =
+      CoralSystemPresets.STARTUP; // Tracks last reached preset
 
   private enum CoralSystemMovementState {
-    START,
-    SAFEARM,
+    STABLE,
+    SAFE_ARM,
     MOVE_ELEVATOR,
-    MOVE_ARM
+    MOVE_ARM_FINAL
   }
 
-  private CoralSystemMovementState systemState = CoralSystemMovementState.START;
+  private CoralSystemMovementState systemState = CoralSystemMovementState.STABLE;
 
   public CoralSystem(Elevator elevator, Arm arm, Intake intake) {
     coralSystemPresetChooser = new CoralSystemPresetChooser(this);
@@ -69,42 +65,46 @@ public class CoralSystem extends SubsystemBase {
     Logger.recordOutput("CoralSystem/AtGoal", isAtGoal());
 
     switch (systemState) {
-      case START:
+      case STABLE:
+        // Do Nothing
+        break;
+      case SAFE_ARM:
         // Move Arm to Safe
         this.arm.setTargetPreset(CoralSystemPresets.STOW);
         if (arm.isAtGoal()) {
-          systemState = CoralSystemMovementState.MOVE_ARM
-
+          systemState = CoralSystemMovementState.MOVE_ELEVATOR;
+          // Start moving elevator
+          this.elevator.setTargetPreset(targetCoralPreset);
         }
         break;
-      case SAFEARM:
-        break;
-      case MOVE_ARM:
-        break;
       case MOVE_ELEVATOR:
+        this.elevator.setTargetPreset(targetCoralPreset);
+        if (elevator.isAtGoal()) {
+          systemState = CoralSystemMovementState.MOVE_ARM_FINAL;
+          // Start Moving arm
+          this.arm.setTargetPreset(targetCoralPreset);
+        }
+        break;
+      case MOVE_ARM_FINAL:
+        this.arm.setTargetPreset(targetCoralPreset);
+        if (arm.isAtGoal()) {
+          currentCoralPreset = targetCoralPreset;
+          systemState = CoralSystemMovementState.STABLE;
+        }
         break;
       default:
         break;
     }
-
-    if (targetCoralPreset != currentCoralPreset) {
-      if (!elevator.isAtGoal()) {
-        this.arm.setTargetPreset(CoralSystemPresets.STOW);
-        if (arm.isAtGoal()) {
-          this.elevator.setTargetPreset(targetCoralPreset);
-        }
-      } else {
-        this.arm.setTargetPreset(targetCoralPreset);
-      }
-    }
-
-    coralSystemPresetChooser.checkAndUpdate();
   }
 
   public void setTargetPreset(CoralSystemPresets preset) {
-    this.targetCoralPreset = preset;
-    // this.elevator.setTargetPreset(preset);
-    // this.arm.setTargetPreset(preset);
+    if (preset != this.currentCoralPreset) {
+      this.targetCoralPreset = preset;
+      // Start Moving Arm to Safe
+      this.arm.setTargetPreset(CoralSystemPresets.STOW);
+      // Change state
+      systemState = CoralSystemMovementState.SAFE_ARM;
+    }
   }
 
   public void setCoralInRobot(Boolean coralInRobot) {
@@ -114,8 +114,6 @@ public class CoralSystem extends SubsystemBase {
 
   public boolean isAtGoal() {
     boolean atGoal = elevator.isAtGoal() && arm.isAtGoal();
-    if (atGoal)
-      currentCoralPreset = targetCoralPreset;
     return atGoal;
   }
 
