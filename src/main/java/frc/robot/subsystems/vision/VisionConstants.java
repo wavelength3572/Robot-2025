@@ -71,7 +71,7 @@ public final class VisionConstants {
           // Camera lens)
           -0.0809625, // 11/16 (Elevator frame side to mid lens)+ 2.5(Center of robot to elevator
           // frame side)
-          0.47625, // 15(Top of Frame to mid lens) + 3.75 (Ground to top of frame)
+          0.74295, // 25.5 (Top of Frame to mid lens) + 3.75 (Ground to top of frame)
           new Rotation3d(0.0, 0.0, Rotation2d.fromDegrees(60).getRadians()));
 
   public static Transform3d robotToElevatorBackCam =
@@ -81,7 +81,7 @@ public final class VisionConstants {
           -0.0809625, // 11/16 (Elevator frame side to mid lens)+ 2.5(Center of robot to elevator
           // frame
           // side)
-          0.47625, // 15(Top of Frame to mid lens) + 3.75 (Ground to top of frame) -inches
+          0.74295, // (25.5) 15(Top of Frame to mid lens) + 3.75 (Ground to top of frame) -inches
           new Rotation3d(0.0, 0.0, Rotation2d.fromDegrees(120).getRadians()));
 
   // Basic filtering thresholds
