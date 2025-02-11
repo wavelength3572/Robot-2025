@@ -16,14 +16,10 @@ package frc.robot;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.CoralSystemCommands;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
@@ -155,7 +151,6 @@ public class RobotContainer {
             arm::getAngleDEG,
             coralSystem::isCoralInRobot);
 
-    SetupSmartDashboardUI();
     SetupAutoChooser();
     updateOI();
   }
@@ -174,49 +169,11 @@ public class RobotContainer {
   public void normalModeOI() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     oi = OISelector.findOperatorInterface();
-    WLButtons.configureButtonBindings(oi, drive, coralSystem, indicatorLight);
+    ButtonsAndDashboardBindings.configureBindings(oi, drive, coralSystem, indicatorLight);
   }
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
-  }
-
-  public void SetupSmartDashboardUI() {
-    if (elevator != null) {
-      elevator.setPosition(0.0);
-      SmartDashboard.putNumber("Elevator Goal (in)", 0.0);
-      SmartDashboard.putData(
-          "Set Elevator", CoralSystemCommands.setElevatorPositionFromDashboard(coralSystem));
-    }
-
-    if (arm != null) {
-      SmartDashboard.putNumber("Arm Goal (DEG)", 90.0);
-      SmartDashboard.putData(
-          "Set Arm", CoralSystemCommands.setArmPositionFromDashboard(coralSystem));
-    }
-
-    SmartDashboard.putData(
-        "DriveToClosestLEFTPole",
-        DriveToCommands.driveToPole(
-            drive, // The Drive subsystem
-            true, // isLeftPole = true
-            () -> 0.0, // Default X joystick input (stationary for dashboard testing)
-            () -> 0.0, // Default Y joystick input
-            () -> 0.0, // Default rotation joystick input
-            FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
-
-    SmartDashboard.putData(
-        "DriveToClosestRIGHTPole",
-        DriveToCommands.driveToPole(
-            drive, // The Drive subsystem
-            false, // isLeftPole = false
-            () -> 0.0, // Default X joystick input (stationary for dashboard testing)
-            () -> 0.0, // Default Y joystick input
-            () -> 0.0, // Default rotation joystick input
-            FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
-
-    SmartDashboard.putData(
-        "Toggle Vision", Commands.runOnce(drive::toggleVision).ignoringDisable(true));
   }
 
   public void SetupAutoChooser() {

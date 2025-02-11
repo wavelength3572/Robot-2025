@@ -12,6 +12,7 @@ import frc.robot.FieldConstants.ReefFacesRed;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AlignmentUtils;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -43,9 +44,15 @@ public class DriveToCommands {
       DoubleSupplier xJoystickSupplier,
       DoubleSupplier yJoystickSupplier,
       DoubleSupplier rotationJoystickSupplier,
-      double distanceThresholdMeters) {
+      double distanceThresholdMeters,
+      BooleanSupplier isCoralInRobotSupplier) {
     return Commands.runOnce(
         () -> {
+          if (!isCoralInRobotSupplier.getAsBoolean()) {
+            System.out.println("No coral in the robot. Aborting drive to pole.");
+            return;
+          }
+
           // Get the closest reef face selection
           AlignmentUtils.ReefFaceSelection selection = drive.getReefFaceSelection();
 
