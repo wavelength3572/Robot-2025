@@ -67,8 +67,7 @@ public class ElevatorIOSpark implements ElevatorIO {
 
   @Override
   public void setPosition(double requestedPosition, double arbFF) {
-    if (arbFF >=0 && arbFF <= 0.4)
-      this.elevatorCurrentArbFF = arbFF;
+    if (arbFF >= 0 && arbFF <= 0.4) this.elevatorCurrentArbFF = arbFF;
     this.elevatorCurrentTarget = requestedPosition;
   }
 

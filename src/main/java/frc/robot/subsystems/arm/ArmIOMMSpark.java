@@ -59,8 +59,7 @@ public class ArmIOMMSpark implements ArmIO {
   public void setAngleDEG(double requestedPosition, double requestedArbFF) {
     this.armTargetDEG = requestedPosition;
     this.armTargetEncoderRotations = this.armTargetDEG * ArmConstants.kArmGearing / 360.0;
-    if (requestedArbFF >= -0.21 && requestedArbFF <= 0.21)
-      this.armArbFF = requestedArbFF;
+    if (requestedArbFF >= -0.21 && requestedArbFF <= 0.21) this.armArbFF = requestedArbFF;
   }
 
   @Override

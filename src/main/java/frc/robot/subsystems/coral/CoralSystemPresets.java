@@ -15,7 +15,6 @@ public enum CoralSystemPresets {
   PREPARE_DISLODGE_LEVEL_2(25, 45, CoralState.PREP_L2_DISLODGE, 0.37, 0.0),
   FINAL_DISLODGE_LEVEL_2(32, 110, CoralState.FINAL_L2_DISLODGE, 0.37, 0.0);
 
-
   @Getter private final double elevatorHeight;
   @Getter private final double armAngle;
   @Getter private final CoralState state;
