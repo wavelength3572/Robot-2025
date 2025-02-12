@@ -82,9 +82,9 @@ public class ButtonsAndDashboardBindings {
             coralSystem::isCoralInRobot));
 
     SmartDashboard.putData(
-        "Drive to Dislodge", AlgaeCommands.driveToDislodge(drive, coralSystem, oi));
+        "Algae Prepare to Dislodge", AlgaeCommands.driveToDislodge(drive, coralSystem, oi));
     SmartDashboard.putData(
-        "Execute Dislodge Sequence", AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi));
+        "Alage Dislodge", AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi));
   }
 
   private static void configureDriverButtonBindings() {

@@ -115,7 +115,8 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public boolean isAtGoal() {
-    return elevator.isAtGoal() && arm.isAtGoal();
+    return systemState == CoralSystemMovementState.STABLE
+        && currentCoralPreset == targetCoralPreset;
   }
 
   @AutoLogOutput(key = "TOF")
