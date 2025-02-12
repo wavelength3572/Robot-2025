@@ -35,16 +35,17 @@ public class ArmIOMMSpark implements ArmIO {
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
+    inputs.currentAngleDEG = armEncoder.getPosition() * 360.0 / ArmConstants.kArmGearing;
     armClosedLoopController.setReference(
         armTargetEncoderRotations,
         ControlType.kMAXMotionPositionControl,
         ClosedLoopSlot.kSlot0,
-        armArbFF);
+        this.armArbFF * Math.cos(Math.toRadians(inputs.currentAngleDEG)));
     inputs.targetAngleDEG = armTargetDEG;
-    inputs.currentAngleDEG = armEncoder.getPosition() * 360.0 / ArmConstants.kArmGearing;
     inputs.targetEncoderRotations = this.armTargetEncoderRotations;
     inputs.encoderRotations = armEncoder.getPosition();
     inputs.armArbFF = this.armArbFF;
+    inputs.armArbFF_COS = this.armArbFF * Math.cos(Math.toRadians(inputs.currentAngleDEG));
     inputs.velocityRPM = armEncoder.getVelocity();
     inputs.appliedVolts = armMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = armMotor.getOutputCurrent();

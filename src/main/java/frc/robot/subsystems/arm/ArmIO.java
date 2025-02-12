@@ -10,6 +10,7 @@ public interface ArmIO {
     public double targetEncoderRotations = 0.0;
     public double encoderRotations = 0.0;
     public double armArbFF = 0.0;
+    public double armArbFF_COS = 0.0;
     public double velocityRPM = 0.0;
     public double appliedVolts = 0.0;
     public double currentAmps = 0.0;

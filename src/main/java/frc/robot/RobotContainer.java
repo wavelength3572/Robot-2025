@@ -27,6 +27,7 @@ import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIOMMSpark;
 import frc.robot.subsystems.arm.ArmIOVirtualSim;
 import frc.robot.subsystems.coral.CoralSystem;
+import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIOSpark;
@@ -152,7 +153,11 @@ public class RobotContainer {
             coralSystem::isCoralInRobot);
 
     if (elevator != null) {
-      elevator.setPositionInches(0.0);
+      elevator.setTargetPreset(CoralSystemPresets.STARTUP);
+    }
+
+    if (arm != null) {
+      arm.setTargetPreset(CoralSystemPresets.STARTUP);
     }
 
     SetupAutoChooser();
