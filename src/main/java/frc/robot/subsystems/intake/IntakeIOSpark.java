@@ -18,6 +18,14 @@ public class IntakeIOSpark implements IntakeIO {
   private Double requestedSpeed = 0.0;
   private boolean haveCoral = false;
 
+  private enum intakeState {
+    OFF,
+    PUSH,
+    PULL
+  }
+
+  private intakeState currentIntakeState = intakeState.OFF;
+
   public IntakeIOSpark() {
     intakeMotor.configure(
         IntakeConfigs.IntakeSubsystem.intakeConfig,
@@ -29,7 +37,11 @@ public class IntakeIOSpark implements IntakeIO {
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
     haveCoral = intakeMotor.getForwardLimitSwitch().isPressed();
-    intakeMotor.set(requestedSpeed);
+    if (currentIntakeState == intakeState.PULL && haveCoral) {
+      intakeMotor.set(0.0);
+    } else {
+      intakeMotor.set(requestedSpeed);
+    }
 
     inputs.requestedSpeed = this.requestedSpeed;
     inputs.velocityRPM = intakeEncoder.getVelocity();
@@ -51,20 +63,19 @@ public class IntakeIOSpark implements IntakeIO {
 
   @Override
   public void pullCoral() {
-    if (haveCoral) {
-      stopIntake();
-    } else {
-      setSpeed(IntakeConstants.intakeInSpeed);
-    }
+    currentIntakeState = intakeState.PULL;
+    setSpeed(IntakeConstants.intakeInSpeed);
   }
 
   @Override
   public void pushCoral() {
+    currentIntakeState = intakeState.PUSH;
     setSpeed(IntakeConstants.intakeOutSpeed);
   }
 
   @Override
   public void stopIntake() {
+    currentIntakeState = intakeState.OFF;
     setSpeed(0.0);
   }
 }
