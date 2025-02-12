@@ -8,6 +8,7 @@ public class ArmConstants {
   public static final double armStartAngle = 90.0; // Degrees
   public static final double armMinAngle = 40.0; // Degrees
   public static final double armMaxAngle = 240.0; // Degrees
+  public static final double armTBEOffset = 27.24; // Degrees
 
   public static final double kArmKp = .3;
   public static final double kArmKd = 0.00;

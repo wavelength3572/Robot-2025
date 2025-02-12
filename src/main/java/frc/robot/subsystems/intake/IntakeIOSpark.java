@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.subsystems.arm.ArmConstants;
 
 public class IntakeIOSpark implements IntakeIO {
 
@@ -48,6 +49,7 @@ public class IntakeIOSpark implements IntakeIO {
     inputs.appliedVolts = intakeMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = intakeMotor.getOutputCurrent();
     inputs.Arm_TBE = armEncoder.getPosition();
+    inputs.Arm_TBE_DEG = ArmConstants.armTBEOffset + ((1.0-inputs.Arm_TBE) * 120.0);
     inputs.coralInRobot = haveCoral;
   }
 

@@ -11,6 +11,7 @@ public interface IntakeIO {
     public boolean coralInRobot = false;
     public double currentAmps = 0.0;
     public double Arm_TBE = 0.0;
+    public double Arm_TBE_DEG = 0.0;
   }
 
   /** Update the set of loggable inputs. */
