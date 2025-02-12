@@ -13,8 +13,8 @@ public class ArmConstants {
   public static final double kArmKp = .3;
   public static final double kArmKd = 0.00;
   public static final double kArmKf = 0.20;
-  public static final double kArmVel = 600;
-  public static final double kArmAcc = 600;
+  public static final double kArmVel = 1000;
+  public static final double kArmAcc = 1500;
   public static final double kAllowableError = .05;
 
   public static final double kArmkS = 0.0; // volts (V)
