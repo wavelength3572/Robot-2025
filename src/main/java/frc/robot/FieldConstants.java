@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -116,30 +115,32 @@ public final class FieldConstants {
     REEF_FACE_ORIENTATION_BLUE.put(
         17,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(60)), new Rotation2d(Math.toRadians(-120)) // 60, -120
+          new Rotation2d(Math.toRadians(60)), new Rotation2d(Math.toRadians(60)) // 60, -120
         });
     REEF_FACE_ORIENTATION_BLUE.put(
         18,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(0)), new Rotation2d(Math.toRadians(180))
+          new Rotation2d(Math.toRadians(0)), new Rotation2d(Math.toRadians(0))
         }); // 180, -180
     REEF_FACE_ORIENTATION_BLUE.put(
         19,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(-60)), new Rotation2d(Math.toRadians(120)) // 120, -60
+          new Rotation2d(Math.toRadians(-60)), new Rotation2d(Math.toRadians(-60)) // 120, -60
         });
     REEF_FACE_ORIENTATION_BLUE.put(
         20,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(-120)), new Rotation2d(Math.toRadians(60))
+          new Rotation2d(Math.toRadians(-120)), new Rotation2d(Math.toRadians(-120))
         });
     REEF_FACE_ORIENTATION_BLUE.put(
         21,
-        new Rotation2d[] {new Rotation2d(Math.toRadians(180)), new Rotation2d(Math.toRadians(0))});
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(180)), new Rotation2d(Math.toRadians(180))
+        });
     REEF_FACE_ORIENTATION_BLUE.put(
         22,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(120)), new Rotation2d(Math.toRadians(-60))
+          new Rotation2d(Math.toRadians(120)), new Rotation2d(Math.toRadians(120))
         });
     Collections.unmodifiableMap(REEF_FACE_ORIENTATION_BLUE);
 
@@ -147,25 +148,31 @@ public final class FieldConstants {
     REEF_FACE_ORIENTATION_RED.put(
         6,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(-60)), new Rotation2d(Math.toRadians(120))
+          new Rotation2d(Math.toRadians(-60 + 180)), new Rotation2d(Math.toRadians(-60 + 180))
         });
     REEF_FACE_ORIENTATION_RED.put(
         7,
-        new Rotation2d[] {new Rotation2d(Math.toRadians(0)), new Rotation2d(Math.toRadians(180))});
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(0 + 180)), new Rotation2d(Math.toRadians(0 + 180))
+        });
     REEF_FACE_ORIENTATION_RED.put(
         8,
-        new Rotation2d[] {new Rotation2d(Math.toRadians(60)), new Rotation2d(Math.toRadians(240))});
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(60 + 180)), new Rotation2d(Math.toRadians(60 + 180))
+        });
     REEF_FACE_ORIENTATION_RED.put(
         9,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(120)), new Rotation2d(Math.toRadians(-60))
+          new Rotation2d(Math.toRadians(120 + 180)), new Rotation2d(Math.toRadians(120 + 180))
         });
     REEF_FACE_ORIENTATION_RED.put(
         10,
-        new Rotation2d[] {new Rotation2d(Math.toRadians(180)), new Rotation2d(Math.toRadians(0))});
+        new Rotation2d[] {new Rotation2d(Math.toRadians(0)), new Rotation2d(Math.toRadians(0))});
     REEF_FACE_ORIENTATION_RED.put(
         11,
-        new Rotation2d[] {new Rotation2d(Math.toRadians(240)), new Rotation2d(Math.toRadians(60))});
+        new Rotation2d[] {
+          new Rotation2d(Math.toRadians(240 - 180)), new Rotation2d(Math.toRadians(240 - 180))
+        });
     Collections.unmodifiableMap(REEF_FACE_ORIENTATION_RED);
   }
 
@@ -378,13 +385,11 @@ public final class FieldConstants {
     // ---------------- BLUE Orientation ----------------
     CORAL_STATION_ORIENTATION_BLUE.put(
         12,
-        new Rotation2d[] {
-          new Rotation2d(Math.toRadians(54)), new Rotation2d(Math.toRadians(54 + 180))
-        });
+        new Rotation2d[] {new Rotation2d(Math.toRadians(54)), new Rotation2d(Math.toRadians(54))});
     CORAL_STATION_ORIENTATION_BLUE.put(
         13,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(306)), new Rotation2d(Math.toRadians(306 + 180))
+          new Rotation2d(Math.toRadians(306)), new Rotation2d(Math.toRadians(306))
         }); // 180, -180
     Collections.unmodifiableMap(CORAL_STATION_ORIENTATION_BLUE);
 
@@ -392,12 +397,12 @@ public final class FieldConstants {
     CORAL_STATION_ORIENTATION_RED.put(
         1,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(126)), new Rotation2d(Math.toRadians(126 + 180))
+          new Rotation2d(Math.toRadians(126)), new Rotation2d(Math.toRadians(126))
         });
     CORAL_STATION_ORIENTATION_RED.put(
         2,
         new Rotation2d[] {
-          new Rotation2d(Math.toRadians(234)), new Rotation2d(Math.toRadians(234 + 180))
+          new Rotation2d(Math.toRadians(234)), new Rotation2d(Math.toRadians(234))
         });
     Collections.unmodifiableMap(CORAL_STATION_ORIENTATION_RED);
   }
@@ -423,55 +428,49 @@ public final class FieldConstants {
   public static final Map<Integer, Pose2d> REEF_FACE_POSES_RED;
 
   static {
-    // Compute Pose2d for blue reef faces using the front positions of each pole.
+    // ----- Build Blue Reef Face Poses -----
     Map<Integer, Pose2d> bluePoses = new HashMap<>();
     for (ReefFacesBlue face : ReefFacesBlue.values()) {
-      // Use the front translation from both poles.
+      int blueFaceId = face.getFaceId();
       Translation2d left = face.getLeftPole().getFrontTranslation();
       Translation2d right = face.getRightPole().getFrontTranslation();
       double midX = (left.getX() + right.getX()) / 2.0;
       double midY = (left.getY() + right.getY()) / 2.0;
       Translation2d midpoint = new Translation2d(midX, midY);
 
-      // Choose an orientation.
-      // For simplicity, we’ll pick the "front" orientation from our
-      // REEF_FACE_ORIENTATION_BLUE map.
-      Rotation2d[] possibleOrients = REEF_FACE_ORIENTATION_BLUE.get(face.getFaceId());
+      // Retrieve the blue orientation(s) for this face id.
+      Rotation2d[] possibleOrients = REEF_FACE_ORIENTATION_BLUE.get(blueFaceId);
       Rotation2d chosenRotation =
           (possibleOrients != null && possibleOrients.length > 0)
-              ? possibleOrients[0] // Use the first one as the default "front" orientation.
-              : new Rotation2d(); // Fallback to 0 radians if none exists.
+              ? possibleOrients[0] // Default to the first orientation.
+              : new Rotation2d(); // Fallback to 0 radians.
 
-      bluePoses.put(face.getFaceId(), new Pose2d(midpoint, chosenRotation));
+      bluePoses.put(blueFaceId, new Pose2d(midpoint, chosenRotation));
     }
     REEF_FACE_POSES_BLUE = Collections.unmodifiableMap(bluePoses);
 
-    // For red reef faces, reflect the blue poses.
+    // ----- Build Red Reef Face Poses -----
+    // The mapping is: blue id 17 -> red id 6, 18 -> 7, 19 -> 8, 20 -> 9, 21 -> 10, 22 -> 11.
     Map<Integer, Pose2d> redPoses = new HashMap<>();
     for (Map.Entry<Integer, Pose2d> entry : REEF_FACE_POSES_BLUE.entrySet()) {
-      // Reflect the translation.
+      int blueFaceId = entry.getKey();
+      // Compute the red face ID by subtracting 11.
+      int redFaceId = blueFaceId - 11; // e.g., 17-11 = 6, 18-11 = 7, etc.
+
       Translation2d blueTranslation = entry.getValue().getTranslation();
+      // Reflect the blue translation to get the red translation.
       Translation2d redTranslation = reflectBlueToRed(blueTranslation);
 
-      // Get the corresponding red orientation from the REEF_FACE_ORIENTATION_RED map.
-      Rotation2d[] possibleRedOrients = REEF_FACE_ORIENTATION_RED.get(entry.getKey());
+      // Get the red orientation for this face id.
+      Rotation2d[] possibleRedOrients = REEF_FACE_ORIENTATION_RED.get(redFaceId);
       Rotation2d redRotation =
           (possibleRedOrients != null && possibleRedOrients.length > 0)
               ? possibleRedOrients[0]
-              : entry.getValue().getRotation();
+              : entry.getValue().getRotation(); // Fallback: use the blue rotation if none defined.
 
-      redPoses.put(entry.getKey(), new Pose2d(redTranslation, redRotation));
+      redPoses.put(redFaceId, new Pose2d(redTranslation, redRotation));
     }
     REEF_FACE_POSES_RED = Collections.unmodifiableMap(redPoses);
-
-    // Log the blue reef face poses.
-    for (Map.Entry<Integer, Pose2d> entry : REEF_FACE_POSES_BLUE.entrySet()) {
-      Logger.recordOutput("REEF_FACE_POSES_BLUE/face_" + entry.getKey(), entry.getValue());
-    }
-    // Log the red reef face poses.
-    for (Map.Entry<Integer, Pose2d> entry : REEF_FACE_POSES_RED.entrySet()) {
-      Logger.recordOutput("REEF_FACE_POSES_RED/face_" + entry.getKey(), entry.getValue());
-    }
   }
 
   public static final Set<Integer> DISLODGE_L1_FACES_BLUE = Set.of(17, 19, 21);

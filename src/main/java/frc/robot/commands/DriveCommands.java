@@ -464,14 +464,14 @@ public class DriveCommands {
           chosenOrientation.rotation2D().getRadians());
     }
 
-    if (cageSelection != null
-        && DriverStation.getAlliance().isPresent()
-        && cageSelection.getDistanceToCage() <= cageDistanceThresholdMeters) {
+    // if (cageSelection != null
+    //     && DriverStation.getAlliance().isPresent()
+    //     && cageSelection.getDistanceToCage() <= cageDistanceThresholdMeters) {
 
-      return angleController.calculate(
-          robotPoseSupplier.get().getRotation().getRadians(),
-          cageSelection.getRotationToCage().getRadians());
-    }
+    //   return angleController.calculate(
+    //       robotPoseSupplier.get().getRotation().getRadians(),
+    //       cageSelection.getRotationToCage().getRadians());
+    // }
 
     return 0.0;
   }
