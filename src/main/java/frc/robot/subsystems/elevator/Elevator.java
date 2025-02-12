@@ -74,8 +74,7 @@ public class Elevator {
   }
 
   public double getSetpointInMeters() {
-    return (inputs.setpoint * ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI)
-        / ElevatorConstants.kElevatorGearing;
+    return io.getSetpointInMeters();
   }
 
   public double getHeightInInches() {

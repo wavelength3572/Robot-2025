@@ -39,6 +39,12 @@ public class ElevatorIOVirtualSim implements ElevatorIO {
   }
 
   @Override
+  public double getSetpointInMeters() {
+    return (this.elevatorCurrentTarget * ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI)
+        / ElevatorConstants.kElevatorGearing;
+  }
+
+  @Override
   public double getHeightInMeters() {
     return (elevatorVirtualEncoder / ElevatorConstants.kElevatorGearing)
         * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI);

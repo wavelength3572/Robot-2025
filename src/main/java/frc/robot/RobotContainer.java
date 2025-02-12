@@ -148,7 +148,7 @@ public class RobotContainer {
         new Visualizer(
             drive::getPose,
             elevator::getHeightInMeters,
-            arm::getAngleDEG,
+            arm::getCurrentAngleDEG,
             coralSystem::isCoralInRobot);
 
     if (elevator != null) {

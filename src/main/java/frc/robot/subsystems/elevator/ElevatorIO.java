@@ -31,6 +31,10 @@ public interface ElevatorIO {
     return 0.0;
   }
 
+  public default double getSetpointInMeters() {
+    return 0.0;
+  }
+
   public default void setPIDValues(
       double kP, double kD, double kF, double VelocityMax, double AccelerationMax) {}
 }
