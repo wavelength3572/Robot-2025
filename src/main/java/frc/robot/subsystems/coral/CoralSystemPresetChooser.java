@@ -13,13 +13,14 @@ public class CoralSystemPresetChooser {
   private void setupChooser() {
     chooser = new SendableChooser<>(); // Clear previous options
     chooser.setDefaultOption("Stow", CoralSystemPresets.STOW);
+    chooser.addOption("Startup", CoralSystemPresets.STARTUP);
     chooser.addOption("Pickup", CoralSystemPresets.PICKUP);
-    chooser.addOption("L1", CoralSystemPresets.SCORE_LEVEL_1);
-    chooser.addOption("L2", CoralSystemPresets.SCORE_LEVEL_2);
-    chooser.addOption("L3", CoralSystemPresets.SCORE_LEVEL_3);
-    chooser.addOption("L4", CoralSystemPresets.SCORE_LEVEL_4);
-    chooser.addOption("Dislodge L1", CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1);
-    chooser.addOption("Dislodge L2", CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2);
+    chooser.addOption("Shelf-L1", CoralSystemPresets.SCORE_LEVEL_1);
+    chooser.addOption("Low-L2", CoralSystemPresets.SCORE_LEVEL_2);
+    chooser.addOption("Mid-L3", CoralSystemPresets.SCORE_LEVEL_3);
+    chooser.addOption("High-L4", CoralSystemPresets.SCORE_LEVEL_4);
+    chooser.addOption("Algae-L1", CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1);
+    chooser.addOption("Algae-L2", CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2);
     SmartDashboard.putData("Coral Position Chooser", chooser);
   }
 

@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -15,6 +16,8 @@ import org.littletonrobotics.junction.Logger;
 public class DriveToPose extends Command {
   private static final double JOYSTICK_DEADBAND = 0.1; // Adjust as needed
   private double TIMEOUT_TIME = 8.0;
+
+  private final double speedScalar;
 
   private final Drive drivetrain;
   private final Supplier<Pose2d> poseSupplier;
@@ -54,13 +57,38 @@ public class DriveToPose extends Command {
       Supplier<Pose2d> poseSupplier,
       DoubleSupplier xJoystickSupplier,
       DoubleSupplier yJoystickSupplier,
-      DoubleSupplier rotationJoystickSupplier) {
+      DoubleSupplier rotationJoystickSupplier,
+      double speedScalar) {
     this.drivetrain = drivetrain;
     this.poseSupplier = poseSupplier;
     this.xJoystickSupplier = xJoystickSupplier;
     this.yJoystickSupplier = yJoystickSupplier;
     this.rotationJoystickSupplier = rotationJoystickSupplier;
+
+    // Clamp the speedScalar between 0 and 1 to prevent unsafe values.
+    double clampedScalar = MathUtil.clamp(speedScalar, 0.0, 1.0);
+    if (clampedScalar != speedScalar) {
+      Logger.recordOutput(
+          "DriveToPose/Warning",
+          "Speed scalar " + speedScalar + " out of bounds; clamped to " + clampedScalar);
+    }
+    this.speedScalar = clampedScalar;
     addRequirements(drivetrain);
+  }
+
+  public DriveToPose(
+      Drive drivetrain,
+      Supplier<Pose2d> poseSupplier,
+      DoubleSupplier xJoystickSupplier,
+      DoubleSupplier yJoystickSupplier,
+      DoubleSupplier rotationJoystickSupplier) {
+    this(
+        drivetrain,
+        poseSupplier,
+        xJoystickSupplier,
+        yJoystickSupplier,
+        rotationJoystickSupplier,
+        1.0);
   }
 
   @Override
@@ -98,9 +126,10 @@ public class DriveToPose extends Command {
     double driveXVelocity = driveControllerX.calculate(currentPose.getX(), targetX);
     double driveYVelocity = driveControllerY.calculate(currentPose.getY(), targetY);
 
-    double maxLinearSpeed = drivetrain.getMaxLinearSpeedMetersPerSec();
-    double scaledXVelocity = driveXVelocity * maxLinearSpeed;
-    double scaledYVelocity = driveYVelocity * maxLinearSpeed;
+    double effectiveMaxLinearSpeed = drivetrain.getMaxLinearSpeedMetersPerSec() * speedScalar;
+
+    double scaledXVelocity = driveXVelocity * effectiveMaxLinearSpeed;
+    double scaledYVelocity = driveYVelocity * effectiveMaxLinearSpeed;
 
     double thetaVelocity =
         thetaController.calculate(currentPose.getRotation().getRadians(), targetTheta);

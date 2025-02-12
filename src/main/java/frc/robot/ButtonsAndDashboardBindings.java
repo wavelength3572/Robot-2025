@@ -81,10 +81,9 @@ public class ButtonsAndDashboardBindings {
             FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
             coralSystem::isCoralInRobot));
 
+    SmartDashboard.putData("Algae Alignment", AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
     SmartDashboard.putData(
-        "Algae Prepare to Dislodge", AlgaeCommands.driveToDislodge(drive, coralSystem, oi));
-    SmartDashboard.putData(
-        "Alage Dislodge", AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi));
+        "Algae Dislodge", AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi));
   }
 
   private static void configureDriverButtonBindings() {

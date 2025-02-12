@@ -37,7 +37,8 @@ public class CoralSystem extends SubsystemBase {
     STABLE,
     SAFE_ARM,
     MOVE_ELEVATOR,
-    MOVE_ARM_FINAL
+    MOVE_ARM_FINAL,
+    MOVE_SIMULTANEOUS
   }
 
   private CoralSystemMovementState systemState = CoralSystemMovementState.STABLE;
@@ -93,6 +94,16 @@ public class CoralSystem extends SubsystemBase {
           systemState = CoralSystemMovementState.STABLE;
         }
         break;
+
+      case MOVE_SIMULTANEOUS:
+        this.arm.setTargetPreset(targetCoralPreset);
+        this.elevator.setTargetPreset(targetCoralPreset);
+        if (arm.isAtGoal() && elevator.isAtGoal()) {
+          currentCoralPreset = targetCoralPreset;
+          systemState = CoralSystemMovementState.STABLE;
+        }
+        break;
+
       default:
         // do nothing
         break;
@@ -106,6 +117,13 @@ public class CoralSystem extends SubsystemBase {
       this.arm.setTargetPreset(CoralSystemPresets.STOW);
       // Change state
       systemState = CoralSystemMovementState.SAFE_ARM;
+    }
+  }
+
+  public void setAlgaeDislodgePreset(CoralSystemPresets preset) {
+    if (preset != this.currentCoralPreset) {
+      this.targetCoralPreset = preset;
+      systemState = CoralSystemMovementState.MOVE_SIMULTANEOUS;
     }
   }
 

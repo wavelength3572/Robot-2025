@@ -38,6 +38,29 @@ public class DriveToCommands {
         drive, poseSupplier, xJoystickSupplier, yJoystickSupplier, rotationJoystickSupplier);
   }
 
+  /**
+   * Drive to a specific pose on the field.
+   *
+   * @param drive The drivetrain subsystem.
+   * @param poseSupplier A supplier for the target pose.
+   * @return A command to drive to the specified pose.
+   */
+  public static Command createDriveToPoseScaled(
+      Drive drive,
+      Supplier<Pose2d> poseSupplier,
+      DoubleSupplier xJoystickSupplier,
+      DoubleSupplier yJoystickSupplier,
+      DoubleSupplier rotationJoystickSupplier,
+      double speedScalar) {
+    return new DriveToPose(
+        drive,
+        poseSupplier,
+        xJoystickSupplier,
+        yJoystickSupplier,
+        rotationJoystickSupplier,
+        speedScalar);
+  }
+
   public static Command driveToPole(
       Drive drive,
       boolean isLeftPole,

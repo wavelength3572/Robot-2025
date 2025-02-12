@@ -19,6 +19,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class AlgaeCommands {
 
+  private static final double SPEED_SCALAR = 0.5;
+
   private AlgaeCommands() {
     // Prevent instantiation - utility class
   }
@@ -27,21 +29,14 @@ public class AlgaeCommands {
    * Creates a command to drive to the dislodge (algae removal) target pose if all conditions are
    * met.
    */
-  public static Command driveToDislodge(
-      Drive drive, CoralSystem coralSystem, OperatorInterface oi) {
+  public static Command AlgaeAlignment(Drive drive, CoralSystem coralSystem, OperatorInterface oi) {
     return new ConditionalCommand(
         // True branch: run the sequence if conditions are met.
         new SequentialCommandGroup(
-            // 1. Command the coral system to move to STOW.
-            new InstantCommand(() -> coralSystem.setTargetPreset(CoralSystemPresets.STOW)),
-            // 2. Wait until the system reaches STOW.
-            new WaitUntilCommand(coralSystem::isAtGoal),
-            // 3. Command the coral system to move to the appropriate dislodge preset based
-            // on the current face.
             SetAppropriateDislodgePresetCommand(drive, coralSystem),
-            // 4. Wait until the system reaches the dislodge preset.
+            // Wait until the system reaches the dislodge preset.
             new WaitUntilCommand(coralSystem::isAtGoal),
-            // 5. Finally, drive to the dislodge (algae removal) target pose.
+            // Finally, drive to the dislodge (algae removal) target pose.
             DriveToCommands.createDriveToPose(
                 drive,
                 drive::getAlgaeTargetPose,
@@ -55,12 +50,12 @@ public class AlgaeCommands {
         // - The accepted reef face is within the threshold distance,
         // - AND there is NO coral currently in the robot.
         () -> {
-          boolean notAtDislodgePreset =
-              !(coralSystem.isAtGoal()
-                  && (coralSystem.getCurrentCoralPreset()
-                          == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1
-                      || coralSystem.getCurrentCoralPreset()
-                          == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2));
+          // boolean notAtDislodgePreset =
+          //     !(coralSystem.isAtGoal()
+          //         && (coralSystem.getCurrentCoralPreset()
+          //                 == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1
+          //             || coralSystem.getCurrentCoralPreset()
+          //                 == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2));
 
           AlignmentUtils.ReefFaceSelection selection = drive.getReefFaceSelection();
           boolean withinThreshold = false;
@@ -71,7 +66,7 @@ public class AlgaeCommands {
 
           boolean noCoral = !coralSystem.isCoralInRobot();
 
-          return notAtDislodgePreset && withinThreshold && noCoral;
+          return withinThreshold && noCoral;
         });
   }
 
@@ -95,20 +90,22 @@ public class AlgaeCommands {
                   } else if (currentPreset == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2) {
                     finalPreset = CoralSystemPresets.FINAL_DISLODGE_LEVEL_2;
                   } else {
+                    // This branch should never happen because of our outer condition.
+                    // If it does, log the problem and return early without setting any final
+                    // preset.
                     System.out.println(
-                        "[AlgaeCommands] Warning: Unexpected preset! Defaulting to FINAL_DISLODGE_LEVEL_1.");
-                    finalPreset = CoralSystemPresets.FINAL_DISLODGE_LEVEL_1;
+                        "[AlgaeCommands] Dislodge sequence canceled: Not in a valid prepare preset.");
+                    return;
                   }
-                  coralSystem.setTargetPreset(finalPreset);
+                  coralSystem.setAlgaeDislodgePreset(finalPreset);
                 },
                 coralSystem),
 
-            // 2. Wait for a fixed delay (e.g., 0.2 seconds) to allow the mechanism to
-            // settle.
-            new WaitCommand(0.2),
+            // 2. Wait for a fixed delay (e.g., 0.1 seconds) to allow dislodge to start
+            new WaitCommand(0.1),
 
             // 3. Drive backward 10 inches relative to the current pose.
-            DriveToCommands.createDriveToPose(
+            DriveToCommands.createDriveToPoseScaled(
                 drive,
                 () -> {
                   Pose2d currentPose = drive.getPose();
@@ -120,19 +117,20 @@ public class AlgaeCommands {
                 },
                 oi::getTranslateX,
                 oi::getTranslateY,
-                oi::getRotate),
+                oi::getRotate,
+                SPEED_SCALAR)),
 
-            // 4. Finally, move the coral system to PICKUP preset.
-            new InstantCommand(
-                () -> {
-                  coralSystem.setTargetPreset(CoralSystemPresets.PICKUP);
-                },
-                coralSystem)),
+        // 4. Finally, move the coral system to PICKUP preset.
+        // new InstantCommand(
+        //     () -> {
+        //       coralSystem.setTargetPreset(CoralSystemPresets.PICKUP);
+        //     },
+        //     coralSystem)),
 
-        // ❌ **False Branch**: Do nothing (command does not run)
+        // **False Branch**: Do nothing (command does not run)
         Commands.none(),
 
-        // 🛑 **Condition Check**: Execute only if:
+        // **Condition Check**: Execute only if:
         () -> {
           boolean isInDislodgePreset =
               coralSystem.isAtGoal()
@@ -142,14 +140,6 @@ public class AlgaeCommands {
                           == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2);
 
           boolean noCoral = !coralSystem.isCoralInRobot();
-
-          // Debugging Log
-          System.out.println(
-              "[AlgaeCommands] Dislodge Check: isInDislodgePreset="
-                  + isInDislodgePreset
-                  + ", noCoral="
-                  + noCoral);
-
           return isInDislodgePreset && noCoral;
         });
   }
