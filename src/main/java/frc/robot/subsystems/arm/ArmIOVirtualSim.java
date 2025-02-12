@@ -32,7 +32,7 @@ public class ArmIOVirtualSim implements ArmIO {
   }
 
   @Override
-  public void setTargetAngleDEG(double requestedPosition, double requestedArbFF) {
+  public void setTargetAngleDEG(double requestedPosition) {
     this.armTargetDEG = requestedPosition;
     this.armTargetEncoderRotations = this.armTargetDEG * ArmConstants.kArmGearing / 360.0;
   }

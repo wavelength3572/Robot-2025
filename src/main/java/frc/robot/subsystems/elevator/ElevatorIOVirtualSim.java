@@ -34,7 +34,7 @@ public class ElevatorIOVirtualSim implements ElevatorIO {
   }
 
   @Override
-  public void setPosition(double requestedPosition, double arbFF) {
+  public void setPosition(double requestedPosition) {
     this.elevatorCurrentTarget = requestedPosition;
   }
 

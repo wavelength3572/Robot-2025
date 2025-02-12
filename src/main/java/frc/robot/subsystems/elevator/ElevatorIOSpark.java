@@ -18,12 +18,10 @@ public class ElevatorIOSpark implements ElevatorIO {
   // elevator, so we also
   // need to initialize the closed loop controller and encoder.
   private SparkMax leaderMotor = new SparkMax(ElevatorConstants.leaderCanId, MotorType.kBrushless);
-  private SparkClosedLoopController elevatorClosedLoopController =
-      leaderMotor.getClosedLoopController();
+  private SparkClosedLoopController elevatorClosedLoopController = leaderMotor.getClosedLoopController();
   private RelativeEncoder leaderEncoder = leaderMotor.getEncoder();
 
-  private SparkMax followerMotor =
-      new SparkMax(ElevatorConstants.followerCanId, MotorType.kBrushless);
+  private SparkMax followerMotor = new SparkMax(ElevatorConstants.followerCanId, MotorType.kBrushless);
   private RelativeEncoder followerEncoder = followerMotor.getEncoder();
 
   private double elevatorCurrentTarget = 0.0;
@@ -54,10 +52,9 @@ public class ElevatorIOSpark implements ElevatorIO {
     inputs.setpoint = this.elevatorCurrentTarget;
     inputs.positionRotations = leaderEncoder.getPosition();
     inputs.velocityRPM = leaderEncoder.getVelocity();
-    inputs.elevatorHeightCalc =
-        Units.metersToInches(
-            (leaderEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
-                * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI));
+    inputs.elevatorHeightCalc = Units.metersToInches(
+        (leaderEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
+            * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI));
     inputs.appliedVolts = leaderMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = leaderMotor.getOutputCurrent();
     inputs.feedforwardOutput = elevatorCurrentArbFF;
@@ -67,8 +64,12 @@ public class ElevatorIOSpark implements ElevatorIO {
   }
 
   @Override
-  public void setPosition(double requestedPosition, double arbFF) {
-    if (arbFF >= 0 && arbFF <= 0.4) this.elevatorCurrentArbFF = arbFF;
+  public void setPosition(double requestedPosition) {
+    if (requestedPosition <= .01) {
+      this.elevatorCurrentArbFF = 0.0;
+    } else {
+      this.elevatorCurrentArbFF = ElevatorConstants.kElevatorKf;
+    }
     this.elevatorCurrentTarget = requestedPosition;
   }
 
@@ -85,12 +86,10 @@ public class ElevatorIOSpark implements ElevatorIO {
   }
 
   @Override
-  public void setPIDValues(
-      double kP, double kD, double kF, double VelocityMax, double AccelerationMax) {
+  public void setPIDValues(double kP, double kD, double VelocityMax, double AccelerationMax) {
     final SparkMaxConfig config = new SparkMaxConfig();
-    config
-        .closedLoop
-        .pidf(kP, 0.0, kD, kF)
+    config.closedLoop
+        .pidf(kP, 0.0, kD, 0.0)
         .maxMotion
         // Set MAXMotion parameters for position control
         .maxVelocity(VelocityMax)

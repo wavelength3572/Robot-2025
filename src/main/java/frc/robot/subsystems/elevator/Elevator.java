@@ -9,18 +9,17 @@ public class Elevator {
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-  private static final LoggedTunableNumber ElevatorPosInches =
-      new LoggedTunableNumber("Elevator/Goal", 0.0);
-  private static final LoggedTunableNumber ElevatorkP =
-      new LoggedTunableNumber("Elevator/kEp", ElevatorConstants.kElevatorKp);
-  private static final LoggedTunableNumber ElevatorkD =
-      new LoggedTunableNumber("Elevator/kEd", ElevatorConstants.kElevatorKd);
-  private static final LoggedTunableNumber ElevatorkF =
-      new LoggedTunableNumber("Elevator/kEf", ElevatorConstants.kElevatorKf);
-  private static final LoggedTunableNumber ElevatorVel =
-      new LoggedTunableNumber("Elevator/kEVel", ElevatorConstants.kElevatorVel);
-  private static final LoggedTunableNumber ElevatorAcc =
-      new LoggedTunableNumber("Elevator/kEAcc", ElevatorConstants.kElevatorAcc);
+  private static final LoggedTunableNumber ElevatorPosInches = new LoggedTunableNumber("Elevator/Goal", 0.0);
+  private static final LoggedTunableNumber ElevatorkP = new LoggedTunableNumber("Elevator/kEp",
+      ElevatorConstants.kElevatorKp);
+  private static final LoggedTunableNumber ElevatorkD = new LoggedTunableNumber("Elevator/kEd",
+      ElevatorConstants.kElevatorKd);
+  // private static final LoggedTunableNumber ElevatorkF = new LoggedTunableNumber("Elevator/kEf",
+  //     ElevatorConstants.kElevatorKf);
+  private static final LoggedTunableNumber ElevatorVel = new LoggedTunableNumber("Elevator/kEVel",
+      ElevatorConstants.kElevatorVel);
+  private static final LoggedTunableNumber ElevatorAcc = new LoggedTunableNumber("Elevator/kEAcc",
+      ElevatorConstants.kElevatorAcc);
 
   public Elevator(ElevatorIO io) {
     this.io = io;
@@ -32,41 +31,43 @@ public class Elevator {
         || ElevatorVel.hasChanged(hashCode())
         || ElevatorAcc.hasChanged(hashCode())) {
       io.setPIDValues(
-          ElevatorkP.get(), ElevatorkD.get(), 0.0, ElevatorVel.get(), ElevatorAcc.get());
+          ElevatorkP.get(), ElevatorkD.get(), ElevatorVel.get(), ElevatorAcc.get());
     }
-    if (ElevatorPosInches.hasChanged(hashCode()) || ElevatorkF.hasChanged(hashCode())) {
-      setPosition(ElevatorPosInches.get(), ElevatorkF.get());
+    // if (ElevatorPosInches.hasChanged(hashCode()) ||
+    // ElevatorkF.hasChanged(hashCode())) {
+    // setPosition(ElevatorPosInches.get(), ElevatorkF.get());
+    // }
+    if (ElevatorPosInches.hasChanged(hashCode())) {
+        setPositionInches(ElevatorPosInches.get());
     }
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
   }
 
   public void setTargetPreset(CoralSystemPresets preset) {
-    // The preset Elevator Height is in inches but we set position in rotations but
-    // based in meters
-    double presetInMeters = Units.inchesToMeters(preset.getElevatorHeight());
-    double setRotations =
-        ElevatorConstants.kElevatorGearing
-            * (presetInMeters / (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI));
-    setPosition(setRotations, preset.getElevatorFF());
+    setPositionInches(preset.getElevatorHeight());
   }
 
   public void setPositionInches(Double requestedPosition) {
+    // Must convert Inches to meters because kElevatorDrumRadius is in Meters
     double requestedPositionInMeters = Units.inchesToMeters(requestedPosition);
 
-    double requestedPositionInRotations =
-        ElevatorConstants.kElevatorGearing
-            * (requestedPositionInMeters / (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI));
+    // For the requested height in meters, calculate the motor rotation position
+    double requestedPositionInRotations = ElevatorConstants.kElevatorGearing
+        * (requestedPositionInMeters / (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI));
 
-    io.setPosition(requestedPositionInRotations, ElevatorkF.get());
+    setPosition(requestedPositionInRotations);
   }
 
-  public void setPosition(Double requestedPosition, double requestedArbFF) {
-    double maxRotations =
-        ElevatorConstants.kElevatorGearing
-            * (ElevatorConstants.kMaxElevatorHeightMeters
-                / (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI));
-    if (requestedPosition <= maxRotations) io.setPosition(requestedPosition, requestedArbFF);
+  public void setPosition(Double requestedPosition) {
+    // The requested position is in motor rotations
+    // calulate the max motor rotation based on max elevator height
+    // So we don't exceed it
+    double maxRotations = ElevatorConstants.kElevatorGearing
+        * (ElevatorConstants.kMaxElevatorHeightMeters
+            / (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI));
+    if (requestedPosition <= maxRotations)
+      io.setPosition(requestedPosition);
   }
 
   public double getSetpointInInches() {
@@ -86,7 +87,6 @@ public class Elevator {
   }
 
   public boolean isAtGoal() {
-    return Math.abs(getHeightInInches() - getSetpointInInches())
-        < ElevatorConstants.kSetpointThresholdINCHES;
+    return Math.abs(getHeightInInches() - getSetpointInInches()) < ElevatorConstants.kSetpointThresholdINCHES;
   }
 }

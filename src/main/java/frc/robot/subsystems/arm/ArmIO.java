@@ -22,7 +22,7 @@ public interface ArmIO {
   /** Run open loop at the specified voltage. */
   public default void setVoltage(double volts) {}
 
-  public default void setTargetAngleDEG(double requestedPositionDEG, double arbFF) {}
+  public default void setTargetAngleDEG(double requestedPositionDEG) {}
 
   public default double getTargetAngleDEG() {
     return 0.0;

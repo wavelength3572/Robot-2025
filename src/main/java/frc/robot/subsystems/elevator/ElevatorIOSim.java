@@ -81,7 +81,7 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void setPosition(double requestedPosition, double arbFF) {
+  public void setPosition(double requestedPosition) {
     this.elevatorCurrentTarget = requestedPosition;
   }
 
@@ -93,11 +93,11 @@ public class ElevatorIOSim implements ElevatorIO {
 
   @Override
   public void setPIDValues(
-      double kP, double kD, double kF, double VelocityMax, double AccelerationMax) {
+      double kP, double kD, double VelocityMax, double AccelerationMax) {
     final SparkMaxConfig config = new SparkMaxConfig();
     config
         .closedLoop
-        .pidf(kP, 0.0, kD, kF)
+        .pidf(kP, 0.0, kD, 0.0)
         .maxMotion
         // Set MAXMotion parameters for position control
         .maxVelocity(VelocityMax)

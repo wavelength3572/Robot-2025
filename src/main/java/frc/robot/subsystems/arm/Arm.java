@@ -14,8 +14,8 @@ public class Arm {
       new LoggedTunableNumber("Arm/kEp", ArmConstants.kArmKp);
   private static final LoggedTunableNumber ArmkD =
       new LoggedTunableNumber("Arm/kEd", ArmConstants.kArmKd);
-  private static final LoggedTunableNumber ArmkF =
-      new LoggedTunableNumber("Arm/kEf", ArmConstants.kArmKf);
+  // private static final LoggedTunableNumber ArmkF =
+  //     new LoggedTunableNumber("Arm/kEf", ArmConstants.kArmKf);
   private static final LoggedTunableNumber ArmVel =
       new LoggedTunableNumber("Arm/kEVel", ArmConstants.kArmVel);
   private static final LoggedTunableNumber ArmAcc =
@@ -32,21 +32,24 @@ public class Arm {
         || ArmAcc.hasChanged(hashCode())) {
       io.setPIDValues(ArmkP.get(), ArmkD.get(), ArmVel.get(), ArmAcc.get());
     }
-    if (ArmPosDegrees.hasChanged(hashCode()) || ArmkF.hasChanged(hashCode())) {
-      setAngleDEG(ArmPosDegrees.get(), ArmkF.get());
+    // if (ArmPosDegrees.hasChanged(hashCode()) || ArmkF.hasChanged(hashCode())) {
+    //   setAngleDEG(ArmPosDegrees.get(), ArmkF.get());
+    // }
+    if (ArmPosDegrees.hasChanged(hashCode())) {
+      setAngleDEG(ArmPosDegrees.get());
     }
     io.updateInputs(inputs);
     Logger.processInputs("Arm", inputs);
   }
 
   public void setTargetPreset(CoralSystemPresets preset) {
-    setAngleDEG(preset.getArmAngle(), preset.getArmFF());
+    setAngleDEG(preset.getArmAngle());
   }
 
-  public void setAngleDEG(Double requestedPosition, double requestedArbFF) {
+  public void setAngleDEG(Double requestedPosition) {
     if (requestedPosition >= ArmConstants.armMinAngle
         && requestedPosition <= ArmConstants.armMaxAngle)
-      io.setTargetAngleDEG(requestedPosition, requestedArbFF);
+      io.setTargetAngleDEG(requestedPosition);
   }
 
   public double getCurrentAngleDEG() {

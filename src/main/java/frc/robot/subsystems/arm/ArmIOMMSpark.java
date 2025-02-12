@@ -23,7 +23,7 @@ public class ArmIOMMSpark implements ArmIO {
   private double armTargetEncoderRotations =
       ArmConstants.armStartAngle * ArmConstants.kArmGearing / 360.0;
 
-  private double armArbFF = 0.0;
+  // private double armArbFF = 0.0;
 
   public ArmIOMMSpark() {
     armMotor.configure(
@@ -40,12 +40,12 @@ public class ArmIOMMSpark implements ArmIO {
         armTargetEncoderRotations,
         ControlType.kMAXMotionPositionControl,
         ClosedLoopSlot.kSlot0,
-        this.armArbFF * Math.cos(Math.toRadians(inputs.currentAngleDEG)));
+        ArmConstants.kArmKf * Math.cos(Math.toRadians(inputs.currentAngleDEG)));
     inputs.targetAngleDEG = armTargetDEG;
     inputs.targetEncoderRotations = this.armTargetEncoderRotations;
     inputs.encoderRotations = armEncoder.getPosition();
-    inputs.armArbFF = this.armArbFF;
-    inputs.armArbFF_COS = this.armArbFF * Math.cos(Math.toRadians(inputs.currentAngleDEG));
+    inputs.armArbFF = ArmConstants.kArmKf;
+    inputs.armArbFF_COS = ArmConstants.kArmKf * Math.cos(Math.toRadians(inputs.currentAngleDEG));
     inputs.velocityRPM = armEncoder.getVelocity();
     inputs.appliedVolts = armMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = armMotor.getOutputCurrent();
@@ -57,10 +57,10 @@ public class ArmIOMMSpark implements ArmIO {
   }
 
   @Override
-  public void setTargetAngleDEG(double requestedPosition, double requestedArbFF) {
+  public void setTargetAngleDEG(double requestedPosition) {
     this.armTargetDEG = requestedPosition;
     this.armTargetEncoderRotations = this.armTargetDEG * ArmConstants.kArmGearing / 360.0;
-    if (requestedArbFF >= -0.21 && requestedArbFF <= 0.21) this.armArbFF = requestedArbFF;
+    // if (requestedArbFF >= -0.21 && requestedArbFF <= 0.21) this.armArbFF = requestedArbFF;
   }
 
   @Override
