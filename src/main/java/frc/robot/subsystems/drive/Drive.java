@@ -465,4 +465,12 @@ public class Drive extends SubsystemBase {
     // Combine translation and rotation into a Pose3d.
     return new Pose3d(translation3d, rotation3d);
   }
+
+  @AutoLogOutput(key = "Drive/CurrentSpeedMetersPerSec")
+  public double getCurrentSpeedMetersPerSec() {
+    // Get the current chassis speeds (these are measured from the modules).
+    ChassisSpeeds speeds = getChassisSpeeds();
+    // Compute the magnitude of the translational velocity.
+    return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+  }
 }

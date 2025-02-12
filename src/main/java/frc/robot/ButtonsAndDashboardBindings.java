@@ -54,7 +54,8 @@ public class ButtonsAndDashboardBindings {
             oi::getTranslateX,
             oi::getTranslateY,
             oi::getRotate,
-            coralSystem::isCoralInRobot));
+            coralSystem::isCoralInRobot,
+            coralSystem.getElevator()::getHeightInInches));
 
     SmartDashboard.putData(
         "Toggle Vision", Commands.runOnce(drive::toggleVision).ignoringDisable(true));
