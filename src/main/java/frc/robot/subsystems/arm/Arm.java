@@ -46,18 +46,19 @@ public class Arm {
   public void setAngleDEG(Double requestedPosition, double requestedArbFF) {
     if (requestedPosition >= ArmConstants.armMinAngle
         && requestedPosition <= ArmConstants.armMaxAngle)
-      io.setAngleDEG(requestedPosition, requestedArbFF);
+      io.setTargetAngleDEG(requestedPosition, requestedArbFF);
   }
 
-  public double getAngleDEG() {
-    return io.getAngleDEG();
+  public double getCurrentAngleDEG() {
+    return io.getCurrentArmDEG();
   }
 
-  public double getSetpointDEG() {
-    return inputs.targetAngleDEG;
+  public double getTargetAngleDEG() {
+    return io.getTargetAngleDEG();
   }
 
   public boolean isAtGoal() {
-    return Math.abs(getAngleDEG() - getSetpointDEG()) < ArmConstants.kSetpointThresholdDEG;
+    return Math.abs(getCurrentAngleDEG() - getTargetAngleDEG())
+        < ArmConstants.kSetpointThresholdDEG;
   }
 }

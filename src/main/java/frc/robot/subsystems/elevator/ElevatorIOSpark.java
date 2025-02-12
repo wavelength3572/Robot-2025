@@ -14,7 +14,8 @@ import edu.wpi.first.wpilibj.RobotController;
 
 public class ElevatorIOSpark implements ElevatorIO {
 
-  // Initialize elevator SPARK. We will use MAXMotion position control for the elevator, so we also
+  // Initialize elevator SPARK. We will use MAXMotion position control for the
+  // elevator, so we also
   // need to initialize the closed loop controller and encoder.
   private SparkMax leaderMotor = new SparkMax(ElevatorConstants.leaderCanId, MotorType.kBrushless);
   private SparkClosedLoopController elevatorClosedLoopController =
@@ -67,8 +68,7 @@ public class ElevatorIOSpark implements ElevatorIO {
 
   @Override
   public void setPosition(double requestedPosition, double arbFF) {
-    if (arbFF >=0 && arbFF <= 0.4)
-      this.elevatorCurrentArbFF = arbFF;
+    if (arbFF >= 0 && arbFF <= 0.4) this.elevatorCurrentArbFF = arbFF;
     this.elevatorCurrentTarget = requestedPosition;
   }
 
@@ -76,6 +76,12 @@ public class ElevatorIOSpark implements ElevatorIO {
   public double getHeightInMeters() {
     return (leaderEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
         * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI);
+  }
+
+  @Override
+  public double getSetpointInMeters() {
+    return (this.elevatorCurrentTarget * ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI)
+        / ElevatorConstants.kElevatorGearing;
   }
 
   @Override
