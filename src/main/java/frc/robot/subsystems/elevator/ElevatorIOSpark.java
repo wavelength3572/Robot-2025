@@ -18,10 +18,12 @@ public class ElevatorIOSpark implements ElevatorIO {
   // elevator, so we also
   // need to initialize the closed loop controller and encoder.
   private SparkMax leaderMotor = new SparkMax(ElevatorConstants.leaderCanId, MotorType.kBrushless);
-  private SparkClosedLoopController elevatorClosedLoopController = leaderMotor.getClosedLoopController();
+  private SparkClosedLoopController elevatorClosedLoopController =
+      leaderMotor.getClosedLoopController();
   private RelativeEncoder leaderEncoder = leaderMotor.getEncoder();
 
-  private SparkMax followerMotor = new SparkMax(ElevatorConstants.followerCanId, MotorType.kBrushless);
+  private SparkMax followerMotor =
+      new SparkMax(ElevatorConstants.followerCanId, MotorType.kBrushless);
   private RelativeEncoder followerEncoder = followerMotor.getEncoder();
 
   private double elevatorCurrentTarget = 0.0;
@@ -52,9 +54,10 @@ public class ElevatorIOSpark implements ElevatorIO {
     inputs.setpoint = this.elevatorCurrentTarget;
     inputs.positionRotations = leaderEncoder.getPosition();
     inputs.velocityRPM = leaderEncoder.getVelocity();
-    inputs.elevatorHeightCalc = Units.metersToInches(
-        (leaderEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
-            * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI));
+    inputs.elevatorHeightCalc =
+        Units.metersToInches(
+            (leaderEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
+                * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI));
     inputs.appliedVolts = leaderMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = leaderMotor.getOutputCurrent();
     inputs.feedforwardOutput = elevatorCurrentArbFF;
@@ -88,7 +91,8 @@ public class ElevatorIOSpark implements ElevatorIO {
   @Override
   public void setPIDValues(double kP, double kD, double VelocityMax, double AccelerationMax) {
     final SparkMaxConfig config = new SparkMaxConfig();
-    config.closedLoop
+    config
+        .closedLoop
         .pidf(kP, 0.0, kD, 0.0)
         .maxMotion
         // Set MAXMotion parameters for position control

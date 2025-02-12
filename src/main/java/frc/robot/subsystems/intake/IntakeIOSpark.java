@@ -49,7 +49,7 @@ public class IntakeIOSpark implements IntakeIO {
     inputs.appliedVolts = intakeMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = intakeMotor.getOutputCurrent();
     inputs.Arm_TBE = armEncoder.getPosition();
-    inputs.Arm_TBE_DEG = ArmConstants.armTBEOffset + ((1.0-inputs.Arm_TBE) * 120.0);
+    inputs.Arm_TBE_DEG = ArmConstants.armTBEOffset + ((1.0 - inputs.Arm_TBE) * 120.0);
     inputs.coralInRobot = haveCoral;
   }
 

@@ -92,8 +92,7 @@ public class ElevatorIOSim implements ElevatorIO {
   }
 
   @Override
-  public void setPIDValues(
-      double kP, double kD, double VelocityMax, double AccelerationMax) {
+  public void setPIDValues(double kP, double kD, double VelocityMax, double AccelerationMax) {
     final SparkMaxConfig config = new SparkMaxConfig();
     config
         .closedLoop

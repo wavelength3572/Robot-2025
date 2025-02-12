@@ -48,8 +48,7 @@ public class Arm {
 
   public void setAngleDEG(Double requestedPosition) {
     if (requestedPosition >= ArmConstants.armMinAngle
-        && requestedPosition <= ArmConstants.armMaxAngle)
-      io.setTargetAngleDEG(requestedPosition);
+        && requestedPosition <= ArmConstants.armMaxAngle) io.setTargetAngleDEG(requestedPosition);
   }
 
   public double getCurrentAngleDEG() {

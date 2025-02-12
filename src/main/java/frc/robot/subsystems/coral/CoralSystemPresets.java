@@ -19,10 +19,7 @@ public enum CoralSystemPresets {
   @Getter private final double armAngle;
   @Getter private final CoralState state;
 
-  CoralSystemPresets(
-      double elevatorHeightINCHES,
-      double armAngleDEGREES,
-      CoralState state) {
+  CoralSystemPresets(double elevatorHeightINCHES, double armAngleDEGREES, CoralState state) {
     this.elevatorHeight = elevatorHeightINCHES;
     this.armAngle = armAngleDEGREES;
     this.state = state;
