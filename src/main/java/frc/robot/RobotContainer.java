@@ -16,24 +16,19 @@ package frc.robot;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.LED.IndicatorLight;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIOMMSpark;
 import frc.robot.subsystems.arm.ArmIOVirtualSim;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.elevator.ElevatorIOVirtualSim;
 import frc.robot.subsystems.intake.Intake;
@@ -45,9 +40,6 @@ import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.Visualizer;
 import lombok.Getter;
-import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -65,21 +57,13 @@ public class RobotContainer {
   private final Intake intake;
   private final CoralSystem coralSystem;
   @Getter private Visualizer visualizer;
-
+  private final IndicatorLight indicatorLight;
   private OperatorInterface oi = new OperatorInterface() {};
-
-  // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
-
-  private LoggedMechanism2d scoringSystem = new LoggedMechanism2d(.8382, 2.0);
-  private LoggedMechanismRoot2d root = scoringSystem.getRoot("Base", 0.51, 0.0);
-  private LoggedMechanismLigament2d m_elevator =
-      root.append(
-          new LoggedMechanismLigament2d(
-              "Elevator", ElevatorConstants.kGroundToElevator, 90, 2, new Color8Bit(Color.kBlue)));
+  private LoggedDashboardChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -102,6 +86,12 @@ public class RobotContainer {
         arm = new Arm(new ArmIOMMSpark() {});
         intake = new Intake(new IntakeIOSpark() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
+        indicatorLight = new IndicatorLight();
+        indicatorLight.setupLightingSuppliers(
+            coralSystem::getCurrentCoralPreset,
+            coralSystem.coralSystemPresetChooser::getSelected,
+            coralSystem::getTargetCoralPreset,
+            coralSystem::isCoralInRobot);
         break;
 
       case SIM:
@@ -126,6 +116,13 @@ public class RobotContainer {
         arm = new Arm(new ArmIOVirtualSim() {});
         intake = new Intake(new IntakeIOVirtualSim() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
+        indicatorLight = new IndicatorLight();
+        indicatorLight.setupLightingSuppliers(
+            coralSystem::getCurrentCoralPreset,
+            coralSystem.coralSystemPresetChooser::getSelected,
+            coralSystem::getTargetCoralPreset,
+            coralSystem::isCoralInRobot);
+
         break;
 
       default:
@@ -143,6 +140,7 @@ public class RobotContainer {
         arm = null;
         coralSystem = null;
         intake = null;
+        indicatorLight = null;
         break;
     }
 
@@ -157,49 +155,7 @@ public class RobotContainer {
       elevator.setPositionInches(0.0);
     }
 
-    SmartDashboard.putData(
-        "DriveToClosestLEFTPole",
-        DriveToCommands.driveToPole(
-            drive, // The Drive subsystem
-            true, // isLeftPole = true
-            () -> 0.0, // Default X joystick input (stationary for dashboard testing)
-            () -> 0.0, // Default Y joystick input
-            () -> 0.0, // Default rotation joystick input
-            FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
-
-    SmartDashboard.putData(
-        "DriveToClosestRIGHTPole",
-        DriveToCommands.driveToPole(
-            drive, // The Drive subsystem
-            false, // isLeftPole = false
-            () -> 0.0, // Default X joystick input (stationary for dashboard testing)
-            () -> 0.0, // Default Y joystick input
-            () -> 0.0, // Default rotation joystick input
-            FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
-
-    SmartDashboard.putData(
-        "Toggle Vision", Commands.runOnce(drive::toggleVision).ignoringDisable(true));
-
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-    // autoChooser = new LoggedDashboardChooser<>("Auto");
-
-    // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
+    SetupAutoChooser();
     updateOI();
   }
 
@@ -217,29 +173,31 @@ public class RobotContainer {
   public void normalModeOI() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     oi = OISelector.findOperatorInterface();
-
-    WLButtons.configureButtonBindings(oi, drive, coralSystem);
+    ButtonsAndDashboardBindings.configureBindings(oi, drive, coralSystem, indicatorLight);
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
 
-  public LoggedMechanism2d getElevator() {
-    // Update the Elevator 2D Mech
-    m_elevator.setLength(ElevatorConstants.kGroundToElevator + elevator.getHeightInMeters());
-    return scoringSystem;
+  public void SetupAutoChooser() {
+    // Set up auto routines
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+    // Set up SysId routines
+    autoChooser.addOption(
+        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    autoChooser.addOption(
+        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Forward)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 }

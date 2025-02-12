@@ -30,7 +30,7 @@
   "bumperOffsetY": 0.0,
   "robotFeatures": [
     "{\"name\":\"ArmAxle\",\"type\":\"line\",\"data\":{\"start\":{\"x\":0.0,\"y\":-0.042},\"end\":{\"x\":0.0,\"y\":-0.203},\"strokeWidth\":0.02}}",
-    "{\"name\":\"Arm\",\"type\":\"line\",\"data\":{\"start\":{\"x\":-0.464,\"y\":-0.203},\"end\":{\"x\":0.464,\"y\":-0.203},\"strokeWidth\":0.02}}",
-    "{\"name\":\"Elevator\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.0,\"y\":-0.089},\"size\":{\"width\":0.051,\"length\":0.495},\"borderRadius\":0.0,\"strokeWidth\":0.02,\"filled\":false}}"
+    "{\"name\":\"Elevator\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.0,\"y\":-0.089},\"size\":{\"width\":0.051,\"length\":0.495},\"borderRadius\":0.0,\"strokeWidth\":0.02,\"filled\":false}}",
+    "{\"name\":\"Arm2\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.0,\"y\":-0.189},\"size\":{\"width\":0.025,\"length\":1.0},\"borderRadius\":0.0,\"strokeWidth\":0.01,\"filled\":false}}"
   ]
 }

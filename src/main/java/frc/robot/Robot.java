@@ -124,8 +124,10 @@ public class Robot extends LoggedRobot {
     // Return to normal thread priority
     Threads.setCurrentThreadPriority(false, 10);
 
-    Logger.recordOutput("Scoring System", robotContainer.getElevator());
-    robotContainer.getVisualizer().updateVisualization();
+    if (robotContainer.getVisualizer() != null) {
+      robotContainer.getVisualizer().update3DVisualization();
+      robotContainer.getVisualizer().update2DVisualization();
+    }
   }
 
   /** This function is called once when the robot is disabled. */

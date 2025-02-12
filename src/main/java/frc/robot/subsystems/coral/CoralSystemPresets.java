@@ -10,8 +10,11 @@ public enum CoralSystemPresets {
   SCORE_LEVEL_2(21.0, 70, CoralState.L2_SCORE, 0.37, 0.0),
   SCORE_LEVEL_3(37, 70, CoralState.L3_SCORE, 0.37, 0.0),
   SCORE_LEVEL_4(65, 55, CoralState.L4_SCORE, 0.37, 0.0),
-  DISLODGE_LEVEL_1(23.6220, 45, CoralState.L1_DISLODGE, 0.37, 0.0),
-  DISLODGE_LEVEL_2(47.2440, 45, CoralState.L2_DISLODGE, 0.37, 0.0);
+  PREPARE_DISLODGE_LEVEL_1(15, 45, CoralState.PREP_L1_DISLODGE, 0.37, 0.0),
+  FINAL_DISLODGE_LEVEL_1(22, 110, CoralState.FINAL_L1_DISLODGE, 0.37, 0.0),
+  PREPARE_DISLODGE_LEVEL_2(25, 45, CoralState.PREP_L2_DISLODGE, 0.37, 0.0),
+  FINAL_DISLODGE_LEVEL_2(32, 110, CoralState.FINAL_L2_DISLODGE, 0.37, 0.0);
+
 
   @Getter private final double elevatorHeight;
   @Getter private final double armAngle;
@@ -40,7 +43,9 @@ public enum CoralSystemPresets {
     L2_SCORE,
     L3_SCORE,
     L4_SCORE,
-    L1_DISLODGE,
-    L2_DISLODGE
+    PREP_L1_DISLODGE,
+    FINAL_L1_DISLODGE,
+    PREP_L2_DISLODGE,
+    FINAL_L2_DISLODGE,
   }
 }

@@ -1,96 +1,98 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.LED.IndicatorLight;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AlignmentUtils;
 
-public class WLButtons {
+public class ButtonsAndDashboardBindings {
 
   private static OperatorInterface oi;
-  private static Drive WLDrive;
+  private static Drive drive;
   private static CoralSystem coralSystem;
+  private static IndicatorLight indicatorLight;
 
-  public WLButtons() {}
+  public ButtonsAndDashboardBindings() {}
 
   public static void configureTestModeButtonBindings(
       OperatorInterface operatorInterface, Drive drive) {
     oi = operatorInterface;
-    WLDrive = drive;
+    ButtonsAndDashboardBindings.drive = drive;
   }
 
   // Updated method signature to receive CoralSubsystem instead of Elevator.
-  public static void configureButtonBindings(
-      OperatorInterface operatorInterface, Drive drive, CoralSystem coralSystem) {
-    oi = operatorInterface;
-    WLDrive = drive;
-    WLButtons.coralSystem = coralSystem;
+  public static void configureBindings(
+      OperatorInterface operatorInterface,
+      Drive drive,
+      CoralSystem coralSystem,
+      IndicatorLight indicatorLight) {
+    ButtonsAndDashboardBindings.oi = operatorInterface;
+    ButtonsAndDashboardBindings.drive = drive;
+    ButtonsAndDashboardBindings.coralSystem = coralSystem;
+    ButtonsAndDashboardBindings.indicatorLight = indicatorLight;
 
-    WLDrive.setDriveModeNormal();
-    WLDrive.setDefaultCommand(
-        DriveCommands.joystickDrive(WLDrive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
+    drive.setDriveModeNormal();
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(drive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
 
-    configureDriverButtons();
+    configureDriverButtonBindings();
+    configureDashboardBindings();
   }
 
-  private static void configureDriverButtons() {
+  private static void configureDashboardBindings() {
 
-    // Gyro Reset
-    oi.getResetGyroButton()
-        .onTrue(Commands.runOnce(WLDrive::zeroGyroscope, WLDrive).ignoringDisable(true));
-
-    // Then create the toggle command
-    final Command toggleDriveModeCmd =
+    SmartDashboard.putData(
+        "Toggle Smart Drive",
         DriveCommands.toggleSmartDriveCmd(
-            WLDrive,
+            drive,
             oi::getTranslateX,
             oi::getTranslateY,
             oi::getRotate,
-            coralSystem::isCoralInRobot);
+            coralSystem::isCoralInRobot));
 
-    SmartDashboard.putData("Toggle Smart Drive", toggleDriveModeCmd);
+    SmartDashboard.putData(
+        "Toggle Vision", Commands.runOnce(drive::toggleVision).ignoringDisable(true));
 
-    oi.getRightJoyLeftButton()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  if (coralSystem.isCoralInRobot()) {
-                    // If there's coral in the robot, drive to a pole
-                    DriveToCommands.driveToPole(
-                            WLDrive,
-                            /* isLeftPole = */ true,
-                            oi::getTranslateX,
-                            oi::getTranslateY,
-                            oi::getRotate,
-                            FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE)
-                        .schedule();
-                  }
-                },
-                WLDrive));
+    SmartDashboard.putData(
+        "Closest A Pole",
+        DriveToCommands.driveToPole(
+            drive,
+            true,
+            oi::getTranslateX,
+            oi::getTranslateY,
+            oi::getRotate,
+            FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
+            coralSystem::isCoralInRobot));
 
-    oi.getRightJoyRightButton()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  if (coralSystem.isCoralInRobot()) {
-                    // If there's coral in the robot, drive to a pole
-                    DriveToCommands.driveToPole(
-                            WLDrive,
-                            false,
-                            oi::getTranslateX,
-                            oi::getTranslateY,
-                            oi::getRotate,
-                            FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE)
-                        .schedule();
-                  }
-                },
-                WLDrive));
+    SmartDashboard.putData(
+        "Closest B Pole",
+        DriveToCommands.driveToPole(
+            drive,
+            false,
+            oi::getTranslateX,
+            oi::getTranslateY,
+            oi::getRotate,
+            FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
+            coralSystem::isCoralInRobot));
 
+    SmartDashboard.putData(
+        "Drive to Dislodge", AlgaeCommands.driveToDislodge(drive, coralSystem, oi));
+    SmartDashboard.putData(
+        "Execute Dislodge Sequence", AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi));
+  }
+
+  private static void configureDriverButtonBindings() {
+    // Gyro Reset
+    oi.getResetGyroButton()
+        .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
+
+    // Simulate Coral in Robot
     if (oi.getButtonV().getAsBoolean()) {
       coralSystem.setCoralInRobot(true);
     } else coralSystem.setCoralInRobot(false);

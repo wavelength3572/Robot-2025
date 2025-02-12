@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -8,9 +9,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.subsystems.coral.CoralSystemPresets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -23,6 +27,7 @@ public final class FieldConstants {
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF = 2.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION = 2.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE = 2.0; // meters
+  public static final double THRESHOLD_DISTANCE_FOR_DISLODGE = 3.0; // meters
 
   public static Translation2d selectedCageTranslation = new Translation2d();
   // Assume these are your fixed cage positions defined somewhere (using WPILib's
@@ -413,4 +418,89 @@ public final class FieldConstants {
           "Coral0", new Pose3d(0.5, 1.0, 1.175, new Rotation3d(0, 0, 0)),
           "Coral1", new Pose3d(1.0, 1.5, 1.175, new Rotation3d(0, 0, 0)),
           "Coral2", new Pose3d(1.5, 2.0, 1.175, new Rotation3d(0, 0, 0)));
+
+  public static final Map<Integer, Pose2d> REEF_FACE_POSES_BLUE;
+  public static final Map<Integer, Pose2d> REEF_FACE_POSES_RED;
+
+  static {
+    // Compute Pose2d for blue reef faces using the front positions of each pole.
+    Map<Integer, Pose2d> bluePoses = new HashMap<>();
+    for (ReefFacesBlue face : ReefFacesBlue.values()) {
+      // Use the front translation from both poles.
+      Translation2d left = face.getLeftPole().getFrontTranslation();
+      Translation2d right = face.getRightPole().getFrontTranslation();
+      double midX = (left.getX() + right.getX()) / 2.0;
+      double midY = (left.getY() + right.getY()) / 2.0;
+      Translation2d midpoint = new Translation2d(midX, midY);
+
+      // Choose an orientation.
+      // For simplicity, we’ll pick the "front" orientation from our
+      // REEF_FACE_ORIENTATION_BLUE map.
+      Rotation2d[] possibleOrients = REEF_FACE_ORIENTATION_BLUE.get(face.getFaceId());
+      Rotation2d chosenRotation =
+          (possibleOrients != null && possibleOrients.length > 0)
+              ? possibleOrients[0] // Use the first one as the default "front" orientation.
+              : new Rotation2d(); // Fallback to 0 radians if none exists.
+
+      bluePoses.put(face.getFaceId(), new Pose2d(midpoint, chosenRotation));
+    }
+    REEF_FACE_POSES_BLUE = Collections.unmodifiableMap(bluePoses);
+
+    // For red reef faces, reflect the blue poses.
+    Map<Integer, Pose2d> redPoses = new HashMap<>();
+    for (Map.Entry<Integer, Pose2d> entry : REEF_FACE_POSES_BLUE.entrySet()) {
+      // Reflect the translation.
+      Translation2d blueTranslation = entry.getValue().getTranslation();
+      Translation2d redTranslation = reflectBlueToRed(blueTranslation);
+
+      // Get the corresponding red orientation from the REEF_FACE_ORIENTATION_RED map.
+      Rotation2d[] possibleRedOrients = REEF_FACE_ORIENTATION_RED.get(entry.getKey());
+      Rotation2d redRotation =
+          (possibleRedOrients != null && possibleRedOrients.length > 0)
+              ? possibleRedOrients[0]
+              : entry.getValue().getRotation();
+
+      redPoses.put(entry.getKey(), new Pose2d(redTranslation, redRotation));
+    }
+    REEF_FACE_POSES_RED = Collections.unmodifiableMap(redPoses);
+
+    // Log the blue reef face poses.
+    for (Map.Entry<Integer, Pose2d> entry : REEF_FACE_POSES_BLUE.entrySet()) {
+      Logger.recordOutput("REEF_FACE_POSES_BLUE/face_" + entry.getKey(), entry.getValue());
+    }
+    // Log the red reef face poses.
+    for (Map.Entry<Integer, Pose2d> entry : REEF_FACE_POSES_RED.entrySet()) {
+      Logger.recordOutput("REEF_FACE_POSES_RED/face_" + entry.getKey(), entry.getValue());
+    }
+  }
+
+  public static final Set<Integer> DISLODGE_L1_FACES_BLUE = Set.of(17, 19, 21);
+  public static final Set<Integer> DISLODGE_L2_FACES_BLUE = Set.of(18, 20, 22);
+
+  public static final Set<Integer> DISLODGE_L1_FACES_RED = Set.of(6, 8, 10);
+  public static final Set<Integer> DISLODGE_L2_FACES_RED = Set.of(7, 9, 11);
+
+  /**
+   * Returns the appropriate dislodge preset for a given reef face ID based on the current alliance.
+   *
+   * @param faceId The reef face ID.
+   * @return The dislodge preset to use, or null if no mapping is defined.
+   */
+  public static CoralSystemPresets getDislodgePresetForFace(int faceId) {
+    Alliance alliance = DriverStation.getAlliance().get();
+    if (alliance == Alliance.Blue) {
+      if (DISLODGE_L1_FACES_BLUE.contains(faceId)) {
+        return CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1;
+      } else if (DISLODGE_L2_FACES_BLUE.contains(faceId)) {
+        return CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2;
+      }
+    } else { // Alliance.Red
+      if (DISLODGE_L1_FACES_RED.contains(faceId)) {
+        return CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1;
+      } else if (DISLODGE_L2_FACES_RED.contains(faceId)) {
+        return CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2;
+      }
+    }
+    return null;
+  }
 }

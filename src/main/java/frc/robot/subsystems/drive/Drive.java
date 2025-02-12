@@ -27,7 +27,10 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -45,6 +48,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.FieldConstants;
+import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.AlignmentUtils;
 import frc.robot.util.AlignmentUtils.CageSelection;
 import frc.robot.util.AlignmentUtils.CoralStationSelection;
@@ -79,9 +83,10 @@ public class Drive extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
-  private ReefFaceSelection reefFaceSelection;
-  private CoralStationSelection coralStationSelection;
-  private CageSelection cageSelection;
+  @Getter private ReefFaceSelection reefFaceSelection;
+  @Getter private CoralStationSelection coralStationSelection;
+  @Getter private Pose2d algaeTargetPose;
+  @Getter private CageSelection cageSelection;
   @Getter private Boolean isVisionOn = true;
 
   public Drive(
@@ -136,26 +141,30 @@ public class Drive extends SubsystemBase {
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
 
-  public ReefFaceSelection getReefFaceSelection() {
-    return reefFaceSelection;
-  }
-
-  public CoralStationSelection getCoralStationSelection() {
-    return coralStationSelection;
-  }
-
-  public CageSelection getCageSelection() {
-    return cageSelection;
-  }
-
   @Override
   public void periodic() {
 
     Logger.recordOutput("isVisionOn", isVisionOn);
 
+    Pose3d robotPose3D = convertPose2dTo3d(getPose());
+
+    Logger.recordOutput(
+        "CamPoses/FrontRightCam", robotPose3D.transformBy(VisionConstants.robotToFrontRightCam));
+    Logger.recordOutput(
+        "CamPoses/BackRightCam", robotPose3D.transformBy(VisionConstants.robotToBackRightCam));
+    Logger.recordOutput(
+        "CamPoses/FrontElevatorCam",
+        robotPose3D.transformBy(VisionConstants.robotToElevatorFrontCam));
+    Logger.recordOutput(
+        "CamPoses/BackElevatorCam",
+        robotPose3D.transformBy(VisionConstants.robotToElevatorBackCam));
+
+    Logger.recordMetadata(getSubsystem(), getName());
+
     if (DriverStation.getAlliance().isPresent()) {
       reefFaceSelection = AlignmentUtils.findClosestReefFaceAndRejectOthers(getPose());
       coralStationSelection = AlignmentUtils.findClosestCoralStation(getPose());
+      algaeTargetPose = AlignmentUtils.getAlgaeRemovalTargetPose(getPose(), reefFaceSelection);
 
       if (FieldConstants.selectedCageTranslation != null)
         cageSelection =
@@ -427,5 +436,33 @@ public class Drive extends SubsystemBase {
 
   public void toggleVision() {
     isVisionOn = !isVisionOn;
+  }
+
+  /**
+   * Converts a 2D pose (Pose2d) into a 3D pose (Pose3d) by assuming: - The z-coordinate is 0. -
+   * Roll and pitch are 0. - Yaw comes directly from the Pose2d rotation.
+   *
+   * @param pose2d The 2D pose to convert.
+   * @return A Pose3d representing the same pose in 3D space.
+   */
+  public static Pose3d convertPose2dTo3d(Pose2d pose2d) {
+    // Create a 3D translation from the 2D translation; set z to 0.
+    Translation3d translation3d =
+        new Translation3d(
+            pose2d.getTranslation().getX(),
+            pose2d.getTranslation().getY(),
+            0.0 // z-coordinate on the ground
+            );
+
+    // Create a 3D rotation with roll and pitch set to 0, and yaw from the 2D rotation.
+    Rotation3d rotation3d =
+        new Rotation3d(
+            0.0, // roll
+            0.0, // pitch
+            pose2d.getRotation().getRadians() // yaw
+            );
+
+    // Combine translation and rotation into a Pose3d.
+    return new Pose3d(translation3d, rotation3d);
   }
 }

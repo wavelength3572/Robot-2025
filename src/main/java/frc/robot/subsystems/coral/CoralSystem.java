@@ -15,10 +15,9 @@ import org.littletonrobotics.junction.Logger;
 public class CoralSystem extends SubsystemBase {
 
   @Getter private Elevator elevator;
+  @Getter public final CoralSystemPresetChooser coralSystemPresetChooser;
   @Getter private Arm arm;
   @Getter private Intake intake;
-
-  @Getter private final CoralSystemPresetChooser coralSystemPresetChooser;
 
   @Getter public boolean coralInRobot;
 
@@ -26,12 +25,12 @@ public class CoralSystem extends SubsystemBase {
 
   @AutoLogOutput(key = "CoralSystem/targetCoralPreset")
   @Getter
-  private CoralSystemPresets targetCoralPreset =
+  public CoralSystemPresets targetCoralPreset =
       CoralSystemPresets.STARTUP; // Default startup position
 
   @AutoLogOutput(key = "CoralSystem/currentCoralPreset")
   @Getter
-  private CoralSystemPresets currentCoralPreset =
+  public CoralSystemPresets currentCoralPreset =
       CoralSystemPresets.STARTUP; // Tracks last reached preset
 
   private enum CoralSystemMovementState {
@@ -61,6 +60,7 @@ public class CoralSystem extends SubsystemBase {
 
     coralInRobot = this.intake.getCoralInRobot();
 
+    Logger.recordOutput("CoralSystem/CoralInRobot", coralInRobot);
     Logger.recordOutput("CoralSystem/ElevatorAtGoal", elevator.isAtGoal());
     Logger.recordOutput("CoralSystem/ArmAtGoal", arm.isAtGoal());
     Logger.recordOutput("CoralSystem/AtGoal", isAtGoal());

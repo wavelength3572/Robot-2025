@@ -387,4 +387,28 @@ public class AlignmentUtils {
       return rotationToCage;
     }
   }
+
+  public static Pose2d getAlgaeRemovalTargetPose(Pose2d robotPose, ReefFaceSelection selection) {
+    if (selection == null || selection.getAcceptedFaceId() == null) {
+      Logger.recordOutput("Alignment/AlgaeRemoval", "No valid reef face selection found");
+      return null;
+    }
+
+    int faceId = selection.getAcceptedFaceId();
+    Pose2d targetPose = null;
+
+    if (DriverStation.getAlliance().isPresent()
+        && DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+      targetPose = FieldConstants.REEF_FACE_POSES_BLUE.get(faceId);
+    } else {
+      targetPose = FieldConstants.REEF_FACE_POSES_RED.get(faceId);
+    }
+
+    // Optionally refine the orientation using the current heading.
+    FieldConstants.ReefChosenOrientation chosen = pickClosestOrientationForReef(robotPose, faceId);
+    Pose2d refinedTargetPose = new Pose2d(targetPose.getTranslation(), chosen.rotation2D());
+
+    Logger.recordOutput("Alignment/AlgaeRemoval", refinedTargetPose);
+    return refinedTargetPose;
+  }
 }
