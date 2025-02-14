@@ -73,7 +73,7 @@ public class Visualizer {
     algaeSystem2D = new LoggedMechanism2d(1.0, 1.0); // Separate system
 
     // Offset Algae Base to the side of the robot
-    algaeRoot = algaeSystem2D.getRoot("Algae Base", 1.0, 0.5); // X = 1.0 moves it to the right side
+    algaeRoot = algaeSystem2D.getRoot("Algae Base", 1.0, 0.1); // X = 1.0 moves it to the right side
 
     // Algae deploy arm visualization (now offset correctly)
     algaeDeployArm =
