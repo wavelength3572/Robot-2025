@@ -78,7 +78,6 @@ public interface AlgaeIO {
   public default void setAlgaeInRobot(boolean algaeInRobot) {}
 
   public default double getCurrentSpeedRPM() {
-      return 0.0;
+    return 0.0;
   }
-  
 }

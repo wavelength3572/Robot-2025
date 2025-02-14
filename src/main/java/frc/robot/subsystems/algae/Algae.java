@@ -1,8 +1,9 @@
 package frc.robot.subsystems.algae;
 
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
-public class Algae {
+public class Algae extends SubsystemBase {
   private final AlgaeIO io;
   private final AlgaeIOInputsAutoLogged inputs = new AlgaeIOInputsAutoLogged();
 
@@ -51,5 +52,13 @@ public class Algae {
     return io.getCurrentSpeedRPM();
   }
 
+  /** Sets the target deploy arm angle in degrees */
+  public void setTargetAngleDEG(double angle) {
+    io.setTargetAngleDEG(angle);
+  }
 
+  /** Sets the intake/outtake motor speed */
+  public void setSpeed(double speed) {
+    io.setSpeed(speed);
+  }
 }

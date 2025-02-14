@@ -24,7 +24,6 @@ import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
 import frc.robot.subsystems.algae.Algae;
-import frc.robot.subsystems.algae.AlgaeIOSpark;
 import frc.robot.subsystems.algae.AlgaeIOVirtualSim;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIOMMSpark;
@@ -91,7 +90,8 @@ public class RobotContainer {
         arm = new Arm(new ArmIOMMSpark() {});
         intake = new Intake(new IntakeIOSpark() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
-        algae = new Algae(new AlgaeIOVirtualSim()); // THIS IS SIM FOR NOW SO I DONT BLOW SOMETHING UP
+        algae =
+            new Algae(new AlgaeIOVirtualSim()); // THIS IS SIM FOR NOW SO I DONT BLOW SOMETHING UP
         indicatorLight = new IndicatorLight();
         indicatorLight.setupLightingSuppliers(
             coralSystem::getCurrentCoralPreset,
@@ -160,8 +160,7 @@ public class RobotContainer {
             coralSystem::isCoralInRobot,
             algae::getAlgaeInRobot,
             algae::getCurrentAngleDEG,
-            algae::getCurrentSpeedRPM
-            );
+            algae::getCurrentSpeedRPM);
 
     if (elevator != null) {
       elevator.setTargetPreset(CoralSystemPresets.STARTUP);
@@ -189,7 +188,7 @@ public class RobotContainer {
   public void normalModeOI() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     oi = OISelector.findOperatorInterface();
-    ButtonsAndDashboardBindings.configureBindings(oi, drive, coralSystem, indicatorLight);
+    ButtonsAndDashboardBindings.configureBindings(oi, drive, coralSystem, algae, indicatorLight);
   }
 
   public Command getAutonomousCommand() {

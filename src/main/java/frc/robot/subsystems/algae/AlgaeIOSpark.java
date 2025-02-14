@@ -117,7 +117,7 @@ public class AlgaeIOSpark implements AlgaeIO {
   }
 
   @Override
-  public double getCurrentSpeedRPM(){
+  public double getCurrentSpeedRPM() {
     return algaeCaptureMotor.getEncoder().getVelocity();
   }
 }

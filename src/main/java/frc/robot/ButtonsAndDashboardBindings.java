@@ -7,6 +7,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
+import frc.robot.subsystems.algae.Algae;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AlignmentUtils;
@@ -17,6 +18,7 @@ public class ButtonsAndDashboardBindings {
   private static Drive drive;
   private static CoralSystem coralSystem;
   private static IndicatorLight indicatorLight;
+  private static Algae algae;
 
   public ButtonsAndDashboardBindings() {}
 
@@ -31,11 +33,13 @@ public class ButtonsAndDashboardBindings {
       OperatorInterface operatorInterface,
       Drive drive,
       CoralSystem coralSystem,
+      Algae algae,
       IndicatorLight indicatorLight) {
     ButtonsAndDashboardBindings.oi = operatorInterface;
     ButtonsAndDashboardBindings.drive = drive;
     ButtonsAndDashboardBindings.coralSystem = coralSystem;
     ButtonsAndDashboardBindings.indicatorLight = indicatorLight;
+    ButtonsAndDashboardBindings.algae = algae;
 
     drive.setDriveModeNormal();
     drive.setDefaultCommand(
@@ -85,6 +89,26 @@ public class ButtonsAndDashboardBindings {
     SmartDashboard.putData("Algae Alignment", AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
     SmartDashboard.putData(
         "Algae Dislodge", AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi));
+
+    // Algae Deploy Angle Control (Adjust arm angle)
+    SmartDashboard.putNumber("Set Algae Angle", 0.0); // Default to 0 degrees
+    SmartDashboard.putData(
+        "Apply Algae Angle",
+        Commands.runOnce(
+            () -> {
+              double angle = SmartDashboard.getNumber("Set Algae Angle", 0.0);
+              algae.setTargetAngleDEG(angle);
+            }));
+
+    // Algae Motor Speed Control (Adjust intake/outtake speed)
+    SmartDashboard.putNumber("Set Algae Speed", 0.0); // Default to 0 speed
+    SmartDashboard.putData(
+        "Apply Algae Speed",
+        Commands.runOnce(
+            () -> {
+              double speed = SmartDashboard.getNumber("Set Algae Speed", 0.0);
+              algae.setSpeed(speed);
+            }));
   }
 
   private static void configureDriverButtonBindings() {

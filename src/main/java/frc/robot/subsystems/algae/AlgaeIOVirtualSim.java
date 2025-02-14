@@ -67,7 +67,7 @@ public class AlgaeIOVirtualSim implements AlgaeIO {
   }
 
   @Override
-  public double getCurrentSpeedRPM(){
+  public double getCurrentSpeedRPM() {
     return requestedSpeed;
   }
 }

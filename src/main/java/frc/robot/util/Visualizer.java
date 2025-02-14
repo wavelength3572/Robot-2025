@@ -27,7 +27,7 @@ public class Visualizer {
   private final Supplier<Double> algaeCaptureSpeedSupplier;
 
   private LoggedMechanism2d coralSystem2D;
-  private LoggedMechanismRoot2d root;
+  private LoggedMechanismRoot2d coralRoot;
   private LoggedMechanismLigament2d m_elevator;
 
   private LoggedMechanism2d algaeSystem2D;
@@ -50,37 +50,42 @@ public class Visualizer {
     this.isAlgaeInRobotSupplier = isAlgaeInRobotSupplier;
     this.algaeDeployAngleSupplier = algaeDeployAngleSupplier;
     this.algaeCaptureSpeedSupplier = algaeCaptureSpeedSupplier;
-    initialize2DVisualization();
+    initializeCoral2DVisualization();
+    initializeAlgae2DVisualization();
   }
 
-  /** Initializes the 2D visualization for the robot's components */
-  public void initialize2DVisualization() {
+  /** Initializes the 2D visualization for the Coral system */
+  private void initializeCoral2DVisualization() {
     coralSystem2D = new LoggedMechanism2d(.8382, 2.0);
-    root = coralSystem2D.getRoot("Base", 0.51, 0.0);
+    coralRoot = coralSystem2D.getRoot("Coral Base", 0.51, 0.0);
+
     m_elevator =
-        root.append(
+        coralRoot.append(
             new LoggedMechanismLigament2d(
                 "Elevator",
                 ElevatorConstants.kGroundToElevator,
                 90,
                 2,
                 new Color8Bit(Color.kBlue)));
+  }
 
-    // Algae system visualization (separate)
+  private void initializeAlgae2DVisualization() {
     algaeSystem2D = new LoggedMechanism2d(1.0, 1.0); // Separate system
-    algaeRoot = algaeSystem2D.getRoot("Algae Base", 0.5, 0.5);
 
-    // Algae deploy arm visualization
+    // Offset Algae Base to the side of the robot
+    algaeRoot = algaeSystem2D.getRoot("Algae Base", 1.0, 0.5); // X = 1.0 moves it to the right side
+
+    // Algae deploy arm visualization (now offset correctly)
     algaeDeployArm =
         algaeRoot.append(
             new LoggedMechanismLigament2d(
                 "Algae Deploy Arm",
-                0.3, // Adjusted arm length
-                0, // Initial angle (will update)
+                0.3, // Arm length
+                0, // Initial angle
                 3,
                 new Color8Bit(Color.kGreen)));
 
-    // Algae capture motor (visual indicator for intake/outtake)
+    // Algae capture motor (indicator for intake/outtake)
     algaeCaptureMotor =
         algaeDeployArm.append(
             new LoggedMechanismLigament2d(
