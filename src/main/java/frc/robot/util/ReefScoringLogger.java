@@ -49,7 +49,7 @@ public class ReefScoringLogger {
   // Keep a static list of events if you want a global logger
   private static final List<ScoringEvent> events = new ArrayList<>();
 
-  // Track the previous value of “coral in robot” so we detect transitions
+  // Track the previous value so we detect transitions
   private static boolean prevCoralInRobot = false;
 
   /**

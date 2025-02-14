@@ -23,6 +23,9 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
+import frc.robot.subsystems.algae.Algae;
+import frc.robot.subsystems.algae.AlgaeIOSpark;
+import frc.robot.subsystems.algae.AlgaeIOVirtualSim;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.ArmIOMMSpark;
 import frc.robot.subsystems.arm.ArmIOVirtualSim;
@@ -57,6 +60,7 @@ public class RobotContainer {
   private final Arm arm;
   private final Intake intake;
   @Getter private final CoralSystem coralSystem;
+  @Getter private final Algae algae;
   @Getter private Visualizer visualizer;
   private final IndicatorLight indicatorLight;
   private OperatorInterface oi = new OperatorInterface() {};
@@ -87,6 +91,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOMMSpark() {});
         intake = new Intake(new IntakeIOSpark() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
+        algae = new Algae(new AlgaeIOVirtualSim()); // THIS IS SIM FOR NOW SO I DONT BLOW SOMETHING UP
         indicatorLight = new IndicatorLight();
         indicatorLight.setupLightingSuppliers(
             coralSystem::getCurrentCoralPreset,
@@ -117,6 +122,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOVirtualSim() {});
         intake = new Intake(new IntakeIOVirtualSim() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
+        algae = new Algae(new AlgaeIOVirtualSim());
         indicatorLight = new IndicatorLight();
         indicatorLight.setupLightingSuppliers(
             coralSystem::getCurrentCoralPreset,
@@ -139,6 +145,7 @@ public class RobotContainer {
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         elevator = null;
         arm = null;
+        algae = null;
         coralSystem = null;
         intake = null;
         indicatorLight = null;
@@ -150,7 +157,11 @@ public class RobotContainer {
             drive::getPose,
             elevator::getHeightInMeters,
             arm::getCurrentAngleDEG,
-            coralSystem::isCoralInRobot);
+            coralSystem::isCoralInRobot,
+            algae::getAlgaeInRobot,
+            algae::getCurrentAngleDEG,
+            algae::getCurrentSpeedRPM
+            );
 
     if (elevator != null) {
       elevator.setTargetPreset(CoralSystemPresets.STARTUP);

@@ -21,20 +21,35 @@ public class Visualizer {
   private final Supplier<Double> elevatorHeightSupplier;
   private final Supplier<Double> armAngleSupplier;
   private final Supplier<Boolean> isCoralInRobotSupplier;
+  private final Supplier<Boolean> isAlgaeInRobotSupplier;
+
+  private final Supplier<Double> algaeDeployAngleSupplier;
+  private final Supplier<Double> algaeCaptureSpeedSupplier;
 
   private LoggedMechanism2d coralSystem2D;
   private LoggedMechanismRoot2d root;
   private LoggedMechanismLigament2d m_elevator;
 
+  private LoggedMechanism2d algaeSystem2D;
+  private LoggedMechanismRoot2d algaeRoot;
+  private LoggedMechanismLigament2d algaeDeployArm;
+  private LoggedMechanismLigament2d algaeCaptureMotor;
+
   public Visualizer(
       Supplier<Pose2d> robotPoseSupplier,
       Supplier<Double> elevatorHeightSupplier,
       Supplier<Double> armAngleSupplier,
-      Supplier<Boolean> isCoralInRobotSupplier) {
+      Supplier<Boolean> isCoralInRobotSupplier,
+      Supplier<Boolean> isAlgaeInRobotSupplier,
+      Supplier<Double> algaeDeployAngleSupplier,
+      Supplier<Double> algaeCaptureSpeedSupplier) {
     this.robotPoseSupplier = robotPoseSupplier;
     this.elevatorHeightSupplier = elevatorHeightSupplier;
     this.armAngleSupplier = armAngleSupplier;
     this.isCoralInRobotSupplier = isCoralInRobotSupplier;
+    this.isAlgaeInRobotSupplier = isAlgaeInRobotSupplier;
+    this.algaeDeployAngleSupplier = algaeDeployAngleSupplier;
+    this.algaeCaptureSpeedSupplier = algaeCaptureSpeedSupplier;
     initialize2DVisualization();
   }
 
@@ -50,6 +65,26 @@ public class Visualizer {
                 90,
                 2,
                 new Color8Bit(Color.kBlue)));
+
+    // Algae system visualization (separate)
+    algaeSystem2D = new LoggedMechanism2d(1.0, 1.0); // Separate system
+    algaeRoot = algaeSystem2D.getRoot("Algae Base", 0.5, 0.5);
+
+    // Algae deploy arm visualization
+    algaeDeployArm =
+        algaeRoot.append(
+            new LoggedMechanismLigament2d(
+                "Algae Deploy Arm",
+                0.3, // Adjusted arm length
+                0, // Initial angle (will update)
+                3,
+                new Color8Bit(Color.kGreen)));
+
+    // Algae capture motor (visual indicator for intake/outtake)
+    algaeCaptureMotor =
+        algaeDeployArm.append(
+            new LoggedMechanismLigament2d(
+                "Algae Capture Motor", 0.1, 0, 4, new Color8Bit(Color.kRed)));
   }
 
   /** Updates 3D visualization for the robot's components and game pieces */
@@ -81,6 +116,15 @@ public class Visualizer {
       Pose3d stagedCoralPose = new Pose3d(0.5, 1.0, -0.5, new Rotation3d(0, 0, 0)); // Match JSON
       Logger.recordOutput("Coral", new Pose3d());
     }
+
+    // if (isAlgaeInRobotSupplier.get()) {
+    //   // ✅ Move algae relative to the robot's 2D pose
+    //   Pose3d algaePiecePose = attachAlgaeToRobot(robotPose2d, algaePose);
+    //   Logger.recordOutput("Algae", algaePiecePose);
+    // } else {
+    //   // ✅ Restore algae to original staged position
+    //   Logger.recordOutput("Algae", new Pose3d());
+    // }
   }
 
   /** Computes and returns the 3D pose of the elevator for visualization */
@@ -131,6 +175,23 @@ public class Visualizer {
     double elevatorHeight = elevatorHeightSupplier.get();
     m_elevator.setLength(ElevatorConstants.kGroundToElevator + elevatorHeight);
 
+    double algaeDeployAngle = algaeDeployAngleSupplier.get();
+    double algaeCaptureSpeed = algaeCaptureSpeedSupplier.get();
+
+    // Update algae arm position
+    algaeDeployArm.setAngle(algaeDeployAngle);
+
+    // Change color of capture motor based on speed (indicating intake/outtake)
+    if (algaeCaptureSpeed > 0.1) {
+      algaeCaptureMotor.setColor(new Color8Bit(Color.kGreen)); // Intake
+    } else if (algaeCaptureSpeed < -0.1) {
+      algaeCaptureMotor.setColor(new Color8Bit(Color.kRed)); // Outtake
+    } else {
+      algaeCaptureMotor.setColor(new Color8Bit(Color.kGray)); // Idle
+    }
+
+    // ✅ Log the separate 2D visualizations
     Logger.recordOutput("Coral System 2D", coralSystem2D);
+    Logger.recordOutput("Algae System 2D", algaeSystem2D);
   }
 }
