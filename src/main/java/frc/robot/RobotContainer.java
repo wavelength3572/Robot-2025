@@ -39,6 +39,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.PathPlannerCommands;
 import frc.robot.util.Visualizer;
 import lombok.Getter;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -160,6 +161,7 @@ public class RobotContainer {
       arm.setTargetPreset(CoralSystemPresets.STARTUP);
     }
 
+    PathPlannerCommands.Setup(coralSystem);
     SetupAutoChooser();
     updateOI();
   }
