@@ -137,5 +137,27 @@ public class ButtonsAndDashboardBindings {
     oi.getButtonGPosition0().onTrue(Commands.runOnce(AlignmentUtils::setLeftCage));
     oi.getButtonGPosition1().onTrue(Commands.runOnce(AlignmentUtils::setMidCage));
     oi.getButtonGPosition2().onTrue(Commands.runOnce(AlignmentUtils::setRightCage));
+
+    oi.getRightJoyLeftButton()
+        .onTrue(
+            DriveToCommands.driveToPole(
+                drive,
+                true,
+                oi::getTranslateX,
+                oi::getTranslateY,
+                oi::getRotate,
+                FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
+                coralSystem::isCoralInRobot));
+
+    oi.getRightJoyRightButton()
+        .onTrue(
+            DriveToCommands.driveToPole(
+                drive,
+                false,
+                oi::getTranslateX,
+                oi::getTranslateY,
+                oi::getRotate,
+                FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
+                coralSystem::isCoralInRobot));
   }
 }

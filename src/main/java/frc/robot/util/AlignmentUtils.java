@@ -9,7 +9,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.FieldConstants;
 import frc.robot.FieldConstants.CageTarget;
 import frc.robot.FieldConstants.ReefChosenOrientation;
+import frc.robot.FieldConstants.ReefFacesBlue;
+import frc.robot.FieldConstants.ReefFacesRed;
 import frc.robot.FieldConstants.StationChosenOrientation;
+import frc.robot.util.AlignmentUtils.ReefFaceSelection.PolePosition;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +27,11 @@ public class AlignmentUtils {
     private final Translation2d acceptedFace;
     private final double acceptedDistance;
     private final Translation2d[] rejectedFaces;
+
+    public enum PolePosition {
+      A_LEFT,
+      B_RIGHT
+    }
 
     public ReefFaceSelection(
         Integer acceptedFaceId,
@@ -410,5 +418,38 @@ public class AlignmentUtils {
 
     Logger.recordOutput("Alignment/AlgaeRemoval", refinedTargetPose);
     return refinedTargetPose;
+  }
+
+  public static PolePosition findPolePosition(int faceId, Pose2d robotPose) {
+    // Check alliance color to determine which reef data to use
+    DriverStation.Alliance alliance = DriverStation.getAlliance().get();
+
+    Translation2d leftPoleTrans;
+    Translation2d rightPoleTrans;
+
+    if (alliance == DriverStation.Alliance.Blue) {
+      ReefFacesBlue faceEnum = ReefFacesBlue.fromId(faceId);
+      if (faceEnum == null) {
+        return PolePosition.A_LEFT; // Default
+      }
+      leftPoleTrans = faceEnum.getLeftPole().getFrontTranslation();
+      rightPoleTrans = faceEnum.getRightPole().getFrontTranslation();
+
+    } else if (alliance == DriverStation.Alliance.Red) {
+      ReefFacesRed faceEnum = ReefFacesRed.fromId(faceId);
+      if (faceEnum == null) {
+        return PolePosition.A_LEFT;
+      }
+      leftPoleTrans = faceEnum.getLeftPole().getFrontTranslation();
+      rightPoleTrans = faceEnum.getRightPole().getFrontTranslation();
+
+    } else {
+      return PolePosition.A_LEFT; // Default if no alliance
+    }
+
+    double distLeft = robotPose.getTranslation().getDistance(leftPoleTrans);
+    double distRight = robotPose.getTranslation().getDistance(rightPoleTrans);
+
+    return (distLeft <= distRight) ? PolePosition.A_LEFT : PolePosition.B_RIGHT;
   }
 }

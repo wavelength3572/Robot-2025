@@ -56,7 +56,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Arm arm;
   private final Intake intake;
-  private final CoralSystem coralSystem;
+  @Getter private final CoralSystem coralSystem;
   @Getter private Visualizer visualizer;
   private final IndicatorLight indicatorLight;
   private OperatorInterface oi = new OperatorInterface() {};
