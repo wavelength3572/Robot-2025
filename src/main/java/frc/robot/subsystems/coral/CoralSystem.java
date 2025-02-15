@@ -109,8 +109,7 @@ public class CoralSystem extends SubsystemBase {
         break;
     }
 
-
-    //check the score timer and stop the intake if its greater than a score time threshold
+    // check the score timer and stop the intake if its greater than a score time threshold
   }
 
   public void setTargetPreset(CoralSystemPresets preset) {
@@ -145,12 +144,10 @@ public class CoralSystem extends SubsystemBase {
     return timeOfFlight.getRange();
   }
 
-  public void scoreCoral()
-  {
+  public void scoreCoral() {
     intake.pushCoral();
-    //set state to running coral
-    //start a timer
+    // set state to running coral
+    // start a timer
 
   }
-
 }

@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.NamedCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.Intake;
@@ -21,9 +21,7 @@ public class PickupCoralCommand extends Command {
   }
 
   @Override
-  public void execute() {
-
-  }
+  public void execute() {}
 
   @Override
   public boolean isFinished() {
