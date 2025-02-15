@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.coral.intake;
 
 public class IntakeConstants {
   public static final int canId = 20;

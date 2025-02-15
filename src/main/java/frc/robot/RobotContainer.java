@@ -24,22 +24,23 @@ import frc.robot.commands.PathPlannerCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
-import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.arm.ArmIOMMSpark;
-import frc.robot.subsystems.arm.ArmIOVirtualSim;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
+import frc.robot.subsystems.coral.arm.Arm;
+import frc.robot.subsystems.coral.arm.ArmIOMMSpark;
+import frc.robot.subsystems.coral.arm.ArmIOVirtualSim;
+import frc.robot.subsystems.coral.elevator.Elevator;
+import frc.robot.subsystems.coral.elevator.ElevatorIOSpark;
+import frc.robot.subsystems.coral.elevator.ElevatorIOVirtualSim;
+import frc.robot.subsystems.coral.intake.Intake;
+import frc.robot.subsystems.coral.intake.IntakeIOSpark;
+import frc.robot.subsystems.coral.intake.IntakeIOVirtualSim;
 import frc.robot.subsystems.drive.*;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIOSpark;
-import frc.robot.subsystems.elevator.ElevatorIOVirtualSim;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeIOSpark;
-import frc.robot.subsystems.intake.IntakeIOVirtualSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.RobotOdometry;
 import frc.robot.util.Visualizer;
 import lombok.Getter;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -160,6 +161,10 @@ public class RobotContainer {
     if (arm != null) {
       arm.setTargetPreset(CoralSystemPresets.STARTUP);
     }
+
+    RobotOdometry.initialize(
+        drive); // this lets us access the robot's pose from anywhere through a util class (e.g.,
+    // for the sim stuff)
 
     PathPlannerCommands.Setup(coralSystem);
     SetupAutoChooser();

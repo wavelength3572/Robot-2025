@@ -5,9 +5,11 @@ import com.playingwithfusion.TimeOfFlight.RangingMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.*;
-import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.coral.arm.Arm;
+import frc.robot.subsystems.coral.elevator.Elevator;
+import frc.robot.subsystems.coral.intake.Intake;
+import frc.robot.util.ReefScoringLogger;
+import frc.robot.util.RobotOdometry;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -60,6 +62,7 @@ public class CoralSystem extends SubsystemBase {
     this.intake.periodic();
 
     coralInRobot = this.intake.getCoralInRobot();
+    ReefScoringLogger.checkAndLogScoringEvent(RobotOdometry.getRobotPose(), this);
 
     Logger.recordOutput("CoralSystem/CoralInRobot", coralInRobot);
     Logger.recordOutput("CoralSystem/ElevatorAtGoal", elevator.isAtGoal());

@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -450,7 +451,8 @@ public final class FieldConstants {
     REEF_FACE_POSES_BLUE = Collections.unmodifiableMap(bluePoses);
 
     // ----- Build Red Reef Face Poses -----
-    // The mapping is: blue id 17 -> red id 6, 18 -> 7, 19 -> 8, 20 -> 9, 21 -> 10, 22 -> 11.
+    // The mapping is: blue id 17 -> red id 6, 18 -> 7, 19 -> 8, 20 -> 9, 21 -> 10,
+    // 22 -> 11.
     Map<Integer, Pose2d> redPoses = new HashMap<>();
     for (Map.Entry<Integer, Pose2d> entry : REEF_FACE_POSES_BLUE.entrySet()) {
       int blueFaceId = entry.getKey();
@@ -501,5 +503,129 @@ public final class FieldConstants {
       }
     }
     return null;
+  }
+
+  // ---------------- STAGED ALGAE POSITIONS ----------------
+  public static final Map<String, Translation3d> STAGED_ALGAE_POSITIONS;
+
+  static {
+    Map<String, Translation3d> algaePositions = new HashMap<>();
+
+    // These values are measured in Onshape (using a centered coordinate system).
+    // We immediately convert them to WPILib coordinates (where (0,0,0) is the bottom-left)
+
+    // Blue Side Staged Algae
+    algaePositions.put(
+        "ALGAE_1",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(7.555, 0.0, 0.497))); // Middle Snowcone Algae
+    algaePositions.put(
+        "ALGAE_2",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(3.945, 0.588, 1.313))); // Blue 6
+    algaePositions.put(
+        "ALGAE_3",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(4.624, 0.588, 0.909))); // Blue 5
+    algaePositions.put(
+        "ALGAE_4",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(3.605, 0.0, 0.909))); // Blue 4
+    algaePositions.put(
+        "ALGAE_5",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(4.624, -0.588, 0.909))); // Blue 2
+    algaePositions.put(
+        "ALGAE_6",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(3.945, -0.588, 1.313))); // Blue 3
+    algaePositions.put(
+        "ALGAE_7",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(4.964, 0.0, 1.313))); // Blue 1
+    algaePositions.put(
+        "ALGAE_8",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(7.555, 1.829, 0.497))); // Right Snowcone Algae
+    algaePositions.put(
+        "ALGAE_9",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(7.555, -1.829, 0.497))); // Left Snowcone Algae
+
+    // Red Side Staged Algae
+    algaePositions.put(
+        "ALGAE_10",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-7.555, 0.0, 0.497))); // Middle Snowcone Algae
+    algaePositions.put(
+        "ALGAE_11",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-7.555, -1.829, 0.497))); // Right Snowcone Algae
+    algaePositions.put(
+        "ALGAE_12",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-7.555, 1.829, 0.497))); // Left Snowcone Algae
+    algaePositions.put(
+        "ALGAE_13",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-4.964, 0.0, 1.313))); // Red 1
+    algaePositions.put(
+        "ALGAE_14",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-3.945, 0.588, 1.313))); // Red 3
+    algaePositions.put(
+        "ALGAE_15",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-4.624, 0.588, 0.909))); // Red 2
+    algaePositions.put(
+        "ALGAE_16",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-3.605, 0.0, 0.909))); // Red 4
+    algaePositions.put(
+        "ALGAE_18",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-3.945, -0.588, 1.313))); // Red 5
+    algaePositions.put(
+        "ALGAE_19",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-4.624, -0.588, 0.909))); // Red 6
+
+    STAGED_ALGAE_POSITIONS = Collections.unmodifiableMap(algaePositions);
+  }
+
+  /** Retrieves the original algae position from its name (in WPILib coordinates). */
+  public static Translation3d getStagedAlgaePosition(String algaeName) {
+    return STAGED_ALGAE_POSITIONS.getOrDefault(algaeName, new Translation3d(0, 0, 0));
+  }
+
+  /**
+   * Retrieves all staged algae positions as an array for logging (already in WPILib coordinates).
+   */
+  public static Translation3d[] getAllStagedAlgaePositions() {
+    return STAGED_ALGAE_POSITIONS.values().toArray(new Translation3d[0]);
+  }
+
+  /**
+   * Converts an Onshape-centered position (with (0,0,0) at the field center) to WPILib coordinates,
+   * where (0,0,0) is the bottom-left of the field.
+   *
+   * <p>This method assumes the field is 17.55m long and 8.05m wide.
+   */
+  public static Translation3d convertOnShapeOriginMeasurementToWPILibCoordinates(
+      Translation3d onshapePos) {
+    double fieldLength = 17.55; // Field length in meters
+    double fieldWidth = 8.05; // Field width in meters
+    double halfLength = fieldLength / 2.0; // Center of the field in X (approx. 8.775)
+    double halfWidth = fieldWidth / 2.0; // Center of the field in Y (approx. 4.025)
+
+    // Since the Onshape measurements are taken from a centered coordinate system,
+    // to convert to WPILib (bottom-left origin), add halfLength to the X value
+    // and halfWidth to the Y value, then invert the sign if necessary.
+    // Here we assume that increasing X in WPILib goes right, and increasing Y goes up.
+    return new Translation3d(
+        -onshapePos.getX() + halfLength,
+        -onshapePos.getY() + halfWidth,
+        onshapePos.getZ() // Z remains unchanged
+        );
   }
 }

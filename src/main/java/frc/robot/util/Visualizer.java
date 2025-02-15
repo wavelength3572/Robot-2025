@@ -4,11 +4,17 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import frc.robot.subsystems.elevator.ElevatorConstants;
+import frc.robot.FieldConstants;
+import frc.robot.subsystems.coral.CoralSystemPresets;
+import frc.robot.subsystems.coral.elevator.ElevatorConstants;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -77,10 +83,11 @@ public class Visualizer {
       Pose3d coralPose = attachCoralToRobot(robotPose2d, armCalibratedPose);
       Logger.recordOutput("Coral", coralPose);
     } else {
-      // ✅ Restore coral to its original staged position
-      Pose3d stagedCoralPose = new Pose3d(0.5, 1.0, -0.5, new Rotation3d(0, 0, 0)); // Match JSON
       Logger.recordOutput("Coral", new Pose3d());
     }
+
+    // 🔹 Log scored corals on the reef poles
+    logScoredCorals();
   }
 
   /** Computes and returns the 3D pose of the elevator for visualization */
@@ -132,5 +139,72 @@ public class Visualizer {
     m_elevator.setLength(ElevatorConstants.kGroundToElevator + elevatorHeight);
 
     Logger.recordOutput("Coral System 2D", coralSystem2D);
+  }
+
+  private void logScoredCorals() {
+    List<ReefScoringLogger.ScoringEvent> scoredCorals = ReefScoringLogger.getScoringEvents();
+    List<Pose3d> scoredCoralPoses = new ArrayList<>();
+
+    for (ReefScoringLogger.ScoringEvent event : scoredCorals) {
+      Pose3d coralPose = getScoredCoralPose(event);
+      if (coralPose != null) {
+        scoredCoralPoses.add(coralPose);
+      }
+    }
+
+    Logger.recordOutput("ScoredCorals", scoredCoralPoses.toArray(new Pose3d[0]));
+    Logger.recordOutput("Algae/StagedAlgae", FieldConstants.getAllStagedAlgaePositions());
+  }
+
+  private Pose3d getScoredCoralPose(ReefScoringLogger.ScoringEvent event) {
+    boolean isBlue = DriverStation.getAlliance().get() == DriverStation.Alliance.Blue;
+
+    // Get the reef face position
+    Translation2d reefFaceTranslation =
+        isBlue
+            ? FieldConstants.REEF_FACE_POSES_BLUE.get(event.faceId).getTranslation()
+            : FieldConstants.REEF_FACE_POSES_RED.get(event.faceId).getTranslation();
+
+    if (reefFaceTranslation == null) return null; // No valid reef face found
+
+    // Get the branch/pole position
+    Translation2d branchTranslation;
+    if (isBlue) {
+      FieldConstants.ReefFacesBlue face = FieldConstants.ReefFacesBlue.fromId(event.faceId);
+      branchTranslation =
+          (event.pole == AlignmentUtils.ReefFaceSelection.PolePosition.A_LEFT)
+              ? face.getLeftPole().getFrontTranslation()
+              : face.getRightPole().getFrontTranslation();
+    } else {
+      FieldConstants.ReefFacesRed face = FieldConstants.ReefFacesRed.fromId(event.faceId);
+      branchTranslation =
+          (event.pole == AlignmentUtils.ReefFaceSelection.PolePosition.A_LEFT)
+              ? face.getLeftPole().getFrontTranslation()
+              : face.getRightPole().getFrontTranslation();
+    }
+
+    if (branchTranslation == null) return null; // No branch found
+
+    // Convert branch translation to a 3D pose
+    return new Pose3d(
+        branchTranslation.getX(),
+        branchTranslation.getY(),
+        getPresetHeight(event.preset),
+        new Rotation3d(0, 0, 0)); // No rotation needed
+  }
+
+  private double getPresetHeight(CoralSystemPresets preset) {
+    switch (preset) {
+      case SCORE_LEVEL_1:
+        return 0.5; // Lower scoring height
+      case SCORE_LEVEL_2:
+        return 1.0; // Higher scoring height
+      case SCORE_LEVEL_3:
+        return 1.5; // Lower scoring height
+      case SCORE_LEVEL_4:
+        return 2.0; // Higher scoring height
+      default:
+        return 2.0; // Default midpoint height
+    }
   }
 }

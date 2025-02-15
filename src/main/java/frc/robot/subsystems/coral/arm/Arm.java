@@ -1,4 +1,4 @@
-package frc.robot.subsystems.arm;
+package frc.robot.subsystems.coral.arm;
 
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.util.LoggedTunableNumber;

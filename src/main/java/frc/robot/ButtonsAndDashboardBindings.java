@@ -92,11 +92,6 @@ public class ButtonsAndDashboardBindings {
     oi.getResetGyroButton()
         .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
 
-    // Simulate Coral in Robot
-    if (oi.getButtonV().getAsBoolean()) {
-      coralSystem.setCoralInRobot(true);
-    } else coralSystem.setCoralInRobot(false);
-
     oi.getButtonV()
         .onTrue(Commands.runOnce(() -> coralSystem.setCoralInRobot(true), coralSystem))
         .onFalse(Commands.runOnce(() -> coralSystem.setCoralInRobot(false), coralSystem));

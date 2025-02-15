@@ -1,7 +1,7 @@
 package frc.robot.commands.NamedCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.coral.intake.Intake;
 
 public class PickupCoralCommand extends Command {
 
