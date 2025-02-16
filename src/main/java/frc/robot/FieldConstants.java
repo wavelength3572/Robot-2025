@@ -512,7 +512,8 @@ public final class FieldConstants {
     Map<String, Translation3d> algaePositions = new HashMap<>();
 
     // These values are measured in Onshape (using a centered coordinate system).
-    // We immediately convert them to WPILib coordinates (where (0,0,0) is the bottom-left)
+    // We immediately convert them to WPILib coordinates (where (0,0,0) is the
+    // bottom-left)
 
     // Blue Side Staged Algae
     algaePositions.put(
@@ -621,7 +622,8 @@ public final class FieldConstants {
     // Since the Onshape measurements are taken from a centered coordinate system,
     // to convert to WPILib (bottom-left origin), add halfLength to the X value
     // and halfWidth to the Y value, then invert the sign if necessary.
-    // Here we assume that increasing X in WPILib goes right, and increasing Y goes up.
+    // Here we assume that increasing X in WPILib goes right, and increasing Y goes
+    // up.
     return new Translation3d(
         -onshapePos.getX() + halfLength,
         -onshapePos.getY() + halfWidth,
