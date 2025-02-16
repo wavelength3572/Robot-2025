@@ -11,10 +11,10 @@ import frc.robot.subsystems.coral.CoralSystem;
 public class PathPlannerCommands {
   public static void Setup(CoralSystem coralSystem) {
     // Register our preset-commands so they finish atGoal
-    NamedCommands.registerCommand("L4", new RunPresetCommand(coralSystem, SCORE_LEVEL_4));
-    NamedCommands.registerCommand("L3", new RunPresetCommand(coralSystem, SCORE_LEVEL_3));
-    NamedCommands.registerCommand("L2", new RunPresetCommand(coralSystem, SCORE_LEVEL_2));
-    NamedCommands.registerCommand("L1", new RunPresetCommand(coralSystem, SCORE_LEVEL_1));
+    NamedCommands.registerCommand("L4", new RunPresetCommand(coralSystem, L4));
+    NamedCommands.registerCommand("L3", new RunPresetCommand(coralSystem, L3));
+    NamedCommands.registerCommand("L2", new RunPresetCommand(coralSystem, L2));
+    NamedCommands.registerCommand("L1", new RunPresetCommand(coralSystem, L1));
     NamedCommands.registerCommand("Stow", new RunPresetCommand(coralSystem, STOW));
     NamedCommands.registerCommand("Pickup", new RunPresetCommand(coralSystem, PICKUP));
 

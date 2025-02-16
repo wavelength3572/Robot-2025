@@ -40,7 +40,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.util.RobotOdometry;
+import frc.robot.util.RobotStatus;
 import frc.robot.util.Visualizer;
 import lombok.Getter;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -162,9 +162,8 @@ public class RobotContainer {
       arm.setTargetPreset(CoralSystemPresets.STARTUP);
     }
 
-    RobotOdometry.initialize(
-        drive); // this lets us access the robot's pose from anywhere through a util class (e.g.,
-    // for the sim stuff)
+    // give static access to currentPreset and robotPose
+    RobotStatus.initialize(drive, coralSystem);
 
     PathPlannerCommands.Setup(coralSystem);
     SetupAutoChooser();

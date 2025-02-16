@@ -8,8 +8,9 @@ import frc.robot.commands.*;
 import frc.robot.subsystems.coral.arm.Arm;
 import frc.robot.subsystems.coral.elevator.Elevator;
 import frc.robot.subsystems.coral.intake.Intake;
+import frc.robot.util.CoralRPStatusLogger;
 import frc.robot.util.ReefScoringLogger;
-import frc.robot.util.RobotOdometry;
+import frc.robot.util.RobotStatus;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -62,12 +63,14 @@ public class CoralSystem extends SubsystemBase {
     this.intake.periodic();
 
     coralInRobot = this.intake.getCoralInRobot();
-    ReefScoringLogger.checkAndLogScoringEvent(RobotOdometry.getRobotPose(), this);
+    ReefScoringLogger.checkAndLogScoringEvent(RobotStatus.getRobotPose(), this);
 
     Logger.recordOutput("CoralSystem/CoralInRobot", coralInRobot);
     Logger.recordOutput("CoralSystem/ElevatorAtGoal", elevator.isAtGoal());
     Logger.recordOutput("CoralSystem/ArmAtGoal", arm.isAtGoal());
     Logger.recordOutput("CoralSystem/AtGoal", isAtGoal());
+
+    CoralRPStatusLogger.logCoralStatus(false);
 
     switch (systemState) {
       case STABLE:
@@ -151,6 +154,5 @@ public class CoralSystem extends SubsystemBase {
     intake.pushCoral();
     // set state to running coral
     // start a timer
-
   }
 }

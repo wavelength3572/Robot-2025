@@ -471,6 +471,8 @@ public class Drive extends SubsystemBase {
     // Get the current chassis speeds (these are measured from the modules).
     ChassisSpeeds speeds = getChassisSpeeds();
     // Compute the magnitude of the translational velocity.
-    return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+    double speed = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+    // Round to one decimal place.
+    return Math.round(speed * 10.0) / 10.0;
   }
 }

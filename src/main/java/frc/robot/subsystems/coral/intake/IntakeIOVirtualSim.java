@@ -5,7 +5,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.FieldConstants;
-import frc.robot.util.RobotOdometry;
+import frc.robot.subsystems.coral.CoralSystemPresets;
+import frc.robot.util.RobotStatus;
 import java.util.Map;
 import java.util.Random;
 
@@ -46,7 +47,7 @@ public class IntakeIOVirtualSim implements IntakeIO {
 
     // Simulate pulling - checking if we're near the feeder station and waiting for the delay
     if (currentIntakeState == IntakeState.PULL) {
-      if (isNearCorrectFeeder()) {
+      if (isNearCorrectFeeder() && RobotStatus.getCurrentPreset() == CoralSystemPresets.PICKUP) {
         if (!pullTimerStarted) {
           // Start a random delay before we "receive" the coral
           randomPullDelay = MIN_FEED_TIME + (random.nextDouble() * (MAX_FEED_TIME - MIN_FEED_TIME));
@@ -108,7 +109,7 @@ public class IntakeIOVirtualSim implements IntakeIO {
   }
 
   private boolean isNearCorrectFeeder() {
-    Pose2d robotPose = RobotOdometry.getRobotPose();
+    Pose2d robotPose = RobotStatus.getRobotPose();
     Translation2d robotTranslation = robotPose.getTranslation();
 
     // Determine the correct set of feeder tags based on alliance color
