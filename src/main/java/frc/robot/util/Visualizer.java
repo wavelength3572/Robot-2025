@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.FieldConstants;
 import frc.robot.subsystems.coral.elevator.ElevatorConstants;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -110,20 +113,21 @@ public class Visualizer {
         armPose.plus(new Transform3d(0, 0, 0, new Rotation3d(0, Units.degreesToRadians(-90), 0)));
 
     // ✅ Log robot components (elevator + calibrated arm)
-    Logger.recordOutput("FinalComponentPoses", new Pose3d[] {elevatorPose, armCalibratedPose});
+    Logger.recordOutput(
+        "Visualizer/FinalComponentPoses", new Pose3d[] {elevatorPose, armCalibratedPose});
 
     if (isCoralInRobotSupplier.get()) {
       // ✅ Move coral relative to the robot's 2D pose, applying zeroed position &
       // rotations
       Pose3d coralPose = attachCoralToRobot(robotPose2d, armCalibratedPose);
-      Logger.recordOutput("Coral", coralPose);
+      Logger.recordOutput("Visualizer/CoralInRobotPose", coralPose);
     } else {
-      Logger.recordOutput("Coral", new Pose3d());
+      Logger.recordOutput("Visualizer/CoralInRobotPose", new Pose3d());
     }
 
     // 🔹 Log scored corals on the reef poles
-    // logScoredCorals();
-    Logger.recordOutput("Algae/StagedAlgae", FieldConstants.getAllStagedAlgaePositions());
+    logScoredCorals();
+    Logger.recordOutput("Visualizer/StagedAlgae", FieldConstants.getAllStagedAlgaePositions());
   }
 
   /** Computes and returns the 3D pose of the elevator for visualization */
@@ -190,7 +194,21 @@ public class Visualizer {
     }
 
     // ✅ Log the separate 2D visualizations
-    Logger.recordOutput("Coral System 2D", coralSystem2D);
-    Logger.recordOutput("Algae System 2D", algaeSystem2D);
+    Logger.recordOutput("Visualizer/Coral System 2D", coralSystem2D);
+    Logger.recordOutput("Visualizer/Algae System 2D", algaeSystem2D);
+  }
+
+  private void logScoredCorals() {
+    List<Pose3d> scoredCoralPoses = new ArrayList<>();
+
+    // Iterate over the coralMapping and collect poses that have been scored.
+    for (Map.Entry<FieldConstants.CoralKey, FieldConstants.CoralLocation> entry :
+        FieldConstants.coralMapping.entrySet()) {
+      if (entry.getValue().scored) {
+        scoredCoralPoses.add(entry.getValue().pose);
+      }
+    }
+
+    Logger.recordOutput("Visualizer/ScoredCorals", scoredCoralPoses.toArray(new Pose3d[0]));
   }
 }

@@ -94,19 +94,21 @@ public class ReefScoringLogger {
       if (FieldConstants.coralMapping.containsKey(key)) {
         FieldConstants.coralMapping.get(key).scored = true;
       } else {
-        Logger.recordOutput("ReefScoringLogger/Warning", "No coral mapping found for key: " + key);
+        Logger.recordOutput(
+            "Scoring/ReefScoringLogger/Warning", "No coral mapping found for key: " + key);
       }
 
       // 7) Log it to AdvantageKit
-      Logger.recordOutput("ReefScoringEvent/FaceID", faceId);
+      Logger.recordOutput("Scoring/ReefScoringEvent/FaceID", faceId);
       Logger.recordOutput(
-          "ReefScoringEvent/Pole", polePosition.name()); // Log as "A_LEFT" or "B_RIGHT"
-      Logger.recordOutput("ReefScoringEvent/ElevatorPreset", currentPreset.name());
-      Logger.recordOutput("ReefScoringEvent/MatchTime", matchTime);
-      Logger.recordOutput("ReefScoringEvent/RobotScoringPose", currentPose);
+          "Scoring/ReefScoringEvent/Pole", polePosition.name()); // Log as "A_LEFT" or "B_RIGHT"
+      Logger.recordOutput("Scoring/ReefScoringEvent/ElevatorPreset", currentPreset.name());
+      Logger.recordOutput("Scoring/ReefScoringEvent/MatchTime", matchTime);
+      Logger.recordOutput("Scoring/ReefScoringEvent/RobotScoringPose", currentPose);
 
       // 8) Log the entire event in a structured format
-      Logger.recordOutput("ReefScoringEvent/WholeEvent", event.toString()); // Logs as a string
+      Logger.recordOutput(
+          "Scoring/ReefScoringEvent/WholeEvent", event.toString()); // Logs as a string
     }
 
     // Update the previous state
@@ -116,5 +118,9 @@ public class ReefScoringLogger {
   /** If you want to retrieve the full list of scored events later on. */
   public static List<ScoringEvent> getScoringEvents() {
     return events;
+  }
+
+  public static void clearScoringEvents() {
+    events.clear();
   }
 }

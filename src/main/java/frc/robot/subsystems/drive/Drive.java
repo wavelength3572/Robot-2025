@@ -147,19 +147,21 @@ public class Drive extends SubsystemBase {
   @Override
   public void periodic() {
 
-    Logger.recordOutput("isVisionOn", isVisionOn);
+    Logger.recordOutput("Vision/isVisionOn", isVisionOn);
 
     Pose3d robotPose3D = convertPose2dTo3d(getPose());
 
     Logger.recordOutput(
-        "CamPoses/FrontRightCam", robotPose3D.transformBy(VisionConstants.robotToFrontRightCam));
+        "Vision/CamPoses/FrontRightCam",
+        robotPose3D.transformBy(VisionConstants.robotToFrontRightCam));
     Logger.recordOutput(
-        "CamPoses/BackRightCam", robotPose3D.transformBy(VisionConstants.robotToBackRightCam));
+        "Vision/CamPoses/BackRightCam",
+        robotPose3D.transformBy(VisionConstants.robotToBackRightCam));
     Logger.recordOutput(
-        "CamPoses/FrontElevatorCam",
+        "Vision/CamPoses/FrontElevatorCam",
         robotPose3D.transformBy(VisionConstants.robotToElevatorFrontCam));
     Logger.recordOutput(
-        "CamPoses/BackElevatorCam",
+        "Vision/CamPoses/BackElevatorCam",
         robotPose3D.transformBy(VisionConstants.robotToElevatorBackCam));
 
     Logger.recordMetadata(getSubsystem(), getName());

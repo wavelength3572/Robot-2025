@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.util.ReefScoringLogger;
 import java.util.HashMap;
 import java.util.Map;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -151,6 +152,14 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
     }
+
+    ReefScoringLogger.clearScoringEvents(); // Clears previous scoring data
+
+    if (Constants.currentMode == Constants.simMode) {
+      robotContainer
+          .getCoralSystem()
+          .setCoralInRobot(true); // Start with coral in robot during simulation
+    }
   }
 
   /** This function is called periodically during autonomous. */
@@ -167,7 +176,6 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    robotContainer.getDrive().setVisionOn();
   }
 
   /** This function is called periodically during operator control. */
@@ -190,9 +198,6 @@ public class Robot extends LoggedRobot {
   public void simulationInit() {
     DriverStationSim.setDsAttached(true);
     DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
-    robotContainer
-        .getCoralSystem()
-        .setCoralInRobot(true); // Start with coral in robot during simulation
   }
 
   /** This function is called periodically whilst in simulation. */

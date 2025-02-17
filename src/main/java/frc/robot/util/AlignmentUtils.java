@@ -1,6 +1,5 @@
 package frc.robot.util;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,9 +18,6 @@ import frc.robot.util.AlignmentUtils.ReefFaceSelection.PolePosition;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
-import lombok.NonNull;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -348,8 +344,10 @@ public class AlignmentUtils {
     // Here we assume a fixed z-height (for example, 0.5 meters).
     double zHeight = 0.5;
     Pose3d target3d = target.getCageOpeningPose3d(zHeight);
-    Logger.recordOutput("CageAlignmentTarget/Pose3d", target3d);
-    Logger.recordOutput("CageAlignmentTarget/TargetAngleDeg", Math.toDegrees(targetAngleRadians));
+    Logger.recordOutput("Alignment/CageAlignmentTarget/Pose3d", target3d);
+    Logger.recordOutput("Alignment/CageAlignmentTarget/Distance", distance);
+    Logger.recordOutput(
+        "Alignment/CageAlignmentTarget/TargetAngleDeg", Math.toDegrees(targetAngleRadians));
 
     return target;
   }
@@ -471,112 +469,5 @@ public class AlignmentUtils {
     double distRight = robotPose.getTranslation().getDistance(rightPoleTrans);
 
     return (distLeft <= distRight) ? PolePosition.A_LEFT : PolePosition.B_RIGHT;
-  }
-
-  public static double alignToReef(
-      Supplier<Pose2d> robotPoseSupplier,
-      Supplier<AlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
-      double reefDistanceThresholdMeters,
-      ProfiledPIDController angleController,
-      AtomicBoolean isManualOverride) {
-
-    AlignmentUtils.ReefFaceSelection selection = reefFaceSelectionSupplier.get();
-    if (selection != null
-        && selection.getAcceptedFaceId() != null
-        && selection.getAcceptedDistance() <= reefDistanceThresholdMeters) {
-
-      if (isManualOverride.get()) {
-        ReefChosenOrientation chosenOrientation =
-            AlignmentUtils.pickClosestOrientationForReef(
-                robotPoseSupplier.get(), selection.getAcceptedFaceId());
-        resetAngleController(angleController, robotPoseSupplier, chosenOrientation);
-        isManualOverride.set(false);
-      }
-
-      ReefChosenOrientation chosenOrientation =
-          AlignmentUtils.pickClosestOrientationForReef(
-              robotPoseSupplier.get(), selection.getAcceptedFaceId());
-
-      return angleController.calculate(
-          robotPoseSupplier.get().getRotation().getRadians(),
-          chosenOrientation.rotation2D().getRadians());
-    }
-
-    return 0.0;
-  }
-
-  public static double alignToCoralStation(
-      Supplier<Pose2d> robotPoseSupplier,
-      Supplier<AlignmentUtils.CoralStationSelection> stationSelectionSupplier,
-      ProfiledPIDController angleController,
-      AtomicBoolean isManualOverride) {
-
-    AlignmentUtils.CoralStationSelection stationSelection = stationSelectionSupplier.get();
-    // If we just switched from manual control, reset the angle controller.
-    if (isManualOverride.get()) {
-      StationChosenOrientation chosenOrientation =
-          AlignmentUtils.pickClosestOrientationForStation(
-              robotPoseSupplier.get(), stationSelection.getAcceptedStationId());
-      resetAngleController(angleController, robotPoseSupplier, chosenOrientation);
-      isManualOverride.set(false);
-    }
-
-    StationChosenOrientation chosenOrientation =
-        AlignmentUtils.pickClosestOrientationForStation(
-            robotPoseSupplier.get(), stationSelection.getAcceptedStationId());
-    Logger.recordOutput(
-        "Alignment/CoralStation/Omega", chosenOrientation.rotation2D().getDegrees());
-
-    return angleController.calculate(
-        robotPoseSupplier.get().getRotation().getRadians(),
-        chosenOrientation.rotation2D().getRadians());
-  }
-
-  private static void resetAngleController(
-      ProfiledPIDController angleController,
-      Supplier<Pose2d> robotPoseSupplier,
-      ReefChosenOrientation chosenOrientation) {
-
-    angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
-    angleController.setGoal(chosenOrientation.rotation2D().getRadians());
-  }
-
-  private static void resetAngleController(
-      ProfiledPIDController angleController,
-      Supplier<Pose2d> robotPoseSupplier,
-      StationChosenOrientation chosenOrientation) {
-
-    angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
-    angleController.setGoal(chosenOrientation.rotation2D().getRadians());
-  }
-
-  public static boolean nearCoralStation(
-      @NonNull Supplier<Pose2d> robotPoseSupplier,
-      @NonNull Supplier<AlignmentUtils.CoralStationSelection> stationSelectionSupplier,
-      double stationDistanceThresholdMeters) {
-
-    AlignmentUtils.CoralStationSelection stationSelection = stationSelectionSupplier.get();
-    // Check if we have a valid station selection within the threshold.
-    return stationSelection != null
-        && stationSelection.getAcceptedStationId() != null
-        && stationSelection.getAcceptedDistance() <= stationDistanceThresholdMeters;
-  }
-
-  private static boolean nearCage(
-      Pose2d climberTipPose,
-      @NonNull Supplier<AlignmentUtils.CageSelection> cageSelectionSupplier,
-      double cageDistanceThresholdMeters,
-      Supplier<Boolean> haveCoral) {
-
-    AlignmentUtils.CageSelection cageSelection = cageSelectionSupplier.get();
-    if (cageSelection == null) {
-      return false;
-    }
-
-    // Compute the distance from the climber tip to the cage target.
-    double distance =
-        climberTipPose.getTranslation().getDistance(cageSelection.getCageSelectionTranslation());
-
-    return (distance <= cageDistanceThresholdMeters && !haveCoral.get());
   }
 }

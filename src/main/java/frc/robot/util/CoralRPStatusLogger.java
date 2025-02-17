@@ -58,7 +58,7 @@ public class CoralRPStatusLogger {
       String label = LEVEL_LABELS.getOrDefault(preset, preset.name());
       // Example output: "High (L4): 3/5"
       String output = String.format("%s (%s): %d/%d", label, preset.name(), count, threshold);
-      Logger.recordOutput("CoralRPStatus/" + preset.name(), output);
+      Logger.recordOutput("Scoring/CoralRPStatus/" + preset.name(), output);
     }
   }
 }

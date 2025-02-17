@@ -145,7 +145,7 @@ public class CoralSystem extends SubsystemBase {
         && currentCoralPreset == targetCoralPreset;
   }
 
-  @AutoLogOutput(key = "TOF")
+  @AutoLogOutput(key = "CoralSystem/Rear TOF")
   public double getTimeOfFlightRange() {
     return timeOfFlight.getRange();
   }
