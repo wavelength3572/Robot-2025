@@ -1,21 +1,49 @@
 package frc.robot.subsystems.algae;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.coral.arm.ArmConstants;
+import frc.robot.util.LoggedTunableNumber;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Algae extends SubsystemBase {
   private final AlgaeIO io;
   private final AlgaeIOInputsAutoLogged inputs = new AlgaeIOInputsAutoLogged();
 
+  private static final LoggedTunableNumber AlgaekP = new LoggedTunableNumber("Algae/kEp",
+      AlgaeConstants.kAlgaeDeployKp);
+  private static final LoggedTunableNumber AlgaekD = new LoggedTunableNumber("Algae/kEd",
+      AlgaeConstants.kAlgaeDeployKd);
+  private static final LoggedTunableNumber AlgaeVel = new LoggedTunableNumber("Algae/kEVel",
+      AlgaeConstants.kAlgaeDeployVel);
+  private static final LoggedTunableNumber AlgaeAcc = new LoggedTunableNumber("Algae/kEAcc",
+      AlgaeConstants.kAlgaeDeployAcc);
+
   public Algae(AlgaeIO io) {
     this.io = io;
   }
 
   public void periodic() {
+    if (AlgaekP.hasChanged(hashCode())
+        || AlgaekD.hasChanged(hashCode())
+        || AlgaeVel.hasChanged(hashCode())
+        || AlgaeAcc.hasChanged(hashCode())) {
+      io.setPIDValues(AlgaekP.get(), AlgaekD.get(), AlgaeVel.get(), AlgaeAcc.get());
+    }   
+
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
   }
 
+  public boolean isAlgaeInRobot() {
+    return io.isAlgaeInRobot();
+  }
+
+  public void setAlgaeInRobot(boolean algaeInRobot) {
+    io.setAlgaeInRobot(algaeInRobot);
+  }
+
+  // Capture Motor Methods
   public void pushAlgae() {
     io.pushAlgae();
   }
@@ -28,6 +56,15 @@ public class Algae extends SubsystemBase {
     io.stop();
   }
 
+  public double getCurrentSpeedRPM() {
+    return io.getCurrentSpeedRPM();
+  }
+
+  public void setSpeed(double speed) {
+    io.setSpeed(speed);
+  }
+
+  // Deploy Motor Methods
   public void deployAlgae() {
     io.deployAlgae();
   }
@@ -36,29 +73,13 @@ public class Algae extends SubsystemBase {
     io.stowAlgae();
   }
 
-  public boolean getAlgaeInRobot() {
-    return io.getAlgaeInRobot();
+  public void setDeployPosition(double rotations) {
+    if (rotations >= AlgaeConstants.MIN_ROTATIONS && rotations <= AlgaeConstants.MAX_ROTATIONS) {
+      io.setDeployPosition(rotations);
+    }
   }
 
-  public void setAlgaeInRobot(boolean algaeInRobot) {
-    io.setAlgaeInRobot(algaeInRobot);
-  }
-
-  public double getCurrentAngleDEG() {
-    return io.getCurrentAngleDEG();
-  }
-
-  public double getCurrentSpeedRPM() {
-    return io.getCurrentSpeedRPM();
-  }
-
-  /** Sets the target deploy arm angle in degrees */
-  public void setTargetAngleDEG(double angle) {
-    io.setTargetAngleDEG(angle);
-  }
-
-  /** Sets the intake/outtake motor speed */
-  public void setSpeed(double speed) {
-    io.setSpeed(speed);
+  public double getDeployPosition() {
+    return io.getDeployPosition();
   }
 }

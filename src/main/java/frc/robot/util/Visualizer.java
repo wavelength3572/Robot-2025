@@ -9,6 +9,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.FieldConstants;
+import frc.robot.subsystems.algae.AlgaeConstants;
 import frc.robot.subsystems.coral.elevator.ElevatorConstants;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public class Visualizer {
   private final Supplier<Boolean> isCoralInRobotSupplier;
   private final Supplier<Boolean> isAlgaeInRobotSupplier;
 
-  private final Supplier<Double> algaeDeployAngleSupplier;
+  private final Supplier<Double> algaeDeployPositionSupplier;
   private final Supplier<Double> algaeCaptureSpeedSupplier;
 
   private LoggedMechanism2d coralSystem2D;
@@ -39,20 +40,22 @@ public class Visualizer {
   private LoggedMechanismLigament2d algaeDeployArm;
   private LoggedMechanismLigament2d algaeCaptureMotor;
 
+  private double visualDeployArmOffset = -90;
+
   public Visualizer(
       Supplier<Pose2d> robotPoseSupplier,
       Supplier<Double> elevatorHeightSupplier,
       Supplier<Double> armAngleSupplier,
       Supplier<Boolean> isCoralInRobotSupplier,
       Supplier<Boolean> isAlgaeInRobotSupplier,
-      Supplier<Double> algaeDeployAngleSupplier,
+      Supplier<Double> algaeDeployPositionSupplier,
       Supplier<Double> algaeCaptureSpeedSupplier) {
     this.robotPoseSupplier = robotPoseSupplier;
     this.elevatorHeightSupplier = elevatorHeightSupplier;
     this.armAngleSupplier = armAngleSupplier;
     this.isCoralInRobotSupplier = isCoralInRobotSupplier;
     this.isAlgaeInRobotSupplier = isAlgaeInRobotSupplier;
-    this.algaeDeployAngleSupplier = algaeDeployAngleSupplier;
+    this.algaeDeployPositionSupplier = algaeDeployPositionSupplier;
     this.algaeCaptureSpeedSupplier = algaeCaptureSpeedSupplier;
     initializeCoral2DVisualization();
     initializeAlgae2DVisualization();
@@ -85,7 +88,7 @@ public class Visualizer {
             new LoggedMechanismLigament2d(
                 "Algae Deploy Arm",
                 0.3, // Arm length
-                0, // Initial angle
+                visualDeployArmOffset, // Initial angle
                 3,
                 new Color8Bit(Color.kGreen)));
 
@@ -178,11 +181,16 @@ public class Visualizer {
     double elevatorHeight = elevatorHeightSupplier.get();
     m_elevator.setLength(ElevatorConstants.kGroundToElevator + elevatorHeight);
 
-    double algaeDeployAngle = algaeDeployAngleSupplier.get();
+    double algaeDeployPosition = algaeDeployPositionSupplier.get();
     double algaeCaptureSpeed = algaeCaptureSpeedSupplier.get();
 
     // Update algae arm position
-    algaeDeployArm.setAngle(algaeDeployAngle);
+
+    double gearRatio = AlgaeConstants.kAlgaeDeployGearing;
+    double rotations = algaeDeployPosition;
+    double angleDegrees = ((rotations / gearRatio) * 360.0) + visualDeployArmOffset;
+
+    algaeDeployArm.setAngle(-angleDegrees);
 
     // Change color of capture motor based on speed (indicating intake/outtake)
     if (algaeCaptureSpeed > 0.1) {

@@ -21,9 +21,7 @@ public class AlgaeIOSpark implements AlgaeIO {
       algaeDeployMotor.getClosedLoopController();
   private RelativeEncoder algaeDeployEncoder = algaeDeployMotor.getEncoder();
 
-  private double targetAngleDEG = AlgaeConstants.algaeStartAngle;
-  private double targetEncoderRotations =
-      AlgaeConstants.algaeStartAngle * AlgaeConstants.kAlgaeDeployGearing / 360.0;
+  private double targetEncoderRotations = 0.0;
 
   public AlgaeIOSpark() {
     algaeCaptureMotor.configure(
@@ -36,8 +34,7 @@ public class AlgaeIOSpark implements AlgaeIO {
         AlgaeConfigs.AlgaeSubsystem.algaeDeployConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
-    algaeDeployEncoder.setPosition(
-        AlgaeConstants.algaeStartAngle * AlgaeConstants.kAlgaeDeployGearing / 360.0);
+    algaeDeployEncoder.setPosition(0.0);
   }
 
   @Override
@@ -49,13 +46,9 @@ public class AlgaeIOSpark implements AlgaeIO {
         algaeCaptureMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.captureCurrentAmps = algaeCaptureMotor.getOutputCurrent();
 
-    // Convert encoder rotations to degrees
-    inputs.currentAngleDEG =
-        algaeDeployEncoder.getPosition() * 360.0 / AlgaeConstants.kAlgaeDeployGearing;
-
     // Compute feedforward torque compensation
-    double armFeedforward =
-        AlgaeConstants.kAlgaeDeployKf * Math.cos(Math.toRadians(inputs.currentAngleDEG));
+    // double armFeedforward =
+    //     AlgaeConstants.kAlgaeDeployKf * Math.cos(Math.toRadians(inputs.currentAngleDEG));
 
     // Closed-loop position control for deploy motor
     algaeDeployController.setReference(
@@ -66,30 +59,12 @@ public class AlgaeIOSpark implements AlgaeIO {
         );
 
     // Logging values
-    inputs.targetAngleDEG = targetAngleDEG;
     inputs.targetEncoderRotations = targetEncoderRotations;
     inputs.encoderRotations = algaeDeployEncoder.getPosition();
     inputs.armArbFF = AlgaeConstants.kAlgaeDeployKf;
-    inputs.armArbFF_COS = armFeedforward;
 
     // Game piece detection
     inputs.algaeInRobot = false; // Placeholder; add sensor logic if needed
-  }
-
-  @Override
-  public void setTargetAngleDEG(double requestedPosition) {
-    this.targetAngleDEG = requestedPosition;
-    this.targetEncoderRotations = this.targetAngleDEG * AlgaeConstants.kAlgaeDeployGearing / 360.0;
-  }
-
-  @Override
-  public double getTargetAngleDEG() {
-    return this.targetAngleDEG;
-  }
-
-  @Override
-  public double getCurrentAngleDEG() {
-    return algaeDeployEncoder.getPosition() * 360.0 / AlgaeConstants.kAlgaeDeployGearing;
   }
 
   @Override
@@ -101,23 +76,33 @@ public class AlgaeIOSpark implements AlgaeIO {
         .maxMotion
         .maxVelocity(VelocityMax)
         .maxAcceleration(AccelerationMax)
-        .allowedClosedLoopError(0.1);
+        .allowedClosedLoopError(AlgaeConstants.kAlgaeDeployAllowableError);
     algaeDeployMotor.configure(
         config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   @Override
   public void deployAlgae() {
-    setTargetAngleDEG(AlgaeConstants.algaeDeployPosition);
+    targetEncoderRotations = AlgaeConstants.algaeDeployPosition;
   }
 
   @Override
   public void stowAlgae() {
-    setTargetAngleDEG(AlgaeConstants.algaeStowPosition);
+    targetEncoderRotations = AlgaeConstants.algaeStowPosition;
   }
 
   @Override
   public double getCurrentSpeedRPM() {
     return algaeCaptureMotor.getEncoder().getVelocity();
+  }
+
+  @Override
+  public double getDeployPosition() {
+    return algaeDeployEncoder.getPosition();
+  }
+
+  @Override
+  public void setDeployPosition(double rotations) {
+    targetEncoderRotations = rotations;
   }
 }

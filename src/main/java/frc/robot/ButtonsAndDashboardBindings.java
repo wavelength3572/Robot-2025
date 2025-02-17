@@ -102,14 +102,17 @@ public class ButtonsAndDashboardBindings {
         Commands.runOnce(drive.getStrategyManager()::toggleAutoCageAlignmentMode));
 
     // Algae Deploy Angle Control (Adjust arm angle)
-    SmartDashboard.putNumber("Set Algae Angle", 0.0); // Default to 0 degrees
+    SmartDashboard.putNumber("Set Algae Rotation Target", 0.0); // Default to 0 degrees
     SmartDashboard.putData(
-        "Apply Algae Angle",
+        "Apply Algae Rotation Target",
         Commands.runOnce(
             () -> {
-              double angle = SmartDashboard.getNumber("Set Algae Angle", 0.0);
-              algae.setTargetAngleDEG(angle);
+              double rotations = SmartDashboard.getNumber("Set Algae Rotation Target", 0.0);
+              algae.setDeployPosition(rotations);
             }));
+
+    SmartDashboard.putData("Stow Algae", Commands.runOnce(algae::stowAlgae));
+    SmartDashboard.putData("Deploy Algae", Commands.runOnce(algae::deployAlgae));
 
     // Algae Motor Speed Control (Adjust intake/outtake speed)
     SmartDashboard.putNumber("Set Algae Speed", 0.0); // Default to 0 speed

@@ -25,6 +25,7 @@ import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
 import frc.robot.subsystems.algae.Algae;
+import frc.robot.subsystems.algae.AlgaeIOSpark;
 import frc.robot.subsystems.algae.AlgaeIOVirtualSim;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIOSpark;
@@ -96,8 +97,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOMMSpark() {});
         intake = new Intake(new IntakeIOSpark() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
-        algae =
-            new Algae(new AlgaeIOVirtualSim()); // THIS IS SIM FOR NOW SO I DONT BLOW SOMETHING UP
+        algae = new Algae(new AlgaeIOSpark());
         climber = new Climber(new ClimberIOSpark() {});
         indicatorLight = new IndicatorLight();
         indicatorLight.setupLightingSuppliers(
@@ -167,8 +167,8 @@ public class RobotContainer {
             elevator::getHeightInMeters,
             arm::getCurrentAngleDEG,
             coralSystem::isCoralInRobot,
-            algae::getAlgaeInRobot,
-            algae::getCurrentAngleDEG,
+            algae::isAlgaeInRobot,
+            algae::getDeployPosition,
             algae::getCurrentSpeedRPM);
 
     if (elevator != null) {

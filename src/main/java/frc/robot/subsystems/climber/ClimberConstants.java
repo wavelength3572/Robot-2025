@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class ClimberConstants {
-  public static final int canId = -1; // TODO: Placeholder
+  public static final int canId = 32; // TODO: Placeholder
   public static final int climberCurrentLimit = 50;
 
   // Define the climber tip offset relative to the robot's center
