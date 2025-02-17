@@ -190,6 +190,9 @@ public class Robot extends LoggedRobot {
   public void simulationInit() {
     DriverStationSim.setDsAttached(true);
     DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+    robotContainer
+        .getCoralSystem()
+        .setCoralInRobot(true); // Start with coral in robot during simulation
   }
 
   /** This function is called periodically whilst in simulation. */

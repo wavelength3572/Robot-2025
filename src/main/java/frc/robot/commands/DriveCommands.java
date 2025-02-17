@@ -29,9 +29,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.FieldConstants;
-import frc.robot.FieldConstants.ReefChosenOrientation;
-import frc.robot.FieldConstants.StationChosenOrientation;
+import frc.robot.alignment.AlignmentContext;
+import frc.robot.alignment.StrategyManager;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.AlignmentUtils;
@@ -39,10 +38,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -56,23 +53,6 @@ public class DriveCommands {
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
   private DriveCommands() {}
-
-  // DHS created method below to help us so that our top speed isn't higher when
-  // going diagonally
-  // private static Translation2d getLinearVelocityFromJoysticks(double x, double
-  // y) {
-  // // Apply deadband
-  // double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
-  // Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
-
-  // // Square magnitude for more precise control
-  // linearMagnitude = linearMagnitude * linearMagnitude;
-
-  // // Return new linear velocity
-  // return new Pose2d(new Translation2d(), linearDirection)
-  // .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
-  // .getTranslation();
-  // }
 
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     double rawMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
@@ -113,21 +93,7 @@ public class DriveCommands {
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
 
-          // Convert to field relative speeds & send command
-          ChassisSpeeds speeds =
-              new ChassisSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec());
-          boolean isFlipped =
-              DriverStation.getAlliance().isPresent()
-                  && DriverStation.getAlliance().get() == Alliance.Red;
-          drive.runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  speeds,
-                  isFlipped
-                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                      : drive.getRotation()));
+          sendSpeedsToDrive(drive, linearVelocity, omega);
         },
         drive);
   }
@@ -164,21 +130,7 @@ public class DriveCommands {
                   angleController.calculate(
                       drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
 
-              // Convert to field relative speeds & send command
-              ChassisSpeeds speeds =
-                  new ChassisSpeeds(
-                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                      omega);
-              boolean isFlipped =
-                  DriverStation.getAlliance().isPresent()
-                      && DriverStation.getAlliance().get() == Alliance.Red;
-              drive.runVelocity(
-                  ChassisSpeeds.fromFieldRelativeSpeeds(
-                      speeds,
-                      isFlipped
-                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                          : drive.getRotation()));
+              sendSpeedsToDrive(drive, linearVelocity, omega);
             },
             drive)
 
@@ -325,236 +277,13 @@ public class DriveCommands {
     double gyroDelta = 0.0;
   }
 
-  public static Command joystickSmartDrive(
-      Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier,
-      Supplier<Pose2d> robotPoseSupplier,
-      Supplier<AlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
-      double reefDistanceThresholdMeters,
-      Supplier<AlignmentUtils.CoralStationSelection> stationSelectionSupplier,
-      double stationDistanceThresholdMeters,
-      Supplier<AlignmentUtils.CageSelection> cageSelectionSupplier,
-      double cageDistanceThresholdMeters,
-      Supplier<Boolean> hasCoralSupplier,
-      DoubleSupplier elevatorHeightInchesSupplier) {
-
-    ProfiledPIDController angleController = createAngleController();
-    AtomicBoolean isManualOverride = new AtomicBoolean(false);
-
-    return Commands.run(
-            () -> {
-              Translation2d linearVelocity =
-                  getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-
-              // Get the elevator height and compute the speed multiplier.
-              double elevatorHeightInches = elevatorHeightInchesSupplier.getAsDouble();
-              double linearSpeedScalar = calculateSpeedMultiplier(elevatorHeightInches);
-              double rotationSpeedScalar = calculateRotationSpeedMultiplier(elevatorHeightInches);
-
-              // Scale the linear velocity by the multiplier.
-              Translation2d scaledLinearVelocity =
-                  new Translation2d(
-                      linearVelocity.getX() * linearSpeedScalar,
-                      linearVelocity.getY() * linearSpeedScalar);
-
-              double manualOmega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
-              double omega =
-                  determineOmega(
-                      drive,
-                      manualOmega,
-                      hasCoralSupplier.get(),
-                      robotPoseSupplier,
-                      reefFaceSelectionSupplier,
-                      reefDistanceThresholdMeters,
-                      stationSelectionSupplier,
-                      stationDistanceThresholdMeters,
-                      cageSelectionSupplier,
-                      cageDistanceThresholdMeters,
-                      angleController,
-                      isManualOverride);
-
-              // Apply rotational speed scaling.
-              double omegaScaled = omega * rotationSpeedScalar;
-
-              sendSpeedsToDrive(drive, scaledLinearVelocity, omegaScaled);
-            },
-            drive)
-        .beforeStarting(
-            () -> angleController.reset(robotPoseSupplier.get().getRotation().getRadians()));
-  }
-
-  private static ProfiledPIDController createAngleController() {
-    ProfiledPIDController controller =
-        new ProfiledPIDController(
-            ANGLE_KP,
-            0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    controller.enableContinuousInput(-Math.PI, Math.PI);
-    return controller;
-  }
-
-  private static double determineOmega(
-      Drive drive,
-      double manualOmega,
-      boolean hasCoral,
-      Supplier<Pose2d> robotPoseSupplier,
-      Supplier<AlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
-      double reefDistanceThresholdMeters,
-      Supplier<AlignmentUtils.CoralStationSelection> stationSelectionSupplier,
-      double stationDistanceThresholdMeters,
-      Supplier<AlignmentUtils.CageSelection> cageSelectionSupplier,
-      double cageDistanceThresholdMeters,
-      ProfiledPIDController angleController,
-      AtomicBoolean isManualOverride) {
-
-    if (Math.abs(manualOmega) > 0.0) {
-      isManualOverride.set(true);
-      return Math.copySign(manualOmega * manualOmega, manualOmega)
-          * drive.getMaxAngularSpeedRadPerSec();
-    }
-
-    if (hasCoral) {
-      return alignToReef(
-          robotPoseSupplier,
-          reefFaceSelectionSupplier,
-          reefDistanceThresholdMeters,
-          angleController,
-          isManualOverride);
-    }
-
-    return alignToCoralStationOrCage(
-        robotPoseSupplier,
-        stationSelectionSupplier,
-        stationDistanceThresholdMeters,
-        cageSelectionSupplier,
-        cageDistanceThresholdMeters,
-        angleController,
-        isManualOverride);
-  }
-
-  private static double alignToReef(
-      Supplier<Pose2d> robotPoseSupplier,
-      Supplier<AlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
-      double reefDistanceThresholdMeters,
-      ProfiledPIDController angleController,
-      AtomicBoolean isManualOverride) {
-
-    AlignmentUtils.ReefFaceSelection selection = reefFaceSelectionSupplier.get();
-    if (selection != null
-        && selection.getAcceptedFaceId() != null
-        && selection.getAcceptedDistance() <= reefDistanceThresholdMeters) {
-
-      if (isManualOverride.get()) {
-        ReefChosenOrientation chosenOrientation =
-            AlignmentUtils.pickClosestOrientationForReef(
-                robotPoseSupplier.get(), selection.getAcceptedFaceId());
-        resetAngleController(angleController, robotPoseSupplier, chosenOrientation);
-        isManualOverride.set(false);
-      }
-
-      ReefChosenOrientation chosenOrientation =
-          AlignmentUtils.pickClosestOrientationForReef(
-              robotPoseSupplier.get(), selection.getAcceptedFaceId());
-
-      return angleController.calculate(
-          robotPoseSupplier.get().getRotation().getRadians(),
-          chosenOrientation.rotation2D().getRadians());
-    }
-
-    return 0.0;
-  }
-
-  private static double alignToCoralStationOrCage(
-      Supplier<Pose2d> robotPoseSupplier,
-      Supplier<AlignmentUtils.CoralStationSelection> stationSelectionSupplier,
-      double stationDistanceThresholdMeters,
-      Supplier<AlignmentUtils.CageSelection> cageSelectionSupplier,
-      double cageDistanceThresholdMeters,
-      ProfiledPIDController angleController,
-      AtomicBoolean isManualOverride) {
-
-    AlignmentUtils.CoralStationSelection stationSelection = stationSelectionSupplier.get();
-    AlignmentUtils.CageSelection cageSelection = cageSelectionSupplier.get();
-
-    if (stationSelection != null
-        && stationSelection.getAcceptedStationId() != null
-        && stationSelection.getAcceptedDistance() <= stationDistanceThresholdMeters) {
-
-      if (isManualOverride.get()) {
-        StationChosenOrientation chosenOrientation =
-            AlignmentUtils.pickClosestOrientationForStation(
-                robotPoseSupplier.get(), stationSelection.getAcceptedStationId());
-        resetAngleController(angleController, robotPoseSupplier, chosenOrientation);
-        isManualOverride.set(false);
-      }
-
-      StationChosenOrientation chosenOrientation =
-          AlignmentUtils.pickClosestOrientationForStation(
-              robotPoseSupplier.get(), stationSelection.getAcceptedStationId());
-
-      Logger.recordOutput(
-          "Alignment/CoralStation/Omega", chosenOrientation.rotation2D().getDegrees());
-      return angleController.calculate(
-          robotPoseSupplier.get().getRotation().getRadians(),
-          chosenOrientation.rotation2D().getRadians());
-    }
-
-    // if (cageSelection != null
-    // && DriverStation.getAlliance().isPresent()
-    // && cageSelection.getDistanceToCage() <= cageDistanceThresholdMeters) {
-
-    // return angleController.calculate(
-    // robotPoseSupplier.get().getRotation().getRadians(),
-    // cageSelection.getRotationToCage().getRadians());
-    // }
-
-    return 0.0;
-  }
-
-  private static void resetAngleController(
-      ProfiledPIDController angleController,
-      Supplier<Pose2d> robotPoseSupplier,
-      ReefChosenOrientation chosenOrientation) {
-
-    angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
-    angleController.setGoal(chosenOrientation.rotation2D().getRadians());
-  }
-
-  private static void resetAngleController(
-      ProfiledPIDController angleController,
-      Supplier<Pose2d> robotPoseSupplier,
-      StationChosenOrientation chosenOrientation) {
-
-    angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
-    angleController.setGoal(chosenOrientation.rotation2D().getRadians());
-  }
-
-  private static void sendSpeedsToDrive(Drive drive, Translation2d linearVelocity, double omega) {
-    ChassisSpeeds speeds =
-        new ChassisSpeeds(
-            linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-            linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-            omega);
-
-    boolean isFlipped =
-        DriverStation.getAlliance().isPresent()
-            && DriverStation.getAlliance().get() == Alliance.Red;
-
-    drive.runVelocity(
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            speeds,
-            isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation()));
-  }
-
   public static InstantCommand toggleSmartDriveCmd(
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier,
-      Supplier<Boolean> hasCoralSupplier,
+      Supplier<Boolean> coralInRobotSupplier,
+      Supplier<Boolean> climberDeployedSupplier,
       DoubleSupplier elevatorHeightInchesSupplier) {
     return new InstantCommand(
         () -> {
@@ -565,70 +294,101 @@ public class DriveCommands {
           } else {
             drive.setDriveModeSmart();
             drive.setDefaultCommand(
-                DriveCommands.joystickSmartDrive(
+                JoystickAlignmentStrategyDrive(
                     drive,
                     xSupplier,
                     ySupplier,
                     omegaSupplier,
                     drive::getPose,
+                    elevatorHeightInchesSupplier,
+                    coralInRobotSupplier,
+                    climberDeployedSupplier,
                     drive::getReefFaceSelection,
-                    FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF,
                     drive::getCoralStationSelection,
-                    FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION,
-                    drive::getCageSelection,
-                    FieldConstants.THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE,
-                    hasCoralSupplier,
-                    elevatorHeightInchesSupplier));
+                    drive::getCageSelection));
           }
         },
         drive);
   }
 
-  private static double calculateSpeedMultiplier(double elevatorHeightInches) {
-    // Convert the elevator height from inches to meters.
-    double elevatorHeightMeters = elevatorHeightInches * 0.0254;
+  /** Creates a joystick-based drive command that integrates alignment strategies. */
+  public static Command JoystickAlignmentStrategyDrive(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier,
+      Supplier<Pose2d> robotPoseSupplier,
+      DoubleSupplier elevatorHeightInchesSupplier,
+      Supplier<Boolean> coralInRobotSupplier,
+      Supplier<Boolean> climberDeployedSupplier,
+      Supplier<AlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
+      Supplier<AlignmentUtils.CoralStationSelection> coralStationSelectionSupplier,
+      Supplier<AlignmentUtils.CageSelection> cageSelectionSupplier) {
 
-    // Define thresholds (in meters):
-    // 25 inches = 25 * 0.0254 ≈ 0.635 m (full speed)
-    // 50 inches = 50 * 0.0254 ≈ 1.27 m (minimum speed)
-    final double fullSpeedThreshold = 25 * 0.0254; // ≈ 0.635 meters
-    final double reducedSpeedThreshold = 50 * 0.0254; // ≈ 1.27 meters
-    final double minMultiplier = 0.2; // Minimum multiplier at maximum height
+    // Step 2: Get the StrategyManager to dynamically select alignment strat
+    StrategyManager strategyManager = drive.getStrategyManager();
 
-    if (elevatorHeightMeters <= fullSpeedThreshold) {
-      return 1.0;
-    } else if (elevatorHeightMeters >= reducedSpeedThreshold) {
-      return minMultiplier;
-    } else {
-      // Linearly interpolate between full speed (1.0) and minimum speed
-      // (minMultiplier)
-      double fraction =
-          (elevatorHeightMeters - fullSpeedThreshold)
-              / (reducedSpeedThreshold - fullSpeedThreshold);
-      return 1.0 - fraction * (1.0 - minMultiplier);
-    }
+    return Commands.run(
+        () -> {
+          // Step 1: Get joystick inputs
+          double rawX = xSupplier.getAsDouble();
+          double rawY = ySupplier.getAsDouble();
+          double rawOmega = omegaSupplier.getAsDouble();
+
+          // Convert joystick inputs to a field-relative translation
+          Translation2d rawTranslationInput = getLinearVelocityFromJoysticks(rawX, rawY);
+          double rawRotationInput = MathUtil.applyDeadband(rawOmega, DEADBAND);
+          rawRotationInput =
+              Math.copySign(
+                  rawRotationInput * rawRotationInput,
+                  rawRotationInput); // Squaring for finer control
+
+          // Step 2: Construct the AlignmentContext
+          AlignmentContext context =
+              new AlignmentContext(
+                  robotPoseSupplier.get(),
+                  coralInRobotSupplier.get(),
+                  elevatorHeightInchesSupplier.getAsDouble(),
+                  climberDeployedSupplier.get(),
+                  reefFaceSelectionSupplier.get(),
+                  coralStationSelectionSupplier.get(),
+                  cageSelectionSupplier.get());
+
+          // Step 3: Update alignment strategy
+          strategyManager.updateStrategyForCycle(context);
+
+          // Step 4: Apply corrections
+          double adjustedRotationInput =
+              strategyManager.getRotationalCorrection(context, rawRotationInput);
+          Translation2d adjustedTranslationInput =
+              strategyManager.getTranslationalCorrection(context, rawTranslationInput);
+
+          // Step 5: Send to drive system
+          sendSpeedsToDrive(drive, adjustedTranslationInput, adjustedRotationInput);
+        },
+        drive);
   }
 
-  private static double calculateRotationSpeedMultiplier(double elevatorHeightInches) {
-    // Convert the elevator height from inches to meters.
-    double elevatorHeightMeters = elevatorHeightInches * 0.0254;
-
-    // Define thresholds (in meters) for rotational speed:
-    // Below 25 inches (~0.635 m), full rotational speed is allowed.
-    // Above 50 inches (~1.27 m), use the minimum rotational speed.
-    final double fullSpeedThreshold = 25 * 0.0254; // ≈ 0.635 meters
-    final double reducedSpeedThreshold = 50 * 0.0254; // ≈ 1.27 meters
-    final double minRotationMultiplier = 0.5; // Adjust as needed
-
-    if (elevatorHeightMeters <= fullSpeedThreshold) {
-      return 1.0;
-    } else if (elevatorHeightMeters >= reducedSpeedThreshold) {
-      return minRotationMultiplier;
-    } else {
-      double fraction =
-          (elevatorHeightMeters - fullSpeedThreshold)
-              / (reducedSpeedThreshold - fullSpeedThreshold);
-      return 1.0 - fraction * (1.0 - minRotationMultiplier);
-    }
+  /**
+   * Sends the computed chassis speeds to the drive subsystem.
+   *
+   * @param drive The drive subsystem.
+   * @param translationInput The field-relative linear velocity.
+   * @param rotationInput The angular velocity.
+   */
+  private static void sendSpeedsToDrive(
+      Drive drive, Translation2d translationInput, double rotationInput) {
+    ChassisSpeeds speeds =
+        new ChassisSpeeds(
+            translationInput.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+            translationInput.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+            rotationInput * drive.getMaxAngularSpeedRadPerSec());
+    boolean isFlipped =
+        DriverStation.getAlliance().isPresent()
+            && DriverStation.getAlliance().get() == Alliance.Red;
+    drive.runVelocity(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            speeds,
+            isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation()));
   }
 }

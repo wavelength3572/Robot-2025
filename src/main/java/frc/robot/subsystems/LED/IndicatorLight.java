@@ -646,7 +646,9 @@ public class IndicatorLight extends SubsystemBase {
     }
 
     // When the selected preset is PICKUP, decide which effect to use based on coral presence.
-    if (selectedPreset != null && selectedPreset.equals(CoralSystemPresets.PICKUP)) {
+    if (selectedPreset != null
+        && selectedPreset.equals(CoralSystemPresets.PICKUP)
+        && currentPreset != CoralSystemPresets.PICKUP) {
       currentColor_GOAL = LED_EFFECTS.SEARCH_LIGHT;
       pickupBlinkTriggered = false;
       return;

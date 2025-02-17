@@ -20,25 +20,30 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.PathPlannerCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
-import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.arm.ArmIOMMSpark;
-import frc.robot.subsystems.arm.ArmIOVirtualSim;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIOSpark;
+import frc.robot.subsystems.climber.ClimberIOVirtualSim;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
+import frc.robot.subsystems.coral.arm.Arm;
+import frc.robot.subsystems.coral.arm.ArmIOMMSpark;
+import frc.robot.subsystems.coral.arm.ArmIOVirtualSim;
+import frc.robot.subsystems.coral.elevator.Elevator;
+import frc.robot.subsystems.coral.elevator.ElevatorIOSpark;
+import frc.robot.subsystems.coral.elevator.ElevatorIOVirtualSim;
+import frc.robot.subsystems.coral.intake.Intake;
+import frc.robot.subsystems.coral.intake.IntakeIOSpark;
+import frc.robot.subsystems.coral.intake.IntakeIOVirtualSim;
 import frc.robot.subsystems.drive.*;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIOSpark;
-import frc.robot.subsystems.elevator.ElevatorIOVirtualSim;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeIOSpark;
-import frc.robot.subsystems.intake.IntakeIOVirtualSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.RobotStatus;
 import frc.robot.util.Visualizer;
 import lombok.Getter;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -56,7 +61,8 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Arm arm;
   private final Intake intake;
-  private final CoralSystem coralSystem;
+  @Getter private Climber climber;
+  @Getter private final CoralSystem coralSystem;
   @Getter private Visualizer visualizer;
   private final IndicatorLight indicatorLight;
   private OperatorInterface oi = new OperatorInterface() {};
@@ -87,6 +93,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOMMSpark() {});
         intake = new Intake(new IntakeIOSpark() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
+        climber = new Climber(new ClimberIOSpark() {});
         indicatorLight = new IndicatorLight();
         indicatorLight.setupLightingSuppliers(
             coralSystem::getCurrentCoralPreset,
@@ -117,6 +124,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOVirtualSim() {});
         intake = new Intake(new IntakeIOVirtualSim() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
+        climber = new Climber(new ClimberIOVirtualSim() {});
         indicatorLight = new IndicatorLight();
         indicatorLight.setupLightingSuppliers(
             coralSystem::getCurrentCoralPreset,
@@ -141,6 +149,7 @@ public class RobotContainer {
         arm = null;
         coralSystem = null;
         intake = null;
+        climber = null;
         indicatorLight = null;
         break;
     }
@@ -160,6 +169,10 @@ public class RobotContainer {
       arm.setTargetPreset(CoralSystemPresets.STARTUP);
     }
 
+    // give static access to currentPreset and robotPose
+    RobotStatus.initialize(drive, coralSystem);
+
+    PathPlannerCommands.Setup(coralSystem);
     SetupAutoChooser();
     updateOI();
   }
@@ -178,7 +191,7 @@ public class RobotContainer {
   public void normalModeOI() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     oi = OISelector.findOperatorInterface();
-    ButtonsAndDashboardBindings.configureBindings(oi, drive, coralSystem, indicatorLight);
+    ButtonsAndDashboardBindings.configureBindings(oi, drive, coralSystem, climber, indicatorLight);
   }
 
   public Command getAutonomousCommand() {
