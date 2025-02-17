@@ -7,6 +7,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AlignmentUtils;
@@ -17,6 +18,7 @@ public class ButtonsAndDashboardBindings {
   private static Drive drive;
   private static CoralSystem coralSystem;
   private static IndicatorLight indicatorLight;
+  private static Climber climber;
 
   public ButtonsAndDashboardBindings() {}
 
@@ -31,11 +33,13 @@ public class ButtonsAndDashboardBindings {
       OperatorInterface operatorInterface,
       Drive drive,
       CoralSystem coralSystem,
+      Climber climber,
       IndicatorLight indicatorLight) {
     ButtonsAndDashboardBindings.oi = operatorInterface;
     ButtonsAndDashboardBindings.drive = drive;
     ButtonsAndDashboardBindings.coralSystem = coralSystem;
     ButtonsAndDashboardBindings.indicatorLight = indicatorLight;
+    ButtonsAndDashboardBindings.climber = climber;
 
     drive.setDriveModeNormal();
     drive.setDefaultCommand(
@@ -55,6 +59,7 @@ public class ButtonsAndDashboardBindings {
             oi::getTranslateY,
             oi::getRotate,
             coralSystem::isCoralInRobot,
+            climber::isClimberDeployed,
             coralSystem.getElevator()::getHeightInInches));
 
     SmartDashboard.putData(
@@ -85,6 +90,12 @@ public class ButtonsAndDashboardBindings {
     SmartDashboard.putData("Algae Alignment", AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
     SmartDashboard.putData(
         "Algae Dislodge", AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi));
+
+    SmartDashboard.putData("Deploy Climber", Commands.runOnce(climber::deployClimber));
+    SmartDashboard.putData("Stow Climber", Commands.runOnce(climber::stowClimber));
+    SmartDashboard.putData(
+        "Toggle Cage Alignment",
+        Commands.runOnce(drive.getStrategyManager()::toggleAutoCageAlignmentMode));
   }
 
   private static void configureDriverButtonBindings() {

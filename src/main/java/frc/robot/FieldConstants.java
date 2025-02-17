@@ -31,19 +31,19 @@ public final class FieldConstants {
   public static final double THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE = 3.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF = 2.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION = 2.0; // meters
-  public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE = 2.0; // meters
+  public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_CAGE_ASSIST = 1.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_DISLODGE = 3.0; // meters
 
   public static Translation2d selectedCageTranslation = new Translation2d();
   // Assume these are your fixed cage positions defined somewhere (using WPILib's
   // coordinates)
-  private static Translation2d BLUE_CAGE_LEFT = new Translation2d(8.72, 7.28);
-  private static Translation2d BLUE_CAGE_MID = new Translation2d(8.72, 6.14);
-  private static Translation2d BLUE_CAGE_RIGHT = new Translation2d(8.72, 5.09);
+  private static Translation2d BLUE_CAGE_LEFT = new Translation2d(8.56, 7.26);
+  private static Translation2d BLUE_CAGE_MID = new Translation2d(8.56, 6.18);
+  private static Translation2d BLUE_CAGE_RIGHT = new Translation2d(8.56, 5.07);
 
-  private static Translation2d RED_CAGE_LEFT = new Translation2d(8.72, 3.03);
-  private static Translation2d RED_CAGE_MID = new Translation2d(8.72, 1.83);
-  private static Translation2d RED_CAGE_RIGHT = new Translation2d(8.72, 0.78);
+  private static Translation2d RED_CAGE_LEFT = new Translation2d(9.0, 2.98);
+  private static Translation2d RED_CAGE_MID = new Translation2d(9.0, 1.87);
+  private static Translation2d RED_CAGE_RIGHT = new Translation2d(9.0, 0.78);
 
   public enum CageTarget {
     LEFT,

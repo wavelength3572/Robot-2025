@@ -24,6 +24,9 @@ import frc.robot.commands.PathPlannerCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIOSpark;
+import frc.robot.subsystems.climber.ClimberIOVirtualSim;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.coral.arm.Arm;
@@ -58,6 +61,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Arm arm;
   private final Intake intake;
+  @Getter private Climber climber;
   @Getter private final CoralSystem coralSystem;
   @Getter private Visualizer visualizer;
   private final IndicatorLight indicatorLight;
@@ -89,6 +93,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOMMSpark() {});
         intake = new Intake(new IntakeIOSpark() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
+        climber = new Climber(new ClimberIOSpark() {});
         indicatorLight = new IndicatorLight();
         indicatorLight.setupLightingSuppliers(
             coralSystem::getCurrentCoralPreset,
@@ -119,6 +124,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOVirtualSim() {});
         intake = new Intake(new IntakeIOVirtualSim() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
+        climber = new Climber(new ClimberIOVirtualSim() {});
         indicatorLight = new IndicatorLight();
         indicatorLight.setupLightingSuppliers(
             coralSystem::getCurrentCoralPreset,
@@ -143,6 +149,7 @@ public class RobotContainer {
         arm = null;
         coralSystem = null;
         intake = null;
+        climber = null;
         indicatorLight = null;
         break;
     }
@@ -184,7 +191,7 @@ public class RobotContainer {
   public void normalModeOI() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     oi = OISelector.findOperatorInterface();
-    ButtonsAndDashboardBindings.configureBindings(oi, drive, coralSystem, indicatorLight);
+    ButtonsAndDashboardBindings.configureBindings(oi, drive, coralSystem, climber, indicatorLight);
   }
 
   public Command getAutonomousCommand() {

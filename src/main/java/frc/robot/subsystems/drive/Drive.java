@@ -48,6 +48,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.FieldConstants;
+import frc.robot.alignment.StrategyManager;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.AlignmentUtils;
 import frc.robot.util.AlignmentUtils.CageSelection;
@@ -88,6 +89,8 @@ public class Drive extends SubsystemBase {
   @Getter private Pose2d algaeTargetPose;
   @Getter private CageSelection cageSelection;
   @Getter private Boolean isVisionOn = true;
+
+  @Getter private final StrategyManager strategyManager = new StrategyManager();
 
   public Drive(
       GyroIO gyroIO,
@@ -168,7 +171,8 @@ public class Drive extends SubsystemBase {
 
       if (FieldConstants.selectedCageTranslation != null)
         cageSelection =
-            AlignmentUtils.findCageRobotAngle(getPose(), FieldConstants.selectedCageTranslation);
+            AlignmentUtils.getCageAlignmentTarget(
+                getPose(), FieldConstants.selectedCageTranslation);
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data
