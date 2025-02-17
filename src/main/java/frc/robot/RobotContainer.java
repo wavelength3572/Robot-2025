@@ -98,7 +98,7 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOSpark() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
         algae = new Algae(new AlgaeIOSpark());
-        climber = new Climber(new ClimberIOSpark() {});
+        climber = new Climber(new ClimberIOVirtualSim() {});
         indicatorLight = new IndicatorLight();
         indicatorLight.setupLightingSuppliers(
             coralSystem::getCurrentCoralPreset,
