@@ -1,0 +1,70 @@
+package frc.robot.commands.NamedCommands;
+
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.coral.intake.Intake;
+
+public class ScoreCoralCommand extends Command {
+
+  private static final double MAX_OUTTAKE_TIME = 10.0; // total hard stop, in seconds
+  private static final double ADDITIONAL_CLEAR_TIME =
+      0.5; // how long to keep running after the coral is gone
+
+  private final Intake intake;
+  private final Timer timer = new Timer();
+
+  private boolean coralCleared = false;
+  private double timeWhenCoralCleared = 0.0;
+
+  public ScoreCoralCommand(Intake intake) {
+    this.intake = intake;
+  }
+
+  @Override
+  public void initialize() {
+    // Start pushing the coral out
+    intake.pushCoral();
+
+    // Reset and start the timer
+    timer.reset();
+    timer.start();
+
+    coralCleared = false;
+    timeWhenCoralCleared = 0.0;
+  }
+
+  @Override
+  public void execute() {
+    // 1) Check limit switch (or sensor) to see if the piece has left the robot
+    if (!intake.getCoralInRobot() && !coralCleared) {
+      // The moment we see it's gone, record the time
+      coralCleared = true;
+      timeWhenCoralCleared = timer.get();
+    }
+  }
+
+  @Override
+  public boolean isFinished() {
+    // 2) If we reached the total max time, we stop no matter what
+    if (timer.get() >= MAX_OUTTAKE_TIME) {
+      return true;
+    }
+
+    // 3) If we already saw the coral clear, check if we have run
+    //    for an additional X seconds *after* clearing
+    if (coralCleared) {
+      double timeSinceCleared = timer.get() - timeWhenCoralCleared;
+      return timeSinceCleared >= ADDITIONAL_CLEAR_TIME;
+    }
+
+    // Otherwise, we haven't detected it leaving yet, keep running
+    return false;
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    // Stop the outtake
+    intake.stopIntake();
+    timer.stop();
+  }
+}

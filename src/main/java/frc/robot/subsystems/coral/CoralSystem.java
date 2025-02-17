@@ -5,9 +5,12 @@ import com.playingwithfusion.TimeOfFlight.RangingMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.*;
-import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.coral.arm.Arm;
+import frc.robot.subsystems.coral.elevator.Elevator;
+import frc.robot.subsystems.coral.intake.Intake;
+import frc.robot.util.CoralRPStatusLogger;
+import frc.robot.util.ReefScoringLogger;
+import frc.robot.util.RobotStatus;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -60,11 +63,14 @@ public class CoralSystem extends SubsystemBase {
     this.intake.periodic();
 
     coralInRobot = this.intake.getCoralInRobot();
+    ReefScoringLogger.checkAndLogScoringEvent(RobotStatus.getRobotPose(), this);
 
     Logger.recordOutput("CoralSystem/CoralInRobot", coralInRobot);
     Logger.recordOutput("CoralSystem/ElevatorAtGoal", elevator.isAtGoal());
     Logger.recordOutput("CoralSystem/ArmAtGoal", arm.isAtGoal());
     Logger.recordOutput("CoralSystem/AtGoal", isAtGoal());
+
+    CoralRPStatusLogger.logCoralStatus(false);
 
     switch (systemState) {
       case STABLE:
@@ -108,6 +114,8 @@ public class CoralSystem extends SubsystemBase {
         // do nothing
         break;
     }
+
+    // check the score timer and stop the intake if its greater than a score time threshold
   }
 
   public void setTargetPreset(CoralSystemPresets preset) {
@@ -140,5 +148,11 @@ public class CoralSystem extends SubsystemBase {
   @AutoLogOutput(key = "TOF")
   public double getTimeOfFlightRange() {
     return timeOfFlight.getRange();
+  }
+
+  public void scoreCoral() {
+    intake.pushCoral();
+    // set state to running coral
+    // start a timer
   }
 }

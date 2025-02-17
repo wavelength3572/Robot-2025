@@ -1,18 +1,24 @@
 package frc.robot;
 
+import static frc.robot.subsystems.coral.CoralSystemPresets.*;
+import static frc.robot.util.AlignmentUtils.ReefFaceSelection.PolePosition.*;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.subsystems.coral.CoralSystemPresets;
+import frc.robot.util.AlignmentUtils.ReefFaceSelection.PolePosition;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -25,19 +31,19 @@ public final class FieldConstants {
   public static final double THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE = 3.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF = 2.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION = 2.0; // meters
-  public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_CAGE = 2.0; // meters
+  public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_CAGE_ASSIST = 1.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_DISLODGE = 3.0; // meters
 
   public static Translation2d selectedCageTranslation = new Translation2d();
   // Assume these are your fixed cage positions defined somewhere (using WPILib's
   // coordinates)
-  private static Translation2d BLUE_CAGE_LEFT = new Translation2d(8.72, 7.28);
-  private static Translation2d BLUE_CAGE_MID = new Translation2d(8.72, 6.14);
-  private static Translation2d BLUE_CAGE_RIGHT = new Translation2d(8.72, 5.09);
+  private static Translation2d BLUE_CAGE_LEFT = new Translation2d(8.56, 7.26);
+  private static Translation2d BLUE_CAGE_MID = new Translation2d(8.56, 6.18);
+  private static Translation2d BLUE_CAGE_RIGHT = new Translation2d(8.56, 5.07);
 
-  private static Translation2d RED_CAGE_LEFT = new Translation2d(8.72, 3.03);
-  private static Translation2d RED_CAGE_MID = new Translation2d(8.72, 1.83);
-  private static Translation2d RED_CAGE_RIGHT = new Translation2d(8.72, 0.78);
+  private static Translation2d RED_CAGE_LEFT = new Translation2d(9.0, 2.98);
+  private static Translation2d RED_CAGE_MID = new Translation2d(9.0, 1.87);
+  private static Translation2d RED_CAGE_RIGHT = new Translation2d(9.0, 0.78);
 
   public enum CageTarget {
     LEFT,
@@ -450,7 +456,8 @@ public final class FieldConstants {
     REEF_FACE_POSES_BLUE = Collections.unmodifiableMap(bluePoses);
 
     // ----- Build Red Reef Face Poses -----
-    // The mapping is: blue id 17 -> red id 6, 18 -> 7, 19 -> 8, 20 -> 9, 21 -> 10, 22 -> 11.
+    // The mapping is: blue id 17 -> red id 6, 18 -> 7, 19 -> 8, 20 -> 9, 21 -> 10,
+    // 22 -> 11.
     Map<Integer, Pose2d> redPoses = new HashMap<>();
     for (Map.Entry<Integer, Pose2d> entry : REEF_FACE_POSES_BLUE.entrySet()) {
       int blueFaceId = entry.getKey();
@@ -501,5 +508,551 @@ public final class FieldConstants {
       }
     }
     return null;
+  }
+
+  // ---------------- STAGED ALGAE POSITIONS ----------------
+  public static final Map<String, Translation3d> STAGED_ALGAE_POSITIONS;
+
+  static {
+    Map<String, Translation3d> algaePositions = new HashMap<>();
+
+    // These values are measured in Onshape (using a centered coordinate system).
+    // We immediately convert them to WPILib coordinates (where (0,0,0) is the
+    // bottom-left)
+
+    // Blue Side Staged Algae
+    algaePositions.put(
+        "ALGAE_1",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(7.555, 0.0, 0.497))); // Middle Snowcone Algae
+    algaePositions.put(
+        "ALGAE_2",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(3.945, 0.588, 1.313))); // Blue 6
+    algaePositions.put(
+        "ALGAE_3",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(4.624, 0.588, 0.909))); // Blue 5
+    algaePositions.put(
+        "ALGAE_4",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(3.605, 0.0, 0.909))); // Blue 4
+    algaePositions.put(
+        "ALGAE_5",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(4.624, -0.588, 0.909))); // Blue 2
+    algaePositions.put(
+        "ALGAE_6",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(3.945, -0.588, 1.313))); // Blue 3
+    algaePositions.put(
+        "ALGAE_7",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(4.964, 0.0, 1.313))); // Blue 1
+    algaePositions.put(
+        "ALGAE_8",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(7.555, 1.829, 0.497))); // Right Snowcone Algae
+    algaePositions.put(
+        "ALGAE_9",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(7.555, -1.829, 0.497))); // Left Snowcone Algae
+
+    // Red Side Staged Algae
+    algaePositions.put(
+        "ALGAE_10",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-7.555, 0.0, 0.497))); // Middle Snowcone Algae
+    algaePositions.put(
+        "ALGAE_11",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-7.555, -1.829, 0.497))); // Right Snowcone Algae
+    algaePositions.put(
+        "ALGAE_12",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-7.555, 1.829, 0.497))); // Left Snowcone Algae
+    algaePositions.put(
+        "ALGAE_13",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-4.964, 0.0, 1.313))); // Red 1
+    algaePositions.put(
+        "ALGAE_14",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-3.945, 0.588, 1.313))); // Red 3
+    algaePositions.put(
+        "ALGAE_15",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-4.624, 0.588, 0.909))); // Red 2
+    algaePositions.put(
+        "ALGAE_16",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-3.605, 0.0, 0.909))); // Red 4
+    algaePositions.put(
+        "ALGAE_18",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-3.945, -0.588, 1.313))); // Red 5
+    algaePositions.put(
+        "ALGAE_19",
+        convertOnShapeOriginMeasurementToWPILibCoordinates(
+            new Translation3d(-4.624, -0.588, 0.909))); // Red 6
+
+    STAGED_ALGAE_POSITIONS = Collections.unmodifiableMap(algaePositions);
+  }
+
+  /** Retrieves the original algae position from its name (in WPILib coordinates). */
+  public static Translation3d getStagedAlgaePosition(String algaeName) {
+    return STAGED_ALGAE_POSITIONS.getOrDefault(algaeName, new Translation3d(0, 0, 0));
+  }
+
+  /**
+   * Retrieves all staged algae positions as an array for logging (already in WPILib coordinates).
+   */
+  public static Translation3d[] getAllStagedAlgaePositions() {
+    return STAGED_ALGAE_POSITIONS.values().toArray(new Translation3d[0]);
+  }
+
+  /**
+   * Converts an Onshape-centered position (with (0,0,0) at the field center) to WPILib coordinates,
+   * where (0,0,0) is the bottom-left of the field.
+   *
+   * <p>This method assumes the field is 17.55m long and 8.05m wide.
+   */
+  public static Translation3d convertOnShapeOriginMeasurementToWPILibCoordinates(
+      Translation3d onshapePos) {
+    double fieldLength = 17.55; // Field length in meters
+    double fieldWidth = 8.05; // Field width in meters
+    double halfLength = fieldLength / 2.0; // Center of the field in X (approx. 8.775)
+    double halfWidth = fieldWidth / 2.0; // Center of the field in Y (approx. 4.025)
+
+    // Since the Onshape measurements are taken from a centered coordinate system,
+    // to convert to WPILib (bottom-left origin), add halfLength to the X value
+    // and halfWidth to the Y value, then invert the sign if necessary.
+    // Here we assume that increasing X in WPILib goes right, and increasing Y goes
+    // up.
+    return new Translation3d(
+        -onshapePos.getX() + halfLength,
+        -onshapePos.getY() + halfWidth,
+        onshapePos.getZ() // Z remains unchanged
+        );
+  }
+
+  // Common Reef Geometry (Onshape-centered)
+  public static final Translation3d RED_REEF_CENTER_ONSHAPE = new Translation3d(4.280, 0, 0);
+  public static final Translation3d BLUE_REEF_CENTER_ONSHAPE = new Translation3d(-4.280, 0, 0);
+
+  public static final double POLE_OFFSET = 0.165; // offset along the face's local Y-axis
+
+  // L1 Coral Constants
+  public static final double L1_EFFECTIVE_RADIUS = 0.78625;
+  public static final double L1_HEIGHT = 0.5; // L1 coral height in meters
+  public static final double L1_FIXED_PITCH_DEG = 0; // L1 coral pitch (degrees)
+  public static final double L1_BASE_ANGLE_DEG = 0; // Face1's center is along 0° in Onshape
+  public static final double L1_YAW_OFFSET_DEG = 90; // Additional yaw offset for L1 coral
+
+  // L2 Coral Constants
+  public static final double L2_EFFECTIVE_RADIUS = 0.71;
+  public static final double L2_HEIGHT = 0.72; // L2 coral height in meters
+  public static final double L2_FIXED_PITCH_DEG = -34; // L2 coral fixed pitch (degrees)
+  public static final double L2_BASE_ANGLE_DEG = 0; // Face1's center is along 0° in Onshape
+
+  // L3 Coral Constants
+  public static final double L3_EFFECTIVE_RADIUS = 0.71;
+  public static final double L3_HEIGHT = 1.13; // L3 coral height in meters
+  public static final double L3_FIXED_PITCH_DEG = -34; // L3 coral fixed pitch (degrees)
+  public static final double L3_BASE_ANGLE_DEG = 0; // Face1's center is along 0° in Onshape
+
+  // ---------------- L4 Coral Constants ----------------
+  public static final double L4_EFFECTIVE_RADIUS = 0.78025;
+  public static final double L4_HEIGHT = 1.745; // L4 coral height (m)
+  public static final double L4_FIXED_PITCH_DEG = 90; // L4 coral fixed pitch (deg)
+  public static final double L4_BASE_ANGLE_DEG = 0; // Face1's center angle (deg)
+
+  public static Pose3d[] generateScoredCoralPosesL1(
+      Translation3d reefCenterOnshape,
+      double effectiveRadius,
+      double poleOffset,
+      double fixedHeight,
+      double fixedPitchDeg,
+      double baseAngleDeg,
+      double yawOffsetDeg) {
+    Pose3d[] poses = new Pose3d[12];
+    int index = 0;
+    double baseAngleRad = Math.toRadians(baseAngleDeg);
+
+    for (int i = 0; i < 6; i++) {
+      double faceAngle = baseAngleRad + i * Math.toRadians(60);
+      double faceCenterX = reefCenterOnshape.getX() + effectiveRadius * Math.cos(faceAngle);
+      double faceCenterY = reefCenterOnshape.getY() + effectiveRadius * Math.sin(faceAngle);
+      Translation3d faceCenter = new Translation3d(faceCenterX, faceCenterY, 0);
+
+      Translation3d localOffsetA = new Translation3d(0, -poleOffset, 0);
+      Translation3d localOffsetB = new Translation3d(0, poleOffset, 0);
+      Translation3d rotatedOffsetA = rotateTranslationByAngle(localOffsetA, faceAngle);
+      Translation3d rotatedOffsetB = rotateTranslationByAngle(localOffsetB, faceAngle);
+
+      Translation3d poleAOnshape = faceCenter.plus(rotatedOffsetA);
+      Translation3d poleBOnshape = faceCenter.plus(rotatedOffsetB);
+      poleAOnshape = new Translation3d(poleAOnshape.getX(), poleAOnshape.getY(), fixedHeight);
+      poleBOnshape = new Translation3d(poleBOnshape.getX(), poleBOnshape.getY(), fixedHeight);
+
+      Translation3d poleAWP = convertCenteredToWPILib(poleAOnshape);
+      Translation3d poleBWP = convertCenteredToWPILib(poleBOnshape);
+
+      Rotation3d coralRotation =
+          new Rotation3d(
+              0, Units.degreesToRadians(fixedPitchDeg), faceAngle + Math.toRadians(yawOffsetDeg));
+
+      poses[index++] = new Pose3d(poleAWP, coralRotation);
+      poses[index++] = new Pose3d(poleBWP, coralRotation);
+    }
+    return poses;
+  }
+
+  public static Pose3d[] generateScoredCoralPosesAngled(
+      Translation3d reefCenterOnshape,
+      double effectiveRadius,
+      double poleOffset,
+      double fixedHeight,
+      double fixedPitchDeg,
+      double baseAngleDeg) {
+    Pose3d[] poses = new Pose3d[12];
+    int index = 0;
+
+    // Convert base angle to radians.
+    double baseAngleRad = Math.toRadians(baseAngleDeg);
+
+    // There are 6 faces (each face yields 2 poles → 12 total), evenly spaced (60°
+    // apart).
+    for (int i = 0; i < 6; i++) {
+      // Compute face center angle in Onshape coordinates.
+      double faceAngle = baseAngleRad + i * Math.toRadians(60);
+      // Compute the face center from the reef center.
+      double faceCenterX = reefCenterOnshape.getX() + effectiveRadius * Math.cos(faceAngle);
+      double faceCenterY = reefCenterOnshape.getY() + effectiveRadius * Math.sin(faceAngle);
+      Translation3d faceCenter = new Translation3d(faceCenterX, faceCenterY, 0);
+
+      // For each face, the two coral poles are offset by ±poleOffset along the face's
+      // local Y-axis.
+      Translation3d localOffsetA = new Translation3d(0, -poleOffset, 0);
+      Translation3d localOffsetB = new Translation3d(0, poleOffset, 0);
+      Translation3d rotatedOffsetA = rotateTranslationByAngle(localOffsetA, faceAngle);
+      Translation3d rotatedOffsetB = rotateTranslationByAngle(localOffsetB, faceAngle);
+
+      // Compute the Onshape coordinates for the two poles.
+      Translation3d poleAOnshape = faceCenter.plus(rotatedOffsetA);
+      Translation3d poleBOnshape = faceCenter.plus(rotatedOffsetB);
+      // Set fixed height.
+      poleAOnshape = new Translation3d(poleAOnshape.getX(), poleAOnshape.getY(), fixedHeight);
+      poleBOnshape = new Translation3d(poleBOnshape.getX(), poleBOnshape.getY(), fixedHeight);
+
+      // Convert these Onshape-centered coordinates to WPILib coordinates.
+      Translation3d poleAWP = convertCenteredToWPILib(poleAOnshape);
+      Translation3d poleBWP = convertCenteredToWPILib(poleBOnshape);
+
+      // For rotation, use a fixed pitch (fixedPitchDeg) and set yaw equal to the
+      // face’s angle.
+      Rotation3d fixedRotation =
+          new Rotation3d(0, Units.degreesToRadians(fixedPitchDeg), faceAngle);
+
+      poses[index++] = new Pose3d(poleAWP, fixedRotation);
+      poses[index++] = new Pose3d(poleBWP, fixedRotation);
+    }
+
+    return poses;
+  }
+
+  public static Pose3d[] generateScoredCoralPosesL4(
+      Translation3d reefCenterOnshape,
+      double effectiveRadius,
+      double poleOffset,
+      double fixedHeight,
+      double fixedPitchDeg,
+      double baseAngleDeg) {
+    Pose3d[] poses = new Pose3d[12];
+    int index = 0;
+
+    // Convert base angle to radians.
+    double baseAngleRad = Math.toRadians(baseAngleDeg);
+
+    // There are 6 faces (each yielding 2 poles → 12 total), evenly spaced (60°
+    // apart).
+    for (int i = 0; i < 6; i++) {
+      // Compute the face center angle in Onshape coordinates.
+      double faceAngle = baseAngleRad + i * Math.toRadians(60);
+      // Compute the face center from the reef center.
+      double faceCenterX = reefCenterOnshape.getX() + effectiveRadius * Math.cos(faceAngle);
+      double faceCenterY = reefCenterOnshape.getY() + effectiveRadius * Math.sin(faceAngle);
+      Translation3d faceCenter = new Translation3d(faceCenterX, faceCenterY, 0);
+
+      // Compute the two coral poles for this face by offsetting the face center along
+      // the local Y-axis.
+      Translation3d localOffsetA = new Translation3d(0, -poleOffset, 0);
+      Translation3d localOffsetB = new Translation3d(0, poleOffset, 0);
+      Translation3d rotatedOffsetA = rotateTranslationByAngle(localOffsetA, faceAngle);
+      Translation3d rotatedOffsetB = rotateTranslationByAngle(localOffsetB, faceAngle);
+
+      Translation3d poleAOnshape = faceCenter.plus(rotatedOffsetA);
+      Translation3d poleBOnshape = faceCenter.plus(rotatedOffsetB);
+      // Set the fixed L4 height.
+      poleAOnshape = new Translation3d(poleAOnshape.getX(), poleAOnshape.getY(), fixedHeight);
+      poleBOnshape = new Translation3d(poleBOnshape.getX(), poleBOnshape.getY(), fixedHeight);
+
+      // Convert these Onshape-centered positions to WPILib coordinates.
+      Translation3d poleAWP = convertCenteredToWPILib(poleAOnshape);
+      Translation3d poleBWP = convertCenteredToWPILib(poleBOnshape);
+
+      // Compute final rotation.
+      // We use a fixed pitch (converted to radians) and set yaw equal to the face
+      // angle.
+      Rotation3d fixedRotation =
+          new Rotation3d(0, Units.degreesToRadians(fixedPitchDeg), faceAngle);
+
+      poses[index++] = new Pose3d(poleAWP, fixedRotation);
+      poses[index++] = new Pose3d(poleBWP, fixedRotation);
+    }
+
+    return poses;
+  }
+
+  /** Onshape(origin field center) to WPILib coordinates (origin blue corner). */
+  public static Translation3d convertCenteredToWPILib(Translation3d onshapePos) {
+    double fieldLength = 17.55;
+    double fieldWidth = 8.05;
+    double halfLength = fieldLength / 2.0; // ~8.775 m
+    double halfWidth = fieldWidth / 2.0; // ~4.025 m (adjust if necessary)
+
+    return new Translation3d(
+        onshapePos.getX() + halfLength, onshapePos.getY() + halfWidth, onshapePos.getZ());
+  }
+
+  /** Rotates a Translation3d about the Z-axis by the given angle (in radians). */
+  public static Translation3d rotateTranslationByAngle(Translation3d translation, double angleRad) {
+    double x = translation.getX();
+    double y = translation.getY();
+    double rotatedX = x * Math.cos(angleRad) - y * Math.sin(angleRad);
+    double rotatedY = x * Math.sin(angleRad) + y * Math.cos(angleRad);
+    return new Translation3d(rotatedX, rotatedY, translation.getZ());
+  }
+
+  public static class CoralKey {
+    public final CoralSystemPresets preset; // e.g. "L1", "L2", etc.
+    public final int faceId; // aprilTag Id of Face
+    public final PolePosition pole; // "A" or "B"
+
+    public CoralKey(int faceId, PolePosition pole, CoralSystemPresets preset) {
+      this.faceId = faceId;
+      this.pole = pole;
+      this.preset = preset;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (!(o instanceof CoralKey)) return false;
+      CoralKey key = (CoralKey) o;
+      return faceId == key.faceId && preset.equals(key.preset) && pole.equals(key.pole);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(faceId, pole, preset);
+    }
+
+    @Override
+    public String toString() {
+      return faceId + "_" + pole + "_" + preset;
+    }
+  }
+
+  // Simple container for a coral location (the Pose3d plus a flag).
+  public static class CoralLocation {
+    public final Pose3d pose;
+    public boolean scored;
+
+    public CoralLocation(Pose3d pose) {
+      this.pose = pose;
+      this.scored = false;
+    }
+
+    @Override
+    public String toString() {
+      return "CoralLocation{" + "pose=" + pose + ", scored=" + scored + "}";
+    }
+  }
+
+  public static final Map<CoralKey, CoralLocation> coralMapping = new HashMap<>();
+
+  static {
+    // Build red coral mapping for L1
+    Pose3d[] redL1 =
+        generateScoredCoralPosesL1(
+            RED_REEF_CENTER_ONSHAPE,
+            L1_EFFECTIVE_RADIUS,
+            POLE_OFFSET,
+            L1_HEIGHT,
+            L1_FIXED_PITCH_DEG,
+            L1_BASE_ANGLE_DEG,
+            L1_YAW_OFFSET_DEG);
+    coralMapping.put(new CoralKey(7, A_LEFT, L1), new CoralLocation(redL1[0]));
+    coralMapping.put(new CoralKey(7, B_RIGHT, L1), new CoralLocation(redL1[1]));
+    coralMapping.put(new CoralKey(6, A_LEFT, L1), new CoralLocation(redL1[10]));
+    coralMapping.put(new CoralKey(6, B_RIGHT, L1), new CoralLocation(redL1[11]));
+    coralMapping.put(new CoralKey(11, A_LEFT, L1), new CoralLocation(redL1[8]));
+    coralMapping.put(new CoralKey(11, B_RIGHT, L1), new CoralLocation(redL1[9]));
+    coralMapping.put(new CoralKey(10, A_LEFT, L1), new CoralLocation(redL1[6]));
+    coralMapping.put(new CoralKey(10, B_RIGHT, L1), new CoralLocation(redL1[7]));
+    coralMapping.put(new CoralKey(9, A_LEFT, L1), new CoralLocation(redL1[4]));
+    coralMapping.put(new CoralKey(9, B_RIGHT, L1), new CoralLocation(redL1[5]));
+    coralMapping.put(new CoralKey(8, A_LEFT, L1), new CoralLocation(redL1[2]));
+    coralMapping.put(new CoralKey(8, B_RIGHT, L1), new CoralLocation(redL1[3]));
+
+    Pose3d[] redL2 =
+        generateScoredCoralPosesAngled(
+            RED_REEF_CENTER_ONSHAPE,
+            L2_EFFECTIVE_RADIUS,
+            POLE_OFFSET,
+            L2_HEIGHT,
+            L2_FIXED_PITCH_DEG,
+            L2_BASE_ANGLE_DEG);
+    coralMapping.put(new CoralKey(7, A_LEFT, L2), new CoralLocation(redL2[0]));
+    coralMapping.put(new CoralKey(7, B_RIGHT, L2), new CoralLocation(redL2[1]));
+    coralMapping.put(new CoralKey(6, A_LEFT, L2), new CoralLocation(redL2[10]));
+    coralMapping.put(new CoralKey(6, B_RIGHT, L2), new CoralLocation(redL2[11]));
+    coralMapping.put(new CoralKey(11, A_LEFT, L2), new CoralLocation(redL2[8]));
+    coralMapping.put(new CoralKey(11, B_RIGHT, L2), new CoralLocation(redL2[9]));
+    coralMapping.put(new CoralKey(10, A_LEFT, L2), new CoralLocation(redL2[6]));
+    coralMapping.put(new CoralKey(10, B_RIGHT, L2), new CoralLocation(redL2[7]));
+    coralMapping.put(new CoralKey(9, A_LEFT, L2), new CoralLocation(redL2[4]));
+    coralMapping.put(new CoralKey(9, B_RIGHT, L2), new CoralLocation(redL2[5]));
+    coralMapping.put(new CoralKey(8, A_LEFT, L2), new CoralLocation(redL2[2]));
+    coralMapping.put(new CoralKey(8, B_RIGHT, L2), new CoralLocation(redL2[3]));
+
+    Pose3d[] redL3 =
+        generateScoredCoralPosesAngled(
+            RED_REEF_CENTER_ONSHAPE,
+            L3_EFFECTIVE_RADIUS,
+            POLE_OFFSET,
+            L3_HEIGHT,
+            L3_FIXED_PITCH_DEG,
+            L3_BASE_ANGLE_DEG);
+    coralMapping.put(new CoralKey(7, A_LEFT, L3), new CoralLocation(redL3[0]));
+    coralMapping.put(new CoralKey(7, B_RIGHT, L3), new CoralLocation(redL3[1]));
+    coralMapping.put(new CoralKey(6, A_LEFT, L3), new CoralLocation(redL3[10]));
+    coralMapping.put(new CoralKey(6, B_RIGHT, L3), new CoralLocation(redL3[11]));
+    coralMapping.put(new CoralKey(11, A_LEFT, L3), new CoralLocation(redL3[8]));
+    coralMapping.put(new CoralKey(11, B_RIGHT, L3), new CoralLocation(redL3[9]));
+    coralMapping.put(new CoralKey(10, A_LEFT, L3), new CoralLocation(redL3[6]));
+    coralMapping.put(new CoralKey(10, B_RIGHT, L3), new CoralLocation(redL3[7]));
+    coralMapping.put(new CoralKey(9, A_LEFT, L3), new CoralLocation(redL3[4]));
+    coralMapping.put(new CoralKey(9, B_RIGHT, L3), new CoralLocation(redL3[5]));
+    coralMapping.put(new CoralKey(8, A_LEFT, L3), new CoralLocation(redL3[2]));
+    coralMapping.put(new CoralKey(8, B_RIGHT, L3), new CoralLocation(redL3[3]));
+
+    Pose3d[] redL4 =
+        generateScoredCoralPosesL4(
+            RED_REEF_CENTER_ONSHAPE,
+            L4_EFFECTIVE_RADIUS,
+            POLE_OFFSET,
+            L4_HEIGHT,
+            L4_FIXED_PITCH_DEG,
+            L4_BASE_ANGLE_DEG);
+    coralMapping.put(new CoralKey(7, A_LEFT, L4), new CoralLocation(redL4[0]));
+    coralMapping.put(new CoralKey(7, B_RIGHT, L4), new CoralLocation(redL4[1]));
+    coralMapping.put(new CoralKey(6, A_LEFT, L4), new CoralLocation(redL4[10]));
+    coralMapping.put(new CoralKey(6, B_RIGHT, L4), new CoralLocation(redL4[11]));
+    coralMapping.put(new CoralKey(11, A_LEFT, L4), new CoralLocation(redL4[8]));
+    coralMapping.put(new CoralKey(11, B_RIGHT, L4), new CoralLocation(redL4[9]));
+    coralMapping.put(new CoralKey(10, A_LEFT, L4), new CoralLocation(redL4[6]));
+    coralMapping.put(new CoralKey(10, B_RIGHT, L4), new CoralLocation(redL4[7]));
+    coralMapping.put(new CoralKey(9, A_LEFT, L4), new CoralLocation(redL4[4]));
+    coralMapping.put(new CoralKey(9, B_RIGHT, L4), new CoralLocation(redL4[5]));
+    coralMapping.put(new CoralKey(8, A_LEFT, L4), new CoralLocation(redL4[2]));
+    coralMapping.put(new CoralKey(8, B_RIGHT, L4), new CoralLocation(redL4[3]));
+
+    // Build red coral mapping for L1
+    Pose3d[] blueL1 =
+        generateScoredCoralPosesL1(
+            BLUE_REEF_CENTER_ONSHAPE,
+            L1_EFFECTIVE_RADIUS,
+            POLE_OFFSET,
+            L1_HEIGHT,
+            L1_FIXED_PITCH_DEG,
+            L1_BASE_ANGLE_DEG,
+            L1_YAW_OFFSET_DEG);
+    coralMapping.put(new CoralKey(21, A_LEFT, L1), new CoralLocation(blueL1[0]));
+    coralMapping.put(new CoralKey(21, B_RIGHT, L1), new CoralLocation(blueL1[1]));
+    coralMapping.put(new CoralKey(22, A_LEFT, L1), new CoralLocation(blueL1[10]));
+    coralMapping.put(new CoralKey(22, B_RIGHT, L1), new CoralLocation(blueL1[11]));
+    coralMapping.put(new CoralKey(17, A_LEFT, L1), new CoralLocation(blueL1[8]));
+    coralMapping.put(new CoralKey(17, B_RIGHT, L1), new CoralLocation(blueL1[9]));
+    coralMapping.put(new CoralKey(18, A_LEFT, L1), new CoralLocation(blueL1[6]));
+    coralMapping.put(new CoralKey(18, B_RIGHT, L1), new CoralLocation(blueL1[7]));
+    coralMapping.put(new CoralKey(19, A_LEFT, L1), new CoralLocation(blueL1[4]));
+    coralMapping.put(new CoralKey(19, B_RIGHT, L1), new CoralLocation(blueL1[5]));
+    coralMapping.put(new CoralKey(20, A_LEFT, L1), new CoralLocation(blueL1[2]));
+    coralMapping.put(new CoralKey(20, B_RIGHT, L1), new CoralLocation(blueL1[3]));
+
+    Pose3d[] blueL2 =
+        generateScoredCoralPosesAngled(
+            BLUE_REEF_CENTER_ONSHAPE,
+            L2_EFFECTIVE_RADIUS,
+            POLE_OFFSET,
+            L2_HEIGHT,
+            L2_FIXED_PITCH_DEG,
+            L2_BASE_ANGLE_DEG);
+    coralMapping.put(new CoralKey(21, A_LEFT, L2), new CoralLocation(blueL2[0]));
+    coralMapping.put(new CoralKey(21, B_RIGHT, L2), new CoralLocation(blueL2[1]));
+    coralMapping.put(new CoralKey(22, A_LEFT, L2), new CoralLocation(blueL2[10]));
+    coralMapping.put(new CoralKey(22, B_RIGHT, L2), new CoralLocation(blueL2[11]));
+    coralMapping.put(new CoralKey(17, A_LEFT, L2), new CoralLocation(blueL2[8]));
+    coralMapping.put(new CoralKey(17, B_RIGHT, L2), new CoralLocation(blueL2[9]));
+    coralMapping.put(new CoralKey(18, A_LEFT, L2), new CoralLocation(blueL2[6]));
+    coralMapping.put(new CoralKey(18, B_RIGHT, L2), new CoralLocation(blueL2[7]));
+    coralMapping.put(new CoralKey(19, A_LEFT, L2), new CoralLocation(blueL2[4]));
+    coralMapping.put(new CoralKey(19, B_RIGHT, L2), new CoralLocation(blueL2[5]));
+    coralMapping.put(new CoralKey(20, A_LEFT, L2), new CoralLocation(blueL2[2]));
+    coralMapping.put(new CoralKey(20, B_RIGHT, L2), new CoralLocation(blueL2[3]));
+
+    Pose3d[] blueL3 =
+        generateScoredCoralPosesAngled(
+            BLUE_REEF_CENTER_ONSHAPE,
+            L3_EFFECTIVE_RADIUS,
+            POLE_OFFSET,
+            L3_HEIGHT,
+            L3_FIXED_PITCH_DEG,
+            L3_BASE_ANGLE_DEG);
+    coralMapping.put(new CoralKey(21, A_LEFT, L3), new CoralLocation(blueL3[0]));
+    coralMapping.put(new CoralKey(21, B_RIGHT, L3), new CoralLocation(blueL3[1]));
+    coralMapping.put(new CoralKey(22, A_LEFT, L3), new CoralLocation(blueL3[10]));
+    coralMapping.put(new CoralKey(22, B_RIGHT, L3), new CoralLocation(blueL3[11]));
+    coralMapping.put(new CoralKey(17, A_LEFT, L3), new CoralLocation(blueL3[8]));
+    coralMapping.put(new CoralKey(17, B_RIGHT, L3), new CoralLocation(blueL3[9]));
+    coralMapping.put(new CoralKey(18, A_LEFT, L3), new CoralLocation(blueL3[6]));
+    coralMapping.put(new CoralKey(18, B_RIGHT, L3), new CoralLocation(blueL3[7]));
+    coralMapping.put(new CoralKey(19, A_LEFT, L3), new CoralLocation(blueL3[4]));
+    coralMapping.put(new CoralKey(19, B_RIGHT, L3), new CoralLocation(blueL3[5]));
+    coralMapping.put(new CoralKey(20, A_LEFT, L3), new CoralLocation(blueL3[2]));
+    coralMapping.put(new CoralKey(20, B_RIGHT, L3), new CoralLocation(blueL3[3]));
+
+    Pose3d[] blueL4 =
+        generateScoredCoralPosesL4(
+            BLUE_REEF_CENTER_ONSHAPE,
+            L4_EFFECTIVE_RADIUS,
+            POLE_OFFSET,
+            L4_HEIGHT,
+            L4_FIXED_PITCH_DEG,
+            L4_BASE_ANGLE_DEG);
+    coralMapping.put(new CoralKey(21, A_LEFT, L4), new CoralLocation(blueL4[0]));
+    coralMapping.put(new CoralKey(21, B_RIGHT, L4), new CoralLocation(blueL4[1]));
+    coralMapping.put(new CoralKey(22, A_LEFT, L4), new CoralLocation(blueL4[10]));
+    coralMapping.put(new CoralKey(22, B_RIGHT, L4), new CoralLocation(blueL4[11]));
+    coralMapping.put(new CoralKey(17, A_LEFT, L4), new CoralLocation(blueL4[8]));
+    coralMapping.put(new CoralKey(17, B_RIGHT, L4), new CoralLocation(blueL4[9]));
+    coralMapping.put(new CoralKey(18, A_LEFT, L4), new CoralLocation(blueL4[6]));
+    coralMapping.put(new CoralKey(18, B_RIGHT, L4), new CoralLocation(blueL4[7]));
+    coralMapping.put(new CoralKey(19, A_LEFT, L4), new CoralLocation(blueL4[4]));
+    coralMapping.put(new CoralKey(19, B_RIGHT, L4), new CoralLocation(blueL4[5]));
+    coralMapping.put(new CoralKey(20, A_LEFT, L4), new CoralLocation(blueL4[2]));
+    coralMapping.put(new CoralKey(20, B_RIGHT, L4), new CoralLocation(blueL4[3]));
   }
 }

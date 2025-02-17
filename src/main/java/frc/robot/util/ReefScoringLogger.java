@@ -2,6 +2,7 @@ package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.FieldConstants;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.util.AlignmentUtils.ReefFaceSelection.PolePosition;
@@ -16,19 +17,24 @@ import org.littletonrobotics.junction.Logger;
  */
 public class ReefScoringLogger {
 
-  // A simple struct-like class to hold one scoring event
   public static class ScoringEvent {
     public final int faceId;
     public final PolePosition pole;
     public final CoralSystemPresets preset;
     public final double matchTime;
+    public final Pose2d robotPose; // new field
 
     public ScoringEvent(
-        int faceId, PolePosition pole, CoralSystemPresets preset, double matchTime) {
+        int faceId,
+        PolePosition pole,
+        CoralSystemPresets preset,
+        double matchTime,
+        Pose2d robotPose) {
       this.faceId = faceId;
       this.pole = pole;
       this.preset = preset;
       this.matchTime = matchTime;
+      this.robotPose = robotPose;
     }
 
     @Override
@@ -42,6 +48,8 @@ public class ReefScoringLogger {
           + preset.name()
           + ", MatchTime="
           + matchTime
+          + ", RobotPose="
+          + robotPose
           + " }";
     }
   }
@@ -49,14 +57,9 @@ public class ReefScoringLogger {
   // Keep a static list of events if you want a global logger
   private static final List<ScoringEvent> events = new ArrayList<>();
 
-  // Track the previous value so we detect transitions
+  // Track the previous value of coral in robot so we detect transitions
   private static boolean prevCoralInRobot = false;
 
-  /**
-   * Call this periodically (or whenever you think a score might happen). The method will check if
-   * coral was in the robot and now is gone, indicating a scoring attempt. If so, it deduces
-   * face/pole/level/time and logs it.
-   */
   public static void checkAndLogScoringEvent(Pose2d currentPose, CoralSystem coralSystem) {
     boolean currentCoralInRobot = coralSystem.isCoralInRobot();
 
@@ -81,17 +84,28 @@ public class ReefScoringLogger {
       double matchTime = DriverStation.getMatchTime();
 
       // 5) Create a ScoringEvent and store it
-      ScoringEvent event = new ScoringEvent(faceId, polePosition, currentPreset, matchTime);
+      ScoringEvent event =
+          new ScoringEvent(faceId, polePosition, currentPreset, matchTime, currentPose);
       events.add(event);
 
-      // 6) Log it to AdvantageKit
+      // 6) Mark the corresponding coral as scored in our coralMapping.
+      FieldConstants.CoralKey key =
+          new FieldConstants.CoralKey(faceId, polePosition, currentPreset);
+      if (FieldConstants.coralMapping.containsKey(key)) {
+        FieldConstants.coralMapping.get(key).scored = true;
+      } else {
+        Logger.recordOutput("ReefScoringLogger/Warning", "No coral mapping found for key: " + key);
+      }
+
+      // 7) Log it to AdvantageKit
       Logger.recordOutput("ReefScoringEvent/FaceID", faceId);
       Logger.recordOutput(
           "ReefScoringEvent/Pole", polePosition.name()); // Log as "A_LEFT" or "B_RIGHT"
       Logger.recordOutput("ReefScoringEvent/ElevatorPreset", currentPreset.name());
       Logger.recordOutput("ReefScoringEvent/MatchTime", matchTime);
+      Logger.recordOutput("ReefScoringEvent/RobotScoringPose", currentPose);
 
-      // 7) Log the entire event in a structured format
+      // 8) Log the entire event in a structured format
       Logger.recordOutput("ReefScoringEvent/WholeEvent", event.toString()); // Logs as a string
     }
 

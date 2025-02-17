@@ -1,9 +1,12 @@
 package frc.robot.util;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.FieldConstants;
@@ -16,6 +19,9 @@ import frc.robot.util.AlignmentUtils.ReefFaceSelection.PolePosition;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
+import lombok.NonNull;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
@@ -311,52 +317,42 @@ public class AlignmentUtils {
   }
 
   /**
-   * Creates a rotation supplier that computes the field-relative angle from the robot's current
-   * position to the specified cage target.
+   * Returns a fixed cage alignment target.
    *
-   * <p>This helper method assumes the robot's pose is provided in WPILib coordinates (with the blue
-   * side origin at the bottom right) and returns the angle (as a Rotation2d) that points toward the
-   * cage target.
+   * <p>This method creates a CageSelection that represents the fixed target for aligning to the
+   * cage. The target rotation is locked based on the alliance: 0° for Blue and 180° for Red.
    *
-   * @param poseSupplier A supplier for the current robot Pose2d.
-   * @param cageTarget The target cage position as a Translation2d.
-   * @return A Supplier that returns the desired Rotation2d on each call.
+   * @param robotPose The current robot Pose2d (used here only to compute the distance, if desired).
+   * @param cageTranslation The known field position (Translation2d) of the cage (or cage center).
+   * @return A CageSelection representing the fixed cage alignment target.
    */
-  public static CageSelection findCageRobotAngle(Pose2d robotPose, Translation2d cageTranslation) {
-
-    if (DriverStation.getAlliance().isEmpty()) {
-      // error
+  public static CageSelection getCageAlignmentTarget(
+      Pose2d robotPose, Translation2d cageTranslation) {
+    // Determine the target orientation based on alliance.
+    double targetAngleRadians = 0.0;
+    if (DriverStation.getAlliance().isPresent()
+        && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+      targetAngleRadians = Math.PI; // 180° for Red
     }
-    CageSelection cageSelection;
-    // Calculate the direction vector from the robot to the cage target
-    Translation2d direction = cageTranslation.minus(robotPose.getTranslation());
+    Rotation2d targetRotation = new Rotation2d(targetAngleRadians);
 
-    // Compute the angle using atan2 (which handles WPILib's coordinate system
-    // correctly)
-    double angleRadians = Math.atan2(direction.getY(), direction.getX());
-    double distanceToCage = robotPose.getTranslation().minus(cageTranslation).getNorm();
-    if (DriverStation.getAlliance().get() == Alliance.Blue
-        && robotPose.getX() < cageTranslation.getX()) {
-      cageSelection =
-          new CageSelection(cageTranslation, distanceToCage, new Rotation2d(angleRadians));
+    // Optionally, compute the distance from the robot to the cage. (This might help
+    // with logging or if you need it later.)
+    double distance = robotPose.getTranslation().getDistance(cageTranslation);
 
-    } else if (DriverStation.getAlliance().get() == Alliance.Red
-        && robotPose.getX() > cageTranslation.getX()) {
+    // Create a CageSelection using the cage's translation, distance, and the fixed
+    // target rotation.
+    CageSelection target = new CageSelection(cageTranslation, distance, targetRotation);
 
-      cageSelection =
-          new CageSelection(cageTranslation, distanceToCage, new Rotation2d(angleRadians));
-    } else {
-      angleRadians = robotPose.getRotation().getRadians();
-      cageSelection =
-          new CageSelection(cageTranslation, distanceToCage, new Rotation2d(angleRadians));
-    }
+    // Log the computed cage alignment target as a 3D pose for visualization.
+    // Here we assume a fixed z-height (for example, 0.5 meters).
+    double zHeight = 0.5;
+    Pose3d target3d = target.getCageOpeningPose3d(zHeight);
+    Logger.recordOutput("CageAlignmentTarget/Pose3d", target3d);
+    Logger.recordOutput("CageAlignmentTarget/TargetAngleDeg", Math.toDegrees(targetAngleRadians));
 
-    Logger.recordOutput("Alignment/Cage/CageTranslation", cageTranslation);
-    Logger.recordOutput("Alignment/Cage/CageDistance", distanceToCage);
-    Logger.recordOutput("Alignment/Cage/angleToCage", Units.radiansToDegrees(angleRadians));
-    return cageSelection;
+    return target;
   }
-  ;
 
   public static void setLeftCage() {
     FieldConstants.selectedCageTranslation = FieldConstants.getCage(CageTarget.LEFT);
@@ -371,7 +367,6 @@ public class AlignmentUtils {
   }
 
   public static class CageSelection {
-
     private final Translation2d cageSelectionTranslation;
     private final double distanceToCage;
     private final Rotation2d rotationToCage;
@@ -393,6 +388,31 @@ public class AlignmentUtils {
 
     public Rotation2d getRotationToCage() {
       return rotationToCage;
+    }
+
+    /**
+     * Computes the 2D pose of the cage opening using an offset.
+     *
+     * @return The Pose2d of the cage opening.
+     */
+    public Pose2d getCageOpeningPose2d() {
+      double openingOffset = 0;
+      Translation2d offset = new Translation2d(openingOffset, 0.0).rotateBy(rotationToCage);
+      return new Pose2d(cageSelectionTranslation.plus(offset), rotationToCage);
+    }
+
+    /**
+     * Converts the 2D opening pose into a 3D pose with a fixed z-height.
+     *
+     * @param zHeight The fixed z-height (in meters).
+     * @return The Pose3d of the cage opening.
+     */
+    public Pose3d getCageOpeningPose3d(double zHeight) {
+      Pose2d opening2d = getCageOpeningPose2d();
+      return new Pose3d(
+          new Translation3d(
+              opening2d.getTranslation().getX(), opening2d.getTranslation().getY(), zHeight),
+          new Rotation3d(0, 0, opening2d.getRotation().getRadians()));
     }
   }
 
@@ -451,5 +471,112 @@ public class AlignmentUtils {
     double distRight = robotPose.getTranslation().getDistance(rightPoleTrans);
 
     return (distLeft <= distRight) ? PolePosition.A_LEFT : PolePosition.B_RIGHT;
+  }
+
+  public static double alignToReef(
+      Supplier<Pose2d> robotPoseSupplier,
+      Supplier<AlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
+      double reefDistanceThresholdMeters,
+      ProfiledPIDController angleController,
+      AtomicBoolean isManualOverride) {
+
+    AlignmentUtils.ReefFaceSelection selection = reefFaceSelectionSupplier.get();
+    if (selection != null
+        && selection.getAcceptedFaceId() != null
+        && selection.getAcceptedDistance() <= reefDistanceThresholdMeters) {
+
+      if (isManualOverride.get()) {
+        ReefChosenOrientation chosenOrientation =
+            AlignmentUtils.pickClosestOrientationForReef(
+                robotPoseSupplier.get(), selection.getAcceptedFaceId());
+        resetAngleController(angleController, robotPoseSupplier, chosenOrientation);
+        isManualOverride.set(false);
+      }
+
+      ReefChosenOrientation chosenOrientation =
+          AlignmentUtils.pickClosestOrientationForReef(
+              robotPoseSupplier.get(), selection.getAcceptedFaceId());
+
+      return angleController.calculate(
+          robotPoseSupplier.get().getRotation().getRadians(),
+          chosenOrientation.rotation2D().getRadians());
+    }
+
+    return 0.0;
+  }
+
+  public static double alignToCoralStation(
+      Supplier<Pose2d> robotPoseSupplier,
+      Supplier<AlignmentUtils.CoralStationSelection> stationSelectionSupplier,
+      ProfiledPIDController angleController,
+      AtomicBoolean isManualOverride) {
+
+    AlignmentUtils.CoralStationSelection stationSelection = stationSelectionSupplier.get();
+    // If we just switched from manual control, reset the angle controller.
+    if (isManualOverride.get()) {
+      StationChosenOrientation chosenOrientation =
+          AlignmentUtils.pickClosestOrientationForStation(
+              robotPoseSupplier.get(), stationSelection.getAcceptedStationId());
+      resetAngleController(angleController, robotPoseSupplier, chosenOrientation);
+      isManualOverride.set(false);
+    }
+
+    StationChosenOrientation chosenOrientation =
+        AlignmentUtils.pickClosestOrientationForStation(
+            robotPoseSupplier.get(), stationSelection.getAcceptedStationId());
+    Logger.recordOutput(
+        "Alignment/CoralStation/Omega", chosenOrientation.rotation2D().getDegrees());
+
+    return angleController.calculate(
+        robotPoseSupplier.get().getRotation().getRadians(),
+        chosenOrientation.rotation2D().getRadians());
+  }
+
+  private static void resetAngleController(
+      ProfiledPIDController angleController,
+      Supplier<Pose2d> robotPoseSupplier,
+      ReefChosenOrientation chosenOrientation) {
+
+    angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
+    angleController.setGoal(chosenOrientation.rotation2D().getRadians());
+  }
+
+  private static void resetAngleController(
+      ProfiledPIDController angleController,
+      Supplier<Pose2d> robotPoseSupplier,
+      StationChosenOrientation chosenOrientation) {
+
+    angleController.reset(robotPoseSupplier.get().getRotation().getRadians());
+    angleController.setGoal(chosenOrientation.rotation2D().getRadians());
+  }
+
+  public static boolean nearCoralStation(
+      @NonNull Supplier<Pose2d> robotPoseSupplier,
+      @NonNull Supplier<AlignmentUtils.CoralStationSelection> stationSelectionSupplier,
+      double stationDistanceThresholdMeters) {
+
+    AlignmentUtils.CoralStationSelection stationSelection = stationSelectionSupplier.get();
+    // Check if we have a valid station selection within the threshold.
+    return stationSelection != null
+        && stationSelection.getAcceptedStationId() != null
+        && stationSelection.getAcceptedDistance() <= stationDistanceThresholdMeters;
+  }
+
+  private static boolean nearCage(
+      Pose2d climberTipPose,
+      @NonNull Supplier<AlignmentUtils.CageSelection> cageSelectionSupplier,
+      double cageDistanceThresholdMeters,
+      Supplier<Boolean> haveCoral) {
+
+    AlignmentUtils.CageSelection cageSelection = cageSelectionSupplier.get();
+    if (cageSelection == null) {
+      return false;
+    }
+
+    // Compute the distance from the climber tip to the cage target.
+    double distance =
+        climberTipPose.getTranslation().getDistance(cageSelection.getCageSelectionTranslation());
+
+    return (distance <= cageDistanceThresholdMeters && !haveCoral.get());
   }
 }

@@ -8,6 +8,7 @@ import frc.robot.commands.DriveToCommands;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
 import frc.robot.subsystems.algae.Algae;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AlignmentUtils;
@@ -18,6 +19,7 @@ public class ButtonsAndDashboardBindings {
   private static Drive drive;
   private static CoralSystem coralSystem;
   private static IndicatorLight indicatorLight;
+  private static Climber climber;
   private static Algae algae;
 
   public ButtonsAndDashboardBindings() {}
@@ -33,12 +35,14 @@ public class ButtonsAndDashboardBindings {
       OperatorInterface operatorInterface,
       Drive drive,
       CoralSystem coralSystem,
+      Climber climber,
       Algae algae,
       IndicatorLight indicatorLight) {
     ButtonsAndDashboardBindings.oi = operatorInterface;
     ButtonsAndDashboardBindings.drive = drive;
     ButtonsAndDashboardBindings.coralSystem = coralSystem;
     ButtonsAndDashboardBindings.indicatorLight = indicatorLight;
+    ButtonsAndDashboardBindings.climber = climber;
     ButtonsAndDashboardBindings.algae = algae;
 
     drive.setDriveModeNormal();
@@ -59,6 +63,7 @@ public class ButtonsAndDashboardBindings {
             oi::getTranslateY,
             oi::getRotate,
             coralSystem::isCoralInRobot,
+            climber::isClimberDeployed,
             coralSystem.getElevator()::getHeightInInches));
 
     SmartDashboard.putData(
@@ -90,6 +95,12 @@ public class ButtonsAndDashboardBindings {
     SmartDashboard.putData(
         "Algae Dislodge", AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi));
 
+    SmartDashboard.putData("Deploy Climber", Commands.runOnce(climber::deployClimber));
+    SmartDashboard.putData("Stow Climber", Commands.runOnce(climber::stowClimber));
+    SmartDashboard.putData(
+        "Toggle Cage Alignment",
+        Commands.runOnce(drive.getStrategyManager()::toggleAutoCageAlignmentMode));
+
     // Algae Deploy Angle Control (Adjust arm angle)
     SmartDashboard.putNumber("Set Algae Angle", 0.0); // Default to 0 degrees
     SmartDashboard.putData(
@@ -115,11 +126,6 @@ public class ButtonsAndDashboardBindings {
     // Gyro Reset
     oi.getResetGyroButton()
         .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
-
-    // Simulate Coral in Robot
-    if (oi.getButtonV().getAsBoolean()) {
-      coralSystem.setCoralInRobot(true);
-    } else coralSystem.setCoralInRobot(false);
 
     oi.getButtonV()
         .onTrue(Commands.runOnce(() -> coralSystem.setCoralInRobot(true), coralSystem))
