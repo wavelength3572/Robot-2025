@@ -10,9 +10,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.FieldConstants;
 import frc.robot.subsystems.coral.elevator.ElevatorConstants;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -125,7 +122,7 @@ public class Visualizer {
     }
 
     // 🔹 Log scored corals on the reef poles
-    logScoredCorals();
+    // logScoredCorals();
     Logger.recordOutput("Algae/StagedAlgae", FieldConstants.getAllStagedAlgaePositions());
   }
 
@@ -195,6 +192,5 @@ public class Visualizer {
     // ✅ Log the separate 2D visualizations
     Logger.recordOutput("Coral System 2D", coralSystem2D);
     Logger.recordOutput("Algae System 2D", algaeSystem2D);
-
   }
 }

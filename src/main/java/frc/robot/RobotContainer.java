@@ -201,7 +201,8 @@ public class RobotContainer {
   public void normalModeOI() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     oi = OISelector.findOperatorInterface();
-    ButtonsAndDashboardBindings.configureBindings(oi, drive, coralSystem, climber, algae, indicatorLight);
+    ButtonsAndDashboardBindings.configureBindings(
+        oi, drive, coralSystem, climber, algae, indicatorLight);
   }
 
   public Command getAutonomousCommand() {
