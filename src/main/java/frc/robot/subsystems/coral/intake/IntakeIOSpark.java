@@ -18,6 +18,7 @@ public class IntakeIOSpark implements IntakeIO {
   private AbsoluteEncoder armEncoder = intakeMotor.getAbsoluteEncoder();
   private Double requestedSpeed = 0.0;
   private boolean haveCoral = false;
+  private int currentSpikeCounter = 0;
 
   private enum intakeState {
     OFF,
@@ -37,9 +38,22 @@ public class IntakeIOSpark implements IntakeIO {
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    haveCoral = intakeMotor.getForwardLimitSwitch().isPressed();
+    // haveCoral = intakeMotor.getForwardLimitSwitch().isPressed();
+    if (currentIntakeState == intakeState.PULL) {
+      if (intakeMotor.getOutputCurrent() >= 45.0) {
+        if (currentSpikeCounter > 2) {
+          haveCoral = (haveCoral || intakeMotor.getOutputCurrent() >= 45.0);
+        } else {
+          currentSpikeCounter++;
+        }
+      }
+    } else {
+      haveCoral = false;
+      currentSpikeCounter = 0;
+    }
+
     if (currentIntakeState == intakeState.PULL && haveCoral) {
-      intakeMotor.set(0.0);
+      intakeMotor.set(0.03);
     } else {
       intakeMotor.set(requestedSpeed);
     }
@@ -48,6 +62,7 @@ public class IntakeIOSpark implements IntakeIO {
     inputs.velocityRPM = intakeEncoder.getVelocity();
     inputs.appliedVolts = intakeMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = intakeMotor.getOutputCurrent();
+    inputs.motorPosition = intakeEncoder.getPosition();
     inputs.Arm_TBE = armEncoder.getPosition();
     inputs.Arm_TBE_DEG = ArmConstants.armTBEOffset + ((1.0 - inputs.Arm_TBE) * 120.0);
     inputs.coralInRobot = haveCoral;
