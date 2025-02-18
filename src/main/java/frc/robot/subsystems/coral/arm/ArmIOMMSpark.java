@@ -52,6 +52,13 @@ public class ArmIOMMSpark implements ArmIO {
   }
 
   @Override
+  public void setInitialAngle(double initialDegree) {
+    armTargetDEG = initialDegree;
+    armTargetEncoderRotations = armTargetDEG * ArmConstants.kArmGearing / 360.0;
+    armEncoder.setPosition(armTargetEncoderRotations);
+  }
+
+  @Override
   public void setVoltage(double volts) {
     armMotor.setVoltage(volts);
   }

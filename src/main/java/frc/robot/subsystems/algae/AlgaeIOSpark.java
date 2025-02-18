@@ -62,7 +62,8 @@ public class AlgaeIOSpark implements AlgaeIO {
     inputs.targetEncoderRotations = targetEncoderRotations;
     inputs.encoderRotations = algaeDeployEncoder.getPosition();
     inputs.armArbFF = AlgaeConstants.kAlgaeDeployKf;
-    inputs.deployAppliedVolts = algaeDeployMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
+    inputs.deployAppliedVolts =
+        algaeDeployMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.deployCurrentAmps = algaeDeployMotor.getOutputCurrent();
 
     // Game piece detection

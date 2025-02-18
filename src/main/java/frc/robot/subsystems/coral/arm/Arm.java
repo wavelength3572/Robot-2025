@@ -42,6 +42,10 @@ public class Arm {
     Logger.processInputs("Arm", inputs);
   }
 
+  public void setInitialAngle(double initialDegree) {
+    io.setInitialAngle(initialDegree);
+  }
+
   public void setTargetPreset(CoralSystemPresets preset) {
     setAngleDEG(preset.getArmAngle());
   }

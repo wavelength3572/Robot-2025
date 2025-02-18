@@ -95,4 +95,11 @@ public class IntakeIOSpark implements IntakeIO {
     currentIntakeState = intakeState.OFF;
     setSpeed(0.0);
   }
+
+  @Override
+  public double get_Arm_TBE_DEG() {
+    double Arm_TBE_Local = armEncoder.getPosition();
+    double Arm_TBE_DEG_local = ArmConstants.armTBEOffset + ((1.0 - Arm_TBE_Local) * 120.0);
+    return Arm_TBE_DEG_local;
+  }
 }

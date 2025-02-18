@@ -31,5 +31,9 @@ public interface IntakeIO {
     return false;
   }
 
+  public default double get_Arm_TBE_DEG() {
+    return 0.0;
+  }
+
   public default void setCoralInRobot(boolean coralInRobot) {}
 }

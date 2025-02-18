@@ -53,6 +53,8 @@ public class CoralSystem extends SubsystemBase {
     this.intake = intake;
     timeOfFlight.setRangingMode(RangingMode.Short, 20);
 
+    this.arm.setInitialAngle(this.intake.get_Arm_TBE_DEG());
+
     SmartDashboard.putData("Set Coral Config", CoralSystemCommands.runPreset(this));
   }
 

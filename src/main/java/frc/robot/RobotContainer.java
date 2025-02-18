@@ -28,7 +28,6 @@ import frc.robot.subsystems.algae.Algae;
 import frc.robot.subsystems.algae.AlgaeIOSpark;
 import frc.robot.subsystems.algae.AlgaeIOVirtualSim;
 import frc.robot.subsystems.climber.Climber;
-import frc.robot.subsystems.climber.ClimberIOSpark;
 import frc.robot.subsystems.climber.ClimberIOVirtualSim;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;

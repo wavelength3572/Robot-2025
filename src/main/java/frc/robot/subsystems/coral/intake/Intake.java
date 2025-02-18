@@ -34,4 +34,8 @@ public class Intake {
   public void setCoralInRobot(boolean coralInRobot) {
     io.setCoralInRobot(coralInRobot);
   }
+
+  public double get_Arm_TBE_DEG() {
+    return io.get_Arm_TBE_DEG();
+  }
 }
