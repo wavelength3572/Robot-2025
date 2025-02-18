@@ -191,18 +191,18 @@ public class IndicatorLight extends SubsystemBase {
     publishLEDsToDashboardFlipped("StripA", wlLEDBuffer);
   }
 
-/**
- * Publishes the colors from an AddressableLEDBuffer of length 20 to the SmartDashboard as a
- * single strip, flipping its order so LED 0 appears last on the dashboard.
- *
- * @param baseKey  NetworkTable key prefix (e.g., "StripA")
- * @param buffer   The AddressableLEDBuffer containing the full LED data (20 LEDs)
- */
-public void publishLEDsToDashboardFlipped(String baseKey, AddressableLEDBuffer buffer) {
-  int length = buffer.getLength(); // Should be 20
+  /**
+   * Publishes the colors from an AddressableLEDBuffer of length 20 to the SmartDashboard as a
+   * single strip, flipping its order so LED 0 appears last on the dashboard.
+   *
+   * @param baseKey NetworkTable key prefix (e.g., "StripA")
+   * @param buffer The AddressableLEDBuffer containing the full LED data (20 LEDs)
+   */
+  public void publishLEDsToDashboardFlipped(String baseKey, AddressableLEDBuffer buffer) {
+    int length = buffer.getLength(); // Should be 20
 
-  // Publish all LEDs in reverse order so that LED 0 is "at the bottom"
-  for (int i = 0; i < length; i++) {
+    // Publish all LEDs in reverse order so that LED 0 is "at the bottom"
+    for (int i = 0; i < length; i++) {
       // Flip index: so LED 0 → last, LED 1 → second last, etc.
       int reversedIndex = length - 1 - i;
 
@@ -214,8 +214,8 @@ public void publishLEDsToDashboardFlipped(String baseKey, AddressableLEDBuffer b
 
       // Publish to SmartDashboard: e.g., "StripA/led0", "StripA/led1", ...
       SmartDashboard.putString(baseKey + "/led" + i, hex);
+    }
   }
-}
 
   public void blueOmbre() {
     currentColor_GOAL = LED_EFFECTS.BLUEOMBRE;

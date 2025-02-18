@@ -123,7 +123,7 @@ public class DriveConstants {
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 
   // PathPlanner configuration
-  public static final double robotMassKg = Units.lbsToKilograms(85.0 + 13.5); // Robot plus Battery
+  public static final double robotMassKg = Units.lbsToKilograms(105.4 + 13.5); // Robot plus Battery
   public static final double robotMOI = 6.883;
   public static final double wheelCOF = 1.0; // From
   // https://www.vexrobotics.com/colsonperforma.html#attr-vex_resources

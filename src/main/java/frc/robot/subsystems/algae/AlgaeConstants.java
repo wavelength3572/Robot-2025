@@ -1,7 +1,7 @@
 package frc.robot.subsystems.algae;
 
 public class AlgaeConstants {
-  public static final int algaeDeployCanId = 31;
+  public static final int algaeDeployCanId = 33;
   public static final int algaeCaptureCanId = 30;
   public static final int algaeDeployCurrentLimit = 20;
   public static final int algaeCaptureCurrentLimit = 20;
