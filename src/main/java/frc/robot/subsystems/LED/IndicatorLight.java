@@ -188,38 +188,34 @@ public class IndicatorLight extends SubsystemBase {
 
     // Publish the first 10 LEDs of wlLEDBuffer under "StripA" and the second 10
     // under "StripB"
-    publishLEDsToDashboardFlipped("StripA", "StripB", wlLEDBuffer);
+    publishLEDsToDashboardFlipped("StripA", wlLEDBuffer);
   }
 
-  /**
-   * Publishes the colors from an AddressableLEDBuffer as if it were two separate strips, flipping
-   * each half so that LED 0 is at the bottom of each strip.
-   *
-   * @param baseKeyA NetworkTable key prefix for the first strip (e.g., "StripA")
-   * @param baseKeyB NetworkTable key prefix for the second strip (e.g., "StripB")
-   * @param buffer The AddressableLEDBuffer containing the full LED data
-   */
-  public void publishLEDsToDashboardFlipped(
-      String baseKeyA, String baseKeyB, AddressableLEDBuffer buffer) {
-    int length = buffer.getLength();
-    int half = length / 2; // Split the buffer into two halves
+/**
+ * Publishes the colors from an AddressableLEDBuffer of length 20 to the SmartDashboard as a
+ * single strip, flipping its order so LED 0 appears last on the dashboard.
+ *
+ * @param baseKey  NetworkTable key prefix (e.g., "StripA")
+ * @param buffer   The AddressableLEDBuffer containing the full LED data (20 LEDs)
+ */
+public void publishLEDsToDashboardFlipped(String baseKey, AddressableLEDBuffer buffer) {
+  int length = buffer.getLength(); // Should be 20
 
-    // 1) Publish the **first half**, but in **reverse order**
-    for (int i = 0; i < half; i++) {
-      int reversedIndex = half - 1 - i; // Flip the index
-      var color8Bit = buffer.getLED8Bit(reversedIndex);
-      String hex = String.format("#%02X%02X%02X", color8Bit.red, color8Bit.green, color8Bit.blue);
-      SmartDashboard.putString(baseKeyA + "/led" + i, hex);
-    }
+  // Publish all LEDs in reverse order so that LED 0 is "at the bottom"
+  for (int i = 0; i < length; i++) {
+      // Flip index: so LED 0 → last, LED 1 → second last, etc.
+      int reversedIndex = length - 1 - i;
 
-    // 2) Publish the **second half**, but also in **reverse order**
-    for (int i = 0; i < half; i++) {
-      int reversedIndex = length - 1 - i; // Flip the index within the second half
+      // Retrieve color in 8-bit format
       var color8Bit = buffer.getLED8Bit(reversedIndex);
+
+      // Convert to hex string (#RRGGBB)
       String hex = String.format("#%02X%02X%02X", color8Bit.red, color8Bit.green, color8Bit.blue);
-      SmartDashboard.putString(baseKeyB + "/led" + i, hex);
-    }
+
+      // Publish to SmartDashboard: e.g., "StripA/led0", "StripA/led1", ...
+      SmartDashboard.putString(baseKey + "/led" + i, hex);
   }
+}
 
   public void blueOmbre() {
     currentColor_GOAL = LED_EFFECTS.BLUEOMBRE;
@@ -564,19 +560,8 @@ public class IndicatorLight extends SubsystemBase {
     wlLED.setData(wlLEDBuffer);
   }
 
-  /**
-   * Applies an elevator LED mapping effect using the provided preset and bright color. The mapping
-   * is determined by the preset’s state: - L1_SCORE: LED 0 is bright. - L2_SCORE: LEDs 1-3 are
-   * bright. - L3_SCORE: LEDs 4-6 are bright. - L4_SCORE: LEDs 7-9 are bright. The remainder of each
-   * 10‑LED half is set to a muted version of the given color.
-   *
-   * @param preset The preset used to determine the LED mapping.
-   * @param brightColor The color to use for the bright block.
-   */
   private void setElevatorHeightEffect(CoralSystemPresets preset, Color brightColor) {
-
-    final int totalLEDs = wlLEDBuffer.getLength(); // Expected 20
-    final int halfLength = totalLEDs / 2; // 10 LEDs per strip
+    final int totalLEDs = wlLEDBuffer.getLength(); // 20
 
     int brightStart;
     int brightCount;
@@ -585,28 +570,29 @@ public class IndicatorLight extends SubsystemBase {
         currentColor_GOAL = LED_EFFECTS.BLUEOMBRE;
         return;
       }
-
       case L1_SCORE -> {
         brightStart = 0;
-        brightCount = 1;
+        brightCount = 5;
       }
       case L2_SCORE -> {
-        brightStart = 1;
-        brightCount = 3;
+        brightStart = 5;
+        brightCount = 5;
       }
       case L3_SCORE -> {
-        brightStart = 4;
-        brightCount = 3;
+        brightStart = 10;
+        brightCount = 5;
       }
       case L4_SCORE -> {
-        brightStart = 7;
-        brightCount = 3;
+        brightStart = 15;
+        brightCount = 19;
       }
       default -> {
         brightStart = 0;
         brightCount = 0;
       }
     }
+
+    // Create a 'muted' version of the bright color
     double mutedFactor = 0.3;
     Color mutedColor =
         new Color(
@@ -614,18 +600,16 @@ public class IndicatorLight extends SubsystemBase {
             brightColor.green * mutedFactor,
             brightColor.blue * mutedFactor);
 
-    // For each half of the LED strip (assuming 20 LEDs split into two groups)
-    for (int half = 0; half < 2; half++) {
-      int offset = half * halfLength;
-      // Fill the half with the muted color.
-      for (int i = 0; i < halfLength; i++) {
-        wlLEDBuffer.setLED(offset + i, mutedColor);
-      }
-      // Overwrite the designated block with the full bright color.
-      for (int i = brightStart; i < brightStart + brightCount && i < halfLength; i++) {
-        wlLEDBuffer.setLED(offset + i, brightColor);
-      }
+    // 1) Fill the entire 20-LED strip with the muted color
+    for (int i = 0; i < totalLEDs; i++) {
+      wlLEDBuffer.setLED(i, mutedColor);
     }
+
+    // 2) Overwrite the bright block in the designated range
+    for (int i = brightStart; i < brightStart + brightCount && i < totalLEDs; i++) {
+      wlLEDBuffer.setLED(i, brightColor);
+    }
+
     wlLED.setData(wlLEDBuffer);
   }
 

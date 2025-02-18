@@ -79,6 +79,7 @@ public class AlgaeCommands {
     return new ConditionalCommand(
         // ✅ **True Branch**: Execute the dislodge sequence
         new SequentialCommandGroup(
+            new InstantCommand(coralSystem.getIntake()::pullCoral),
             // 1. Determine and set the final dislodge preset based on the current prepare
             // preset.
             new InstantCommand(
