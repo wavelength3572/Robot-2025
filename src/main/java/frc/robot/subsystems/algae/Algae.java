@@ -1,23 +1,21 @@
 package frc.robot.subsystems.algae;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.coral.arm.ArmConstants;
 import frc.robot.util.LoggedTunableNumber;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Algae extends SubsystemBase {
   private final AlgaeIO io;
   private final AlgaeIOInputsAutoLogged inputs = new AlgaeIOInputsAutoLogged();
 
-  private static final LoggedTunableNumber AlgaekP = new LoggedTunableNumber("Algae/kEp",
-      AlgaeConstants.kAlgaeDeployKp);
-  private static final LoggedTunableNumber AlgaekD = new LoggedTunableNumber("Algae/kEd",
-      AlgaeConstants.kAlgaeDeployKd);
-  private static final LoggedTunableNumber AlgaeVel = new LoggedTunableNumber("Algae/kEVel",
-      AlgaeConstants.kAlgaeDeployVel);
-  private static final LoggedTunableNumber AlgaeAcc = new LoggedTunableNumber("Algae/kEAcc",
-      AlgaeConstants.kAlgaeDeployAcc);
+  private static final LoggedTunableNumber AlgaekP =
+      new LoggedTunableNumber("Algae/kEp", AlgaeConstants.kAlgaeDeployKp);
+  private static final LoggedTunableNumber AlgaekD =
+      new LoggedTunableNumber("Algae/kEd", AlgaeConstants.kAlgaeDeployKd);
+  private static final LoggedTunableNumber AlgaeVel =
+      new LoggedTunableNumber("Algae/kEVel", AlgaeConstants.kAlgaeDeployVel);
+  private static final LoggedTunableNumber AlgaeAcc =
+      new LoggedTunableNumber("Algae/kEAcc", AlgaeConstants.kAlgaeDeployAcc);
 
   public Algae(AlgaeIO io) {
     this.io = io;
@@ -29,10 +27,10 @@ public class Algae extends SubsystemBase {
         || AlgaeVel.hasChanged(hashCode())
         || AlgaeAcc.hasChanged(hashCode())) {
       io.setPIDValues(AlgaekP.get(), AlgaekD.get(), AlgaeVel.get(), AlgaeAcc.get());
-    }   
+    }
 
     io.updateInputs(inputs);
-    Logger.processInputs("Intake", inputs);
+    Logger.processInputs("Algae", inputs);
   }
 
   public boolean isAlgaeInRobot() {
