@@ -55,6 +55,7 @@ import frc.robot.util.AlignmentUtils.CageSelection;
 import frc.robot.util.AlignmentUtils.CoralStationSelection;
 import frc.robot.util.AlignmentUtils.ReefFaceSelection;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.RobotStatus;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import lombok.Getter;
@@ -88,7 +89,6 @@ public class Drive extends SubsystemBase {
   @Getter private CoralStationSelection coralStationSelection;
   @Getter private Pose2d algaeTargetPose;
   @Getter private CageSelection cageSelection;
-  @Getter private Boolean isVisionOn = true;
 
   @Getter private final StrategyManager strategyManager = new StrategyManager();
 
@@ -146,8 +146,6 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
-
-    Logger.recordOutput("Vision/isVisionOn", isVisionOn);
 
     Pose3d robotPose3D = convertPose2dTo3d(getPose());
 
@@ -316,7 +314,7 @@ public class Drive extends SubsystemBase {
 
   /** Returns the measured chassis speeds of the robot. */
   @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
-  private ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
 
@@ -395,7 +393,7 @@ public class Drive extends SubsystemBase {
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
 
-    if (isVisionOn) {
+    if (RobotStatus.isVisionOn()) {
       poseEstimator.addVisionMeasurement(
           visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     }
@@ -430,18 +428,6 @@ public class Drive extends SubsystemBase {
     } else {
       setDriveModeSmart();
     }
-  }
-
-  public void setVisionOn() {
-    isVisionOn = true;
-  }
-
-  public void setVisionOff() {
-    isVisionOn = false;
-  }
-
-  public void toggleVision() {
-    isVisionOn = !isVisionOn;
   }
 
   /**

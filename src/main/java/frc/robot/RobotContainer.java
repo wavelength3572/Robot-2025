@@ -45,6 +45,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.OdometryHealthMonitor;
 import frc.robot.util.RobotStatus;
 import frc.robot.util.Visualizer;
 import lombok.Getter;
@@ -70,6 +71,8 @@ public class RobotContainer {
   private final IndicatorLight indicatorLight;
   private OperatorInterface oi = new OperatorInterface() {};
   private LoggedDashboardChooser<Command> autoChooser;
+
+  @Getter private final OdometryHealthMonitor odometryHealthMonitor;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -170,6 +173,8 @@ public class RobotContainer {
             algae::getDeployPosition,
             algae::getCurrentSpeedRPM);
 
+    odometryHealthMonitor = new OdometryHealthMonitor(drive, vision);
+
     if (elevator != null) {
       elevator.setTargetPreset(CoralSystemPresets.STARTUP);
     }
@@ -178,8 +183,8 @@ public class RobotContainer {
       arm.setTargetPreset(CoralSystemPresets.STARTUP);
     }
 
-    // give static access to currentPreset and robotPose
-    RobotStatus.initialize(drive, coralSystem);
+    // give static access to certain methods across subsystems
+    RobotStatus.initialize(drive, coralSystem, vision);
 
     PathPlannerCommands.Setup(coralSystem);
     SetupAutoChooser();
@@ -201,7 +206,7 @@ public class RobotContainer {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     oi = OISelector.findOperatorInterface();
     ButtonsAndDashboardBindings.configureBindings(
-        oi, drive, coralSystem, climber, algae, indicatorLight);
+        oi, drive, coralSystem, climber, algae, vision, indicatorLight);
   }
 
   public Command getAutonomousCommand() {

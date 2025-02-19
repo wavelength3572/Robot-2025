@@ -34,6 +34,7 @@ public class Vision extends SubsystemBase {
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
+  private Boolean isVisionOn = true;
 
   public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -65,6 +66,8 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
+    Logger.recordOutput("Vision/isVisionOn", isVisionOn);
+
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
       Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
@@ -179,5 +182,21 @@ public class Vision extends SubsystemBase {
         Pose2d visionRobotPoseMeters,
         double timestampSeconds,
         Matrix<N3, N1> visionMeasurementStdDevs);
+  }
+
+  public boolean isVisionOn() {
+    return isVisionOn;
+  }
+
+  public void setVisionOn() {
+    isVisionOn = true;
+  }
+
+  public void setVisionOff() {
+    isVisionOn = false;
+  }
+
+  public void toggleVision() {
+    isVisionOn = !isVisionOn;
   }
 }

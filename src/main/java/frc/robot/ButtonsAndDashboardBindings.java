@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
-import frc.robot.commands.NamedCommands.PickupCoralCommand;
 import frc.robot.commands.NamedCommands.ScoreCoralCommand;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
@@ -17,6 +16,7 @@ import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.AlignmentUtils;
 
 public class ButtonsAndDashboardBindings {
@@ -27,9 +27,9 @@ public class ButtonsAndDashboardBindings {
   private static IndicatorLight indicatorLight;
   private static Climber climber;
   private static Algae algae;
+  private static Vision vision;
 
-  public ButtonsAndDashboardBindings() {
-  }
+  public ButtonsAndDashboardBindings() {}
 
   public static void configureTestModeButtonBindings(
       OperatorInterface operatorInterface, Drive drive) {
@@ -44,6 +44,7 @@ public class ButtonsAndDashboardBindings {
       CoralSystem coralSystem,
       Climber climber,
       Algae algae,
+      Vision vision,
       IndicatorLight indicatorLight) {
     ButtonsAndDashboardBindings.oi = operatorInterface;
     ButtonsAndDashboardBindings.drive = drive;
@@ -51,6 +52,7 @@ public class ButtonsAndDashboardBindings {
     ButtonsAndDashboardBindings.indicatorLight = indicatorLight;
     ButtonsAndDashboardBindings.climber = climber;
     ButtonsAndDashboardBindings.algae = algae;
+    ButtonsAndDashboardBindings.vision = vision;
 
     drive.setDriveModeNormal();
     drive.setDefaultCommand(
@@ -76,7 +78,7 @@ public class ButtonsAndDashboardBindings {
             coralSystem.getElevator()::getHeightInInches));
 
     SmartDashboard.putData(
-        "Toggle Vision", Commands.runOnce(drive::toggleVision).ignoringDisable(true));
+        "Toggle Vision", Commands.runOnce(vision::toggleVision).ignoringDisable(true));
 
     SmartDashboard.putData(
         "Closest A Pole",
@@ -205,51 +207,61 @@ public class ButtonsAndDashboardBindings {
 
   private static void configureOperatorButtonBindings() {
 
+    oi.getButtonBox1Button3()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  if (coralSystem.currentCoralPreset == PREPARE_DISLODGE_LEVEL_1
+                      || coralSystem.currentCoralPreset == PREPARE_DISLODGE_LEVEL_2) {
+                    AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi).schedule();
+                  } else {
+                    new ScoreCoralCommand(coralSystem.getIntake()).schedule();
+                  }
+                }));
 
-    oi.getButtonBox1Button3().onTrue(
-      Commands.runOnce(()->
-      {
-        if (coralSystem.currentCoralPreset==PREPARE_DISLODGE_LEVEL_1 || coralSystem.currentCoralPreset == PREPARE_DISLODGE_LEVEL_2)
-        {
-          AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi).schedule();
-        } else
-        {
-          new ScoreCoralCommand(coralSystem.getIntake()).schedule();
-        }
-      }
-      ));
-    
     // oi.getButtonBox1Button7().onTrue(Commands.runOnce(climber::deployClimber));
     // oi.getButtonBox1Button8().onTrue(Commands.runOnce(climber::stowClimber));
 
-    oi.getButtonBox1Button6().onTrue(Commands.runOnce(// this is the collect algae
-        ()->
-        {          
-          // algae.deployAlgae();          // deploy the algae mechanism
-          // algae.setSpeed(0);          // run algae intake
-        }));
+    oi.getButtonBox1Button6()
+        .onTrue(
+            Commands.runOnce( // this is the collect algae
+                () -> {
+                  // algae.deployAlgae();          // deploy the algae mechanism
+                  // algae.setSpeed(0);          // run algae intake
+                }));
 
-    oi.getButtonBox1Button5().onTrue(Commands.runOnce( // this is the process algae button
-          ()->
-          {          
-            // algae.deployAlgae();          // does mechanism need to move?
-            // algae.setSpeed(0);          // run algae intake
-          }));
-        
-   oi.getButtonBox1YAxisPositive().onTrue(Commands.runOnce(()->coralSystem.setTargetPreset(CoralSystemPresets.L1))); // L1
-   oi.getButtonBox1YAxisNegative().onTrue(Commands.runOnce(()->coralSystem.setTargetPreset(CoralSystemPresets.L2)));  // L2
-   oi.getButtonBox1XAxisNegative().onTrue(Commands.runOnce(()->coralSystem.setTargetPreset(CoralSystemPresets.L3)));  // L3
-   oi.getButtonBox1XAxisPositive().onTrue(Commands.runOnce(()->coralSystem.setTargetPreset(CoralSystemPresets.L4)));  // L4
+    oi.getButtonBox1Button5()
+        .onTrue(
+            Commands.runOnce( // this is the process algae button
+                () -> {
+                  // algae.deployAlgae();          // does mechanism need to move?
+                  // algae.setSpeed(0);          // run algae intake
+                }));
 
-   oi.getButtonBox1Button1().onTrue(Commands.runOnce(()->coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1)));  
-   oi.getButtonBox1Button2().onTrue(Commands.runOnce(()->coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2)));  
+    oi.getButtonBox1YAxisPositive()
+        .onTrue(Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L1))); // L1
+    oi.getButtonBox1YAxisNegative()
+        .onTrue(Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L2))); // L2
+    oi.getButtonBox1XAxisNegative()
+        .onTrue(Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L3))); // L3
+    oi.getButtonBox1XAxisPositive()
+        .onTrue(Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L4))); // L4
 
-   oi.getButtonBox1Button4().onTrue(Commands.runOnce(()->
-      {
-        coralSystem.setTargetPreset(CoralSystemPresets.PICKUP);
-        coralSystem.getIntake().pullCoral();
-      }));
+    oi.getButtonBox1Button1()
+        .onTrue(
+            Commands.runOnce(
+                () -> coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1)));
+    oi.getButtonBox1Button2()
+        .onTrue(
+            Commands.runOnce(
+                () -> coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2)));
 
-    }
-
+    oi.getButtonBox1Button4()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  coralSystem.setTargetPreset(CoralSystemPresets.PICKUP);
+                  coralSystem.getIntake().pullCoral();
+                }));
+  }
 }

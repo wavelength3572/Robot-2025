@@ -83,48 +83,8 @@ public class CoralSystem extends SubsystemBase {
 
     CoralRPStatusLogger.logCoralStatus(false);
 
-    boolean safeDistanceFromStation =
-        RobotStatus.getCoralStationSelection().getAcceptedDistance()
-            > SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE;
-
-    boolean nearReef =
-        RobotStatus.getReefFaceSelection().getAcceptedDistance() < NEAR_REEF_DISTANCE;
-
-    Logger.recordOutput("Automation/justPickedUp", justPickedUp);
-    justPickedUp = false;
-
-    Logger.recordOutput("Automation/justNearReef", justNearReef);
-    justNearReef = false;
-    Logger.recordOutput("Automation/justScored", justScored);
-    justScored = false;
-
-    if (DriverStation.isTeleop()
-        && safeDistanceFromStation
-        && coralInRobot
-        && currentCoralPreset == PICKUP
-        && systemState == CoralSystemMovementState.STABLE) {
-      justPickedUp = true;
-    }
-
-    if (DriverStation.isTeleop()
-        && nearReef
-        && coralInRobot
-        && currentCoralPreset == STOW
-        && systemState == CoralSystemMovementState.STABLE) {
-      justNearReef = true;
-    }
-
-    if (DriverStation.isTeleop()
-        && !coralInRobot
-        && (currentCoralPreset != CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1
-            && currentCoralPreset != CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2)
-        && (currentCoralPreset == L1
-            || currentCoralPreset == L2
-            || currentCoralPreset == L3
-            || currentCoralPreset == L4)
-        && nearReef
-        && systemState == CoralSystemMovementState.STABLE) {
-      justScored = true;
+    if (DriverStation.isEnabled()) {
+      automationTriggerChecks();
     }
 
     switch (systemState) {
@@ -172,6 +132,52 @@ public class CoralSystem extends SubsystemBase {
 
     // check the score timer and stop the intake if its greater than a score time
     // threshold
+  }
+
+  private void automationTriggerChecks() {
+    boolean safeDistanceFromStation =
+        RobotStatus.getCoralStationSelection().getAcceptedDistance()
+            > SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE;
+
+    boolean nearReef =
+        RobotStatus.getReefFaceSelection().getAcceptedDistance() < NEAR_REEF_DISTANCE;
+
+    Logger.recordOutput("Automation/justPickedUp", justPickedUp);
+    justPickedUp = false;
+
+    Logger.recordOutput("Automation/justNearReef", justNearReef);
+    justNearReef = false;
+    Logger.recordOutput("Automation/justScored", justScored);
+    justScored = false;
+
+    if (DriverStation.isTeleop()
+        && safeDistanceFromStation
+        && coralInRobot
+        && currentCoralPreset == PICKUP
+        && systemState == CoralSystemMovementState.STABLE) {
+      justPickedUp = true;
+    }
+
+    if (DriverStation.isTeleop()
+        && nearReef
+        && coralInRobot
+        && currentCoralPreset == STOW
+        && systemState == CoralSystemMovementState.STABLE) {
+      justNearReef = true;
+    }
+
+    if (DriverStation.isTeleop()
+        && !coralInRobot
+        && (currentCoralPreset != CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1
+            && currentCoralPreset != CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2)
+        && (currentCoralPreset == L1
+            || currentCoralPreset == L2
+            || currentCoralPreset == L3
+            || currentCoralPreset == L4)
+        && nearReef
+        && systemState == CoralSystemMovementState.STABLE) {
+      justScored = true;
+    }
   }
 
   public void setTargetPreset(CoralSystemPresets preset) {

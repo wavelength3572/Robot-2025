@@ -4,25 +4,28 @@ import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.AlignmentUtils.CoralStationSelection;
 import frc.robot.util.AlignmentUtils.ReefFaceSelection;
 
 public class RobotStatus {
-  private static Drive driveSubsystem;
+  private static Drive driveSystem;
   private static CoralSystem coralSystem;
+  private static Vision visionSystem;
 
   // Called once from RobotContainer to initialize with the actual Drive instance
-  public static void initialize(Drive drive, CoralSystem coral) {
-    driveSubsystem = drive;
+  public static void initialize(Drive drive, CoralSystem coral, Vision vision) {
+    driveSystem = drive;
     coralSystem = coral;
+    visionSystem = vision;
   }
 
   // Globally accessible method to get the robot's pose
   public static Pose2d getRobotPose() {
-    if (driveSubsystem == null) {
+    if (driveSystem == null) {
       throw new IllegalStateException("RobotStatus has not been initialized!");
     }
-    return driveSubsystem.getPose();
+    return driveSystem.getPose();
   }
 
   // Globally accessible method to get the robot's pose
@@ -35,22 +38,27 @@ public class RobotStatus {
 
   // Globally accessible method to get the reefFaceSelection
   public static ReefFaceSelection getReefFaceSelection() {
-    if (driveSubsystem == null) {
+    if (driveSystem == null) {
       throw new IllegalStateException("RobotStatus has not been initialized!");
     }
-    return driveSubsystem.getReefFaceSelection();
+    return driveSystem.getReefFaceSelection();
   }
 
   // Globally accessible method to get the reefFaceSelection
   public static CoralStationSelection getCoralStationSelection() {
-    if (driveSubsystem == null) {
+    if (driveSystem == null) {
       throw new IllegalStateException("RobotStatus has not been initialized!");
     }
-    return driveSubsystem.getCoralStationSelection();
+    return driveSystem.getCoralStationSelection();
   }
 
   // Globally accessible method to get the reefFaceSelection
   public static boolean isDriveModeSmart() {
-    return driveSubsystem.isDriveModeSmart();
+    return driveSystem.isDriveModeSmart();
+  }
+
+  // Globally accessible method to whether vision is on
+  public static boolean isVisionOn() {
+    return visionSystem.isVisionOn();
   }
 }

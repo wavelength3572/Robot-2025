@@ -129,6 +129,10 @@ public class Robot extends LoggedRobot {
       robotContainer.getVisualizer().update3DVisualization();
       robotContainer.getVisualizer().update2DVisualization();
     }
+
+    if (robotContainer.getOdometryHealthMonitor() != null) {
+      robotContainer.getOdometryHealthMonitor().checkOdometryHealth();
+    }
   }
 
   /** This function is called once when the robot is disabled. */
