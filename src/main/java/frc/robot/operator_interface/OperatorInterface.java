@@ -197,7 +197,19 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getButtonBox1YAxis() {
+  public default Trigger getButtonBox1YAxisNegative() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getButtonBox1YAxisPositive() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getButtonBox1XAxisNegative() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getButtonBox1XAxisPositive() {
     return new Trigger(() -> false);
   }
 
