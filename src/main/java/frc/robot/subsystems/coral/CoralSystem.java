@@ -112,7 +112,6 @@ public class CoralSystem extends SubsystemBase {
         && currentCoralPreset == STOW
         && systemState == CoralSystemMovementState.STABLE) {
       justNearReef = true;
-      justNearReef = false;
     }
 
     if (DriverStation.isTeleop()
@@ -126,7 +125,6 @@ public class CoralSystem extends SubsystemBase {
         && nearReef
         && systemState == CoralSystemMovementState.STABLE) {
       justScored = true;
-      justScored = false;
     }
 
     switch (systemState) {
