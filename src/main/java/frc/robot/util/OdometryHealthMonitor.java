@@ -75,9 +75,7 @@ public class OdometryHealthMonitor {
 
     // Adjusted Frozen Logic
     boolean frozen =
-        currentVelocity > 0.1
-            && poseDifference < FROZEN_POSE_THRESHOLD
-            && elapsedTime > 0.5; 
+        currentVelocity > 0.1 && poseDifference < FROZEN_POSE_THRESHOLD && elapsedTime > 0.5;
 
     Logger.recordOutput("OdometryHealth/PoseFrozenComputed", frozen);
     return frozen;
