@@ -61,12 +61,12 @@ public class AlgaeIOVirtualSim implements AlgaeIO {
   }
 
   @Override
-  public double getDeployPosition() {
-    return virtualEncoderRotations;
+  public void setDeployPositionAngle(double angle) {
+    targetEncoderRotations = angle;
   }
 
   @Override
-  public void setDeployPosition(double rotations) {
-    targetEncoderRotations = rotations;
+  public double getDeployPositionAngle() {
+    return 0.0;
   }
 }

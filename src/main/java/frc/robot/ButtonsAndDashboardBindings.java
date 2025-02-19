@@ -12,6 +12,7 @@ import frc.robot.commands.NamedCommands.ScoreCoralCommand;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
 import frc.robot.subsystems.algae.Algae;
+import frc.robot.subsystems.algae.AlgaeConstants;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
@@ -118,8 +119,10 @@ public class ButtonsAndDashboardBindings {
         "Apply Algae Rotation Target",
         Commands.runOnce(
             () -> {
-              double rotations = SmartDashboard.getNumber("Set Algae Rotation Target", 0.0);
-              algae.setDeployPosition(rotations);
+              double angle =
+                  SmartDashboard.getNumber(
+                      "Set Algae Angle Target", AlgaeConstants.kAlgaeDeployInitalAngle);
+              algae.setDeployPositionAngle(angle);
             }));
 
     SmartDashboard.putData("Stow Algae", Commands.runOnce(algae::stowAlgae));
@@ -145,30 +148,66 @@ public class ButtonsAndDashboardBindings {
         .onTrue(Commands.runOnce(() -> coralSystem.setCoralInRobot(true), coralSystem))
         .onFalse(Commands.runOnce(() -> coralSystem.setCoralInRobot(false), coralSystem));
 
+    // oi.getButtonFPosition0() // Push Intake
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> {
+    //               coralSystem.getIntake().pushCoral();
+    //             }))
+    //     .onFalse(
+    //         Commands.runOnce(
+    //             () -> {
+    //               coralSystem.getIntake().stopIntake();
+    //               ;
+    //             }));
+    // oi.getButtonFPosition2() // Pull Intake
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> {
+    //               coralSystem.getIntake().pullCoral();
+    //             }))
+    //     .onFalse(
+    //         Commands.runOnce(
+    //             () -> {
+    //               coralSystem.getIntake().stopIntake();
+    //               ;
+    //             }));
+
     oi.getButtonFPosition0() // Push Intake
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  coralSystem.getIntake().pushCoral();
+                  algae.pushAlgae();
                 }))
         .onFalse(
             Commands.runOnce(
                 () -> {
-                  coralSystem.getIntake().stopIntake();
-                  ;
+                  algae.stopAlgae();
                 }));
     oi.getButtonFPosition2() // Pull Intake
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  coralSystem.getIntake().pullCoral();
+                  algae.pullAlgae();
                 }))
         .onFalse(
             Commands.runOnce(
                 () -> {
-                  coralSystem.getIntake().stopIntake();
-                  ;
+                  algae.stopAlgae();
                 }));
+
+    // oi.getButtonFPosition0() // Push Algae Arm
+    // .onTrue(
+    // Commands.runOnce(
+    // () -> {
+    // algae.deployAlgae();
+    // }));
+    // oi.getButtonFPosition2() // Pull Algae Arm
+    // .onTrue(
+    // Commands.runOnce(
+    // () -> {
+    // algae.stowAlgae();
+    // }));
 
     if (oi.getButtonGPosition0().getAsBoolean()) {
       AlignmentUtils.setLeftCage();
@@ -226,16 +265,16 @@ public class ButtonsAndDashboardBindings {
         .onTrue(
             Commands.runOnce( // this is the collect algae
                 () -> {
-                  // algae.deployAlgae();          // deploy the algae mechanism
-                  // algae.setSpeed(0);          // run algae intake
+                  // algae.deployAlgae(); // deploy the algae mechanism
+                  // algae.setSpeed(0); // run algae intake
                 }));
 
     oi.getButtonBox1Button5()
         .onTrue(
             Commands.runOnce( // this is the process algae button
                 () -> {
-                  // algae.deployAlgae();          // does mechanism need to move?
-                  // algae.setSpeed(0);          // run algae intake
+                  // algae.deployAlgae(); // does mechanism need to move?
+                  // algae.setSpeed(0); // run algae intake
                 }));
 
     oi.getButtonBox1YAxisPositive()

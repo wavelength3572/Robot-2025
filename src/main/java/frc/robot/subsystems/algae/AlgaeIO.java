@@ -14,7 +14,9 @@ public interface AlgaeIO {
 
     // Deploy Motor Values (Tracked in Both Degrees and Rotations)
     public double encoderRotations = 0.0; // Current deploy encoder rotations
+    public double currentAngle = 0.0;
     public double targetEncoderRotations = 0.0; // Target encoder rotations
+    public double targetAngle = 0.0;
 
     // Feedforward and Control Values
     public double armArbFF = 0.0; // Raw feedforward value
@@ -36,7 +38,7 @@ public interface AlgaeIO {
 
   /** Set PID values dynamically for position control tuning. */
   public default void setPIDValues(
-      double kP, double kD, double velocityMax, double accelerationMax) {}
+      double kP, double kD, double kFF, double velocityMax, double accelerationMax) {}
 
   /** Run intake motor to pull in algae (game piece). */
   public default void pullAlgae() {}
@@ -45,7 +47,7 @@ public interface AlgaeIO {
   public default void pushAlgae() {}
 
   /** Stop intake motor. */
-  public default void stop() {}
+  public default void stopAlgae() {}
 
   /** Deploy the arm to the predefined position. */
   public default void deployAlgae() {}
@@ -53,11 +55,11 @@ public interface AlgaeIO {
   /** Stow the arm to the predefined position. */
   public default void stowAlgae() {}
 
-  public default double getDeployPosition() {
+  public default void setDeployPositionAngle(double angle) {}
+
+  public default double getDeployPositionAngle() {
     return 0.0;
   }
-
-  public default void setDeployPosition(double rotations) {}
 
   /** Check if an algae (game piece) is in the system. */
   public default boolean isAlgaeInRobot() {

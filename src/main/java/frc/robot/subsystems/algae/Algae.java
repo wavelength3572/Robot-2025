@@ -16,6 +16,8 @@ public class Algae extends SubsystemBase {
       new LoggedTunableNumber("Algae/kEVel", AlgaeConstants.kAlgaeDeployVel);
   private static final LoggedTunableNumber AlgaeAcc =
       new LoggedTunableNumber("Algae/kEAcc", AlgaeConstants.kAlgaeDeployAcc);
+  private static final LoggedTunableNumber AlgaeAFF =
+      new LoggedTunableNumber("Algae/kEAFF", AlgaeConstants.kAlgaeDeployKf);
 
   public Algae(AlgaeIO io) {
     this.io = io;
@@ -25,8 +27,9 @@ public class Algae extends SubsystemBase {
     if (AlgaekP.hasChanged(hashCode())
         || AlgaekD.hasChanged(hashCode())
         || AlgaeVel.hasChanged(hashCode())
-        || AlgaeAcc.hasChanged(hashCode())) {
-      io.setPIDValues(AlgaekP.get(), AlgaekD.get(), AlgaeVel.get(), AlgaeAcc.get());
+        || AlgaeAcc.hasChanged(hashCode())
+        || AlgaeAFF.hasChanged(hashCode())) {
+      io.setPIDValues(AlgaekP.get(), AlgaekD.get(), AlgaeAFF.get(), AlgaeVel.get(), AlgaeAcc.get());
     }
 
     io.updateInputs(inputs);
@@ -50,8 +53,8 @@ public class Algae extends SubsystemBase {
     io.pullAlgae();
   }
 
-  public void stop() {
-    io.stop();
+  public void stopAlgae() {
+    io.stopAlgae();
   }
 
   public double getCurrentSpeedRPM() {
@@ -71,13 +74,13 @@ public class Algae extends SubsystemBase {
     io.stowAlgae();
   }
 
-  public void setDeployPosition(double rotations) {
-    if (rotations >= AlgaeConstants.MIN_ROTATIONS && rotations <= AlgaeConstants.MAX_ROTATIONS) {
-      io.setDeployPosition(rotations);
+  public void setDeployPositionAngle(double angle) {
+    if (angle >= AlgaeConstants.MIN_ANGLE && angle <= AlgaeConstants.MAX_ANGLE) {
+      io.setDeployPositionAngle(angle);
     }
   }
 
-  public double getDeployPosition() {
-    return io.getDeployPosition();
+  public double getDeployPositionAngle() {
+    return io.getDeployPositionAngle();
   }
 }

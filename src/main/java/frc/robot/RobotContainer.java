@@ -170,7 +170,7 @@ public class RobotContainer {
             arm::getCurrentAngleDEG,
             coralSystem::isCoralInRobot,
             algae::isAlgaeInRobot,
-            algae::getDeployPosition,
+            algae::getDeployPositionAngle,
             algae::getCurrentSpeedRPM);
 
     odometryHealthMonitor = new OdometryHealthMonitor(drive, vision);
