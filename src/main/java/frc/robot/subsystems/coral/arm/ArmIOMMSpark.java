@@ -13,7 +13,8 @@ import edu.wpi.first.wpilibj.RobotController;
 
 public class ArmIOMMSpark implements ArmIO {
 
-  // Initialize elevator SPARK. We will use MAXMotion position control for the elevator, so we also
+  // Initialize elevator SPARK. We will use MAXMotion position control for the
+  // elevator, so we also
   // need to initialize the closed loop controller and encoder.
   private SparkFlex armMotor = new SparkFlex(ArmConstants.canId, MotorType.kBrushless);
   private SparkClosedLoopController armClosedLoopController = armMotor.getClosedLoopController();
@@ -23,6 +24,8 @@ public class ArmIOMMSpark implements ArmIO {
   private double armTargetEncoderRotations =
       ArmConstants.armStartAngle * ArmConstants.kArmGearing / 360.0;
 
+  private boolean TBE_Valid = true;
+
   // private double armArbFF = 0.0;
 
   public ArmIOMMSpark() {
@@ -30,7 +33,7 @@ public class ArmIOMMSpark implements ArmIO {
         ArmConfigs.ArmSubsystem.armConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
-    armEncoder.setPosition(ArmConstants.armStartAngle * ArmConstants.kArmGearing / 360.0);
+    armEncoder.setPosition(armTargetEncoderRotations);
   }
 
   @Override
@@ -45,6 +48,7 @@ public class ArmIOMMSpark implements ArmIO {
     inputs.targetEncoderRotations = this.armTargetEncoderRotations;
     inputs.encoderRotations = armEncoder.getPosition();
     inputs.armArbFF = ArmConstants.kArmKf;
+    inputs.TBE_Valid = this.TBE_Valid;
     inputs.armArbFF_COS = ArmConstants.kArmKf * Math.cos(Math.toRadians(inputs.currentAngleDEG));
     inputs.velocityRPM = armEncoder.getVelocity();
     inputs.appliedVolts = armMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
@@ -53,9 +57,15 @@ public class ArmIOMMSpark implements ArmIO {
 
   @Override
   public void setInitialAngle(double initialDegree) {
-    armTargetDEG = initialDegree;
-    armTargetEncoderRotations = armTargetDEG * ArmConstants.kArmGearing / 360.0;
-    armEncoder.setPosition(armTargetEncoderRotations);
+    if (initialDegree >= 65 && initialDegree <= 144) {
+      TBE_Valid = true;
+      armTargetDEG = initialDegree;
+      armTargetEncoderRotations = armTargetDEG * ArmConstants.kArmGearing / 360.0;
+      armEncoder.setPosition(armTargetEncoderRotations);
+    } else {
+      // Bad ThroughBore Encoder Reading
+      TBE_Valid = false;
+    }
   }
 
   @Override
@@ -65,9 +75,12 @@ public class ArmIOMMSpark implements ArmIO {
 
   @Override
   public void setTargetAngleDEG(double requestedPosition) {
-    this.armTargetDEG = requestedPosition;
-    this.armTargetEncoderRotations = this.armTargetDEG * ArmConstants.kArmGearing / 360.0;
-    // if (requestedArbFF >= -0.21 && requestedArbFF <= 0.21) this.armArbFF = requestedArbFF;
+    if (TBE_Valid) {
+      this.armTargetDEG = requestedPosition;
+      this.armTargetEncoderRotations = this.armTargetDEG * ArmConstants.kArmGearing / 360.0;
+      // if (requestedArbFF >= -0.21 && requestedArbFF <= 0.21) this.armArbFF =
+      // requestedArbFF;
+    }
   }
 
   @Override

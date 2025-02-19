@@ -15,8 +15,8 @@ import java.util.function.Supplier;
 
 public class IndicatorLight extends SubsystemBase {
 
-  private LED_EFFECTS currentColor_GOAL = LED_EFFECTS.BLUEOMBRE;
-  private LED_EFFECTS LED_State = LED_EFFECTS.BLUEOMBRE;
+  private LED_EFFECTS currentColor_GOAL = LED_EFFECTS.BLACK;
+  private LED_EFFECTS LED_State = LED_EFFECTS.BLACK;
 
   Supplier<CoralSystemPresets> getCurrentCoralPreset;
   Supplier<CoralSystemPresets> getSelectedCoralPreset;
