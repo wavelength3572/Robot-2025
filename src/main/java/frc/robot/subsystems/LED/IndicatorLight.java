@@ -600,9 +600,11 @@ public class IndicatorLight extends SubsystemBase {
             brightColor.green * mutedFactor,
             brightColor.blue * mutedFactor);
 
+    Color black = new Color();
+
     // 1) Fill the entire 20-LED strip with the muted color
     for (int i = 0; i < totalLEDs; i++) {
-      wlLEDBuffer.setLED(i, mutedColor);
+      wlLEDBuffer.setLED(i, black);
     }
 
     // 2) Overwrite the bright block in the designated range

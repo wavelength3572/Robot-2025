@@ -1,7 +1,10 @@
 package frc.robot.subsystems.coral;
 
+import static frc.robot.subsystems.coral.CoralSystemPresets.*;
+
 import com.playingwithfusion.TimeOfFlight;
 import com.playingwithfusion.TimeOfFlight.RangingMode;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.*;
@@ -17,12 +20,18 @@ import org.littletonrobotics.junction.Logger;
 
 public class CoralSystem extends SubsystemBase {
 
+  private double SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE = 1.5;
+  private double NEAR_REEF_DISTANCE = 1;
+
   @Getter private Elevator elevator;
   @Getter public final CoralSystemPresetChooser coralSystemPresetChooser;
   @Getter private Arm arm;
   @Getter private Intake intake;
 
   @Getter public boolean coralInRobot;
+  @Getter public boolean justNearReef;
+  @Getter public boolean justPickedUp;
+  @Getter public boolean justScored;
 
   private TimeOfFlight timeOfFlight = new TimeOfFlight(31); // Back of Robot on Elevator
 
@@ -74,6 +83,50 @@ public class CoralSystem extends SubsystemBase {
 
     CoralRPStatusLogger.logCoralStatus(false);
 
+    boolean safeDistanceFromStation =
+        RobotStatus.getCoralStationSelection().getAcceptedDistance()
+            > SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE;
+
+    boolean nearReef =
+        RobotStatus.getReefFaceSelection().getAcceptedDistance() < NEAR_REEF_DISTANCE;
+
+    Logger.recordOutput("Automation/justPickedUp", justPickedUp);
+    justPickedUp = false;
+
+    Logger.recordOutput("Automation/justNearReef", justNearReef);
+    justNearReef = false;
+    Logger.recordOutput("Automation/justScored", justScored);
+    justScored = false;
+
+    if (DriverStation.isTeleop()
+        && safeDistanceFromStation
+        && coralInRobot
+        && currentCoralPreset == PICKUP
+        && systemState == CoralSystemMovementState.STABLE) {
+      justPickedUp = true;
+    }
+
+    if (DriverStation.isTeleop()
+        && nearReef
+        && coralInRobot
+        && currentCoralPreset == STOW
+        && systemState == CoralSystemMovementState.STABLE) {
+      justNearReef = true;
+    }
+
+    if (DriverStation.isTeleop()
+        && !coralInRobot
+        && (currentCoralPreset != CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1
+            && currentCoralPreset != CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2)
+        && (currentCoralPreset == L1
+            || currentCoralPreset == L2
+            || currentCoralPreset == L3
+            || currentCoralPreset == L4)
+        && nearReef
+        && systemState == CoralSystemMovementState.STABLE) {
+      justScored = true;
+    }
+
     switch (systemState) {
       case STABLE:
         // Do Nothing
@@ -117,7 +170,8 @@ public class CoralSystem extends SubsystemBase {
         break;
     }
 
-    // check the score timer and stop the intake if its greater than a score time threshold
+    // check the score timer and stop the intake if its greater than a score time
+    // threshold
   }
 
   public void setTargetPreset(CoralSystemPresets preset) {
