@@ -9,6 +9,7 @@ public interface ArmIO {
     public double currentAngleDEG = 0.0;
     public double targetEncoderRotations = 0.0;
     public double encoderRotations = 0.0;
+    public boolean TBE_Valid = false;
     public double armArbFF = 0.0;
     public double armArbFF_COS = 0.0;
     public double velocityRPM = 0.0;

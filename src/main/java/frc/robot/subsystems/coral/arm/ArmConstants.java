@@ -5,7 +5,7 @@ public class ArmConstants {
   public static final int armCurrentLimit = 50;
   public static final double kArmGearing = 48.0; // 16:1 (Motor Gearing) * 48:16 (Sprockets)
 
-  public static final double armStartAngle = 90.0; // Degrees
+  public static final double armStartAngle = 105.0; // Degrees
   public static final double armMinAngle = 40.0; // Degrees
   public static final double armMaxAngle = 240.0; // Degrees
   public static final double armTBEOffset = 28.56; // Degrees
