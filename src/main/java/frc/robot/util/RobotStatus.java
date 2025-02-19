@@ -4,6 +4,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.util.AlignmentUtils.CoralStationSelection;
+import frc.robot.util.AlignmentUtils.ReefFaceSelection;
 
 public class RobotStatus {
   private static Drive driveSubsystem;
@@ -29,5 +31,26 @@ public class RobotStatus {
       throw new IllegalStateException("RobotStatus has not been initialized!");
     }
     return coralSystem.getCurrentCoralPreset();
+  }
+
+  // Globally accessible method to get the reefFaceSelection
+  public static ReefFaceSelection getReefFaceSelection() {
+    if (driveSubsystem == null) {
+      throw new IllegalStateException("RobotStatus has not been initialized!");
+    }
+    return driveSubsystem.getReefFaceSelection();
+  }
+
+  // Globally accessible method to get the reefFaceSelection
+  public static CoralStationSelection getCoralStationSelection() {
+    if (driveSubsystem == null) {
+      throw new IllegalStateException("RobotStatus has not been initialized!");
+    }
+    return driveSubsystem.getCoralStationSelection();
+  }
+
+  // Globally accessible method to get the reefFaceSelection
+  public static boolean isDriveModeSmart() {
+    return driveSubsystem.isDriveModeSmart();
   }
 }
