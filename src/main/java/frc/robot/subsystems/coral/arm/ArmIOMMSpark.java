@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj.RobotController;
+import org.littletonrobotics.junction.Logger;
 
 public class ArmIOMMSpark implements ArmIO {
 
@@ -53,6 +54,23 @@ public class ArmIOMMSpark implements ArmIO {
     inputs.velocityRPM = armEncoder.getVelocity();
     inputs.appliedVolts = armMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = armMotor.getOutputCurrent();
+
+    Logger.recordOutput(
+        "Arm/FaultInfo/FaultPeriodMs", armMotor.configAccessor.signals.getFaultsPeriodMs());
+    Logger.recordOutput(
+        "Arm/FaultInfo/WarningPeriodMs", armMotor.configAccessor.signals.getWarningsPeriodMs());
+    Logger.recordOutput(
+        "Arm/FaultInfo/FaultsAlwaysOn", armMotor.configAccessor.signals.getFaultsAlwaysOn());
+    Logger.recordOutput("Arm/FaultInfo/HasActiveFault", armMotor.hasActiveFault());
+    Logger.recordOutput("Arm/FaultInfo/HasStickFault", armMotor.hasStickyFault());
+    Logger.recordOutput("Arm/FaultInfo/HasActiveWarning", armMotor.hasActiveWarning());
+    Logger.recordOutput("Arm/FaultInfo/HasStickyWarning", armMotor.hasStickyWarning());
+
+    // armMotor.setPeriodicFrameTimeout(50);
+
+    if (armMotor.hasStickyFault()) {
+      // armMotor.clearFaults();
+    }
   }
 
   @Override

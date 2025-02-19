@@ -26,6 +26,7 @@ public class Arm {
   }
 
   public void periodic() {
+
     if (ArmkP.hasChanged(hashCode())
         || ArmkD.hasChanged(hashCode())
         || ArmVel.hasChanged(hashCode())
