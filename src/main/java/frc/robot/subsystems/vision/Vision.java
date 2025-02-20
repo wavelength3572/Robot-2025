@@ -106,7 +106,9 @@ public class Vision extends SubsystemBase {
         }
       }
 
-      Logger.recordOutput("Vision/Camera" + cameraIndex + "/ObservationCount", inputs[cameraIndex].poseObservations.length);
+      Logger.recordOutput(
+          "Vision/Camera" + cameraIndex + "/ObservationCount",
+          inputs[cameraIndex].poseObservations.length);
 
       // Loop over pose observations
       for (var observation : inputs[cameraIndex].poseObservations) {
@@ -119,9 +121,7 @@ public class Vision extends SubsystemBase {
                 || observation.pose().getY() < 0.0
                 || observation.pose().getY() > aprilTagLayout.getFieldWidth();
 
-                // || observation.averageTagDistance() > MAX_TAG_DISTANCE;
-              
-
+        // || observation.averageTagDistance() > MAX_TAG_DISTANCE;
 
         // Track which tags contributed to this observation
         List<Pose3d> contributingTags = new LinkedList<>();
