@@ -594,7 +594,7 @@ public class IndicatorLight extends SubsystemBase {
 
     // 1) Fill the entire 20-LED strip with white color
     for (int i = 0; i < totalLEDs; i++) {
-      wlLEDBuffer.setLED(i,  Color.kWhite);
+      wlLEDBuffer.setLED(i, Color.kWhite);
     }
 
     // 2) Overwrite the bright block in the designated range

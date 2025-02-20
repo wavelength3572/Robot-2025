@@ -25,7 +25,6 @@ import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
 import frc.robot.subsystems.algae.Algae;
-import frc.robot.subsystems.algae.AlgaeIOSpark;
 import frc.robot.subsystems.algae.AlgaeIOVirtualSim;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.climber.ClimberIOVirtualSim;
@@ -99,7 +98,7 @@ public class RobotContainer {
         arm = new Arm(new ArmIOMMSpark() {});
         intake = new Intake(new IntakeIOSpark() {});
         coralSystem = new CoralSystem(elevator, arm, intake);
-        algae = new Algae(new AlgaeIOSpark());
+        algae = new Algae(new AlgaeIOVirtualSim());
         climber = new Climber(new ClimberIOVirtualSim() {});
         indicatorLight = new IndicatorLight();
         indicatorLight.setupLightingSuppliers(
