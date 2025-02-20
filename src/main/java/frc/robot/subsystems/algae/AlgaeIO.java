@@ -22,7 +22,7 @@ public interface AlgaeIO {
     public double armArbFF = 0.0; // Raw feedforward value
 
     // Motion Control Data
-    public double velocityRPM = 0.0;
+    public double deployVelocityRPM = 0.0;
     public double deployAppliedVolts = 0.0;
     public double deployCurrentAmps = 0.0;
 
@@ -38,7 +38,7 @@ public interface AlgaeIO {
 
   /** Set PID values dynamically for position control tuning. */
   public default void setPIDValues(
-      double kP, double kD, double kFF, double velocityMax, double accelerationMax) {}
+      double kP, double kD, double velocityMax, double accelerationMax) {}
 
   /** Run intake motor to pull in algae (game piece). */
   public default void pullAlgae() {}

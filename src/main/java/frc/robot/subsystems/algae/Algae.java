@@ -16,8 +16,6 @@ public class Algae extends SubsystemBase {
       new LoggedTunableNumber("Algae/kEVel", AlgaeConstants.kAlgaeDeployVel);
   private static final LoggedTunableNumber AlgaeAcc =
       new LoggedTunableNumber("Algae/kEAcc", AlgaeConstants.kAlgaeDeployAcc);
-  private static final LoggedTunableNumber AlgaeAFF =
-      new LoggedTunableNumber("Algae/kEAFF", AlgaeConstants.kAlgaeDeployKf);
 
   public Algae(AlgaeIO io) {
     this.io = io;
@@ -27,9 +25,8 @@ public class Algae extends SubsystemBase {
     if (AlgaekP.hasChanged(hashCode())
         || AlgaekD.hasChanged(hashCode())
         || AlgaeVel.hasChanged(hashCode())
-        || AlgaeAcc.hasChanged(hashCode())
-        || AlgaeAFF.hasChanged(hashCode())) {
-      io.setPIDValues(AlgaekP.get(), AlgaekD.get(), AlgaeAFF.get(), AlgaeVel.get(), AlgaeAcc.get());
+        || AlgaeAcc.hasChanged(hashCode())) {
+      io.setPIDValues(AlgaekP.get(), AlgaekD.get(), AlgaeVel.get(), AlgaeAcc.get());
     }
 
     io.updateInputs(inputs);
