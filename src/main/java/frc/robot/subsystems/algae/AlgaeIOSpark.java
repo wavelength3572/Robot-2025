@@ -23,7 +23,17 @@ public class AlgaeIOSpark implements AlgaeIO {
 
   private double targetEncoderRotations = angleToRotations(AlgaeConstants.kAlgaeDeployInitalAngle);
 
-  private double Aff = AlgaeConstants.kAlgaeDeployKf;
+  private double algaeRotorSpeed = 0.0;
+  private double algaeAmpDetectCount = 0.0;
+
+  private enum algaeIntakeState {
+    OFF,
+    PUSH,
+    PULL,
+    CAPTURE
+  }
+
+  private algaeIntakeState currentAlgIntakeState = algaeIntakeState.OFF;
 
   public AlgaeIOSpark() {
     algaeCaptureMotor.configure(
@@ -58,6 +68,21 @@ public class AlgaeIOSpark implements AlgaeIO {
     inputs.deployAppliedVolts =
         algaeDeployMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.deployCurrentAmps = algaeDeployMotor.getOutputCurrent();
+    inputs.deployVelocityRPM = algaeDeployEncoder.getVelocity();
+
+    if (inputs.captureCurrentAmps > 7.0 && currentAlgIntakeState == algaeIntakeState.PULL) {
+      algaeAmpDetectCount++;
+    } else {
+      algaeAmpDetectCount = 0;
+    }
+
+    if (algaeAmpDetectCount >= 2 || currentAlgIntakeState == algaeIntakeState.CAPTURE) {
+      // We have an algae?
+      currentAlgIntakeState = algaeIntakeState.CAPTURE;
+      algaeRotorSpeed = 0.03;
+    }
+
+    algaeCaptureMotor.set(algaeRotorSpeed);
 
     // Closed-loop position control for deploy motor
     algaeDeployController.setReference(
@@ -79,11 +104,7 @@ public class AlgaeIOSpark implements AlgaeIO {
   }
 
   @Override
-  public void setPIDValues(
-      double kP, double kD, double kFF, double VelocityMax, double AccelerationMax) {
-    if (kFF >= -6.0 && kFF <= 6.0) {
-      this.Aff = kFF;
-    }
+  public void setPIDValues(double kP, double kD, double VelocityMax, double AccelerationMax) {
     final SparkMaxConfig config = new SparkMaxConfig();
     config
         .closedLoop
@@ -108,17 +129,20 @@ public class AlgaeIOSpark implements AlgaeIO {
 
   @Override
   public void pushAlgae() {
-    algaeCaptureMotor.set(AlgaeConstants.algaeOutSpeed);
+    algaeRotorSpeed = AlgaeConstants.algaeOutSpeed;
+    currentAlgIntakeState = algaeIntakeState.PUSH;
   }
 
   @Override
   public void pullAlgae() {
-    algaeCaptureMotor.set(AlgaeConstants.algaeInSpeed);
+    algaeRotorSpeed = AlgaeConstants.algaeInSpeed;
+    currentAlgIntakeState = algaeIntakeState.PULL;
   }
 
   @Override
   public void stopAlgae() {
-    algaeCaptureMotor.set(0.0);
+    algaeRotorSpeed = 0.0;
+    currentAlgIntakeState = algaeIntakeState.OFF;
   }
 
   @Override

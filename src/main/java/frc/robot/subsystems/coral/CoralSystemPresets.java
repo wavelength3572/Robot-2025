@@ -6,7 +6,7 @@ public enum CoralSystemPresets {
   STARTUP(0, 105, CoralState.STARTUP),
   STOW(22, 105, CoralState.STOW),
   PICKUP(40.0, 233, CoralState.PICKUP),
-  PICKUPFAR(37.0, 233, CoralState.PICKUP), // TOF > 300
+  PICKUPFAR(37.0, 233, CoralState.PICKUPFAR), // TOF > 300
   L1(0.00000, 92, CoralState.L1_SCORE),
   L2(14.0, 77, CoralState.L2_SCORE),
   L3(31, 77, CoralState.L3_SCORE),
@@ -30,6 +30,7 @@ public enum CoralSystemPresets {
     STARTUP,
     STOW,
     PICKUP,
+    PICKUPFAR,
     L1_SCORE,
     L2_SCORE,
     L3_SCORE,
