@@ -63,7 +63,7 @@ public class DriveConstants {
   // Drive motor configuration
   public static final int driveMotorCurrentLimit =
       35; // Hopefully the amps to prevent wheel slippage
-  public static final double wheelRadiusMeters = Units.inchesToMeters(1.895);
+  public static final double wheelRadiusMeters = Units.inchesToMeters(2.006);
   public static final double driveMotorReduction =
       (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0); // Gear ratios for
   // SDS MK4i L2

@@ -36,7 +36,7 @@ public class DriveToPose extends Command {
 
   private double driveXKp = 1.1;
   private double driveYKp = 1.1;
-  private double thetaKp = 1.2;
+  private double thetaKp = 0.9;
 
   private final ProfiledPIDController driveControllerX =
       new ProfiledPIDController(driveXKp, 0.0, 0.0, new TrapezoidProfile.Constraints(2, .5));

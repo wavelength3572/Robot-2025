@@ -40,9 +40,9 @@ public class IntakeIOSpark implements IntakeIO {
   public void updateInputs(IntakeIOInputs inputs) {
     // haveCoral = intakeMotor.getForwardLimitSwitch().isPressed();
     if (currentIntakeState == intakeState.PULL) {
-      if (intakeMotor.getOutputCurrent() >= 45.0) {
+      if (intakeMotor.getOutputCurrent() >= 38.0) {
         if (currentSpikeCounter > 2) {
-          haveCoral = (haveCoral || intakeMotor.getOutputCurrent() >= 45.0);
+          haveCoral = (haveCoral || intakeMotor.getOutputCurrent() >= 38.0);
         } else {
           currentSpikeCounter++;
         }
