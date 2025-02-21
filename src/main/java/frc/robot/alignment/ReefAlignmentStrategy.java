@@ -1,5 +1,7 @@
 package frc.robot.alignment;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -23,8 +25,13 @@ public class ReefAlignmentStrategy implements AlignmentStrategy {
     ReefChosenOrientation chosenOrientation =
         AlignmentUtils.pickClosestOrientationForReef(robotPose, selection.getAcceptedFaceId());
 
-    return angleController.calculate(
-        robotPose.getRotation().getRadians(), chosenOrientation.rotation2D().getRadians());
+    double currentAngle = robotPose.getRotation().getRadians();
+    double goalAngle = chosenOrientation.rotation2D().getRadians();
+
+    Logger.recordOutput("Alignment/ReefAlignment/CurrentAngle", Math.toDegrees(currentAngle));
+    Logger.recordOutput("Alignment/ReefAlignment/GoalAngle", Math.toDegrees(goalAngle));
+
+    return angleController.calculate(currentAngle, goalAngle);
   }
 
   @Override
