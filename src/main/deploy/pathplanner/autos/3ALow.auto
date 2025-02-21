@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BlueStart-3A"
+            "pathName": "BlueStart-3A-Events"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "L2"
+            "name": "WaitForPreset"
           }
         },
         {
@@ -32,6 +32,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "BlueStart",
   "choreoAuto": false
 }

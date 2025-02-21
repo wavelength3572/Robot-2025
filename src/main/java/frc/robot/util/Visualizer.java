@@ -164,7 +164,7 @@ public class Visualizer {
     // This is the "fine tuning" that says, "the coral is 0.202 m forward from the
     // pivot, etc."
     Transform3d armToCoral =
-        new Transform3d(new Translation3d(-.21, -.0155, 0.3135), new Rotation3d(0, 0, 0));
+        new Transform3d(new Translation3d(-.225, 0, 0.42), new Rotation3d(0, 0, 0));
 
     // (4) Compose them:
     // fieldToCoral = fieldToRobot * robotToArm * armToCoral
