@@ -87,11 +87,6 @@ public class ArmIOMMSpark implements ArmIO {
   }
 
   @Override
-  public void setVoltage(double volts) {
-    armMotor.setVoltage(volts);
-  }
-
-  @Override
   public void setTargetAngleDEG(double requestedPosition) {
     if (TBE_Valid) {
       this.armTargetDEG = requestedPosition;
