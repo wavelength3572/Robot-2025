@@ -20,6 +20,10 @@ public class Climber extends SubsystemBase {
     io.deployClimber();
   }
 
+  public void stopClimber() {
+
+  }
+
   public void stowClimber() {
     io.stowClimber();
   }

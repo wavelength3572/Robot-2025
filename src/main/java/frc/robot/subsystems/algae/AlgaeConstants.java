@@ -4,7 +4,7 @@ public class AlgaeConstants {
   public static final int algaeDeployCanId = 33;
   public static final int algaeCaptureCanId = 30;
   public static final int algaeDeployCurrentLimit = 50;
-  public static final int algaeCaptureCurrentLimit = 50;
+  public static final int algaeCaptureCurrentLimit = 30;
 
   public static final double algaeInSpeed = 0.50;
   public static final double algaeOutSpeed = -1.0;

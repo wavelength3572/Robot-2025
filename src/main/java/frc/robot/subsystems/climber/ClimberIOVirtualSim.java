@@ -1,36 +1,30 @@
 package frc.robot.subsystems.climber;
 
+import frc.robot.subsystems.climber.ClimberConstants.CLIMB_STATE;
+
 public class ClimberIOVirtualSim implements ClimberIO {
 
-  private boolean climberDeployed = false; // Start without a coral
-
-  private enum climberState {
-    DEPLOYED,
-    STOWED,
-    CLIMB
-  }
-
-  private climberState currentIntakeState = climberState.STOWED;
+  private CLIMB_STATE currentClimberState = CLIMB_STATE.STOWED;
 
   public ClimberIOVirtualSim() {}
 
   @Override
   public void updateInputs(ClimberIOInputs inputs) {
-    inputs.climberDeployed = climberDeployed;
+    inputs.currentClimbState = currentClimberState;
   }
 
   @Override
   public void deployClimber() {
-    climberDeployed = true;
+    currentClimberState = CLIMB_STATE.DEPLOY;
   }
 
   @Override
   public void stowClimber() {
-    climberDeployed = false;
+    currentClimberState = CLIMB_STATE.STOWED;
   }
 
   @Override
   public boolean isClimberDeployed() {
-    return climberDeployed;
+    return (this.currentClimberState != CLIMB_STATE.STOWED);
   }
 }

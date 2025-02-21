@@ -14,6 +14,7 @@ public final class IntakeConfigs {
           .idleMode(IdleMode.kBrake)
           .smartCurrentLimit(IntakeConstants.intakeCurrentLimit)
           .voltageCompensation(12)
+          .openLoopRampRate(.25)
           .limitSwitch
           .forwardLimitSwitchEnabled(false);
     }
