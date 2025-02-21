@@ -19,7 +19,7 @@ public class ClimberIOVirtualSim implements ClimberIO {
   }
 
   @Override
-  public void stowClimber() {
+  public void climb() {
     currentClimberState = CLIMB_STATE.STOWED;
   }
 

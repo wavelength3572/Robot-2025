@@ -1,15 +1,17 @@
 package frc.robot.subsystems.climber;
 
-import org.littletonrobotics.junction.AutoLog;
-
+import edu.wpi.first.wpilibj.Relay;
 import frc.robot.subsystems.climber.ClimberConstants.CLIMB_STATE;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface ClimberIO {
   @AutoLog
   public static class ClimberIOInputs {
-    public double requestedPosition = 0.0;
+    public double targetPosition = 0.0;
+    public double currentPosition = 0.0;
     public double appliedVolts = 0.0;
     public double currentAmps = 0.0;
+    public Relay.Value relayState;
     public CLIMB_STATE currentClimbState = CLIMB_STATE.STOWED;
   }
 
@@ -17,11 +19,11 @@ public interface ClimberIO {
 
   public default void deployClimber() {}
 
-  public default void stowClimber() {}
+  public default void climb() {}
 
   public default void stopClimber() {}
 
-  public default void climb() {}
+  public default void setRelayState(Relay.Value newState) {}
 
   public default boolean isClimberDeployed() {
     return false;

@@ -14,6 +14,9 @@ public final class ClimberConstants {
   public static final double CLIMBER_TIP_OFFSET_X = 0.35;
   public static final double CLIMBER_TIP_OFFSET_Y = 0.06;
 
+  public static final double climberKp = 0.5;
+  public static final double climberKd = 0.0;
+
   /**
    * Computes the climber tip pose based on the robot's current pose.
    *

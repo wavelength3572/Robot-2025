@@ -3,6 +3,7 @@ package frc.robot;
 import static frc.robot.subsystems.coral.CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1;
 import static frc.robot.subsystems.coral.CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2;
 
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AlgaeCommands;
@@ -67,9 +68,9 @@ public class ButtonsAndDashboardBindings {
 
   private static void configureDashboardBindings() {
 
-    SmartDashboard.putData(  
-      "Set Coral In Robot", Commands.runOnce(()->coralSystem.setCoralInRobot(true)).ignoringDisable(true));
-
+    SmartDashboard.putData(
+        "Set Coral In Robot",
+        Commands.runOnce(() -> coralSystem.setCoralInRobot(true)).ignoringDisable(true));
 
     SmartDashboard.putData(
         "Toggle Smart Drive",
@@ -111,8 +112,6 @@ public class ButtonsAndDashboardBindings {
     SmartDashboard.putData(
         "Algae Dislodge", AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi));
 
-    SmartDashboard.putData("Deploy Climber", Commands.runOnce(climber::deployClimber));
-    SmartDashboard.putData("Stow Climber", Commands.runOnce(climber::stowClimber));
     SmartDashboard.putData(
         "Toggle Cage Alignment",
         Commands.runOnce(drive.getStrategyManager()::toggleAutoCageAlignmentMode));
@@ -127,19 +126,6 @@ public class ButtonsAndDashboardBindings {
                   SmartDashboard.getNumber(
                       "Set Algae Angle Target", AlgaeConstants.kAlgaeDeployInitalAngle);
               algae.setDeployPositionAngle(angle);
-            }));
-
-    SmartDashboard.putData("Stow Algae", Commands.runOnce(algae::stowAlgae));
-    SmartDashboard.putData("Deploy Algae", Commands.runOnce(algae::deployAlgae));
-
-    // Algae Motor Speed Control (Adjust intake/outtake speed)
-    SmartDashboard.putNumber("Set Algae Speed", 0.0); // Default to 0 speed
-    SmartDashboard.putData(
-        "Apply Algae Speed",
-        Commands.runOnce(
-            () -> {
-              double speed = SmartDashboard.getNumber("Set Algae Speed", 0.0);
-              algae.setSpeed(speed);
             }));
   }
 
@@ -200,18 +186,67 @@ public class ButtonsAndDashboardBindings {
     // algae.stopAlgae();
     // }));
 
-    oi.getButtonFPosition0() // Push Algae Arm
+    oi.getButtonFPosition0() // Push Climber Up
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  algae.deployAlgae();
+                  climber.deployClimber();
+                }))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  climber.stopClimber();
                 }));
-    oi.getButtonFPosition2() // Pull Algae Arm
+    oi.getButtonFPosition2() // Pull Intake
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  algae.stowAlgae();
+                  climber.climb();
+                }))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  climber.stopClimber();
                 }));
+
+    oi.getButtonCPosition0() // Push Climber Up
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  climber.setRelayState(Relay.Value.kForward);
+                }))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  climber.setRelayState(Relay.Value.kOff);
+                }));
+    oi.getButtonCPosition2() // Pull Intake
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  climber.setRelayState(Relay.Value.kReverse);
+                }))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  climber.setRelayState(Relay.Value.kOff);
+                }));
+
+    // oi.getButtonBox1Button7().onTrue(Commands.runOnce(climber::deployClimber));
+    // oi.getButtonBox1Button8().onTrue(Commands.runOnce(climber::stowClimber));
+
+    // oi.getButtonFPosition0() // Push Algae Arm
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> {
+    //               algae.deployAlgae();
+    //             }));
+    // oi.getButtonFPosition2() // Pull Algae Arm
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> {
+    //               algae.stowAlgae();
+    //             }));
 
     if (oi.getButtonGPosition0().getAsBoolean()) {
       AlignmentUtils.setLeftCage();
