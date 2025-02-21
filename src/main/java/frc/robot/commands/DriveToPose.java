@@ -34,15 +34,23 @@ public class DriveToPose extends Command {
 
   private Timer timeoutTimer = new Timer();
 
-  private double driveXKp = .9; //changed from 1.1
-  private double driveYKp = .9; //changed from 1.1
+  private double driveXKp = .9; // changed from 1.1
+  private double driveYKp = .9; // changed from 1.1
   private double thetaKp = 0.9;
 
   private final ProfiledPIDController driveControllerX =
-      new ProfiledPIDController(driveXKp, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 2)); // upped accelleration from .5
+      new ProfiledPIDController(
+          driveXKp,
+          0.0,
+          0.0,
+          new TrapezoidProfile.Constraints(2, 2)); // upped accelleration from .5
 
   private final ProfiledPIDController driveControllerY =
-      new ProfiledPIDController(driveYKp, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 2)); // upped accelleration from .5
+      new ProfiledPIDController(
+          driveYKp,
+          0.0,
+          0.0,
+          new TrapezoidProfile.Constraints(2, 2)); // upped accelleration from .5
 
   private final ProfiledPIDController thetaController =
       new ProfiledPIDController(
@@ -109,8 +117,8 @@ public class DriveToPose extends Command {
     driveControllerY.setGoal(targetY);
     thetaController.setGoal(targetTheta);
 
-    driveControllerX.setTolerance(0.0762); //3 inches tolerance, was much larger
-    driveControllerY.setTolerance(0.0762); //3 inches tolerance, was much larger
+    driveControllerX.setTolerance(0.0762); // 3 inches tolerance, was much larger
+    driveControllerY.setTolerance(0.0762); // 3 inches tolerance, was much larger
     thetaController.setTolerance(Units.degreesToRadians(.1));
 
     Logger.recordOutput("DriveToPose/targetPoseX", targetX);
