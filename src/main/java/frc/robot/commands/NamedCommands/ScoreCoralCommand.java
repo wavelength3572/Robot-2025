@@ -1,5 +1,7 @@
 package frc.robot.commands.NamedCommands;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.coral.intake.Intake;
@@ -7,8 +9,7 @@ import frc.robot.subsystems.coral.intake.Intake;
 public class ScoreCoralCommand extends Command {
 
   private static final double MAX_OUTTAKE_TIME = 10.0; // total hard stop, in seconds
-  private static final double ADDITIONAL_CLEAR_TIME =
-      0.5; // how long to keep running after the coral is gone
+  private static final double ADDITIONAL_CLEAR_TIME = 3; // how long to keep running after the coral is gone
 
   private final Intake intake;
   private final Timer timer = new Timer();
@@ -35,11 +36,18 @@ public class ScoreCoralCommand extends Command {
 
   @Override
   public void execute() {
+ // Log the current time and sensor state
+ Logger.recordOutput("ScoreCoral/CurrentTime", timer.get());
+ Logger.recordOutput("ScoreCoral/CoralInRobot", intake.getCoralInRobot());
+ Logger.recordOutput("ScoreCoral/CoralCleared", coralCleared);
+
+
     // 1) Check limit switch (or sensor) to see if the piece has left the robot
     if (!intake.getCoralInRobot() && !coralCleared) {
       // The moment we see it's gone, record the time
       coralCleared = true;
       timeWhenCoralCleared = timer.get();
+      Logger.recordOutput("ScoreCoral/TimeWhenCoralCleared", timeWhenCoralCleared);
     }
   }
 
@@ -47,6 +55,8 @@ public class ScoreCoralCommand extends Command {
   public boolean isFinished() {
     // 2) If we reached the total max time, we stop no matter what
     if (timer.get() >= MAX_OUTTAKE_TIME) {
+      Logger.recordOutput("ScoreCoral/FinishReason", "MaxOuttakeTimeExceeded");
+
       return true;
     }
 
@@ -54,7 +64,11 @@ public class ScoreCoralCommand extends Command {
     //    for an additional X seconds *after* clearing
     if (coralCleared) {
       double timeSinceCleared = timer.get() - timeWhenCoralCleared;
-      return timeSinceCleared >= ADDITIONAL_CLEAR_TIME;
+      if (timeSinceCleared >= ADDITIONAL_CLEAR_TIME) {
+        // Log the reason for finishing
+        Logger.recordOutput("ScoreCoral/FinishReason", "CoralClearedTimeElapsed");
+        return true;
+      }
     }
 
     // Otherwise, we haven't detected it leaving yet, keep running
