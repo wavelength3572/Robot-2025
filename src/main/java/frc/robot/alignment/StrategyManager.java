@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -35,10 +36,11 @@ public class StrategyManager implements AlignmentStrategy {
     // Initialize shared PID controller
     this.sharedAngleController =
         new ProfiledPIDController(
-            5.0, // ANGLE_KP
+            0.5, // ANGLE_KP
             0.0,
-            0.4, // ANGLE_KD
-            new TrapezoidProfile.Constraints(8.0, 20.0));
+            0.0, // ANGLE_KD
+            new TrapezoidProfile.Constraints(
+                Units.degreesToRadians(360.0), Units.degreesToRadians(360.0)));
     this.sharedAngleController.enableContinuousInput(-Math.PI, Math.PI);
 
     // Instantiate alignment strategies with shared controller and override flag

@@ -193,7 +193,7 @@ public final class FieldConstants {
     BRANCH_G(new Translation2d(5.7402, 3.6711), new Translation2d(5.7402, 4.0521)),
     BRANCH_H(new Translation2d(5.7402, 3.9997), new Translation2d(5.7402, 4.3807)),
     BRANCH_I(new Translation2d(5.4220, 4.9317), new Translation2d(5.0921, 5.1222)),
-    BRANCH_J(new Translation2d(5.138, 5.216), new Translation2d(4.8075, 5.2866)),
+    BRANCH_J(new Translation2d(5.168, 5.213), new Translation2d(4.8075, 5.2866)),
     BRANCH_K(new Translation2d(4.1712, 5.2866), new Translation2d(3.8412, 5.0961)),
     BRANCH_L(new Translation2d(3.8866, 5.1222), new Translation2d(3.5566, 4.9317));
 

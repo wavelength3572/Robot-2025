@@ -2,7 +2,7 @@ package frc.robot.subsystems.coral.arm;
 
 public class ArmConstants {
   public static final int canId = 15;
-  public static final int armCurrentLimit = 30;
+  public static final int armCurrentLimit = 50;
   public static final double kArmGearing = 48.0; // 16:1 (Motor Gearing) * 48:16 (Sprockets)
 
   public static final double armStartAngle = 105.0; // Degrees
