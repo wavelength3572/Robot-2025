@@ -1,0 +1,66 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.157,
+        "y": 7.547
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.601043968054426,
+        "y": 6.747649856398338
+      },
+      "isLocked": false,
+      "linkedName": "BargeStart"
+    },
+    {
+      "anchor": {
+        "x": 5.460264976987694,
+        "y": 4.990955868776757
+      },
+      "prevControl": {
+        "x": 5.623967805445851,
+        "y": 5.238876188162927
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "3A"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.46004842615012087,
+      "rotationDegrees": -119.99999999999999
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "L4",
+      "waypointRelativePos": 0.6189138576778969,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 1.0,
+    "maxAcceleration": 1.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": -119.99999999999999
+  },
+  "reversed": false,
+  "folder": "BlueStart",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": false
+}

@@ -3,12 +3,13 @@
   "robotLength": 0.886,
   "holonomicMode": true,
   "pathFolders": [
-    "3A",
-    "3B",
-    "BlueStart",
-    "MidStart",
     "Tests",
-    "StationLeft"
+    "StationLeft",
+    "2A",
+    "MidStart",
+    "BlueStart",
+    "3B",
+    "3A"
   ],
   "autoFolders": [
     "BlueStart"

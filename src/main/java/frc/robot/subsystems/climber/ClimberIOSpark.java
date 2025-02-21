@@ -46,8 +46,7 @@ public class ClimberIOSpark implements ClimberIO {
     climberMotor.set(ClimberConstants.deployPower);
   }
 
-  public void stowClimber() {
-  }
+  public void stowClimber() {}
 
   public void stopClimber() {
     climberMotor.set(0.0);
