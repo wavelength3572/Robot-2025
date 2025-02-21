@@ -2,6 +2,7 @@ package frc.robot.subsystems.climber;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
 public final class ClimberConfigs {
 
@@ -13,7 +14,12 @@ public final class ClimberConfigs {
       climberConfig
           .idleMode(IdleMode.kBrake)
           .smartCurrentLimit(ClimberConstants.climberCurrentLimit)
+          .openLoopRampRate(.1)
           .voltageCompensation(12);
+      climberConfig
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .outputRange(-1, 1);
     }
   }
 }
