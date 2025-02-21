@@ -107,6 +107,10 @@ public class CoralSystem extends SubsystemBase {
 
     CoralRPStatusLogger.logCoralStatus(false);
 
+    if (RobotStatus.isClimberDeployed() && targetCoralPreset != CLIMB) {
+      setTargetPreset(CLIMB);
+    }
+
     if (DriverStation.isEnabled()) {
       automationTriggerChecks();
     }
@@ -193,7 +197,7 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public void setTargetPreset(CoralSystemPresets preset) {
-    if (preset != this.currentCoralPreset) {
+    if (preset != this.currentCoralPreset && targetCoralPreset != CLIMB) {
       this.targetCoralPreset = preset;
       // Start Moving Arm to Safe
       this.arm.setTargetPreset(CoralSystemPresets.STOW);

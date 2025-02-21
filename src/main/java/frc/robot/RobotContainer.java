@@ -184,7 +184,7 @@ public class RobotContainer {
     }
 
     // give static access to certain methods across subsystems
-    RobotStatus.initialize(drive, coralSystem, vision);
+    RobotStatus.initialize(drive, coralSystem, vision, climber);
 
     PathPlannerCommands.Setup(coralSystem);
     SetupAutoChooser();

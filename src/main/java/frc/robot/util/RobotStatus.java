@@ -1,6 +1,7 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
@@ -12,12 +13,14 @@ public class RobotStatus {
   private static Drive driveSystem;
   private static CoralSystem coralSystem;
   private static Vision visionSystem;
+  private static Climber climberSystem;
 
   // Called once from RobotContainer to initialize with the actual Drive instance
-  public static void initialize(Drive drive, CoralSystem coral, Vision vision) {
+  public static void initialize(Drive drive, CoralSystem coral, Vision vision, Climber climber) {
     driveSystem = drive;
     coralSystem = coral;
     visionSystem = vision;
+    climberSystem = climber;
   }
 
   // Globally accessible method to get the robot's pose
@@ -60,5 +63,10 @@ public class RobotStatus {
   // Globally accessible method to whether vision is on
   public static boolean isVisionOn() {
     return visionSystem.isVisionOn();
+  }
+
+  // Globally accessible method to whether vision is on
+  public static boolean isClimberDeployed() {
+    return climberSystem.isClimberDeployed();
   }
 }
