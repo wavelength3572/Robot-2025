@@ -617,49 +617,59 @@ public class IndicatorLight extends SubsystemBase {
     CoralSystemPresets selectedPreset = getSelectedCoralPreset.get();
     CoralSystemPresets targetPreset = getTargetCoralPreset.get();
 
+    // If we're in STARTUP, do nothing else
     if (currentPreset.equals(CoralSystemPresets.STARTUP)) {
       return;
     }
 
-    // When the selected preset is PICKUP, decide which effect to use based on coral presence.
+    // 1) If the SELECTED preset is PICKUP, but CURRENT is NOT yet PICKUP,
+    //    then use the SEARCH_LIGHT effect and reset the pickupBlinkTriggered.
     if (selectedPreset != null
         && selectedPreset.equals(CoralSystemPresets.PICKUP)
         && currentPreset != CoralSystemPresets.PICKUP) {
+
       currentColor_GOAL = LED_EFFECTS.SEARCH_LIGHT;
       pickupBlinkTriggered = false;
       return;
-    } else if (currentPreset != null && currentPreset.equals(CoralSystemPresets.PICKUP)) {
-      // If a coral is present and we haven't triggered blink yet, do that.
-      if (getIsCoralInRobot != null && getIsCoralInRobot.get()) {
-        if (!pickupBlinkTriggered) {
-          currentColor_GOAL = LED_EFFECTS.BLINK; // or a dedicated state like PICKUP_BLINK
-          pickupBlinkTriggered = true;
-        } else {
-          currentColor_GOAL = LED_EFFECTS.BLUEOMBRE;
-        }
-      } else {
-        currentColor_GOAL = LED_EFFECTS.SEARCH_LIGHT;
-      }
-      // Since we've handled PICKUP here, we might return.
-      return;
     }
 
-    // Detect change in the selected preset.
+    // 2) If CURRENT preset is PICKUP, handle coral presence.
+    else if (currentPreset.equals(CoralSystemPresets.PICKUP)) {
+
+      boolean coralPresent = (getIsCoralInRobot != null && getIsCoralInRobot.get());
+
+      if (!coralPresent) {
+        // No coral → reset blink so we blink again next time a coral appears
+        pickupBlinkTriggered = false;
+        currentColor_GOAL = LED_EFFECTS.SEARCH_LIGHT;
+      } else {
+        // Coral is present
+        if (!pickupBlinkTriggered) {
+          // Blink once for a new pickup
+          currentColor_GOAL = LED_EFFECTS.BLINK;
+          pickupBlinkTriggered = true;
+        } else {
+          // Already blinked → go steady with BLUEOMBRE
+          currentColor_GOAL = LED_EFFECTS.BLUEOMBRE;
+        }
+      }
+      return; // We handled PICKUP case fully; exit the method.
+    }
+
+    // If not STARTUP or PICKUP, handle your usual elevator lighting (selection changed, etc).
     if ((lastSelectedCoralPreset == null || !lastSelectedCoralPreset.equals(selectedPreset))
         && selectedPreset != null) {
       currentColor_GOAL = LED_EFFECTS.ELEVATOR_SELECTION_CHANGED;
       updateSelectedLighting(selectedPreset);
       lastSelectedCoralPreset = selectedPreset;
     }
-    // Detect change in the target preset.
+
     if (lastTargetCoralPreset == null || !lastTargetCoralPreset.equals(targetPreset)) {
       currentColor_GOAL = LED_EFFECTS.ELEVATOR_TARGET_CHANGED;
       updateTransitionLighting(targetPreset);
       lastTargetCoralPreset = targetPreset;
     }
-    // If the current preset now equals the target and it’s a change from the last
-    // final state,
-    // update final lighting.
+
     if (currentPreset.equals(targetPreset)
         && (lastFinalLightingPreset == null || !lastFinalLightingPreset.equals(targetPreset))) {
       currentColor_GOAL = LED_EFFECTS.ELEVATOR_CURRENT_CHANGED;
