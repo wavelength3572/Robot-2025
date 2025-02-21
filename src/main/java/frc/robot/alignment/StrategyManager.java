@@ -40,6 +40,7 @@ public class StrategyManager implements AlignmentStrategy {
             0.4, // ANGLE_KD
             new TrapezoidProfile.Constraints(8.0, 20.0));
     this.sharedAngleController.enableContinuousInput(-Math.PI, Math.PI);
+    this.sharedAngleController.setTolerance(Math.toRadians(.5));
 
     // Instantiate alignment strategies with shared controller and override flag
     reefStrategy = new ReefAlignmentStrategy(sharedAngleController);
@@ -101,8 +102,8 @@ public class StrategyManager implements AlignmentStrategy {
   }
 
   private void resetAngleController(Pose2d robotPose, double goalRotation) {
-    sharedAngleController.reset(robotPose.getRotation().getRadians());
-    sharedAngleController.setGoal(goalRotation);
+    sharedAngleController.reset(robotPose.getRotation().getRadians(), 0);
+    sharedAngleController.setGoal(goalRotation);    
   }
 
   @Override
