@@ -26,19 +26,6 @@ public class Arm {
   }
 
   public void periodic() {
-
-    if (ArmkP.hasChanged(hashCode())
-        || ArmkD.hasChanged(hashCode())
-        || ArmVel.hasChanged(hashCode())
-        || ArmAcc.hasChanged(hashCode())) {
-      io.setPIDValues(ArmkP.get(), ArmkD.get(), ArmVel.get(), ArmAcc.get());
-    }
-    // if (ArmPosDegrees.hasChanged(hashCode()) || ArmkF.hasChanged(hashCode())) {
-    //   setAngleDEG(ArmPosDegrees.get(), ArmkF.get());
-    // }
-    if (ArmPosDegrees.hasChanged(hashCode())) {
-      setAngleDEG(ArmPosDegrees.get());
-    }
     io.updateInputs(inputs);
     Logger.processInputs("Arm", inputs);
   }
