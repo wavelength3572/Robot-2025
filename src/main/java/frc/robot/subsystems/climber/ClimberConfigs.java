@@ -15,8 +15,15 @@ public final class ClimberConfigs {
           .idleMode(IdleMode.kBrake)
           .smartCurrentLimit(ClimberConstants.climberCurrentLimit)
           .openLoopRampRate(.1)
+          // .closedLoopRampRate(.25)
           .voltageCompensation(12);
-      climberConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).outputRange(-1, 1);
+      climberConfig
+          .closedLoop
+          // Set PID values for position control
+          .p(ClimberConstants.climberKp)
+          .d(ClimberConstants.climberKd)
+          .outputRange(-1.0, 1.0)
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
     }
   }
 }
