@@ -67,6 +67,10 @@ public class ButtonsAndDashboardBindings {
 
   private static void configureDashboardBindings() {
 
+    SmartDashboard.putData(  
+      "Set Coral In Robot", Commands.runOnce(()->coralSystem.setCoralInRobot(true)).ignoringDisable(true));
+
+
     SmartDashboard.putData(
         "Toggle Smart Drive",
         DriveCommands.toggleSmartDriveCmd(

@@ -50,7 +50,7 @@
     "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": null,
+  "folder": "BlueStart",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0
