@@ -105,7 +105,7 @@ public class StrategyManager implements AlignmentStrategy {
 
   private void resetAngleController(Pose2d robotPose, double goalRotation) {
     sharedAngleController.reset(robotPose.getRotation().getRadians(), 0);
-    sharedAngleController.setGoal(goalRotation);    
+    sharedAngleController.setGoal(goalRotation);
   }
 
   @Override

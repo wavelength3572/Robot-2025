@@ -1,12 +1,11 @@
 package frc.robot.alignment;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.FieldConstants.ReefChosenOrientation;
 import frc.robot.util.AlignmentUtils;
+import org.littletonrobotics.junction.Logger;
 
 public class ReefAlignmentStrategy implements AlignmentStrategy {
 

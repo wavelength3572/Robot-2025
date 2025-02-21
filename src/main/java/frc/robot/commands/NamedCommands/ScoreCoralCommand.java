@@ -1,15 +1,15 @@
 package frc.robot.commands.NamedCommands;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.coral.intake.Intake;
+import org.littletonrobotics.junction.Logger;
 
 public class ScoreCoralCommand extends Command {
 
   private static final double MAX_OUTTAKE_TIME = 10.0; // total hard stop, in seconds
-  private static final double ADDITIONAL_CLEAR_TIME = 3; // how long to keep running after the coral is gone
+  private static final double ADDITIONAL_CLEAR_TIME =
+      3; // how long to keep running after the coral is gone
 
   private final Intake intake;
   private final Timer timer = new Timer();
@@ -36,11 +36,10 @@ public class ScoreCoralCommand extends Command {
 
   @Override
   public void execute() {
- // Log the current time and sensor state
- Logger.recordOutput("ScoreCoral/CurrentTime", timer.get());
- Logger.recordOutput("ScoreCoral/CoralInRobot", intake.getCoralInRobot());
- Logger.recordOutput("ScoreCoral/CoralCleared", coralCleared);
-
+    // Log the current time and sensor state
+    Logger.recordOutput("ScoreCoral/CurrentTime", timer.get());
+    Logger.recordOutput("ScoreCoral/CoralInRobot", intake.getCoralInRobot());
+    Logger.recordOutput("ScoreCoral/CoralCleared", coralCleared);
 
     // 1) Check limit switch (or sensor) to see if the piece has left the robot
     if (!intake.getCoralInRobot() && !coralCleared) {

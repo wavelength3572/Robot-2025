@@ -103,7 +103,7 @@ public class ArmIOMMSpark implements ArmIO {
 
   @Override
   public double getCurrentArmDEG() {
-    return this.armTargetEncoderRotations * (1.0 / ArmConstants.kArmGearing) * 360.0;
+    return armEncoder.getPosition() * 360.0 / ArmConstants.kArmGearing;
   }
 
   @Override

@@ -1,12 +1,11 @@
 package frc.robot.alignment;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.FieldConstants.StationChosenOrientation;
 import frc.robot.util.AlignmentUtils;
+import org.littletonrobotics.junction.Logger;
 
 public class CoralStationAlignmentStrategy implements AlignmentStrategy {
   private final ProfiledPIDController angleController;
@@ -21,8 +20,9 @@ public class CoralStationAlignmentStrategy implements AlignmentStrategy {
     Pose2d robotPose = context.getRobotPose();
 
     // Select the best coral station face to align with
-    StationChosenOrientation chosenOrientation = AlignmentUtils.pickClosestOrientationForStation(
-        robotPose, selection.getAcceptedStationId());
+    StationChosenOrientation chosenOrientation =
+        AlignmentUtils.pickClosestOrientationForStation(
+            robotPose, selection.getAcceptedStationId());
 
     double currentAngle = robotPose.getRotation().getRadians();
     double goalAngle = chosenOrientation.rotation2D().getRadians();
@@ -42,8 +42,9 @@ public class CoralStationAlignmentStrategy implements AlignmentStrategy {
 
   @Override
   public double getGoalRotation(AlignmentContext context) {
-    StationChosenOrientation chosenOrientation = AlignmentUtils.pickClosestOrientationForStation(
-        context.getRobotPose(), context.getCoralStationSelection().getAcceptedStationId());
+    StationChosenOrientation chosenOrientation =
+        AlignmentUtils.pickClosestOrientationForStation(
+            context.getRobotPose(), context.getCoralStationSelection().getAcceptedStationId());
     return chosenOrientation.rotation2D().getRadians();
   }
 }
