@@ -3,37 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.157,
-        "y": 7.547
+        "x": 7.14960193428336,
+        "y": 3.997
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.601043968054426,
-        "y": 6.747649856398338
+        "x": 6.89960193428336,
+        "y": 3.997
       },
       "isLocked": false,
-      "linkedName": "BargeStart"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.460264976987694,
-        "y": 4.990955868776757
+        "x": 5.852985312588374,
+        "y": 4.000683448738945
       },
       "prevControl": {
-        "x": 5.623967805445851,
-        "y": 5.238876188162927
+        "x": 6.102985312588374,
+        "y": 4.000683448738945
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "3A"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.46004842615012087,
-      "rotationDegrees": -119.99999999999999
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -46,13 +41,13 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -119.99999999999999
+    "velocity": 0,
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": "BlueStart",
+  "folder": "MidStart",
   "idealStartingState": {
-    "velocity": 0,
+    "velocity": 0.0,
     "rotation": 180.0
   },
   "useDefaultConstraints": true

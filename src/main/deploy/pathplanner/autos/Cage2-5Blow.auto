@@ -7,19 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "MidStart-4B"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score"
+            "pathName": "Cage2-5BLow"
           }
         },
         {
@@ -32,6 +20,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Cage2",
   "choreoAuto": false
 }
