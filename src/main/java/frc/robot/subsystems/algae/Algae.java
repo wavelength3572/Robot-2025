@@ -8,6 +8,8 @@ public class Algae extends SubsystemBase {
   private final AlgaeIO io;
   private final AlgaeIOInputsAutoLogged inputs = new AlgaeIOInputsAutoLogged();
 
+  private boolean isDeployClimberTriggered = false;
+
   private static final LoggedTunableNumber AlgaekP =
       new LoggedTunableNumber("Algae/kEp", AlgaeConstants.kAlgaeDeployKp);
   private static final LoggedTunableNumber AlgaekD =
@@ -43,11 +45,15 @@ public class Algae extends SubsystemBase {
 
   // Capture Motor Methods
   public void pushAlgae() {
-    io.pushAlgae();
+    if (!isDeployClimberTriggered) {
+      io.pushAlgae();
+    }
   }
 
   public void pullAlgae() {
-    io.pullAlgae();
+    if (!isDeployClimberTriggered) {
+      io.pullAlgae();
+    }
   }
 
   public void stopAlgae() {
@@ -64,20 +70,31 @@ public class Algae extends SubsystemBase {
 
   // Deploy Motor Methods
   public void deployAlgae() {
-    io.deployAlgae();
+    if (!isDeployClimberTriggered) {
+      io.deployAlgae();
+    }
   }
 
   public void stowAlgae() {
-    io.stowAlgae();
+    if (!isDeployClimberTriggered) {
+      io.stowAlgae();
+    }
   }
 
   public void setDeployPositionAngle(double angle) {
-    if (angle >= AlgaeConstants.MIN_ANGLE && angle <= AlgaeConstants.MAX_ANGLE) {
-      io.setDeployPositionAngle(angle);
+    if (!isDeployClimberTriggered) {
+      if (angle >= AlgaeConstants.MIN_ANGLE && angle <= AlgaeConstants.MAX_ANGLE) {
+        io.setDeployPositionAngle(angle);
+      }
     }
   }
 
   public double getDeployPositionAngle() {
     return io.getDeployPositionAngle();
+  }
+
+  public void deployClimberTriggered() {
+    deployAlgae(); // deploy the algae before we disable the ability to do so
+    isDeployClimberTriggered = true;
   }
 }

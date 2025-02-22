@@ -69,6 +69,12 @@ public class ButtonsAndDashboardBindings {
   private static void configureDashboardBindings() {
 
     SmartDashboard.putData(
+        "Deploy Climber",
+        Commands.runOnce(climber::deployClimber)
+            .alongWith(Commands.runOnce(coralSystem::deployClimberTriggered))
+            .alongWith(Commands.runOnce(algae::deployClimberTriggered)));
+
+    SmartDashboard.putData(
         "Set Coral In Robot",
         Commands.runOnce(() -> coralSystem.setCoralInRobot(true)).ignoringDisable(true));
 
@@ -297,7 +303,11 @@ public class ButtonsAndDashboardBindings {
                   }
                 }));
 
-    // oi.getButtonBox1Button7().onTrue(Commands.runOnce(climber::deployClimber));
+    oi.getButtonBox1Button7()
+        .onTrue(Commands.runOnce(climber::deployClimber))
+        .onTrue(Commands.runOnce(coralSystem::deployClimberTriggered))
+        .onTrue(Commands.runOnce(algae::deployClimberTriggered));
+
     // oi.getButtonBox1Button8().onTrue(Commands.runOnce(climber::stowClimber));
 
     oi.getButtonBox1Button6()

@@ -64,9 +64,4 @@ public class RobotStatus {
   public static boolean isVisionOn() {
     return visionSystem.isVisionOn();
   }
-
-  // Globally accessible method to whether vision is on
-  public static boolean isClimberDeployed() {
-    return climberSystem.isClimberDeployed();
-  }
 }

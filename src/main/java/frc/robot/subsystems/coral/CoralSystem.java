@@ -93,6 +93,7 @@ public class CoralSystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
     this.elevator.periodic();
     this.arm.periodic();
     this.intake.periodic();
@@ -106,10 +107,6 @@ public class CoralSystem extends SubsystemBase {
     Logger.recordOutput("CoralSystem/AtGoal", isAtGoal());
 
     CoralRPStatusLogger.logCoralStatus(false);
-
-    if (RobotStatus.isClimberDeployed() && targetCoralPreset != CLIMB) {
-      setTargetPreset(CLIMB);
-    }
 
     if (DriverStation.isEnabled()) {
       automationTriggerChecks();
@@ -207,7 +204,7 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public void setAlgaeDislodgePreset(CoralSystemPresets preset) {
-    if (preset != this.currentCoralPreset) {
+    if (preset != this.currentCoralPreset && targetCoralPreset != CLIMB) {
       this.targetCoralPreset = preset;
       systemState = CoralSystemMovementState.MOVE_SIMULTANEOUS;
     }
@@ -229,9 +226,11 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public void scoreCoral() {
-    intake.pushCoral();
-    // set state to running coral
-    // start a timer
+    if (targetCoralPreset != CLIMB) {
+      intake.pushCoral();
+      // set state to running coral
+      // start a timer
+    }
   }
 
   /**
@@ -340,5 +339,11 @@ public class CoralSystem extends SubsystemBase {
       sum += val;
     }
     return tofReadings.isEmpty() ? 0.0 : sum / tofReadings.size();
+  }
+
+  public void deployClimberTriggered() {
+    if (targetCoralPreset != CLIMB) {
+      setTargetPreset(CLIMB);
+    }
   }
 }
