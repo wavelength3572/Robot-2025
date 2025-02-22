@@ -130,6 +130,29 @@ public class ButtonsAndDashboardBindings {
                       "Set Algae Angle Target", AlgaeConstants.kAlgaeDeployInitalAngle);
               algae.setDeployPositionAngle(angle);
             }));
+
+    SmartDashboard.putData(
+        "Deploy Algae Collector",
+        Commands.runOnce( // this is the collect algae - YELLOW INTAKE BUTTON
+            () -> {
+              algae.deployAlgae(); // deploy the algae mechanism
+              algae.pullAlgae();
+            }));
+
+    SmartDashboard.putData(
+        "Process Algae",
+        Commands.runOnce( // this is the process algae button
+            () -> {
+              algae.pushAlgae(); // run algae intake
+            }));
+
+    SmartDashboard.putData(
+        "Stow Algae",
+        Commands.runOnce( // this is the process algae button
+            () -> {
+              algae.stowAlgae(); // does mechanism need to move?
+              algae.stopAlgae(); // run algae intake
+            }));
   }
 
   private static void configureDriverButtonBindings() {
@@ -142,17 +165,17 @@ public class ButtonsAndDashboardBindings {
         .onFalse(Commands.runOnce(() -> coralSystem.setCoralInRobot(false), coralSystem));
 
     // oi.getButtonFPosition0() // Push Algae Arm
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> {
-    //               algae.deployAlgae();
-    //             }));
+    // .onTrue(
+    // Commands.runOnce(
+    // () -> {
+    // algae.deployAlgae();
+    // }));
     // oi.getButtonFPosition2() // Pull Algae Arm
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> {
-    //               algae.stowAlgae();
-    //             }));
+    // .onTrue(
+    // Commands.runOnce(
+    // () -> {
+    // algae.stowAlgae();
+    // }));
 
     if (oi.getButtonGPosition0().getAsBoolean()) {
       AlignmentUtils.setLeftCage();

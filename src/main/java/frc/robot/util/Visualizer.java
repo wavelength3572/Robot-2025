@@ -115,9 +115,19 @@ public class Visualizer {
     Pose3d armCalibratedPose =
         armPose.plus(new Transform3d(0, 0, 0, new Rotation3d(0, Units.degreesToRadians(-90), 0)));
 
-    // ✅ Log robot components (elevator + calibrated arm)
+    double algaeAngleDegrees = algaeDeployPositionSupplier.get();
+
+    // 🔹 Compute dynamic arm pose
+    Pose3d algaePose = getAlgae3DPose(algaeAngleDegrees);
+
+    // 🔹 Apply calibration offset (-90 degrees) to align arm visualization
+    Pose3d algaeCalibratedPose =
+        algaePose.plus(new Transform3d(0, 0, 0, new Rotation3d(Math.toRadians(103), 0, 0)));
+
+    // ✅ Log robot components (elevator + calibrated arm + algae collector)
     Logger.recordOutput(
-        "Visualizer/FinalComponentPoses", new Pose3d[] {elevatorPose, armCalibratedPose});
+        "Visualizer/FinalComponentPoses",
+        new Pose3d[] {elevatorPose, armCalibratedPose, algaeCalibratedPose});
 
     if (isCoralInRobotSupplier.get()) {
       // ✅ Move coral relative to the robot's 2D pose, applying zeroed position &
@@ -146,6 +156,13 @@ public class Visualizer {
         -0.190,
         elevatorHeight + 0.262,
         new Rotation3d(0, armAngleRadians, Units.degreesToRadians(180)));
+  }
+
+  /** Computes and returns the 3D pose of the arm for visualization */
+  private Pose3d getAlgae3DPose(double algaeAngleDegrees) {
+    double algaeAngleRadians =
+        Units.degreesToRadians(algaeAngleDegrees); // ✅ Convert inside the method
+    return new Pose3d(-0.240, 0.212, 0.191, new Rotation3d(-algaeAngleRadians, 0, 0));
   }
 
   private Pose3d attachCoralToRobot(Pose2d robotPose2d, Pose3d armPoseInRobotFrame) {
