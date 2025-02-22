@@ -3,7 +3,6 @@ package frc.robot;
 import static frc.robot.subsystems.coral.CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1;
 import static frc.robot.subsystems.coral.CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2;
 
-import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AlgaeCommands;
@@ -138,7 +137,6 @@ public class ButtonsAndDashboardBindings {
         .onTrue(Commands.runOnce(() -> coralSystem.setCoralInRobot(true), coralSystem))
         .onFalse(Commands.runOnce(() -> coralSystem.setCoralInRobot(false), coralSystem));
 
-  
     // oi.getButtonFPosition0() // Push Algae Arm
     //     .onTrue(
     //         Commands.runOnce(
@@ -206,8 +204,7 @@ public class ButtonsAndDashboardBindings {
         .onTrue(Commands.runOnce(coralSystem::deployClimberTriggered))
         .onTrue(Commands.runOnce(algae::deployClimberTriggered));
 
-    oi.getButtonBox1Button8()
-        .onTrue(Commands.runOnce(climber::climb));
+    oi.getButtonBox1Button8().onTrue(Commands.runOnce(climber::climb));
 
     oi.getButtonBox1Button6()
         .onTrue(
