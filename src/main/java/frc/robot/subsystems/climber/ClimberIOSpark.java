@@ -14,6 +14,7 @@ import frc.robot.subsystems.climber.ClimberConstants.CLIMB_STATE;
 import frc.robot.util.LoggedTunableNumber;
 
 public class ClimberIOSpark implements ClimberIO {
+
   private SparkMax climberMotor = new SparkMax(ClimberConstants.canId, MotorType.kBrushless);
   private RelativeEncoder climberEncoder = climberMotor.getEncoder();
   private SparkClosedLoopController climberController = climberMotor.getClosedLoopController();
@@ -49,12 +50,17 @@ public class ClimberIOSpark implements ClimberIO {
     switch (currentClimberState) {
       case STOWED:
         climberMotor.set(0.0);
+        // setRelayState(Relay.Value.kForward); //Foot shorter
         break;
       case DEPLOY:
-        climberMotor.set(ClimberConstants.deployPower);
+        // climberMotor.set(ClimberConstants.deployPower);
+        climberController.setReference(ClimberConstants.DEPLOY_POSITION, ControlType.kPosition);
+        // setRelayState(Relay.Value.kForward); //Foot shorter
         break;
       case CLIMB:
-        climberMotor.set(ClimberConstants.climbPower);
+        // climberMotor.set(ClimberConstants.climbPower);
+        climberController.setReference(ClimberConstants.CLIMBED_POSITION, ControlType.kPosition);
+        setRelayState(Relay.Value.kReverse); // Foot longer
         break;
       case FINAL:
         // climberMotor.set(0.0);
@@ -82,7 +88,9 @@ public class ClimberIOSpark implements ClimberIO {
   }
 
   public void climb() {
-    currentClimberState = CLIMB_STATE.CLIMB;
+    if (currentClimberState == CLIMB_STATE.DEPLOY) {
+      currentClimberState = CLIMB_STATE.CLIMB;
+    }
   }
 
   public void setRelayState(Relay.Value newState) {

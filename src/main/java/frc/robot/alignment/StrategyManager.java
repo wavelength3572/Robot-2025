@@ -60,6 +60,7 @@ public class StrategyManager implements AlignmentStrategy {
    * called **once per loop cycle**.
    */
   public void updateStrategyForCycle(AlignmentContext context) {
+
     boolean haveCoral = context.isCoralInRobot();
     boolean climberDeployed = context.isClimberDeployed();
     boolean nearReef =

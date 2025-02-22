@@ -3,7 +3,6 @@ package frc.robot;
 import static frc.robot.subsystems.coral.CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1;
 import static frc.robot.subsystems.coral.CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2;
 
-import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AlgaeCommands;
@@ -138,103 +137,6 @@ public class ButtonsAndDashboardBindings {
         .onTrue(Commands.runOnce(() -> coralSystem.setCoralInRobot(true), coralSystem))
         .onFalse(Commands.runOnce(() -> coralSystem.setCoralInRobot(false), coralSystem));
 
-    // oi.getButtonFPosition0() // Push Intake
-    // .onTrue(
-    // Commands.runOnce(
-    // () -> {
-    // coralSystem.getIntake().pushCoral();
-    // }))
-    // .onFalse(
-    // Commands.runOnce(
-    // () -> {
-    // coralSystem.getIntake().stopIntake();
-    // ;
-    // }));
-    // oi.getButtonFPosition2() // Pull Intake
-    // .onTrue(
-    // Commands.runOnce(
-    // () -> {
-    // coralSystem.getIntake().pullCoral();
-    // }))
-    // .onFalse(
-    // Commands.runOnce(
-    // () -> {
-    // coralSystem.getIntake().stopIntake();
-    // ;
-    // }));
-
-    // oi.getButtonFPosition0() // Push Intake
-    // .onTrue(
-    // Commands.runOnce(
-    // () -> {
-    // algae.pushAlgae();
-    // }))
-    // .onFalse(
-    // Commands.runOnce(
-    // () -> {
-    // algae.stopAlgae();
-    // }));
-    // oi.getButtonFPosition2() // Pull Intake
-    // .onTrue(
-    // Commands.runOnce(
-    // () -> {
-    // algae.pullAlgae();
-    // }))
-    // .onFalse(
-    // Commands.runOnce(
-    // () -> {
-    // algae.stopAlgae();
-    // }));
-
-    // oi.getButtonFPosition0() // Push Climber Up
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> {
-    //               climber.deployClimber();
-    //             }))
-    //     .onFalse(
-    //         Commands.runOnce(
-    //             () -> {
-    //               climber.stopClimber();
-    //             }));
-    // oi.getButtonFPosition2() // Pull Intake
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> {
-    //               climber.climb();
-    //             }))
-    //     .onFalse(
-    //         Commands.runOnce(
-    //             () -> {
-    //               climber.stopClimber();
-    //             }));
-
-    oi.getButtonCPosition0() // Push Climber Up
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  climber.setRelayState(Relay.Value.kForward);
-                }))
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  climber.setRelayState(Relay.Value.kOff);
-                }));
-    oi.getButtonCPosition2() // Pull Intake
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  climber.setRelayState(Relay.Value.kReverse);
-                }))
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  climber.setRelayState(Relay.Value.kOff);
-                }));
-
-    // oi.getButtonBox1Button7().onTrue(Commands.runOnce(climber::deployClimber));
-    // oi.getButtonBox1Button8().onTrue(Commands.runOnce(climber::stowClimber));
-
     // oi.getButtonFPosition0() // Push Algae Arm
     //     .onTrue(
     //         Commands.runOnce(
@@ -297,8 +199,12 @@ public class ButtonsAndDashboardBindings {
                   }
                 }));
 
-    // oi.getButtonBox1Button7().onTrue(Commands.runOnce(climber::deployClimber));
-    // oi.getButtonBox1Button8().onTrue(Commands.runOnce(climber::stowClimber));
+    oi.getButtonBox1Button7() // the big switch
+        .onTrue(Commands.runOnce(climber::deployClimber))
+        .onTrue(Commands.runOnce(coralSystem::deployClimberTriggered))
+        .onTrue(Commands.runOnce(algae::deployClimberTriggered));
+
+    oi.getButtonBox1Button8().onTrue(Commands.runOnce(climber::climb));
 
     oi.getButtonBox1Button6()
         .onTrue(
