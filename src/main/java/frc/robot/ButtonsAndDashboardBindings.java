@@ -83,6 +83,10 @@ public class ButtonsAndDashboardBindings {
             coralSystem.getElevator()::getHeightInInches));
 
     SmartDashboard.putData(
+        "Toggle Elevator Height Speed Limits",
+        Commands.runOnce(drive::toggleElevatorHeightLimitsSpeed));
+
+    SmartDashboard.putData(
         "Toggle Vision", Commands.runOnce(vision::toggleVision).ignoringDisable(true));
 
     SmartDashboard.putData(

@@ -34,6 +34,7 @@ import frc.robot.alignment.StrategyManager;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.AlignmentUtils;
+import frc.robot.util.RobotStatus;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -378,17 +379,75 @@ public class DriveCommands {
    */
   private static void sendSpeedsToDrive(
       Drive drive, Translation2d translationInput, double rotationInput) {
+
+    double linearSpeedScalar = 1.0;
+    double rotationSpeedScalar = 1.0;
+    if (drive.getElevatorHeightLimitsSpeed()) {
+      linearSpeedScalar = calculateSpeedMultiplier(RobotStatus.elevatorHeightInches());
+      rotationSpeedScalar = calculateRotationSpeedMultiplier(RobotStatus.elevatorHeightInches());
+    }
+
     ChassisSpeeds speeds =
         new ChassisSpeeds(
-            translationInput.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-            translationInput.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-            rotationInput * drive.getMaxAngularSpeedRadPerSec());
+            translationInput.getX() * drive.getMaxLinearSpeedMetersPerSec() * linearSpeedScalar,
+            translationInput.getY() * drive.getMaxLinearSpeedMetersPerSec() * linearSpeedScalar,
+            rotationInput * drive.getMaxAngularSpeedRadPerSec() * rotationSpeedScalar);
+
     boolean isFlipped =
         DriverStation.getAlliance().isPresent()
             && DriverStation.getAlliance().get() == Alliance.Red;
+
     drive.runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
             speeds,
             isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation()));
+  }
+
+  private static double calculateSpeedMultiplier(double elevatorHeightInches) {
+    // Convert the elevator height from inches to meters.
+    double elevatorHeightMeters = elevatorHeightInches * 0.0254;
+
+    // Define thresholds (in meters):
+    // 25 inches = 25 * 0.0254 ≈ 0.635 m (full speed)
+    // 50 inches = 50 * 0.0254 ≈ 1.27 m (minimum speed)
+    final double fullSpeedThreshold = 25 * 0.0254; // ≈ 0.635 meters
+    final double reducedSpeedThreshold = 50 * 0.0254; // ≈ 1.27 meters
+    final double minMultiplier = 0.2; // Minimum multiplier at maximum height
+
+    if (elevatorHeightMeters <= fullSpeedThreshold) {
+      return 1.0;
+    } else if (elevatorHeightMeters >= reducedSpeedThreshold) {
+      return minMultiplier;
+    } else {
+      // Linearly interpolate between full speed (1.0) and minimum speed
+      // (minMultiplier)
+      double fraction =
+          (elevatorHeightMeters - fullSpeedThreshold)
+              / (reducedSpeedThreshold - fullSpeedThreshold);
+      return 1.0 - fraction * (1.0 - minMultiplier);
+    }
+  }
+
+  private static double calculateRotationSpeedMultiplier(double elevatorHeightInches) {
+    // Convert the elevator height from inches to meters.
+    double elevatorHeightMeters = elevatorHeightInches * 0.0254;
+
+    // Define thresholds (in meters) for rotational speed:
+    // Below 25 inches (~0.635 m), full rotational speed is allowed.
+    // Above 50 inches (~1.27 m), use the minimum rotational speed.
+    final double fullSpeedThreshold = 25 * 0.0254; // ≈ 0.635 meters
+    final double reducedSpeedThreshold = 50 * 0.0254; // ≈ 1.27 meters
+    final double minRotationMultiplier = 0.5; // Adjust as needed
+
+    if (elevatorHeightMeters <= fullSpeedThreshold) {
+      return 1.0;
+    } else if (elevatorHeightMeters >= reducedSpeedThreshold) {
+      return minRotationMultiplier;
+    } else {
+      double fraction =
+          (elevatorHeightMeters - fullSpeedThreshold)
+              / (reducedSpeedThreshold - fullSpeedThreshold);
+      return 1.0 - fraction * (1.0 - minRotationMultiplier);
+    }
   }
 }

@@ -64,4 +64,9 @@ public class RobotStatus {
   public static boolean isVisionOn() {
     return visionSystem.isVisionOn();
   }
+
+  // Globally accessible method to whether vision is on
+  public static double elevatorHeightInches() {
+    return coralSystem.getElevator().getHeightInInches();
+  }
 }

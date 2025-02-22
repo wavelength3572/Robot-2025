@@ -36,13 +36,13 @@ public class StrategyManager implements AlignmentStrategy {
     // Initialize shared PID controller
     this.sharedAngleController =
         new ProfiledPIDController(
-            0.5, // ANGLE_KP
+            0.4, // ANGLE_KP
             0.0,
             0.0, // ANGLE_KD
             new TrapezoidProfile.Constraints(
                 Units.degreesToRadians(360.0), Units.degreesToRadians(360.0)));
     this.sharedAngleController.enableContinuousInput(-Math.PI, Math.PI);
-    this.sharedAngleController.setTolerance(Math.toRadians(.5));
+    this.sharedAngleController.setTolerance(Math.toRadians(1.0));
 
     // Instantiate alignment strategies with shared controller and override flag
     reefStrategy = new ReefAlignmentStrategy(sharedAngleController);
