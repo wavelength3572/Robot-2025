@@ -5,14 +5,17 @@
   "pathFolders": [
     "Tests",
     "StationLeft",
-    "2A",
     "MidStart",
-    "BlueStart",
-    "3B",
-    "3A"
+    "Face3",
+    "Cage6",
+    "Cage5",
+    "Cage2"
   ],
   "autoFolders": [
-    "BlueStart"
+    "BlueStart",
+    "Cage2",
+    "Mid",
+    "Cage5"
   ],
   "defaultMaxVel": 0.5,
   "defaultMaxAccel": 1.0,

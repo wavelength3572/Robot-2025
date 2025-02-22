@@ -3,35 +3,42 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.147868238777627,
-        "y": 5.119417966091126
+        "x": 6.985,
+        "y": 1.91
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1011966168079934,
-        "y": 6.884758647431515
+        "x": 7.301267860521077,
+        "y": 1.739087769186267
       },
       "isLocked": false,
-      "linkedName": "3B"
+      "linkedName": "Cage2"
     },
     {
       "anchor": {
-        "x": 1.3402382902939363,
-        "y": 7.058512718559919
+        "x": 5.125851626653006,
+        "y": 2.870942510918894
       },
       "prevControl": {
-        "x": 2.408008896703656,
-        "y": 6.722261540302692
+        "x": 6.246001286767855,
+        "y": 2.243457350504465
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "StationLeft"
+      "linkedName": "5B"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "L4",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 0.5,
     "maxAcceleration": 1.0,
@@ -42,13 +49,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -54.0
+    "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": "3B",
+  "folder": "Cage2",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": 135.0
   },
   "useDefaultConstraints": true
 }

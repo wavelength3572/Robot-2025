@@ -65,6 +65,8 @@ import org.littletonrobotics.junction.Logger;
 public class Drive extends SubsystemBase {
 
   private boolean isDriveModeSmart = false;
+  private boolean elevatorHeightLimitsSpeed = false;
+
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -420,6 +422,15 @@ public class Drive extends SubsystemBase {
   @AutoLogOutput(key = "Alignment/isSmartDrive")
   public boolean isDriveModeSmart() {
     return isDriveModeSmart;
+  }
+
+  public void toggleElevatorHeightLimitsSpeed() {
+    elevatorHeightLimitsSpeed = !elevatorHeightLimitsSpeed;
+  }
+
+  @AutoLogOutput(key = "Alignment/elevatorHeightLimitsSpeed")
+  public boolean getElevatorHeightLimitsSpeed() {
+    return elevatorHeightLimitsSpeed;
   }
 
   public void toggleDriveMode() {

@@ -84,6 +84,10 @@ public class ButtonsAndDashboardBindings {
             coralSystem.getElevator()::getHeightInInches));
 
     SmartDashboard.putData(
+        "Toggle Elevator Height Speed Limits",
+        Commands.runOnce(drive::toggleElevatorHeightLimitsSpeed));
+
+    SmartDashboard.putData(
         "Toggle Vision", Commands.runOnce(vision::toggleVision).ignoringDisable(true));
 
     SmartDashboard.putData(
@@ -126,6 +130,29 @@ public class ButtonsAndDashboardBindings {
                   SmartDashboard.getNumber(
                       "Set Algae Angle Target", AlgaeConstants.kAlgaeDeployInitalAngle);
               algae.setDeployPositionAngle(angle);
+            }));
+
+    SmartDashboard.putData(
+        "Deploy Algae Collector",
+        Commands.runOnce( // this is the collect algae - YELLOW INTAKE BUTTON
+            () -> {
+              algae.deployAlgae(); // deploy the algae mechanism
+              algae.pullAlgae();
+            }));
+
+    SmartDashboard.putData(
+        "Process Algae",
+        Commands.runOnce( // this is the process algae button
+            () -> {
+              algae.pushAlgae(); // run algae intake
+            }));
+
+    SmartDashboard.putData(
+        "Stow Algae",
+        Commands.runOnce( // this is the process algae button
+            () -> {
+              algae.stowAlgae(); // does mechanism need to move?
+              algae.stopAlgae(); // run algae intake
             }));
   }
 

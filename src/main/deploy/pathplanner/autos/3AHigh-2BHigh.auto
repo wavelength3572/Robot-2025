@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BlueStart-3A-High"
+            "pathName": "Cage5-3B-High"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "3A-StationLeft-Events"
+            "pathName": "3B-StationLeft"
           }
         },
         {

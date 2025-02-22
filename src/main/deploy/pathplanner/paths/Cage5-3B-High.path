@@ -3,45 +3,50 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.460264976987694,
-        "y": 4.990955868776757
+        "x": 6.985361842105262,
+        "y": 6.170641447368421
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.4135933550180604,
-        "y": 6.756296550117146
+        "x": 6.119446555710647,
+        "y": 5.553317183295652
       },
       "isLocked": false,
-      "linkedName": "3A"
+      "linkedName": "Cage5"
     },
     {
       "anchor": {
-        "x": 1.3402382902939363,
-        "y": 7.058512718559919
+        "x": 5.184320545895231,
+        "y": 5.177904900129053
       },
       "prevControl": {
-        "x": 2.408008896703657,
-        "y": 6.722261540302692
+        "x": 5.6588050670219525,
+        "y": 5.9997361981255235
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "StationLeft"
+      "linkedName": "3B"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.46004842615012087,
+      "rotationDegrees": -119.99999999999999
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Stow",
+      "name": "L4",
       "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
-      "name": "Pickup",
-      "waypointRelativePos": 0.19950372208436204,
-      "endWaypointRelativePos": 0.5961538461538516,
+      "name": "Score",
+      "waypointRelativePos": 1.0,
+      "endWaypointRelativePos": null,
       "command": null
     }
   ],
@@ -54,14 +59,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -54.0
+    "velocity": 0.0,
+    "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": "3A",
+  "folder": "Cage5",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": -135.0
   },
   "useDefaultConstraints": true
 }

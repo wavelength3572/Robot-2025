@@ -7,19 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BlueStart-3A-Events"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "WaitForPreset"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score"
+            "pathName": "Cage2-5BHigh"
           }
         },
         {
@@ -32,6 +20,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "BlueStart",
+  "folder": "Cage2",
   "choreoAuto": false
 }

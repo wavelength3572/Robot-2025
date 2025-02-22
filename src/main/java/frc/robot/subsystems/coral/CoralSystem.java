@@ -110,9 +110,8 @@ public class CoralSystem extends SubsystemBase {
 
     if (DriverStation.isEnabled()) {
       automationTriggerChecks();
+      checkAndStowOnCoralPickup();
     }
-
-    checkAndStowOnCoralPickup();
 
     switch (systemState) {
       case STABLE:

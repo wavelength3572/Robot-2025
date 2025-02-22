@@ -1,23 +1,34 @@
 package frc.robot.subsystems.algae;
 
+import frc.robot.subsystems.coral.arm.ArmConstants;
+
 public class AlgaeIOVirtualSim implements AlgaeIO {
 
-  private double targetEncoderRotations = 0.0;
-  private double virtualEncoderRotations = 0.0;
+  private double targetEncoderRotations = angleToRotations(AlgaeConstants.algaeStowPosition);
+  private double virtualEncoderRotations = angleToRotations(AlgaeConstants.algaeStowPosition);
 
   private double requestedSpeed = 0.0;
   private boolean haveAlgae = false;
+  private double algaeTargetDEG = AlgaeConstants.algaeStowPosition;
+  private double appliedVoltage = 0.0;
 
   public AlgaeIOVirtualSim() {}
 
   @Override
   public void updateInputs(AlgaeIOInputs inputs) {
+
+    // Update the basic angle and encoder values.
+    inputs.targetAngle = this.algaeTargetDEG;
+    inputs.currentAngle = virtualEncoderRotations * 360.0 / AlgaeConstants.kAlgaeDeployGearing;
+    inputs.targetEncoderRotations = targetEncoderRotations;
+    inputs.encoderRotations = virtualEncoderRotations;
+
+    // Simulate the applied voltage (this is just stored for logging/simulation
+    // purposes)
+    inputs.deployAppliedVolts = appliedVoltage;
+
     // Capture Motor Inputs (Simulating Intake/Outtake)
     inputs.captureRequestedSpeed = this.requestedSpeed;
-
-    // Simulated Deploy Motor Movement
-    inputs.targetEncoderRotations = this.targetEncoderRotations;
-    inputs.encoderRotations = virtualEncoderRotations;
 
     // Simulate gradual movement toward the target (smooth virtual motion)
     if (virtualEncoderRotations < targetEncoderRotations) {
@@ -52,21 +63,30 @@ public class AlgaeIOVirtualSim implements AlgaeIO {
 
   @Override
   public void deployAlgae() {
-    targetEncoderRotations = AlgaeConstants.algaeDeployPosition;
+    this.targetEncoderRotations = angleToRotations(AlgaeConstants.algaeDeployPosition);
   }
 
   @Override
   public void stowAlgae() {
-    targetEncoderRotations = AlgaeConstants.algaeStowPosition;
+    targetEncoderRotations = angleToRotations(AlgaeConstants.algaeStowPosition);
   }
 
   @Override
   public void setDeployPositionAngle(double angle) {
-    targetEncoderRotations = angle;
+    this.algaeTargetDEG = angle;
+    this.targetEncoderRotations = this.algaeTargetDEG * ArmConstants.kArmGearing / 360.0;
   }
 
   @Override
   public double getDeployPositionAngle() {
-    return 0.0;
+    return virtualEncoderRotations * 360.0 / AlgaeConstants.kAlgaeDeployGearing;
+  }
+
+  public double angleToRotations(double angle) {
+    return (angle / 360.0) * AlgaeConstants.kAlgaeDeployGearing;
+  }
+
+  public double rotationsToAngle(double rotations) {
+    return (rotations / AlgaeConstants.kAlgaeDeployGearing) * 360.0;
   }
 }
