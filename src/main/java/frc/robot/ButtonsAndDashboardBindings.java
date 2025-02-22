@@ -186,28 +186,28 @@ public class ButtonsAndDashboardBindings {
     // algae.stopAlgae();
     // }));
 
-    oi.getButtonFPosition0() // Push Climber Up
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  climber.deployClimber();
-                }))
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  climber.stopClimber();
-                }));
-    oi.getButtonFPosition2() // Pull Intake
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  climber.climb();
-                }))
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  climber.stopClimber();
-                }));
+    // oi.getButtonFPosition0() // Push Climber Up
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> {
+    //               climber.deployClimber();
+    //             }))
+    //     .onFalse(
+    //         Commands.runOnce(
+    //             () -> {
+    //               climber.stopClimber();
+    //             }));
+    // oi.getButtonFPosition2() // Pull Intake
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> {
+    //               climber.climb();
+    //             }))
+    //     .onFalse(
+    //         Commands.runOnce(
+    //             () -> {
+    //               climber.stopClimber();
+    //             }));
 
     oi.getButtonCPosition0() // Push Climber Up
         .onTrue(

@@ -13,7 +13,7 @@ public final class ArmConfigs {
       // Configure basic settings of the elevator motor
       armConfig
           .inverted(true)
-          .idleMode(IdleMode.kCoast)
+          .idleMode(IdleMode.kBrake)
           .smartCurrentLimit(ArmConstants.armCurrentLimit)
           .voltageCompensation(12);
       /*
