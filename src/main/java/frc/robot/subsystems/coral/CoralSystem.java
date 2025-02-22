@@ -120,8 +120,9 @@ public class CoralSystem extends SubsystemBase {
         break;
       case SAFE_ARM:
         // Move Arm to Safe
-        this.arm.setTargetPreset(CoralSystemPresets.STOW);
-        if (arm.isAtGoal()) {
+        this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
+        if (arm.getCurrentAngleDEG()
+            >= CoralSystemPresets.ARMSAFE.getArmAngle() - 1.0) { // Put in a 1 degree fudge factor
           systemState = CoralSystemMovementState.MOVE_ELEVATOR;
           // Start moving elevator
           this.elevator.setTargetPreset(targetCoralPreset);

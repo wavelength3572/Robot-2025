@@ -13,9 +13,9 @@ public final class AlgaeConfigs {
     static {
       // Configure basic settings of the elevator motor
       algaeCaptureConfig
-          .idleMode(IdleMode.kBrake)
+          .idleMode(IdleMode.kCoast)
           .smartCurrentLimit(AlgaeConstants.algaeCaptureCurrentLimit)
-          .openLoopRampRate(.25)
+          .openLoopRampRate(.5)
           .voltageCompensation(12);
 
       algaeDeployConfig

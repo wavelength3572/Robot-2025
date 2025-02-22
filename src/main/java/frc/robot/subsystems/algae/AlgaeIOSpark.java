@@ -1,8 +1,6 @@
 package frc.robot.subsystems.algae;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -30,7 +28,8 @@ public class AlgaeIOSpark implements AlgaeIO {
     OFF,
     PUSH,
     PULL,
-    CAPTURE
+    CAPTURE,
+    STOW
   }
 
   private algaeIntakeState currentAlgIntakeState = algaeIntakeState.OFF;
@@ -46,7 +45,7 @@ public class AlgaeIOSpark implements AlgaeIO {
         AlgaeConfigs.AlgaeSubsystem.algaeDeployConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
-    algaeDeployEncoder.setPosition(angleToRotations(AlgaeConstants.kAlgaeDeployInitalAngle));
+    // algaeDeployEncoder.setPosition(angleToRotations(AlgaeConstants.kAlgaeDeployInitalAngle));
   }
 
   @Override
@@ -76,20 +75,21 @@ public class AlgaeIOSpark implements AlgaeIO {
       algaeAmpDetectCount = 0;
     }
 
-    if (algaeAmpDetectCount >= 2 || currentAlgIntakeState == algaeIntakeState.CAPTURE) {
+    if (algaeAmpDetectCount >= 5 || currentAlgIntakeState == algaeIntakeState.CAPTURE) {
       // We have an algae?
       currentAlgIntakeState = algaeIntakeState.CAPTURE;
-      algaeRotorSpeed = 0.03;
+      algaeRotorSpeed = 0.01;
+      this.stowAlgae();
     }
 
     algaeCaptureMotor.set(algaeRotorSpeed);
 
     // Closed-loop position control for deploy motor
-    algaeDeployController.setReference(
-        targetEncoderRotations,
-        ControlType.kMAXMotionPositionControl,
-        ClosedLoopSlot.kSlot0,
-        AlgaeConstants.kAlgaeDeployKf * Math.cos(Math.toRadians(inputs.currentAngle)));
+    // algaeDeployController.setReference(
+    //     targetEncoderRotations,
+    //     ControlType.kMAXMotionPositionControl,
+    //     ClosedLoopSlot.kSlot0,
+    //     AlgaeConstants.kAlgaeDeployKf * Math.cos(Math.toRadians(inputs.currentAngle)));
 
     // Game piece detection
     inputs.algaeInRobot = false; // Placeholder; add sensor logic if needed
@@ -125,16 +125,22 @@ public class AlgaeIOSpark implements AlgaeIO {
   @Override
   public void stowAlgae() {
     targetEncoderRotations = angleToRotations(AlgaeConstants.algaeStowPosition);
+    algaeAmpDetectCount = 0;
+    currentAlgIntakeState = algaeIntakeState.STOW;
+    algaeRotorSpeed = 0.0;
   }
 
   @Override
   public void pushAlgae() {
+    algaeAmpDetectCount = 0;
     algaeRotorSpeed = AlgaeConstants.algaeOutSpeed;
     currentAlgIntakeState = algaeIntakeState.PUSH;
+    targetEncoderRotations = angleToRotations(AlgaeConstants.algaeDeployPosition);
   }
 
   @Override
   public void pullAlgae() {
+    algaeAmpDetectCount = 0;
     algaeRotorSpeed = AlgaeConstants.algaeInSpeed;
     currentAlgIntakeState = algaeIntakeState.PULL;
   }
