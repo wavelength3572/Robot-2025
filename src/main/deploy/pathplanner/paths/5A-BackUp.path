@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.85049846706692,
-        "y": 2.726348064621076
+        "x": 4.861,
+        "y": 2.714
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.85049846706692,
-        "y": 2.726348064621076
+        "x": 5.861,
+        "y": 2.714
       },
       "isLocked": false,
       "linkedName": "5A"
@@ -45,7 +45,7 @@
     "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Face5",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 119.99999999999999

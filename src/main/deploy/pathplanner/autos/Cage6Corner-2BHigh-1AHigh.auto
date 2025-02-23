@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Cage5-3B-High"
+            "pathName": "Cage6-2B-High"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "3B-StationLeft"
+            "pathName": "2B-StationLeft"
           }
         },
         {
@@ -37,7 +37,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StationLeft-2A-High"
+            "pathName": "StationLeft-1A-High"
           }
         },
         {
@@ -62,6 +62,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "BlueStart",
+  "folder": "Cage6",
   "choreoAuto": false
 }
