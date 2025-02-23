@@ -11,40 +11,39 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Score"
           }
         },
         {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "3B-StationLeft"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "WaitForCoral"
-                }
-              }
-            ]
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "StationLeft-2B"
+            "pathName": "3B-StationLeft"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "L4"
+            "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "StationLeft-2A-High"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
           }
         },
         {

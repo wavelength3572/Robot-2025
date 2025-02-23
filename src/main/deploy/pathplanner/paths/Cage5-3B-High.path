@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.985361842105262,
+        "x": 6.985,
         "y": 6.170641447368421
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.119446555710647,
-        "y": 5.553317183295652
+        "x": 6.166503679647174,
+        "y": 5.542399541692105
       },
       "isLocked": false,
       "linkedName": "Cage5"
     },
     {
       "anchor": {
-        "x": 5.184320545895231,
-        "y": 5.177904900129053
+        "x": 5.1259331654044935,
+        "y": 5.166183220565647
       },
       "prevControl": {
-        "x": 5.6588050670219525,
-        "y": 5.9997361981255235
+        "x": 5.290261655033263,
+        "y": 5.354587433619196
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,7 +30,7 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.46004842615012087,
+      "waypointRelativePos": 0.5,
       "rotationDegrees": -119.99999999999999
     }
   ],
@@ -40,12 +40,6 @@
     {
       "name": "L4",
       "waypointRelativePos": 0.0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Score",
-      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }

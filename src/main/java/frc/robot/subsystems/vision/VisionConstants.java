@@ -22,7 +22,7 @@ import java.io.IOException;
 
 public final class VisionConstants {
 
-  public static double MAX_TAG_DISTANCE = 1.0; // Example: Only accept tags within 3 meters
+  public static double MAX_TAG_DISTANCE = 1.5; // Example: Only accept tags within 3 meters
 
   // AprilTag layout
   // public static AprilTagFieldLayout aprilTagLayout =

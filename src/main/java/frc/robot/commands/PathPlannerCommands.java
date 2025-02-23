@@ -43,5 +43,7 @@ public class PathPlannerCommands {
         .onTrue(
             Commands.print("Running preset: Stow")
                 .andThen(new RunPresetCommand(coralSystem, STOW)));
+    new EventTrigger("Score")
+        .onTrue(Commands.print("Scoring").andThen(new ScoreCoralCommand(coralSystem.getIntake())));
   }
 }

@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "MidStart-4B-NoEvent"
+            "pathName": "MidStart-4A"
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "L2"
+            "waitTime": 1.0
           }
         },
         {
