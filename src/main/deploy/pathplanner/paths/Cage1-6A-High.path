@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.110817307689941,
-        "y": 7.559775641028642
+        "x": 7.15322713657436,
+        "y": 0.4948047050467858
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.8853814524037373,
-        "y": 7.5843047024458805
+        "x": 6.157032438482615,
+        "y": 0.581960447794444
       },
       "isLocked": false,
-      "linkedName": "Cage6"
+      "linkedName": "Cage1"
     },
     {
       "anchor": {
-        "x": 3.175076565233334,
-        "y": 4.360437983236584
+        "x": 3.5455608093298383,
+        "y": 3.059619101315942
       },
       "prevControl": {
-        "x": 1.4493804682536584,
-        "y": 4.360437983236584
+        "x": 2.7955608093298374,
+        "y": 1.7605809956392846
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "1A"
+      "linkedName": "6A"
     }
   ],
   "rotationTargets": [],
@@ -49,10 +49,10 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": 0.0
+    "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": "Cage6",
+  "folder": "Cage1",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

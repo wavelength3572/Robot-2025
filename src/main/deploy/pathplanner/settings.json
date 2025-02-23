@@ -3,13 +3,15 @@
   "robotLength": 0.886,
   "holonomicMode": true,
   "pathFolders": [
+    "Cage1",
     "Cage2",
     "Cage5",
     "Cage6",
+    "Face2",
     "Face3",
     "Face5",
     "MidStart",
-    "Face2",
+    "Face6",
     "StationLeft",
     "StationRight",
     "Tests"
@@ -17,8 +19,9 @@
   "autoFolders": [
     "Cage2",
     "Cage5",
-    "Mid",
     "Cage6",
+    "Mid",
+    "Cage1",
     "Tests"
   ],
   "defaultMaxVel": 0.5,
