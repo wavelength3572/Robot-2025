@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.util.RobotStatus;
 import org.littletonrobotics.junction.Logger;
 
 public class ArmIOMMSpark implements ArmIO {
@@ -27,7 +28,7 @@ public class ArmIOMMSpark implements ArmIO {
 
   private boolean TBE_Valid = true;
 
-  // private double armArbFF = 0.0;
+  private double armArbFF = ArmConstants.kArmKfNoCoral;
 
   public ArmIOMMSpark() {
     armMotor.configure(
@@ -40,17 +41,22 @@ public class ArmIOMMSpark implements ArmIO {
   @Override
   public void updateInputs(ArmIOInputs inputs) {
     inputs.currentAngleDEG = armEncoder.getPosition() * 360.0 / ArmConstants.kArmGearing;
+    if (RobotStatus.haveCoral()) {
+      armArbFF = ArmConstants.kArmKfCoral;
+    } else {
+      armArbFF = ArmConstants.kArmKfNoCoral;
+    }
     armClosedLoopController.setReference(
         armTargetEncoderRotations,
         ControlType.kMAXMotionPositionControl,
         ClosedLoopSlot.kSlot0,
-        ArmConstants.kArmKf * Math.cos(Math.toRadians(inputs.currentAngleDEG)));
+        armArbFF * Math.cos(Math.toRadians(inputs.currentAngleDEG)));
     inputs.targetAngleDEG = armTargetDEG;
     inputs.targetEncoderRotations = this.armTargetEncoderRotations;
     inputs.encoderRotations = armEncoder.getPosition();
-    inputs.armArbFF = ArmConstants.kArmKf;
+    inputs.armArbFF = armArbFF;
     inputs.TBE_Valid = this.TBE_Valid;
-    inputs.armArbFF_COS = ArmConstants.kArmKf * Math.cos(Math.toRadians(inputs.currentAngleDEG));
+    inputs.armArbFF_COS = armArbFF * Math.cos(Math.toRadians(inputs.currentAngleDEG));
     inputs.velocityRPM = armEncoder.getVelocity();
     inputs.appliedVolts = armMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = armMotor.getOutputCurrent();
@@ -87,12 +93,15 @@ public class ArmIOMMSpark implements ArmIO {
   }
 
   @Override
+  public void setArbFFConstant(double volts) {
+    if (volts >= -0.4 && volts <= 0.4) armArbFF = volts;
+  }
+
+  @Override
   public void setTargetAngleDEG(double requestedPosition) {
     if (TBE_Valid) {
       this.armTargetDEG = requestedPosition;
       this.armTargetEncoderRotations = this.armTargetDEG * ArmConstants.kArmGearing / 360.0;
-      // if (requestedArbFF >= -0.21 && requestedArbFF <= 0.21) this.armArbFF =
-      // requestedArbFF;
     }
   }
 

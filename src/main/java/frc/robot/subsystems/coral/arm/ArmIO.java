@@ -21,7 +21,7 @@ public interface ArmIO {
   public default void updateInputs(ArmIOInputs inputs) {}
 
   /** Run open loop at the specified voltage. */
-  public default void setVoltage(double volts) {}
+  public default void setArbFFConstant(double volts) {}
 
   public default void setTargetAngleDEG(double requestedPositionDEG) {}
 

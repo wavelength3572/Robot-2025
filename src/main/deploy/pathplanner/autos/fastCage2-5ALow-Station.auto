@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Cage2-5ALow"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5A-StationRight"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForCoral"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Cage2",
+  "choreoAuto": false
+}

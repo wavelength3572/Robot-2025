@@ -57,12 +57,12 @@ public class ArmIOVirtualSim implements ArmIO {
     }
   }
 
-  @Override
-  public void setVoltage(double volts) {
-    // In simulation, we simply store the applied voltage.
-    // More sophisticated simulation might update armVirtualEncoder based on volts.
-    this.appliedVoltage = volts;
-  }
+  // @Override
+  // public void setVoltage(double volts) {
+  //   // In simulation, we simply store the applied voltage.
+  //   // More sophisticated simulation might update armVirtualEncoder based on volts.
+  //   this.appliedVoltage = volts;
+  // }
 
   @Override
   public void setTargetAngleDEG(double requestedPosition) {

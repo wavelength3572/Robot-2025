@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.FieldConstants;
 import frc.robot.operator_interface.OperatorInterface;
@@ -51,11 +50,11 @@ public class AlgaeCommands {
         // - AND there is NO coral currently in the robot.
         () -> {
           // boolean notAtDislodgePreset =
-          //     !(coralSystem.isAtGoal()
-          //         && (coralSystem.getCurrentCoralPreset()
-          //                 == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1
-          //             || coralSystem.getCurrentCoralPreset()
-          //                 == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2));
+          // !(coralSystem.isAtGoal()
+          // && (coralSystem.getCurrentCoralPreset()
+          // == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1
+          // || coralSystem.getCurrentCoralPreset()
+          // == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2));
 
           AlignmentUtils.ReefFaceSelection selection = drive.getReefFaceSelection();
           boolean withinThreshold = false;
@@ -79,16 +78,16 @@ public class AlgaeCommands {
     return new ConditionalCommand(
         // ✅ **True Branch**: Execute the dislodge sequence
         new SequentialCommandGroup(
-            new InstantCommand(coralSystem.getIntake()::pullCoral),
+            new InstantCommand(coralSystem.getIntake()::pushCoral),
             // 1. Determine and set the final dislodge preset based on the current prepare
             // preset.
             new InstantCommand(
                 () -> {
                   CoralSystemPresets currentPreset = coralSystem.getCurrentCoralPreset();
                   CoralSystemPresets finalPreset;
-                  if (currentPreset == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1) {
+                  if (currentPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1) {
                     finalPreset = CoralSystemPresets.FINAL_DISLODGE_LEVEL_1;
-                  } else if (currentPreset == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2) {
+                  } else if (currentPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
                     finalPreset = CoralSystemPresets.FINAL_DISLODGE_LEVEL_2;
                   } else {
                     // This branch should never happen because of our outer condition.
@@ -102,15 +101,12 @@ public class AlgaeCommands {
                 },
                 coralSystem),
 
-            // 2. Wait for a fixed delay (e.g., 0.1 seconds) to allow dislodge to start
-            new WaitCommand(0.1),
-
             // 3. Drive backward 10 inches relative to the current pose.
             DriveToCommands.createDriveToPoseScaled(
                 drive,
                 () -> {
                   Pose2d currentPose = drive.getPose();
-                  double offsetMeters = -0.254; // Move backward by 10 inches
+                  double offsetMeters = -0.254 * 3.0; // Move backward by 10 inches
                   Translation2d offset =
                       new Translation2d(offsetMeters, 0).rotateBy(currentPose.getRotation());
                   Translation2d targetTranslation = currentPose.getTranslation().plus(offset);
@@ -119,14 +115,15 @@ public class AlgaeCommands {
                 oi::getTranslateX,
                 oi::getTranslateY,
                 oi::getRotate,
-                SPEED_SCALAR)),
+                SPEED_SCALAR),
+            new InstantCommand(coralSystem.getIntake()::stopIntake)),
 
         // 4. Finally, move the coral system to PICKUP preset.
         // new InstantCommand(
-        //     () -> {
-        //       coralSystem.setTargetPreset(CoralSystemPresets.PICKUP);
-        //     },
-        //     coralSystem)),
+        // () -> {
+        // coralSystem.setTargetPreset(CoralSystemPresets.PICKUP);
+        // },
+        // coralSystem)),
 
         // **False Branch**: Do nothing (command does not run)
         Commands.none(),
@@ -136,9 +133,9 @@ public class AlgaeCommands {
           boolean isInDislodgePreset =
               coralSystem.isAtGoal()
                   && (coralSystem.getCurrentCoralPreset()
-                          == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1
+                          == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
                       || coralSystem.getCurrentCoralPreset()
-                          == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2);
+                          == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
 
           boolean noCoral = !coralSystem.isCoralInRobot();
           return isInDislodgePreset && noCoral;

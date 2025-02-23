@@ -181,8 +181,8 @@ public class CoralSystem extends SubsystemBase {
 
     if (DriverStation.isTeleop()
         && !coralInRobot
-        && (currentCoralPreset != CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1
-            && currentCoralPreset != CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2)
+        && (currentCoralPreset != CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1
+            && currentCoralPreset != CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2)
         && (currentCoralPreset == L1
             || currentCoralPreset == L2
             || currentCoralPreset == L3

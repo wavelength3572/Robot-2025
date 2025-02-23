@@ -69,4 +69,8 @@ public class RobotStatus {
   public static double elevatorHeightInches() {
     return coralSystem.getElevator().getHeightInInches();
   }
+
+  public static boolean haveCoral() {
+    return coralSystem.getIntake().getCoralInRobot();
+  }
 }

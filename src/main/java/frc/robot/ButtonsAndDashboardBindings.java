@@ -1,11 +1,11 @@
 package frc.robot;
 
-import static frc.robot.subsystems.coral.CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1;
-import static frc.robot.subsystems.coral.CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2;
-
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
@@ -215,12 +215,14 @@ public class ButtonsAndDashboardBindings {
 
   private static void configureOperatorButtonBindings() {
 
-    oi.getButtonBox1Button3()
+    oi.getButtonBox1Button3() // Reef Button
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  if (coralSystem.currentCoralPreset == PREPARE_DISLODGE_LEVEL_1
-                      || coralSystem.currentCoralPreset == PREPARE_DISLODGE_LEVEL_2) {
+                  if (coralSystem.currentCoralPreset
+                          == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+                      || coralSystem.currentCoralPreset
+                          == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
                     AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi).schedule();
                   } else {
                     new ScoreCoralCommand(coralSystem.getIntake()).schedule();
@@ -235,25 +237,25 @@ public class ButtonsAndDashboardBindings {
     oi.getButtonBox1Button8().onTrue(Commands.runOnce(climber::climb));
 
     // oi.getButtonBox1Button6()
-    //     .onTrue(
-    //         Commands.runOnce( // this is the collect algae - YELLOW INTAKE BUTTON
-    //             () -> {
-    //               algae.deployAlgae(); // deploy the algae mechanism
-    //               algae.pullAlgae();
-    //             }));
+    // .onTrue(
+    // Commands.runOnce( // this is the collect algae - YELLOW INTAKE BUTTON
+    // () -> {
+    // algae.deployAlgae(); // deploy the algae mechanism
+    // algae.pullAlgae();
+    // }));
 
     // oi.getButtonBox1Button5()
-    //     .onTrue(
-    //         Commands.runOnce( // this is the process algae button
-    //             () -> {
-    //               algae.pushAlgae(); // run algae intake
-    //             }))
-    //     .onFalse(
-    //         Commands.runOnce( // this is the process algae button
-    //             () -> {
-    //               algae.stowAlgae(); // does mechanism need to move?
-    //               algae.stopAlgae(); // run algae intake
-    //             }));
+    // .onTrue(
+    // Commands.runOnce( // this is the process algae button
+    // () -> {
+    // algae.pushAlgae(); // run algae intake
+    // }))
+    // .onFalse(
+    // Commands.runOnce( // this is the process algae button
+    // () -> {
+    // algae.stowAlgae(); // does mechanism need to move?
+    // algae.stopAlgae(); // run algae intake
+    // }));
 
     oi.getButtonBox1YAxisPositive()
         .onTrue(Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L1))); // L1
@@ -266,12 +268,29 @@ public class ButtonsAndDashboardBindings {
 
     oi.getButtonBox1Button1()
         .onTrue(
-            Commands.runOnce(
-                () -> coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1)));
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () ->
+                        coralSystem.setTargetPreset(
+                            CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1)),
+                new WaitUntilCommand(coralSystem::isAtGoal),
+                new InstantCommand(
+                    () ->
+                        coralSystem.setAlgaeDislodgePreset(
+                            CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1))));
+
     oi.getButtonBox1Button2()
         .onTrue(
-            Commands.runOnce(
-                () -> coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2)));
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () ->
+                        coralSystem.setTargetPreset(
+                            CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2)),
+                new WaitUntilCommand(coralSystem::isAtGoal),
+                new InstantCommand(
+                    () ->
+                        coralSystem.setAlgaeDislodgePreset(
+                            CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2))));
 
     oi.getButtonBox1Button4()
         .onTrue(

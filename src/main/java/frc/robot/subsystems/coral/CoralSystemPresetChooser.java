@@ -19,8 +19,8 @@ public class CoralSystemPresetChooser {
     chooser.addOption("Low-L2", CoralSystemPresets.L2);
     chooser.addOption("Mid-L3", CoralSystemPresets.L3);
     chooser.addOption("High-L4", CoralSystemPresets.L4);
-    chooser.addOption("Algae-L1", CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1);
-    chooser.addOption("Algae-L2", CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2);
+    chooser.addOption("Algae-L1", CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1);
+    chooser.addOption("Algae-L2", CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2);
     SmartDashboard.putData("Coral Position Chooser", chooser);
   }
 

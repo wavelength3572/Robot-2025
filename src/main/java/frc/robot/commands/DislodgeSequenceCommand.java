@@ -27,9 +27,9 @@ public class DislodgeSequenceCommand extends SequentialCommandGroup {
             () -> {
               CoralSystemPresets currentPreset = coralSystem.getCurrentCoralPreset();
               CoralSystemPresets finalPreset;
-              if (currentPreset == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1) {
+              if (currentPreset == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1) {
                 finalPreset = CoralSystemPresets.FINAL_DISLODGE_LEVEL_1;
-              } else if (currentPreset == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2) {
+              } else if (currentPreset == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2) {
                 finalPreset = CoralSystemPresets.FINAL_DISLODGE_LEVEL_2;
               } else {
                 // Fallback: if not in a valid prepare state, default to one of the finals.

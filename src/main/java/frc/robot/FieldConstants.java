@@ -496,15 +496,15 @@ public final class FieldConstants {
     Alliance alliance = DriverStation.getAlliance().get();
     if (alliance == Alliance.Blue) {
       if (DISLODGE_L1_FACES_BLUE.contains(faceId)) {
-        return CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1;
+        return CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1;
       } else if (DISLODGE_L2_FACES_BLUE.contains(faceId)) {
-        return CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2;
+        return CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2;
       }
     } else { // Alliance.Red
       if (DISLODGE_L1_FACES_RED.contains(faceId)) {
-        return CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1;
+        return CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1;
       } else if (DISLODGE_L2_FACES_RED.contains(faceId)) {
-        return CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2;
+        return CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2;
       }
     }
     return null;
