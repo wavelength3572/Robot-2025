@@ -91,6 +91,7 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
+                drive::addVisionMeasurementForLogging,
                 new VisionIOPhotonVision(frontRightCam, robotToFrontRightCam),
                 new VisionIOPhotonVision(backRightCam, robotToBackRightCam),
                 new VisionIOPhotonVision(elevatorFrontCam, robotToElevatorFrontCam),
@@ -122,6 +123,7 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
+                drive::addVisionMeasurementForLogging,
                 new VisionIOPhotonVisionSim(frontRightCam, robotToFrontRightCam, drive::getPose),
                 new VisionIOPhotonVisionSim(backRightCam, robotToBackRightCam, drive::getPose),
                 new VisionIOPhotonVisionSim(
@@ -153,7 +155,12 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                drive::addVisionMeasurementForLogging,
+                new VisionIO() {},
+                new VisionIO() {});
         elevator = null;
         arm = null;
         algae = null;
