@@ -22,37 +22,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class CoralSystem extends SubsystemBase {
 
-  private double SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE = 1.5;
-  private double NEAR_REEF_DISTANCE = 1;
-  private static final double TIME_OF_FLIGHT_THRESHOLD = 1250; // adjust this constant as needed
-  private static final int MOVING_AVG_WINDOW = 10;
-
-  @Getter private Elevator elevator;
-  @Getter public final CoralSystemPresetChooser coralSystemPresetChooser;
-  @Getter private Arm arm;
-  @Getter private Intake intake;
-
-  @Getter public boolean coralInRobot;
-  @Getter public boolean justNearReef;
-  @Getter public boolean justScored;
-
-  @Getter
-  @AutoLogOutput(key = "CoralStation/safeToMoveArm")
-  public boolean safeToMoveArmAfterPickupFromStation;
-
-  private TimeOfFlight timeOfFlight = new TimeOfFlight(31); // Back of Robot on Elevator
-
-  @AutoLogOutput(key = "CoralSystem/targetCoralPreset")
-  @Getter
-  public CoralSystemPresets targetCoralPreset =
-      CoralSystemPresets.STARTUP; // Default startup position
-
-  @AutoLogOutput(key = "CoralSystem/currentCoralPreset")
-  @Getter
-  public CoralSystemPresets currentCoralPreset =
-      CoralSystemPresets.STARTUP; // Tracks last reached preset
-
-  private enum CoralSystemMovementState {
+  public static enum CoralSystemMovementState {
     STABLE,
     SAFE_ARM,
     MOVE_ELEVATOR,
@@ -68,6 +38,37 @@ public class CoralSystem extends SubsystemBase {
     HAVE_CORAL_WAITING
   }
 
+  private TimeOfFlight timeOfFlight = new TimeOfFlight(31); // Back of Robot on Elevator
+  private static final double TIME_OF_FLIGHT_THRESHOLD = 1250; // adjust this constant as needed
+
+  private double SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE = 1.5;
+  private double NEAR_REEF_DISTANCE = 1;
+  
+  private static final int MOVING_AVG_WINDOW = 10;
+
+  @Getter private Elevator elevator;
+  @Getter public final CoralSystemPresetChooser coralSystemPresetChooser;
+  @Getter private Arm arm;
+  @Getter private Intake intake;
+
+  @Getter public boolean coralInRobot;
+  @Getter public boolean justNearReef;
+  @Getter public boolean justScored;
+
+  @Getter
+  @AutoLogOutput(key = "CoralSystem/safeToMoveArmAfterPickupFromStation")
+  public boolean safeToMoveArmAfterPickupFromStation;
+
+  @AutoLogOutput(key = "CoralSystem/targetCoralPreset")
+  @Getter
+  public CoralSystemPresets targetCoralPreset =
+      CoralSystemPresets.STARTUP; // Default startup position
+
+  @AutoLogOutput(key = "CoralSystem/currentCoralPreset")
+  @Getter
+  public CoralSystemPresets currentCoralPreset =
+      CoralSystemPresets.STARTUP; // Tracks last reached preset
+
   // Current state of the pickup state machine
   private CoralPickupState pickupState = CoralPickupState.WAITING_FOR_CORAL;
 
@@ -77,7 +78,9 @@ public class CoralSystem extends SubsystemBase {
   // For calculating a moving average of the TOF sensor readings
   private final Deque<Double> tofReadings = new ArrayDeque<>();
 
-  private CoralSystemMovementState systemState = CoralSystemMovementState.STABLE;
+  @AutoLogOutput(key = "CoralSystem/coralSystemState")
+  @Getter
+  private CoralSystemMovementState coralSystemState = CoralSystemMovementState.STABLE;
 
   public CoralSystem(Elevator elevator, Arm arm, Intake intake) {
     coralSystemPresetChooser = new CoralSystemPresetChooser();
@@ -88,7 +91,8 @@ public class CoralSystem extends SubsystemBase {
 
     this.arm.setInitialAngle(this.intake.get_Arm_TBE_DEG());
 
-    SmartDashboard.putData("Set Coral Config", CoralSystemCommands.runPreset(this));
+    // Puts the button/command on the dashboard to go to the choosed preset
+    SmartDashboard.putData("Set Coral Config", CoralSystemCommands.runPreset(this)); // 
   }
 
   @Override
@@ -105,6 +109,7 @@ public class CoralSystem extends SubsystemBase {
     Logger.recordOutput("CoralSystem/ElevatorAtGoal", elevator.isAtGoal());
     Logger.recordOutput("CoralSystem/ArmAtGoal", arm.isAtGoal());
     Logger.recordOutput("CoralSystem/AtGoal", isAtGoal());
+    Logger.recordOutput("CoralSystem/AtGoal", isAtGoal());
 
     CoralRPStatusLogger.logCoralStatus(false);
 
@@ -113,7 +118,7 @@ public class CoralSystem extends SubsystemBase {
       checkAndStowOnCoralPickup();
     }
 
-    switch (systemState) {
+    switch (coralSystemState) {
       case STABLE:
         // Do Nothing
         break;
@@ -122,7 +127,7 @@ public class CoralSystem extends SubsystemBase {
         this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
         if (arm.getCurrentAngleDEG()
             >= CoralSystemPresets.ARMSAFE.getArmAngle() - 1.0) { // Put in a 1 degree fudge factor
-          systemState = CoralSystemMovementState.MOVE_ELEVATOR;
+          coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
           // Start moving elevator
           this.elevator.setTargetPreset(targetCoralPreset);
         }
@@ -130,7 +135,7 @@ public class CoralSystem extends SubsystemBase {
       case MOVE_ELEVATOR:
         this.elevator.setTargetPreset(targetCoralPreset);
         if (elevator.isAtGoal()) {
-          systemState = CoralSystemMovementState.MOVE_ARM_FINAL;
+          coralSystemState = CoralSystemMovementState.MOVE_ARM_FINAL;
           // Start Moving arm
           this.arm.setTargetPreset(targetCoralPreset);
         }
@@ -139,7 +144,7 @@ public class CoralSystem extends SubsystemBase {
         this.arm.setTargetPreset(targetCoralPreset);
         if (arm.isAtGoal()) {
           currentCoralPreset = targetCoralPreset;
-          systemState = CoralSystemMovementState.STABLE;
+          coralSystemState = CoralSystemMovementState.STABLE;
         }
         break;
 
@@ -148,7 +153,7 @@ public class CoralSystem extends SubsystemBase {
         this.elevator.setTargetPreset(targetCoralPreset);
         if (arm.isAtGoal() && elevator.isAtGoal()) {
           currentCoralPreset = targetCoralPreset;
-          systemState = CoralSystemMovementState.STABLE;
+          coralSystemState = CoralSystemMovementState.STABLE;
         }
         break;
 
@@ -175,7 +180,7 @@ public class CoralSystem extends SubsystemBase {
         && nearReef
         && coralInRobot
         && currentCoralPreset == STOW
-        && systemState == CoralSystemMovementState.STABLE) {
+        && coralSystemState == CoralSystemMovementState.STABLE) {
       justNearReef = true;
     }
 
@@ -188,7 +193,7 @@ public class CoralSystem extends SubsystemBase {
             || currentCoralPreset == L3
             || currentCoralPreset == L4)
         && nearReef
-        && systemState == CoralSystemMovementState.STABLE) {
+        && coralSystemState == CoralSystemMovementState.STABLE) {
       justScored = true;
     }
   }
@@ -199,14 +204,14 @@ public class CoralSystem extends SubsystemBase {
       // Start Moving Arm to Safe
       this.arm.setTargetPreset(CoralSystemPresets.STOW);
       // Change state
-      systemState = CoralSystemMovementState.SAFE_ARM;
+      coralSystemState = CoralSystemMovementState.SAFE_ARM;
     }
   }
 
   public void setSimultaneousTargetPreset(CoralSystemPresets preset) {
     if (preset != this.currentCoralPreset && targetCoralPreset != CLIMB) {
       this.targetCoralPreset = preset;
-      systemState = CoralSystemMovementState.MOVE_SIMULTANEOUS;
+      coralSystemState = CoralSystemMovementState.MOVE_SIMULTANEOUS;
     }
   }
 
@@ -216,7 +221,7 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public boolean isAtGoal() {
-    return systemState == CoralSystemMovementState.STABLE
+    return coralSystemState == CoralSystemMovementState.STABLE
         && currentCoralPreset == targetCoralPreset;
   }
 
@@ -332,7 +337,7 @@ public class CoralSystem extends SubsystemBase {
   }
 
   // Helper method to compute the current moving average of the TOF sensor values
-  @AutoLogOutput(key = "CoralStation/TOFAverage")
+  @AutoLogOutput(key = "CoralSystem/TOFAverage")
   private double getTOFMovingAverage() {
     double sum = 0.0;
     for (Double val : tofReadings) {
