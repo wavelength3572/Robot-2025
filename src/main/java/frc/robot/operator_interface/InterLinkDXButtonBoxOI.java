@@ -108,8 +108,13 @@ public class InterLinkDXButtonBoxOI implements OperatorInterface {
     return interLinkJoystickJoystickButtons[26];
   }
 
-  public Trigger getFButtonPosition0() {
-    return interLinkJoystickJoystickButtons[9];
+  @Override
+  public Trigger getButtonFPosition1() {
+    // Returns true when neither button[8] nor button[9] is active.
+    return new Trigger(
+        () ->
+            !interLinkJoystickJoystickButtons[8].getAsBoolean()
+                && !interLinkJoystickJoystickButtons[9].getAsBoolean());
   }
 
   // * BUTTON BOX BUTTONS */
@@ -160,8 +165,23 @@ public class InterLinkDXButtonBoxOI implements OperatorInterface {
   }
 
   @Override
-  public Trigger getButtonBox1YAxis() {
+  public Trigger getButtonBox1YAxisNegative() {
+    return player1ButtonBox.axisLessThan(1, -0.5);
+  }
+
+  @Override
+  public Trigger getButtonBox1YAxisPositive() {
     return player1ButtonBox.axisGreaterThan(1, 0.5);
+  }
+
+  @Override
+  public Trigger getButtonBox1XAxisNegative() {
+    return player1ButtonBox.axisLessThan(0, -0.5);
+  }
+
+  @Override
+  public Trigger getButtonBox1XAxisPositive() {
+    return player1ButtonBox.axisGreaterThan(0, 0.5);
   }
 
   @Override
@@ -235,12 +255,12 @@ public class InterLinkDXButtonBoxOI implements OperatorInterface {
 
   @Override
   public Trigger getButtonFPosition2() {
-    return interLinkJoystickJoystickButtons[8]; // Button F top right of front face - up position
+    return interLinkJoystickJoystickButtons[8]; // Button F top right of front face - down position
   }
 
   @Override
   public Trigger getButtonFPosition0() {
-    return interLinkJoystickJoystickButtons[9]; // Button F top right of front face - down position
+    return interLinkJoystickJoystickButtons[9]; // Button F top right of front face - up position
   }
 
   @Override

@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.util.ReefScoringLogger;
 import java.util.HashMap;
 import java.util.Map;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -106,6 +107,7 @@ public class Robot extends LoggedRobot {
         String.format("driveMotorReduction: %.5f", DriveConstants.driveMotorReduction));
     System.out.println(
         String.format("turnMotorReduction: %.5f", DriveConstants.turnMotorReduction));
+    System.out.println(String.format("wheelRadiusMeters: %.5f", DriveConstants.wheelRadiusMeters));
   }
 
   /** This function is called periodically during all modes. */
@@ -124,12 +126,22 @@ public class Robot extends LoggedRobot {
     // Return to normal thread priority
     Threads.setCurrentThreadPriority(false, 10);
 
-    Logger.recordOutput("Scoring System", robotContainer.getElevator());
+    if (robotContainer.getVisualizer() != null) {
+      robotContainer.getVisualizer().update3DVisualization();
+      robotContainer.getVisualizer().update2DVisualization();
+    }
+
+    if (robotContainer.getOdometryHealthMonitor() != null) {
+      robotContainer.getOdometryHealthMonitor().checkOdometryHealth();
+    }
   }
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    // robotContainer.getDrive().setPose(new Pose2d(7.157, 7.547, new
+    // Rotation2d(Math.PI)));
+  }
 
   /** This function is called periodically when disabled. */
   @Override
@@ -145,6 +157,14 @@ public class Robot extends LoggedRobot {
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
+    }
+
+    ReefScoringLogger.clearScoringEvents(); // Clears previous scoring data
+
+    if (Constants.currentMode == Constants.simMode) {
+      robotContainer
+          .getCoralSystem()
+          .setCoralInRobot(true); // Start with coral in robot during simulation
     }
   }
 
@@ -182,6 +202,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {
+    DriverStationSim.setDsAttached(true);
     DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
   }
 

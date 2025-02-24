@@ -37,10 +37,6 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getAngleDriveButton() {
-    return new Trigger(() -> false);
-  }
-
   public default Trigger getResetGyroButton() {
     return new Trigger(() -> false);
   }
@@ -201,7 +197,19 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
-  public default Trigger getButtonBox1YAxis() {
+  public default Trigger getButtonBox1YAxisNegative() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getButtonBox1YAxisPositive() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getButtonBox1XAxisNegative() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getButtonBox1XAxisPositive() {
     return new Trigger(() -> false);
   }
 
@@ -277,11 +285,35 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
+  public default Trigger getButtonH() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getButtonV() {
+    return new Trigger(() -> false);
+  }
+
   public default Trigger getButtonFPosition2() {
     return new Trigger(() -> false);
   }
 
+  public default Trigger getButtonFPosition1() {
+    return new Trigger(() -> false);
+  }
+
   public default Trigger getButtonFPosition0() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getButtonGPosition2() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getButtonGPosition1() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getButtonGPosition0() {
     return new Trigger(() -> false);
   }
 

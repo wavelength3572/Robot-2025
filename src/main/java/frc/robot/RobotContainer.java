@@ -16,28 +16,40 @@ package frc.robot;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.ElevatorCommands;
+import frc.robot.commands.PathPlannerCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
+import frc.robot.subsystems.LED.IndicatorLight;
+import frc.robot.subsystems.algae.Algae;
+import frc.robot.subsystems.algae.AlgaeIOSpark;
+import frc.robot.subsystems.algae.AlgaeIOVirtualSim;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIOSpark;
+import frc.robot.subsystems.climber.ClimberIOVirtualSim;
+import frc.robot.subsystems.coral.CoralSystem;
+import frc.robot.subsystems.coral.CoralSystemPresets;
+import frc.robot.subsystems.coral.arm.Arm;
+import frc.robot.subsystems.coral.arm.ArmIOMMSpark;
+import frc.robot.subsystems.coral.arm.ArmIOVirtualSim;
+import frc.robot.subsystems.coral.elevator.Elevator;
+import frc.robot.subsystems.coral.elevator.ElevatorIOSpark;
+import frc.robot.subsystems.coral.elevator.ElevatorIOVirtualSim;
+import frc.robot.subsystems.coral.intake.Intake;
+import frc.robot.subsystems.coral.intake.IntakeIOSpark;
+import frc.robot.subsystems.coral.intake.IntakeIOVirtualSim;
 import frc.robot.subsystems.drive.*;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorConstants;
-import frc.robot.subsystems.elevator.ElevatorIOSim;
-import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
+import frc.robot.util.OdometryHealthMonitor;
+import frc.robot.util.RobotStatus;
+import frc.robot.util.Visualizer;
+import lombok.Getter;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -49,23 +61,23 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Vision vision;
-  private final Drive drive;
+  @Getter private final Drive drive;
   private final Elevator elevator;
+  private final Arm arm;
+  private final Intake intake;
+  @Getter private Climber climber;
+  @Getter private final CoralSystem coralSystem;
+  @Getter private final Algae algae;
+  @Getter private Visualizer visualizer;
+  private final IndicatorLight indicatorLight;
   private OperatorInterface oi = new OperatorInterface() {};
+  private LoggedDashboardChooser<Command> autoChooser;
 
-  private LoggedMechanism2d scoringSystem = new LoggedMechanism2d(.8382, 2.0);
-  private LoggedMechanismRoot2d root = scoringSystem.getRoot("Base", 0.51, 0.0);
-  private LoggedMechanismLigament2d m_elevator =
-      root.append(
-          new LoggedMechanismLigament2d(
-              "Elevator", ElevatorConstants.kGroundToElevator, 90, 2, new Color8Bit(Color.kBlue)));
+  @Getter private final OdometryHealthMonitor odometryHealthMonitor;
 
-  // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
-
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -78,13 +90,25 @@ public class RobotContainer {
                 new ModuleIOSpark(3));
         vision =
             new Vision(
-                drive::addVisionMeasurement, new VisionIOPhotonVision(cameraBName, robotToCameraB));
-        // vision =
-        //     new Vision(
-        //         drive::addVisionMeasurement,
-        //         new VisionIOPhotonVision(camera0Name, robotToCamera0),
-        //         new VisionIOPhotonVision(camera1Name, robotToCamera1));
+                drive::addVisionMeasurement,
+                drive::addVisionMeasurementForLogging,
+                new VisionIOPhotonVision(frontRightCam, robotToFrontRightCam),
+                new VisionIOPhotonVision(backRightCam, robotToBackRightCam),
+                new VisionIOPhotonVision(elevatorFrontCam, robotToElevatorFrontCam),
+                new VisionIOPhotonVision(elevatorBackCam, robotToElevatorBackCam));
+
         elevator = new Elevator(new ElevatorIOSpark() {});
+        arm = new Arm(new ArmIOMMSpark() {});
+        intake = new Intake(new IntakeIOSpark() {});
+        coralSystem = new CoralSystem(elevator, arm, intake);
+        algae = new Algae(new AlgaeIOSpark());
+        climber = new Climber(new ClimberIOSpark() {});
+        indicatorLight = new IndicatorLight();
+        indicatorLight.setupLightingSuppliers(
+            coralSystem::getCurrentCoralPreset,
+            coralSystem.coralSystemPresetChooser::getSelected,
+            coralSystem::getTargetCoralPreset,
+            coralSystem::isCoralInRobot);
         break;
 
       case SIM:
@@ -99,9 +123,26 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(cameraAName, robotToCameraA, drive::getPose),
-                new VisionIOPhotonVisionSim(cameraBName, robotToCameraB, drive::getPose));
-        elevator = new Elevator(new ElevatorIOSim() {});
+                drive::addVisionMeasurementForLogging,
+                new VisionIOPhotonVisionSim(frontRightCam, robotToFrontRightCam, drive::getPose),
+                new VisionIOPhotonVisionSim(backRightCam, robotToBackRightCam, drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    elevatorFrontCam, robotToElevatorFrontCam, drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    elevatorBackCam, robotToElevatorBackCam, drive::getPose));
+        elevator = new Elevator(new ElevatorIOVirtualSim() {});
+        arm = new Arm(new ArmIOVirtualSim() {});
+        intake = new Intake(new IntakeIOVirtualSim() {});
+        coralSystem = new CoralSystem(elevator, arm, intake);
+        algae = new Algae(new AlgaeIOVirtualSim());
+        climber = new Climber(new ClimberIOVirtualSim() {});
+        indicatorLight = new IndicatorLight();
+        indicatorLight.setupLightingSuppliers(
+            coralSystem::getCurrentCoralPreset,
+            coralSystem.coralSystemPresetChooser::getSelected,
+            coralSystem::getTargetCoralPreset,
+            coralSystem::isCoralInRobot);
+
         break;
 
       default:
@@ -114,38 +155,47 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                drive::addVisionMeasurementForLogging,
+                new VisionIO() {},
+                new VisionIO() {});
         elevator = null;
+        arm = null;
+        algae = null;
+        coralSystem = null;
+        intake = null;
+        climber = null;
+        indicatorLight = null;
         break;
     }
 
+    visualizer =
+        new Visualizer(
+            drive::getPose,
+            elevator::getHeightInMeters,
+            arm::getCurrentAngleDEG,
+            coralSystem::isCoralInRobot,
+            algae::isAlgaeInRobot,
+            algae::getDeployPositionAngle,
+            algae::getCurrentSpeedRPM);
+
+    odometryHealthMonitor = new OdometryHealthMonitor(drive, vision);
+
     if (elevator != null) {
-      elevator.setPosition(0.0);
-      SmartDashboard.putNumber("Elevator Goal", 0.0);
-      SmartDashboard.putData(
-          "Elevator 2", ElevatorCommands.setElevatorPositionFromDashboard(elevator));
+      elevator.setTargetPreset(CoralSystemPresets.STARTUP);
     }
 
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-    // autoChooser = new LoggedDashboardChooser<>("Auto");
+    if (arm != null) {
+      arm.setTargetPreset(CoralSystemPresets.STARTUP);
+    }
 
-    // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // give static access to certain methods across subsystems
+    RobotStatus.initialize(drive, coralSystem, vision, climber);
 
+    PathPlannerCommands.Setup(coralSystem);
+    SetupAutoChooser();
     updateOI();
   }
 
@@ -163,39 +213,32 @@ public class RobotContainer {
   public void normalModeOI() {
     CommandScheduler.getInstance().getActiveButtonLoop().clear();
     oi = OISelector.findOperatorInterface();
-
-    WLButtons.configureButtonBindings(oi, drive);
-
-    // Configure some robot defaults based on current state of Controller Switches.
-    // if (oi.getFieldRelativeButton().getAsBoolean()) {
-    // System.out.println("Field Relative Button False");
-    // drive.disableFieldRelative();
-    // } else {
-    // System.out.println("Field Relative Button True");
-    // drive.enableFieldRelative();
-    // }
-
+    ButtonsAndDashboardBindings.configureBindings(
+        oi, drive, coralSystem, climber, algae, vision, indicatorLight);
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
 
-  public LoggedMechanism2d getElevator() {
-    // Update the Elevator 2D Mech
-    m_elevator.setLength(ElevatorConstants.kGroundToElevator + elevator.getHeightInMeters());
-    return scoringSystem;
+  public void SetupAutoChooser() {
+    // Set up auto routines
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+    // Set up SysId routines
+    autoChooser.addOption(
+        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    autoChooser.addOption(
+        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Forward)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 }
