@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Cage1-6A-High"
+            "pathName": "Cage1Wall-2B-High"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "6A-StationRight"
+            "pathName": "2B-StationLeft"
           }
         },
         {
@@ -37,7 +37,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StationRight-1A-High"
+            "pathName": "StationLeft-1A-High"
           }
         },
         {

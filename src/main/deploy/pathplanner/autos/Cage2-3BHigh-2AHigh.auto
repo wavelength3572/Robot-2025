@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Cage5-3B-High"
+            "pathName": "Cage2-3B-High"
           }
         },
         {
@@ -33,11 +33,35 @@
           "data": {
             "name": "WaitForCoral"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "StationLeft-2A-High"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stow"
+          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Cage5",
+  "folder": "Cage2",
   "choreoAuto": false
 }

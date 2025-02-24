@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Cage5-3B-High"
+            "pathName": "Cage5-5ALow"
           }
         },
         {
@@ -20,6 +20,12 @@
           "type": "named",
           "data": {
             "name": "Stow"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5A-BackUp"
           }
         }
       ]

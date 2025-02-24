@@ -97,7 +97,7 @@ public class AlgaeCommands {
                         "[AlgaeCommands] Dislodge sequence canceled: Not in a valid prepare preset.");
                     return;
                   }
-                  coralSystem.setAlgaeDislodgePreset(finalPreset);
+                  coralSystem.setSimultaneousTargetPreset(finalPreset);
                 },
                 coralSystem),
 

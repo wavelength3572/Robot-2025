@@ -4,51 +4,42 @@
     {
       "anchor": {
         "x": 6.985,
-        "y": 1.91
+        "y": 6.170641447368421
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.301267860521079,
-        "y": 1.739087769186267
+        "x": 6.166503679647174,
+        "y": 5.542399541692105
       },
       "isLocked": false,
-      "linkedName": "Cage2"
+      "linkedName": "Cage5"
     },
     {
       "anchor": {
-        "x": 4.861,
-        "y": 2.714
+        "x": 5.1259331654044935,
+        "y": 5.166183220565647
       },
       "prevControl": {
-        "x": 5.037636414442616,
-        "y": 1.4721022819035676
+        "x": 5.290261655033263,
+        "y": 5.354587433619196
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "5A"
+      "linkedName": "3B"
     }
   ],
-  "rotationTargets": [],
-  "constraintZones": [
+  "rotationTargets": [
     {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0.84,
-      "constraints": {
-        "maxVelocity": 2.0,
-        "maxAcceleration": 2.5,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -119.99999999999999
     }
   ],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "L2",
-      "waypointRelativePos": 0.8743267504488313,
+      "name": "L4",
+      "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -62,14 +53,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 119.99999999999999
+    "velocity": 0.0,
+    "rotation": -119.99999999999999
   },
   "reversed": false,
   "folder": "Cage2",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 135.0
+    "rotation": -135.0
   },
   "useDefaultConstraints": true
 }

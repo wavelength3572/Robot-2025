@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Cage2-5AHigh"
+            "pathName": "Cage5-5AHigh"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.75
+            "waitTime": 1.0
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.75
+            "waitTime": 1.0
           }
         },
         {
@@ -62,6 +62,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Cage2",
+  "folder": "Cage5",
   "choreoAuto": false
 }

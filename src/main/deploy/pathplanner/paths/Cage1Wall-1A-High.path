@@ -8,36 +8,27 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8851580317450587,
-        "y": 7.1900783584603
+        "x": 0.8853814524037373,
+        "y": 7.5843047024458805
       },
       "isLocked": false,
       "linkedName": "Cage6"
     },
     {
       "anchor": {
-        "x": 3.841765955565494,
-        "y": 5.158586791497726
+        "x": 3.175076565233334,
+        "y": 4.360437983236584
       },
       "prevControl": {
-        "x": 4.113499298208148,
-        "y": 5.629242747065325
+        "x": 1.4493804682536584,
+        "y": 4.360437983236584
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "2B"
+      "linkedName": "1A"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.22999369880277154,
-      "rotationDegrees": 180.0
-    },
-    {
-      "waypointRelativePos": 0.46691871455576794,
-      "rotationDegrees": -59.99999999999999
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
@@ -58,12 +49,12 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": -59.99999999999999
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Cage6",
+  "folder": "Cage1",
   "idealStartingState": {
-    "velocity": 0.0,
+    "velocity": 0,
     "rotation": 180.0
   },
   "useDefaultConstraints": true

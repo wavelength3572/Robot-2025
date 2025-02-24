@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Cage2-5ALow"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
+            "pathName": "Cage2-3B-High"
           }
         },
         {
@@ -23,15 +17,9 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "5A-StationRight"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "WaitForCoral"
+            "name": "Stow"
           }
         }
       ]

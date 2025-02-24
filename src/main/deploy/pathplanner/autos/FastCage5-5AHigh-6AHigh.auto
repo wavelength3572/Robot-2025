@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Cage6-2B-High"
+            "pathName": "Cage5-5AHigh"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.75
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "2B-StationLeft"
+            "pathName": "5A-StationRight"
           }
         },
         {
@@ -37,13 +37,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StationLeft-1A-High"
+            "pathName": "StationRight-6A-High"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.75
           }
         },
         {
@@ -62,6 +62,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Cage6",
+  "folder": "Cage5",
   "choreoAuto": false
 }

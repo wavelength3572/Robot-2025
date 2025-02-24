@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Cage5-3B-High"
+            "pathName": "Cage5-5ALow"
           }
         },
         {
@@ -25,37 +25,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "3B-StationLeft"
+            "pathName": "5A-StationRight"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "WaitForCoral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "StationLeft-2A-High"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stow"
           }
         }
       ]

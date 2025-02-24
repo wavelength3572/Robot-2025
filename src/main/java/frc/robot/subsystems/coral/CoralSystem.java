@@ -203,7 +203,7 @@ public class CoralSystem extends SubsystemBase {
     }
   }
 
-  public void setAlgaeDislodgePreset(CoralSystemPresets preset) {
+  public void setSimultaneousTargetPreset(CoralSystemPresets preset) {
     if (preset != this.currentCoralPreset && targetCoralPreset != CLIMB) {
       this.targetCoralPreset = preset;
       systemState = CoralSystemMovementState.MOVE_SIMULTANEOUS;
