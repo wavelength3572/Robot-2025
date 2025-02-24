@@ -35,35 +35,35 @@ public class DriveConstants {
 
   // Zeroed rotation values for each module, see setup instructions
   // Rotation2d(2.520);
-  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(2.52);
+  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(1.636);
   // Rotation2d(-1.132);
-  public static final Rotation2d frontRightZeroRotation = new Rotation2d(-1.132);
-  // Rotation2d(0.954);
-  public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.954);
+  public static final Rotation2d frontRightZeroRotation = new Rotation2d(2.0187);
+  public static final Rotation2d backLeftZeroRotation = new Rotation2d(-2.1785);
   // Rotation2d(1.621);
-  public static final Rotation2d backRightZeroRotation = new Rotation2d(1.621);
+  public static final Rotation2d backRightZeroRotation = new Rotation2d(2.5226);
 
   // Device CAN IDs
   public static final int pigeonCanId = 19;
 
-  public static final int frontLeftDriveCanId = 2;
-  public static final int backLeftDriveCanId = 4;
+  public static final int frontLeftDriveCanId = 5;
+  public static final int backLeftDriveCanId = 8;
   public static final int frontRightDriveCanId = 3;
-  public static final int backRightDriveCanId = 5;
+  public static final int backRightDriveCanId = 6;
 
-  public static final int frontLeftTurnCanId = 6;
-  public static final int backLeftTurnCanId = 8;
+  public static final int frontLeftTurnCanId = 9;
+  public static final int backLeftTurnCanId = 4;
   public static final int frontRightTurnCanId = 7;
-  public static final int backRightTurnCanId = 9;
+  public static final int backRightTurnCanId = 2;
 
-  public static final int frontLeftCANCoderId = 10;
+  public static final int frontLeftCANCoderId = 13;
   public static final int backLeftCANCoderId = 12;
   public static final int frontRightCANCoderId = 11;
-  public static final int backRightCANCoderId = 13;
+  public static final int backRightCANCoderId = 10;
 
   // Drive motor configuration
-  public static final int driveMotorCurrentLimit = 50;
-  public static final double wheelRadiusMeters = Units.inchesToMeters(2.0);
+  public static final int driveMotorCurrentLimit =
+      35; // Hopefully the amps to prevent wheel slippage
+  public static final double wheelRadiusMeters = Units.inchesToMeters(1.9695);
   public static final double driveMotorReduction =
       (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0); // Gear ratios for
   // SDS MK4i L2
@@ -75,10 +75,11 @@ public class DriveConstants {
           / driveMotorReduction
           * 2.0
           * Math.PI
-          * wheelRadiusMeters;
+          * wheelRadiusMeters
+          * 0.95; // Max is 95% of theoretical max
 
   // Drive encoder configuration
-  public static final boolean driveInverted = true;
+  public static final boolean driveInverted = false;
   public static final double driveEncoderPositionFactor =
       2 * Math.PI / driveMotorReduction; // Rotor Rotations ->
   // Wheel Radians
@@ -89,8 +90,8 @@ public class DriveConstants {
   // Drive PID configuration
   public static final double driveKp = 0.0;
   public static final double driveKd = 0.0;
-  public static final double driveKs = 0.0;
-  public static final double driveKv = 0.1;
+  public static final double driveKs = 0.17296;
+  public static final double driveKv = 0.13139;
   public static final double driveSimP = 0.05;
   public static final double driveSimD = 0.0;
   public static final double driveSimKs = 0.04307;
@@ -101,7 +102,7 @@ public class DriveConstants {
 
   // Turn motor configuration
   public static final boolean turnInverted = true;
-  public static final int turnMotorCurrentLimit = 20;
+  public static final int turnMotorCurrentLimit = 50;
   public static final double turnMotorReduction = 150.0 / 7.0; // SDS MK4i L2
   public static final DCMotor turnGearbox = DCMotor.getNEO(1);
 
@@ -122,7 +123,7 @@ public class DriveConstants {
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 
   // PathPlanner configuration
-  public static final double robotMassKg = 54.43;
+  public static final double robotMassKg = Units.lbsToKilograms(105.4 + 13.5); // Robot plus Battery
   public static final double robotMOI = 6.883;
   public static final double wheelCOF = 1.0; // From
   // https://www.vexrobotics.com/colsonperforma.html#attr-vex_resources

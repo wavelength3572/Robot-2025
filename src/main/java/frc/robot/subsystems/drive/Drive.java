@@ -27,7 +27,10 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -44,13 +47,26 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.FieldConstants;
+import frc.robot.alignment.StrategyManager;
+import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.util.AlignmentUtils;
+import frc.robot.util.AlignmentUtils.CageSelection;
+import frc.robot.util.AlignmentUtils.CoralStationSelection;
+import frc.robot.util.AlignmentUtils.ReefFaceSelection;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.RobotStatus;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
+
+  private boolean isDriveModeSmart = false;
+  private boolean elevatorHeightLimitsSpeed = false;
+
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -70,6 +86,16 @@ public class Drive extends SubsystemBase {
       };
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+
+  private SwerveDrivePoseEstimator poseEstimator2 =
+      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+
+  @Getter private ReefFaceSelection reefFaceSelection;
+  @Getter private CoralStationSelection coralStationSelection;
+  @Getter private Pose2d algaeTargetPose;
+  @Getter private CageSelection cageSelection;
+
+  @Getter private final StrategyManager strategyManager = new StrategyManager();
 
   public Drive(
       GyroIO gyroIO,
@@ -125,6 +151,35 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    Pose3d robotPose3D = convertPose2dTo3d(getPose());
+
+    Logger.recordOutput(
+        "Vision/CamPoses/FrontRightCam",
+        robotPose3D.transformBy(VisionConstants.robotToFrontRightCam));
+    Logger.recordOutput(
+        "Vision/CamPoses/BackRightCam",
+        robotPose3D.transformBy(VisionConstants.robotToBackRightCam));
+    Logger.recordOutput(
+        "Vision/CamPoses/FrontElevatorCam",
+        robotPose3D.transformBy(VisionConstants.robotToElevatorFrontCam));
+    Logger.recordOutput(
+        "Vision/CamPoses/BackElevatorCam",
+        robotPose3D.transformBy(VisionConstants.robotToElevatorBackCam));
+
+    Logger.recordMetadata(getSubsystem(), getName());
+
+    if (DriverStation.getAlliance().isPresent()) {
+      reefFaceSelection = AlignmentUtils.findClosestReefFaceAndRejectOthers(getPose());
+      coralStationSelection = AlignmentUtils.findClosestCoralStation(getPose());
+      algaeTargetPose = AlignmentUtils.getAlgaeRemovalTargetPose(getPose(), reefFaceSelection);
+
+      if (FieldConstants.selectedCageTranslation != null)
+        cageSelection =
+            AlignmentUtils.getCageAlignmentTarget(
+                getPose(), FieldConstants.selectedCageTranslation);
+    }
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -176,6 +231,7 @@ public class Drive extends SubsystemBase {
 
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+      poseEstimator2.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
     }
 
     // Update gyro alert
@@ -264,7 +320,7 @@ public class Drive extends SubsystemBase {
 
   /** Returns the measured chassis speeds of the robot. */
   @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
-  private ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
 
@@ -292,6 +348,12 @@ public class Drive extends SubsystemBase {
     return poseEstimator.getEstimatedPosition();
   }
 
+  /** Returns the current odometry pose. */
+  @AutoLogOutput(key = "Odometry/Robot")
+  public Pose2d getPose2() {
+    return poseEstimator2.getEstimatedPosition();
+  }
+
   /** Returns the current odometry rotation. */
   public Rotation2d getRotation() {
     return getPose().getRotation();
@@ -299,6 +361,11 @@ public class Drive extends SubsystemBase {
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
+    poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+  }
+
+  /** Resets the current odometry pose. */
+  public void setPose2(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
@@ -342,7 +409,20 @@ public class Drive extends SubsystemBase {
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
-    poseEstimator.addVisionMeasurement(
+
+    if (RobotStatus.isVisionOn()) {
+      poseEstimator.addVisionMeasurement(
+          visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+    }
+  }
+
+  /** Adds a new timestamped vision measurement. */
+  public void addVisionMeasurementForLogging(
+      Pose2d visionRobotPoseMeters,
+      double timestampSeconds,
+      Matrix<N3, N1> visionMeasurementStdDevs) {
+
+    poseEstimator2.addVisionMeasurement(
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
   }
 
@@ -354,5 +434,73 @@ public class Drive extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
+  }
+
+  public void setDriveModeSmart() {
+    isDriveModeSmart = true;
+  }
+
+  public void setDriveModeNormal() {
+    isDriveModeSmart = false;
+  }
+
+  @AutoLogOutput(key = "Alignment/isSmartDrive")
+  public boolean isDriveModeSmart() {
+    return isDriveModeSmart;
+  }
+
+  public void toggleElevatorHeightLimitsSpeed() {
+    elevatorHeightLimitsSpeed = !elevatorHeightLimitsSpeed;
+  }
+
+  @AutoLogOutput(key = "Alignment/elevatorHeightLimitsSpeed")
+  public boolean getElevatorHeightLimitsSpeed() {
+    return elevatorHeightLimitsSpeed;
+  }
+
+  public void toggleDriveMode() {
+    if (isDriveModeSmart) {
+      setDriveModeNormal();
+    } else {
+      setDriveModeSmart();
+    }
+  }
+
+  /**
+   * Converts a 2D pose (Pose2d) into a 3D pose (Pose3d) by assuming: - The z-coordinate is 0. -
+   * Roll and pitch are 0. - Yaw comes directly from the Pose2d rotation.
+   *
+   * @param pose2d The 2D pose to convert.
+   * @return A Pose3d representing the same pose in 3D space.
+   */
+  public static Pose3d convertPose2dTo3d(Pose2d pose2d) {
+    // Create a 3D translation from the 2D translation; set z to 0.
+    Translation3d translation3d =
+        new Translation3d(
+            pose2d.getTranslation().getX(),
+            pose2d.getTranslation().getY(),
+            0.0 // z-coordinate on the ground
+            );
+
+    // Create a 3D rotation with roll and pitch set to 0, and yaw from the 2D rotation.
+    Rotation3d rotation3d =
+        new Rotation3d(
+            0.0, // roll
+            0.0, // pitch
+            pose2d.getRotation().getRadians() // yaw
+            );
+
+    // Combine translation and rotation into a Pose3d.
+    return new Pose3d(translation3d, rotation3d);
+  }
+
+  @AutoLogOutput(key = "Drive/CurrentSpeedMetersPerSec")
+  public double getCurrentSpeedMetersPerSec() {
+    // Get the current chassis speeds (these are measured from the modules).
+    ChassisSpeeds speeds = getChassisSpeeds();
+    // Compute the magnitude of the translational velocity.
+    double speed = Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+    // Round to one decimal place.
+    return Math.round(speed * 10.0) / 10.0;
   }
 }

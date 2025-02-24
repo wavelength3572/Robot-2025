@@ -250,7 +250,7 @@ public class ModuleIOSpark implements ModuleIO {
         drivePositionQueue.stream().mapToDouble((Double value) -> value).toArray();
     inputs.odometryTurnPositions =
         turnPositionQueue.stream()
-            .map((Double value) -> new Rotation2d(value).minus(zeroRotation))
+            .map((Double value) -> new Rotation2d(value))
             .toArray(Rotation2d[]::new);
     timestampQueue.clear();
     drivePositionQueue.clear();
@@ -280,10 +280,6 @@ public class ModuleIOSpark implements ModuleIO {
 
   @Override
   public void setTurnPosition(Rotation2d rotation) {
-    // double setpoint =
-    //     MathUtil.inputModulus(
-    //         rotation.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
-    // turnController.setReference(setpoint, ControlType.kPosition);
     turnController.setReference(rotation.getRadians(), ControlType.kPosition);
   }
 }

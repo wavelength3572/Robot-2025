@@ -27,12 +27,12 @@ public class InterLinkDXOI implements OperatorInterface {
 
   @Override
   public double getTranslateX() {
-    return -interLinkJoystick.getRawAxis(1);
+    return interLinkJoystick.getRawAxis(1);
   }
 
   @Override
   public double getTranslateY() {
-    return interLinkJoystick.getRawAxis(0);
+    return -interLinkJoystick.getRawAxis(0);
   }
 
   @Override
@@ -53,10 +53,6 @@ public class InterLinkDXOI implements OperatorInterface {
   @Override
   public Trigger getFieldRelativeButton() {
     return interLinkJoystickJoystickButtons[1]; // A Button - near upper left top side
-  }
-
-  public Trigger getAngleDriveButton() {
-    return interLinkJoystickJoystickButtons[12]; // H Button - near right side, bottom most toggle
   }
 
   @Override
@@ -115,13 +111,51 @@ public class InterLinkDXOI implements OperatorInterface {
   }
 
   @Override
+  public Trigger getButtonH() {
+    return interLinkJoystickJoystickButtons[12]; // Button H bottom right of top face - up position
+  }
+
+  @Override
+  public Trigger getButtonV() {
+    return interLinkJoystickJoystickButtons[1]; // Button v bottom left of top face - up position
+  }
+
+  @Override
   public Trigger getButtonFPosition2() {
-    return interLinkJoystickJoystickButtons[8]; // Button F top right of front face - up position
+    return interLinkJoystickJoystickButtons[8]; // Button F top right of front face - down position
+  }
+
+  @Override
+  public Trigger getButtonFPosition1() {
+    // Returns true when neither button[8] nor button[9] is active.
+    return new Trigger(
+        () ->
+            !interLinkJoystickJoystickButtons[8].getAsBoolean()
+                && !interLinkJoystickJoystickButtons[9].getAsBoolean());
   }
 
   @Override
   public Trigger getButtonFPosition0() {
-    return interLinkJoystickJoystickButtons[9]; // Button F top right of front face - down position
+    return interLinkJoystickJoystickButtons[9]; // Button F top right of front face - up position
+  }
+
+  @Override
+  public Trigger getButtonGPosition2() {
+    return interLinkJoystickJoystickButtons[10]; // Button G top right of front face - down position
+  }
+
+  @Override
+  public Trigger getButtonGPosition1() {
+    // Returns true when neither button[10] nor button[11] is active.
+    return new Trigger(
+        () ->
+            !interLinkJoystickJoystickButtons[10].getAsBoolean()
+                && !interLinkJoystickJoystickButtons[11].getAsBoolean());
+  }
+
+  @Override
+  public Trigger getButtonGPosition0() {
+    return interLinkJoystickJoystickButtons[11]; // Button G top right of front face - up position
   }
 
   @Override

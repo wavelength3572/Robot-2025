@@ -21,6 +21,9 @@ import edu.wpi.first.wpilibj.Filesystem;
 import java.io.IOException;
 
 public final class VisionConstants {
+
+  public static double MAX_TAG_DISTANCE = 1.5; // Example: Only accept tags within 3 meters
+
   // AprilTag layout
   // public static AprilTagFieldLayout aprilTagLayout =
   // AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
@@ -40,39 +43,55 @@ public final class VisionConstants {
     }
   }
 
+  // _________________________________________________________________________________________________
+
   // Camera names, must match names configured on coprocessor
-  public static String camera0Name = "CAMERA_A";
-  public static String camera1Name = "CAMERA_B";
-  public static String camera2Name = "CAMERA_C";
+  public static String frontRightCam = "CAMERA_A";
+  public static String backRightCam = "CAMERA_D";
+  public static String elevatorFrontCam = "CAMERA_B";
+  public static String elevatorBackCam = "CAMERA_C";
 
   // Robot to camera transforms
-  public static Transform3d robotToCamera0 =
+  public static Transform3d robotToFrontRightCam =
       new Transform3d(
-          0.2517648,
-          -0.2517648,
-          0.2102358,
+          0.26985,
+          -0.26981,
+          0.22155,
+          new Rotation3d(0.0, Rotation2d.fromDegrees(-15).getRadians(), 0.0));
+
+  public static Transform3d robotToBackRightCam =
+      new Transform3d(
+          -0.26985,
+          -0.26981,
+          0.22155,
           new Rotation3d(
               0.0,
-              Rotation2d.fromDegrees(0).getRadians(),
-              Rotation2d.fromDegrees(-90).getRadians()));
-  public static Transform3d robotToCamera1 =
-      new Transform3d(
-          0.2517648,
-          0.2517648,
-          0.2102358,
-          new Rotation3d(
-              0.0,
-              Rotation2d.fromDegrees(-30).getRadians(),
-              Rotation2d.fromDegrees(45).getRadians()));
-  public static Transform3d robotToCamera2 =
-      new Transform3d(
-          -0.2517648,
-          -0.2517648,
-          0.2102358,
-          new Rotation3d(
-              0.0,
-              Rotation2d.fromDegrees(0).getRadians(),
+              Rotation2d.fromDegrees(-15).getRadians(),
               Rotation2d.fromDegrees(180).getRadians()));
+
+  public static Transform3d robotToElevatorFrontCam =
+      new Transform3d( // Comments in inches
+          0.273, -0.095, 0.743, new Rotation3d(0.0, 0.0, Rotation2d.fromDegrees(60).getRadians()));
+
+  // public static Transform3d robotToElevatorFrontCam =
+  //     new Transform3d( // new camera 2-23-2025
+  //         0.273075,
+  //         -0.088951,
+  //         0.740613,
+  //         new Rotation3d(0.0, Math.toRadians(-20), Math.toRadians(0)));
+
+  // public static Transform3d robotToElevatorBackCam = new Transform3d(
+  // -0.26985,
+  // -0.095,
+  // 0.743,
+  // new Rotation3d(0.0, 0.0, Rotation2d.fromDegrees(120).getRadians()));
+
+  public static Transform3d robotToElevatorBackCam =
+      new Transform3d( // new camera 2-23-2025
+          -0.273075,
+          -0.088951,
+          0.740613,
+          new Rotation3d(0.0, Math.toRadians(-20), Math.toRadians(180)));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
@@ -87,8 +106,10 @@ public final class VisionConstants {
   // (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors =
       new double[] {
-        1.0, // Camera 0
-        1.0 // Camera 1
+        1.0, // FrontRight
+        1.0, // BackRight
+        1.0, // ElevatorFront
+        1.0 // ElevatorBack
       };
 
   // Multipliers to apply for MegaTag 2 observations

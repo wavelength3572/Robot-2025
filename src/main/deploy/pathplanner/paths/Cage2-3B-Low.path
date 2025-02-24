@@ -1,0 +1,66 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 6.985,
+        "y": 6.170641447368421
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.166503679647174,
+        "y": 5.542399541692105
+      },
+      "isLocked": false,
+      "linkedName": "Cage5"
+    },
+    {
+      "anchor": {
+        "x": 5.1259331654044935,
+        "y": 5.166183220565647
+      },
+      "prevControl": {
+        "x": 5.290261655033263,
+        "y": 5.354587433619196
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "3B"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -119.99999999999999
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "L2",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 0.5,
+    "maxAcceleration": 1.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": -119.99999999999999
+  },
+  "reversed": false,
+  "folder": "Cage2",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -135.0
+  },
+  "useDefaultConstraints": true
+}

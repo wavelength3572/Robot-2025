@@ -28,8 +28,13 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.alignment.AlignmentContext;
+import frc.robot.alignment.StrategyManager;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.util.AlignmentUtils;
+import frc.robot.util.RobotStatus;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -51,17 +56,22 @@ public class DriveCommands {
   private DriveCommands() {}
 
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
-    // Apply deadband
-    double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
-    Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
+    double rawMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
+    double scaledMagnitude = rawMagnitude * rawMagnitude; // Squared for sensitivity.
 
-    // Square magnitude for more precise control
-    linearMagnitude = linearMagnitude * linearMagnitude;
+    // Create the vector from the scaled magnitude and direction.
+    Rotation2d direction = new Rotation2d(Math.atan2(y, x));
+    Translation2d vector =
+        new Pose2d(new Translation2d(), direction)
+            .transformBy(new Transform2d(new Translation2d(scaledMagnitude, 0.0), new Rotation2d()))
+            .getTranslation();
 
-    // Return new linear velocity
-    return new Pose2d(new Translation2d(), linearDirection)
-        .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
-        .getTranslation();
+    // If the magnitude is greater than 1, normalize it.
+    if (vector.getNorm() > 1.0) {
+      vector = vector.times(1.0 / vector.getNorm());
+    }
+
+    return vector;
   }
 
   /**
@@ -84,21 +94,7 @@ public class DriveCommands {
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
 
-          // Convert to field relative speeds & send command
-          ChassisSpeeds speeds =
-              new ChassisSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec());
-          boolean isFlipped =
-              DriverStation.getAlliance().isPresent()
-                  && DriverStation.getAlliance().get() == Alliance.Red;
-          drive.runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  speeds,
-                  isFlipped
-                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                      : drive.getRotation()));
+          sendSpeedsToDrive(drive, linearVelocity, omega);
         },
         drive);
   }
@@ -135,21 +131,7 @@ public class DriveCommands {
                   angleController.calculate(
                       drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
 
-              // Convert to field relative speeds & send command
-              ChassisSpeeds speeds =
-                  new ChassisSpeeds(
-                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                      omega);
-              boolean isFlipped =
-                  DriverStation.getAlliance().isPresent()
-                      && DriverStation.getAlliance().get() == Alliance.Red;
-              drive.runVelocity(
-                  ChassisSpeeds.fromFieldRelativeSpeeds(
-                      speeds,
-                      isFlipped
-                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                          : drive.getRotation()));
+              sendSpeedsToDrive(drive, linearVelocity, omega);
             },
             drive)
 
@@ -294,5 +276,178 @@ public class DriveCommands {
     double[] positions = new double[4];
     Rotation2d lastAngle = new Rotation2d();
     double gyroDelta = 0.0;
+  }
+
+  public static InstantCommand toggleSmartDriveCmd(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier,
+      Supplier<Boolean> coralInRobotSupplier,
+      Supplier<Boolean> climberDeployedSupplier,
+      DoubleSupplier elevatorHeightInchesSupplier) {
+    return new InstantCommand(
+        () -> {
+          if (drive.isDriveModeSmart()) {
+            drive.setDriveModeNormal();
+            drive.setDefaultCommand(
+                DriveCommands.joystickDrive(drive, xSupplier, ySupplier, omegaSupplier));
+          } else {
+            drive.setDriveModeSmart();
+            drive.setDefaultCommand(
+                JoystickAlignmentStrategyDrive(
+                    drive,
+                    xSupplier,
+                    ySupplier,
+                    omegaSupplier,
+                    drive::getPose,
+                    elevatorHeightInchesSupplier,
+                    coralInRobotSupplier,
+                    climberDeployedSupplier,
+                    drive::getReefFaceSelection,
+                    drive::getCoralStationSelection,
+                    drive::getCageSelection));
+          }
+        },
+        drive);
+  }
+
+  /** Creates a joystick-based drive command that integrates alignment strategies. */
+  public static Command JoystickAlignmentStrategyDrive(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier,
+      Supplier<Pose2d> robotPoseSupplier,
+      DoubleSupplier elevatorHeightInchesSupplier,
+      Supplier<Boolean> coralInRobotSupplier,
+      Supplier<Boolean> climberDeployedSupplier,
+      Supplier<AlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
+      Supplier<AlignmentUtils.CoralStationSelection> coralStationSelectionSupplier,
+      Supplier<AlignmentUtils.CageSelection> cageSelectionSupplier) {
+
+    // Step 2: Get the StrategyManager to dynamically select alignment strat
+    StrategyManager strategyManager = drive.getStrategyManager();
+
+    return Commands.run(
+        () -> {
+          // Step 1: Get joystick inputs
+          double rawX = xSupplier.getAsDouble();
+          double rawY = ySupplier.getAsDouble();
+          double rawOmega = omegaSupplier.getAsDouble();
+
+          // Convert joystick inputs to a field-relative translation
+          Translation2d rawTranslationInput = getLinearVelocityFromJoysticks(rawX, rawY);
+          double rawRotationInput = MathUtil.applyDeadband(rawOmega, DEADBAND);
+          rawRotationInput =
+              Math.copySign(
+                  rawRotationInput * rawRotationInput,
+                  rawRotationInput); // Squaring for finer control
+
+          // Step 2: Construct the AlignmentContext
+          AlignmentContext context =
+              new AlignmentContext(
+                  robotPoseSupplier.get(),
+                  coralInRobotSupplier.get(),
+                  elevatorHeightInchesSupplier.getAsDouble(),
+                  climberDeployedSupplier.get(),
+                  reefFaceSelectionSupplier.get(),
+                  coralStationSelectionSupplier.get(),
+                  cageSelectionSupplier.get());
+
+          // Step 3: Update alignment strategy
+          strategyManager.updateStrategyForCycle(context);
+
+          // Step 4: Apply corrections
+          double adjustedRotationInput =
+              strategyManager.getRotationalCorrection(context, rawRotationInput);
+          Translation2d adjustedTranslationInput =
+              strategyManager.getTranslationalCorrection(context, rawTranslationInput);
+
+          // Step 5: Send to drive system
+          sendSpeedsToDrive(drive, adjustedTranslationInput, adjustedRotationInput);
+        },
+        drive);
+  }
+
+  /**
+   * Sends the computed chassis speeds to the drive subsystem.
+   *
+   * @param drive The drive subsystem.
+   * @param translationInput The field-relative linear velocity.
+   * @param rotationInput The angular velocity.
+   */
+  private static void sendSpeedsToDrive(
+      Drive drive, Translation2d translationInput, double rotationInput) {
+
+    double linearSpeedScalar = 1.0;
+    double rotationSpeedScalar = 1.0;
+    if (drive.getElevatorHeightLimitsSpeed()) {
+      linearSpeedScalar = calculateSpeedMultiplier(RobotStatus.elevatorHeightInches());
+      rotationSpeedScalar = calculateRotationSpeedMultiplier(RobotStatus.elevatorHeightInches());
+    }
+
+    ChassisSpeeds speeds =
+        new ChassisSpeeds(
+            translationInput.getX() * drive.getMaxLinearSpeedMetersPerSec() * linearSpeedScalar,
+            translationInput.getY() * drive.getMaxLinearSpeedMetersPerSec() * linearSpeedScalar,
+            rotationInput * drive.getMaxAngularSpeedRadPerSec() * rotationSpeedScalar);
+
+    boolean isFlipped =
+        DriverStation.getAlliance().isPresent()
+            && DriverStation.getAlliance().get() == Alliance.Red;
+
+    drive.runVelocity(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            speeds,
+            isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation()));
+  }
+
+  private static double calculateSpeedMultiplier(double elevatorHeightInches) {
+    // Convert the elevator height from inches to meters.
+    double elevatorHeightMeters = elevatorHeightInches * 0.0254;
+
+    // Define thresholds (in meters):
+    // 25 inches = 25 * 0.0254 ≈ 0.635 m (full speed)
+    // 50 inches = 50 * 0.0254 ≈ 1.27 m (minimum speed)
+    final double fullSpeedThreshold = 25 * 0.0254; // ≈ 0.635 meters
+    final double reducedSpeedThreshold = 50 * 0.0254; // ≈ 1.27 meters
+    final double minMultiplier = 0.2; // Minimum multiplier at maximum height
+
+    if (elevatorHeightMeters <= fullSpeedThreshold) {
+      return 1.0;
+    } else if (elevatorHeightMeters >= reducedSpeedThreshold) {
+      return minMultiplier;
+    } else {
+      // Linearly interpolate between full speed (1.0) and minimum speed
+      // (minMultiplier)
+      double fraction =
+          (elevatorHeightMeters - fullSpeedThreshold)
+              / (reducedSpeedThreshold - fullSpeedThreshold);
+      return 1.0 - fraction * (1.0 - minMultiplier);
+    }
+  }
+
+  private static double calculateRotationSpeedMultiplier(double elevatorHeightInches) {
+    // Convert the elevator height from inches to meters.
+    double elevatorHeightMeters = elevatorHeightInches * 0.0254;
+
+    // Define thresholds (in meters) for rotational speed:
+    // Below 25 inches (~0.635 m), full rotational speed is allowed.
+    // Above 50 inches (~1.27 m), use the minimum rotational speed.
+    final double fullSpeedThreshold = 25 * 0.0254; // ≈ 0.635 meters
+    final double reducedSpeedThreshold = 50 * 0.0254; // ≈ 1.27 meters
+    final double minRotationMultiplier = 0.5; // Adjust as needed
+
+    if (elevatorHeightMeters <= fullSpeedThreshold) {
+      return 1.0;
+    } else if (elevatorHeightMeters >= reducedSpeedThreshold) {
+      return minRotationMultiplier;
+    } else {
+      double fraction =
+          (elevatorHeightMeters - fullSpeedThreshold)
+              / (reducedSpeedThreshold - fullSpeedThreshold);
+      return 1.0 - fraction * (1.0 - minRotationMultiplier);
+    }
   }
 }
