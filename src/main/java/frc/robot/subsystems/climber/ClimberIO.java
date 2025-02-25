@@ -13,6 +13,7 @@ public interface ClimberIO {
     public double currentAmps = 0.0;
     public Relay.Value relayState;
     public CLIMB_STATE currentClimbState = CLIMB_STATE.STOWED;
+    public boolean climbingFinished = false;
   }
 
   public default void updateInputs(ClimberIOInputs inputs) {}
@@ -26,6 +27,10 @@ public interface ClimberIO {
   public default void setRelayState(Relay.Value newState) {}
 
   public default boolean isClimberDeployed() {
+    return false;
+  }
+
+  public default boolean isClimbingFinished() {
     return false;
   }
 }

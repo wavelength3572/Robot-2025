@@ -36,4 +36,8 @@ public class Climber extends SubsystemBase {
   public boolean isClimberDeployed() {
     return io.isClimberDeployed();
   }
+
+  public boolean isClimbingFinished() {
+    return io.isClimbingFinished();
+  }
 }

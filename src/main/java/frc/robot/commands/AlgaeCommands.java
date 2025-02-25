@@ -78,7 +78,7 @@ public class AlgaeCommands {
     return new ConditionalCommand(
         // ✅ **True Branch**: Execute the dislodge sequence
         new SequentialCommandGroup(
-            new InstantCommand(coralSystem.getIntake()::pushCoral),
+            new InstantCommand(coralSystem.getIntake()::pushCoral, coralSystem),
             // 1. Determine and set the final dislodge preset based on the current prepare
             // preset.
             new InstantCommand(
@@ -116,7 +116,7 @@ public class AlgaeCommands {
                 oi::getTranslateY,
                 oi::getRotate,
                 SPEED_SCALAR),
-            new InstantCommand(coralSystem.getIntake()::stopIntake)),
+            new InstantCommand(coralSystem.getIntake()::stopIntake, coralSystem)),
 
         // 4. Finally, move the coral system to PICKUP preset.
         // new InstantCommand(
@@ -126,6 +126,66 @@ public class AlgaeCommands {
         // coralSystem)),
 
         // **False Branch**: Do nothing (command does not run)
+        Commands.none(),
+
+        // **Condition Check**: Execute only if:
+        () -> {
+          boolean isInDislodgePreset =
+              coralSystem.isAtGoal()
+                  && (coralSystem.getCurrentCoralPreset()
+                          == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+                      || coralSystem.getCurrentCoralPreset()
+                          == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
+
+          boolean noCoral = !coralSystem.isCoralInRobot();
+          return isInDislodgePreset && noCoral;
+        });
+  }
+
+  /**
+   * Creates a command to execute the full dislodge sequence **only if** the robot is in a dislodge
+   * preset and there is no coral in the robot.
+   */
+  public static Command createAutonomousDislodgeSequence(Drive drive, CoralSystem coralSystem) {
+    return new ConditionalCommand(
+        new SequentialCommandGroup(
+            new InstantCommand(coralSystem.getIntake()::pushCoral),
+            new InstantCommand(
+                () -> {
+                  CoralSystemPresets currentPreset = coralSystem.getCurrentCoralPreset();
+                  CoralSystemPresets finalPreset;
+                  if (currentPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1) {
+                    finalPreset = CoralSystemPresets.FINAL_DISLODGE_LEVEL_1;
+                  } else if (currentPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
+                    finalPreset = CoralSystemPresets.FINAL_DISLODGE_LEVEL_2;
+                  } else {
+                    // This branch should never happen because of our outer condition.
+                    // If it does, log the problem and return early without setting any final
+                    // preset.
+                    System.out.println(
+                        "[AlgaeCommands] Dislodge sequence canceled: Not in a valid prepare preset.");
+                    return;
+                  }
+                  coralSystem.setSimultaneousTargetPreset(finalPreset);
+                },
+                coralSystem),
+
+            // 3. Drive backward 10 inches relative to the current pose.
+            DriveToCommands.createDriveToPoseScaled(
+                drive,
+                () -> {
+                  Pose2d currentPose = drive.getPose();
+                  double offsetMeters = -0.254 * 3.0; // Move backward by 30 inches
+                  Translation2d offset =
+                      new Translation2d(offsetMeters, 0).rotateBy(currentPose.getRotation());
+                  Translation2d targetTranslation = currentPose.getTranslation().plus(offset);
+                  return new Pose2d(targetTranslation, currentPose.getRotation());
+                },
+                () -> 0.0,
+                () -> 0.0,
+                () -> 0.0,
+                SPEED_SCALAR),
+            new InstantCommand(coralSystem.getIntake()::stopIntake)),
         Commands.none(),
 
         // **Condition Check**: Execute only if:

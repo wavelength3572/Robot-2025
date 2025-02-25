@@ -67,8 +67,8 @@ public class ArmIOVirtualSim implements ArmIO {
   @Override
   public void setTargetAngleDEG(double requestedPosition) {
     this.armTargetDEG =
-        requestedPosition
-            - 2.4; // 3.2 is the fudge factor because when we request 45 the through bore actually
+        requestedPosition; // 3.2 is the fudge factor because when we request 45 the through bore
+    // actually
     // reads 42.6
     this.armTargetEncoderRotations = this.armTargetDEG * ArmConstants.kArmGearing / 360.0;
   }
