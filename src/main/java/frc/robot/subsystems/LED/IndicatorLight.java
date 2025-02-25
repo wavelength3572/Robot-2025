@@ -565,24 +565,24 @@ public class IndicatorLight extends SubsystemBase {
 
     int brightStart;
     int brightCount;
-    switch (preset.getState()) {
+    switch (preset) {
       case STOW -> {
         currentColor_GOAL = LED_EFFECTS.BLUEOMBRE;
         return;
       }
-      case L1_SCORE -> {
+      case L1 -> {
         brightStart = 0;
         brightCount = 5;
       }
-      case L2_SCORE -> {
+      case L2 -> {
         brightStart = 5;
         brightCount = 5;
       }
-      case L3_SCORE -> {
+      case L3 -> {
         brightStart = 10;
         brightCount = 5;
       }
-      case L4_SCORE -> {
+      case L4 -> {
         brightStart = 15;
         brightCount = 19;
       }

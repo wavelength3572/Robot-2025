@@ -42,11 +42,6 @@ public class AlgaeIOVirtualSim implements AlgaeIO {
   }
 
   @Override
-  public void setSpeed(double speed) {
-    this.requestedSpeed = speed;
-  }
-
-  @Override
   public void setAlgaeInRobot(boolean algaeInRobot) {
     haveAlgae = algaeInRobot;
   }

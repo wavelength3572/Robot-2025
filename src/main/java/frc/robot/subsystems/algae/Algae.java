@@ -14,21 +14,32 @@ public class Algae extends SubsystemBase {
       new LoggedTunableNumber("Algae/kEp", AlgaeConstants.kAlgaeDeployKp);
   private static final LoggedTunableNumber AlgaekD =
       new LoggedTunableNumber("Algae/kEd", AlgaeConstants.kAlgaeDeployKd);
-  private static final LoggedTunableNumber AlgaeVel =
-      new LoggedTunableNumber("Algae/kEVel", AlgaeConstants.kAlgaeDeployVel);
-  private static final LoggedTunableNumber AlgaeAcc =
-      new LoggedTunableNumber("Algae/kEAcc", AlgaeConstants.kAlgaeDeployAcc);
+  private static final LoggedTunableNumber AlgaeTargetAngle =
+      new LoggedTunableNumber("Algae/AlgaeTargetPosition", AlgaeConstants.kAlgaeDeployInitalAngle);
+  private static final LoggedTunableNumber AlgaeDeployVolts =
+      new LoggedTunableNumber("Algae/AlgaeDeployVolts", 0.0);
+  private static final LoggedTunableNumber AlgaeIntakeVolts =
+      new LoggedTunableNumber("Algae/AlgaeDeployVolts", 0.0);
 
   public Algae(AlgaeIO io) {
     this.io = io;
   }
 
   public void periodic() {
-    if (AlgaekP.hasChanged(hashCode())
-        || AlgaekD.hasChanged(hashCode())
-        || AlgaeVel.hasChanged(hashCode())
-        || AlgaeAcc.hasChanged(hashCode())) {
-      io.setPIDValues(AlgaekP.get(), AlgaekD.get(), AlgaeVel.get(), AlgaeAcc.get());
+    if (AlgaekP.hasChanged(hashCode()) || AlgaekD.hasChanged(hashCode())) {
+      io.setPIDValues(AlgaekP.get(), AlgaekD.get());
+    }
+
+    if (AlgaeTargetAngle.hasChanged(hashCode())) {
+      io.setDeployPositionAngle(AlgaeTargetAngle.get());
+    }
+
+    if (AlgaeDeployVolts.hasChanged(hashCode())) {
+      io.setDeployVolts(AlgaeDeployVolts.get());
+    }
+
+    if (AlgaeIntakeVolts.hasChanged(hashCode())) {
+      io.setDeployVolts(AlgaeIntakeVolts.get());
     }
 
     io.updateInputs(inputs);
@@ -62,10 +73,6 @@ public class Algae extends SubsystemBase {
 
   public double getCurrentSpeedRPM() {
     return io.getCurrentSpeedRPM();
-  }
-
-  public void setSpeed(double speed) {
-    io.setSpeed(speed);
   }
 
   // Deploy Motor Methods
