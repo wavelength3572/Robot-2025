@@ -44,13 +44,13 @@ public class ArmIOVirtualSim implements ArmIO {
     // Simple simulation: slowly update the virtual encoder to reach the target.
     if (armVirtualEncoder < armTargetEncoderRotations) {
       if (armTargetEncoderRotations - armVirtualEncoder > 0.2) {
-        armVirtualEncoder += 0.2;
+        armVirtualEncoder += 0.4;
       } else {
         armVirtualEncoder = armTargetEncoderRotations;
       }
     } else if (armVirtualEncoder > armTargetEncoderRotations) {
       if (armVirtualEncoder - armTargetEncoderRotations > 0.2) {
-        armVirtualEncoder -= 0.2;
+        armVirtualEncoder -= 0.4;
       } else {
         armVirtualEncoder = armTargetEncoderRotations;
       }

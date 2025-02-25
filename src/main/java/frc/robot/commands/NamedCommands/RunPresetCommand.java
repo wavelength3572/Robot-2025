@@ -10,6 +10,8 @@ import org.littletonrobotics.junction.Logger; // Make sure this is the correct L
  * reached its goal.
  */
 public class RunPresetCommand extends Command {
+  private static final double EXPECTED_DURATION_TO_STOW_FROM_L4 = 1.0;
+  private static final double EXPECTED_DURATION_TO_STOW_FROM_L2 = 0.5;
   private final CoralSystem coralSystem;
   private final CoralSystemPresets targetPreset;
 
@@ -31,5 +33,13 @@ public class RunPresetCommand extends Command {
     // Log the goal status: log 1 if at goal, otherwise log 0.
     Logger.recordOutput("Commands/RunPresetCommand/AtGoal", atGoal);
     return atGoal;
+  }
+
+  public static double getExpectedDurationToStowFromL4() {
+    return EXPECTED_DURATION_TO_STOW_FROM_L4;
+  }
+
+  public static double getExpectedDurationToStowFromL2() {
+    return EXPECTED_DURATION_TO_STOW_FROM_L2;
   }
 }

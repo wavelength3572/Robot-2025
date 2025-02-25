@@ -16,7 +16,9 @@ public class IntakeIOVirtualSim implements IntakeIO {
   private boolean haveCoral = false; // Start without a coral
   private static final double MIN_FEED_TIME = 0.5; // Min delay before coral enters
   private static final double MAX_FEED_TIME = 1.0; // Max delay before coral enters
-  private static final double EJECTION_TIME = 1.5; // Fixed push-out time
+  private static final double EJECTION_TIME =
+      0; // Fixed push-out time - I believe this can be 0 because with real robot we count coral as
+  // gone as soon as we start pushing
   private static final double FEEDER_THRESHOLD =
       .8; // Robot must be within 0.5 meters to receive coral
 

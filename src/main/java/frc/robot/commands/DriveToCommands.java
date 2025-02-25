@@ -132,12 +132,8 @@ public class DriveToCommands {
           AlignmentUtils.pickClosestOrientationForReef(drive.getPose(), faceId);
       poleTranslation =
           isLeftPole
-              ? chosen.orientationType() == FieldConstants.ReefOrientationType.FRONT
-                  ? blueFace.getLeftPole().getFrontTranslation()
-                  : blueFace.getLeftPole().getBackTranslation()
-              : chosen.orientationType() == FieldConstants.ReefOrientationType.FRONT
-                  ? blueFace.getRightPole().getFrontTranslation()
-                  : blueFace.getRightPole().getBackTranslation();
+              ? blueFace.getLeftPole().getBranchTranslation()
+              : blueFace.getRightPole().getBranchTranslation();
 
       // Return the pose with proper orientation
       return new Pose2d(poleTranslation, chosen.rotation2D());
@@ -154,12 +150,8 @@ public class DriveToCommands {
           AlignmentUtils.pickClosestOrientationForReef(drive.getPose(), faceId);
       poleTranslation =
           isLeftPole
-              ? chosen.orientationType() == FieldConstants.ReefOrientationType.FRONT
-                  ? redFace.getLeftPole().getFrontTranslation()
-                  : redFace.getLeftPole().getBackTranslation()
-              : chosen.orientationType() == FieldConstants.ReefOrientationType.FRONT
-                  ? redFace.getRightPole().getFrontTranslation()
-                  : redFace.getRightPole().getBackTranslation();
+              ? redFace.getLeftPole().getBranchTranslation()
+              : redFace.getRightPole().getBranchTranslation();
 
       // Return the pose with proper orientation
       return new Pose2d(poleTranslation, chosen.rotation2D());

@@ -26,8 +26,8 @@ public final class BranchAlignmentUtils {
   }
 
   /**
-   * Returns how “close” the robot is to the nearest branch (pole) on a given reef face, using only
-   * the front translation of each pole. The result is a “traffic-light” style status: NONE, RED,
+   * Returns how close the robot is to the nearest branch (pole) on a given reef face, using only
+   * the front translation of each pole. The result is a traffic-light style status: NONE, RED,
    * YELLOW, GREEN.
    *
    * @param robotPose The robot's current position.
@@ -47,8 +47,8 @@ public final class BranchAlignmentUtils {
       ReefFacesBlue faceEnum = ReefFacesBlue.fromId(faceId);
       if (faceEnum != null) {
         // Use only the front translation from left and right poles.
-        Translation2d leftFront = faceEnum.getLeftPole().getFrontTranslation();
-        Translation2d rightFront = faceEnum.getRightPole().getFrontTranslation();
+        Translation2d leftFront = faceEnum.getLeftPole().getBranchTranslation();
+        Translation2d rightFront = faceEnum.getRightPole().getBranchTranslation();
 
         double distLF = robotPose.getTranslation().getDistance(leftFront);
         double distRF = robotPose.getTranslation().getDistance(rightFront);
@@ -65,8 +65,8 @@ public final class BranchAlignmentUtils {
     else if (alliance == DriverStation.Alliance.Red) {
       ReefFacesRed faceEnum = ReefFacesRed.fromId(faceId);
       if (faceEnum != null) {
-        Translation2d leftFront = faceEnum.getLeftPole().getFrontTranslation();
-        Translation2d rightFront = faceEnum.getRightPole().getFrontTranslation();
+        Translation2d leftFront = faceEnum.getLeftPole().getBranchTranslation();
+        Translation2d rightFront = faceEnum.getRightPole().getBranchTranslation();
 
         double distLF = robotPose.getTranslation().getDistance(leftFront);
         double distRF = robotPose.getTranslation().getDistance(rightFront);

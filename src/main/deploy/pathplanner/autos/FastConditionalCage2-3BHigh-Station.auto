@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Cage5-5AHigh"
+            "pathName": "Cage2-3B-High"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.5
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "5A-StationRight"
+            "pathName": "3B-StationLeft"
           }
         },
         {
@@ -35,33 +35,15 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "StationRight-6A-High"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.25
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "Score"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stow"
+            "name": "StationLeft-2B-High-OR-1A-Low"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Cage5",
+  "folder": "Cage2",
   "choreoAuto": false
 }

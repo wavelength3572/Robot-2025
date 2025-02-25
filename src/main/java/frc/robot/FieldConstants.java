@@ -184,43 +184,55 @@ public final class FieldConstants {
 
   // -------------- BLUE BRANCHES -----------------
   public enum ReefBranchesBlue {
-    BRANCH_A(new Translation2d(3.2385, 4.3807), new Translation2d(3.2385, 3.9997)),
-    BRANCH_B(new Translation2d(3.2385, 4.0521), new Translation2d(3.2385, 3.6711)),
-    BRANCH_C(new Translation2d(3.5566, 3.1201), new Translation2d(3.8866, 2.9296)),
-    BRANCH_D(new Translation2d(3.7863, 2.9875), new Translation2d(4.1712, 2.7652)),
-    BRANCH_E(new Translation2d(4.8075, 2.7652), new Translation2d(5.1374, 2.9557)),
-    BRANCH_F(new Translation2d(5.0921, 2.9296), new Translation2d(5.4220, 3.1201)),
-    BRANCH_G(new Translation2d(5.7402, 3.6711), new Translation2d(5.7402, 4.0521)),
-    BRANCH_H(new Translation2d(5.7402, 3.9997), new Translation2d(5.7402, 4.3807)),
-    BRANCH_I(new Translation2d(5.4220, 4.9317), new Translation2d(5.0921, 5.1222)),
-    BRANCH_J(new Translation2d(5.168, 5.213), new Translation2d(4.8075, 5.2866)),
-    BRANCH_K(new Translation2d(4.1712, 5.2866), new Translation2d(3.8412, 5.0961)),
-    BRANCH_L(new Translation2d(3.8866, 5.1222), new Translation2d(3.5566, 4.9317));
+    BRANCH_A_ID_18_FACE_1_POLE_A(new Translation2d(3.2385, 4.3807)),
+    BRANCH_B_ID_18_FACE_1_POLE_B(new Translation2d(3.2385, 4.0521)),
+    BRANCH_C_ID_17_FACE_6_POLE_A(new Translation2d(3.5566, 3.1201)),
+    BRANCH_D_ID_17_FACE_6_POLE_B(new Translation2d(3.7863, 2.9875)),
+    BRANCH_E_ID_22_FACE_5_POLE_A(new Translation2d(4.8075, 2.7652)),
+    BRANCH_F_ID_22_FACE_5_POLE_B(new Translation2d(5.0921, 2.9296)),
+    BRANCH_G_ID_21_FACE_4_POLE_A(new Translation2d(5.7402, 3.6711)),
+    BRANCH_H_ID_21_FACE_4_POLE_B(new Translation2d(5.7402, 3.9997)),
+    BRANCH_I_ID_20_FACE_3_POLE_A(new Translation2d(5.4220, 4.9317)),
+    BRANCH_J_ID_20_FACE_3_POLE_B(new Translation2d(5.168, 5.213)),
+    BRANCH_K_ID_19_FACE_2_POLE_A(new Translation2d(4.1712, 5.2866)),
+    BRANCH_L_ID_19_FACE_2_POLE_B(new Translation2d(3.8866, 5.1222));
 
-    private final Translation2d frontTranslation;
-    private final Translation2d backTranslation;
+    private final Translation2d branchTranslation;
 
-    ReefBranchesBlue(Translation2d frontTranslation, Translation2d backTranslation) {
-      this.frontTranslation = frontTranslation;
-      this.backTranslation = backTranslation;
+    ReefBranchesBlue(Translation2d branchTranslation) {
+      this.branchTranslation = branchTranslation;
     }
 
-    public Translation2d getFrontTranslation() {
-      return frontTranslation;
-    }
-
-    public Translation2d getBackTranslation() {
-      return backTranslation;
+    public Translation2d getBranchTranslation() {
+      return branchTranslation;
     }
   }
 
   public enum ReefFacesBlue {
-    FACE_17(17, ReefBranchesBlue.BRANCH_C, ReefBranchesBlue.BRANCH_D),
-    FACE_18(18, ReefBranchesBlue.BRANCH_A, ReefBranchesBlue.BRANCH_B),
-    FACE_19(19, ReefBranchesBlue.BRANCH_K, ReefBranchesBlue.BRANCH_L),
-    FACE_20(20, ReefBranchesBlue.BRANCH_I, ReefBranchesBlue.BRANCH_J),
-    FACE_21(21, ReefBranchesBlue.BRANCH_G, ReefBranchesBlue.BRANCH_H),
-    FACE_22(22, ReefBranchesBlue.BRANCH_E, ReefBranchesBlue.BRANCH_F);
+    FACE_17(
+        17,
+        ReefBranchesBlue.BRANCH_C_ID_17_FACE_6_POLE_A,
+        ReefBranchesBlue.BRANCH_D_ID_17_FACE_6_POLE_B),
+    FACE_18(
+        18,
+        ReefBranchesBlue.BRANCH_A_ID_18_FACE_1_POLE_A,
+        ReefBranchesBlue.BRANCH_B_ID_18_FACE_1_POLE_B),
+    FACE_19(
+        19,
+        ReefBranchesBlue.BRANCH_K_ID_19_FACE_2_POLE_A,
+        ReefBranchesBlue.BRANCH_L_ID_19_FACE_2_POLE_B),
+    FACE_20(
+        20,
+        ReefBranchesBlue.BRANCH_I_ID_20_FACE_3_POLE_A,
+        ReefBranchesBlue.BRANCH_J_ID_20_FACE_3_POLE_B),
+    FACE_21(
+        21,
+        ReefBranchesBlue.BRANCH_G_ID_21_FACE_4_POLE_A,
+        ReefBranchesBlue.BRANCH_H_ID_21_FACE_4_POLE_B),
+    FACE_22(
+        22,
+        ReefBranchesBlue.BRANCH_E_ID_22_FACE_5_POLE_A,
+        ReefBranchesBlue.BRANCH_F_ID_22_FACE_5_POLE_B);
 
     private final int faceId;
     private final ReefBranchesBlue leftPole;
@@ -258,51 +270,67 @@ public final class FieldConstants {
   }
 
   public enum ReefBranchesRed {
-    // Give each Red branch a matching Blue branch in parentheses
-    BRANCH_A(ReefBranchesBlue.BRANCH_B),
-    BRANCH_B(ReefBranchesBlue.BRANCH_A),
-    BRANCH_C(ReefBranchesBlue.BRANCH_L),
-    BRANCH_D(ReefBranchesBlue.BRANCH_K),
-    BRANCH_E(ReefBranchesBlue.BRANCH_J),
-    BRANCH_F(ReefBranchesBlue.BRANCH_I),
-    BRANCH_G(ReefBranchesBlue.BRANCH_H),
-    BRANCH_H(ReefBranchesBlue.BRANCH_G),
-    BRANCH_I(ReefBranchesBlue.BRANCH_F),
-    BRANCH_J(ReefBranchesBlue.BRANCH_E),
-    BRANCH_K(ReefBranchesBlue.BRANCH_D),
-    BRANCH_L(ReefBranchesBlue.BRANCH_C);
+    BRANCH_A_ID_7_FACE_1_POLE_A(
+        reflectBlueToRed(ReefBranchesBlue.BRANCH_A_ID_18_FACE_1_POLE_A.getBranchTranslation())),
+    BRANCH_B_ID_7_FACE_1_POLE_B(
+        reflectBlueToRed(ReefBranchesBlue.BRANCH_B_ID_18_FACE_1_POLE_B.getBranchTranslation())),
+    BRANCH_C_ID_8_FACE_6_POLE_A(
+        reflectBlueToRed(ReefBranchesBlue.BRANCH_C_ID_17_FACE_6_POLE_A.getBranchTranslation())),
+    BRANCH_D_ID_8_FACE_6_POLE_B(
+        reflectBlueToRed(ReefBranchesBlue.BRANCH_D_ID_17_FACE_6_POLE_B.getBranchTranslation())),
+    BRANCH_E_ID_9_FACE_5_POLE_A(
+        reflectBlueToRed(ReefBranchesBlue.BRANCH_E_ID_22_FACE_5_POLE_A.getBranchTranslation())),
+    BRANCH_F_ID_9_FACE_5_POLE_B(
+        reflectBlueToRed(ReefBranchesBlue.BRANCH_F_ID_22_FACE_5_POLE_B.getBranchTranslation())),
+    BRANCH_G_ID_10_FACE_4_POLE_A(
+        reflectBlueToRed(ReefBranchesBlue.BRANCH_G_ID_21_FACE_4_POLE_A.getBranchTranslation())),
+    BRANCH_H_ID_10_FACE_4_POLE_B(
+        reflectBlueToRed(ReefBranchesBlue.BRANCH_H_ID_21_FACE_4_POLE_B.getBranchTranslation())),
+    BRANCH_I_ID_11_FACE_3_POLE_A(
+        reflectBlueToRed(ReefBranchesBlue.BRANCH_I_ID_20_FACE_3_POLE_A.getBranchTranslation())),
+    BRANCH_J_ID_11_FACE_3_POLE_B(
+        reflectBlueToRed(ReefBranchesBlue.BRANCH_J_ID_20_FACE_3_POLE_B.getBranchTranslation())),
+    BRANCH_K_ID_6_FACE_2_POLE_A(
+        reflectBlueToRed(ReefBranchesBlue.BRANCH_K_ID_19_FACE_2_POLE_A.getBranchTranslation())),
+    BRANCH_L_ID_6_FACE_2_POLE_B(
+        reflectBlueToRed(ReefBranchesBlue.BRANCH_L_ID_19_FACE_2_POLE_B.getBranchTranslation()));
 
-    private final Translation2d frontTranslation;
-    private final Translation2d backTranslation;
+    private final Translation2d translation;
 
-    /** Constructor takes the matching "blue" branch, then mirrors its front/back translations. */
-    ReefBranchesRed(ReefBranchesBlue blueBranch) {
-      this.frontTranslation = reflectBlueToRed(blueBranch.getFrontTranslation());
-      this.backTranslation = reflectBlueToRed(blueBranch.getBackTranslation());
+    ReefBranchesRed(Translation2d translation) {
+      this.translation = translation;
     }
 
-    public Translation2d getFrontTranslation() {
-      return frontTranslation;
-    }
-
-    public Translation2d getBackTranslation() {
-      return backTranslation;
-    }
-
-    // The same mirror logic as above; you can inline it if you prefer
-    private static Translation2d reflectBlueToRed(Translation2d blueCoord) {
-      double fieldWidth = 17.55;
-      return new Translation2d(fieldWidth - blueCoord.getX(), blueCoord.getY());
+    public Translation2d getBranchTranslation() {
+      return translation;
     }
   }
 
   public enum ReefFacesRed {
-    FACE_6(6, ReefBranchesRed.BRANCH_K, ReefBranchesRed.BRANCH_L),
-    FACE_7(7, ReefBranchesRed.BRANCH_A, ReefBranchesRed.BRANCH_B),
-    FACE_8(8, ReefBranchesRed.BRANCH_C, ReefBranchesRed.BRANCH_D),
-    FACE_9(9, ReefBranchesRed.BRANCH_E, ReefBranchesRed.BRANCH_F),
-    FACE_10(10, ReefBranchesRed.BRANCH_G, ReefBranchesRed.BRANCH_H),
-    FACE_11(11, ReefBranchesRed.BRANCH_I, ReefBranchesRed.BRANCH_J);
+    FACE_6(
+        6,
+        ReefBranchesRed.BRANCH_L_ID_6_FACE_2_POLE_B,
+        ReefBranchesRed.BRANCH_K_ID_6_FACE_2_POLE_A),
+    FACE_7(
+        7,
+        ReefBranchesRed.BRANCH_B_ID_7_FACE_1_POLE_B,
+        ReefBranchesRed.BRANCH_A_ID_7_FACE_1_POLE_A),
+    FACE_8(
+        8,
+        ReefBranchesRed.BRANCH_D_ID_8_FACE_6_POLE_B,
+        ReefBranchesRed.BRANCH_C_ID_8_FACE_6_POLE_A),
+    FACE_9(
+        9,
+        ReefBranchesRed.BRANCH_F_ID_9_FACE_5_POLE_B,
+        ReefBranchesRed.BRANCH_E_ID_9_FACE_5_POLE_A),
+    FACE_10(
+        10,
+        ReefBranchesRed.BRANCH_H_ID_10_FACE_4_POLE_B,
+        ReefBranchesRed.BRANCH_G_ID_10_FACE_4_POLE_A),
+    FACE_11(
+        11,
+        ReefBranchesRed.BRANCH_J_ID_11_FACE_3_POLE_B,
+        ReefBranchesRed.BRANCH_I_ID_11_FACE_3_POLE_A);
 
     private final int faceId;
     private final ReefBranchesRed leftPole;
@@ -345,11 +373,13 @@ public final class FieldConstants {
    */
   public static Translation2d reflectBlueToRed(Translation2d blueCoord) {
     double fieldWidthX = 17.55; // total field length in X meters
+    double fieldLengthY = 8.05; // total field length in X meters
+
     double xBlue = blueCoord.getX();
     double yBlue = blueCoord.getY();
 
     double xRed = fieldWidthX - xBlue; // reflect in X
-    double yRed = yBlue; // Y stays the same
+    double yRed = fieldLengthY - yBlue; // Y stays the same
 
     return new Translation2d(xRed, yRed);
   }
@@ -438,8 +468,8 @@ public final class FieldConstants {
     Map<Integer, Pose2d> bluePoses = new HashMap<>();
     for (ReefFacesBlue face : ReefFacesBlue.values()) {
       int blueFaceId = face.getFaceId();
-      Translation2d left = face.getLeftPole().getFrontTranslation();
-      Translation2d right = face.getRightPole().getFrontTranslation();
+      Translation2d left = face.getLeftPole().getBranchTranslation();
+      Translation2d right = face.getRightPole().getBranchTranslation();
       double midX = (left.getX() + right.getX()) / 2.0;
       double midY = (left.getY() + right.getY()) / 2.0;
       Translation2d midpoint = new Translation2d(midX, midY);
@@ -893,18 +923,8 @@ public final class FieldConstants {
             L1_FIXED_PITCH_DEG,
             L1_BASE_ANGLE_DEG,
             L1_YAW_OFFSET_DEG);
-    coralMapping.put(new CoralKey(7, A_LEFT, L1), new CoralLocation(redL1[0]));
-    coralMapping.put(new CoralKey(7, B_RIGHT, L1), new CoralLocation(redL1[1]));
-    coralMapping.put(new CoralKey(6, A_LEFT, L1), new CoralLocation(redL1[10]));
-    coralMapping.put(new CoralKey(6, B_RIGHT, L1), new CoralLocation(redL1[11]));
-    coralMapping.put(new CoralKey(11, A_LEFT, L1), new CoralLocation(redL1[8]));
-    coralMapping.put(new CoralKey(11, B_RIGHT, L1), new CoralLocation(redL1[9]));
-    coralMapping.put(new CoralKey(10, A_LEFT, L1), new CoralLocation(redL1[6]));
-    coralMapping.put(new CoralKey(10, B_RIGHT, L1), new CoralLocation(redL1[7]));
-    coralMapping.put(new CoralKey(9, A_LEFT, L1), new CoralLocation(redL1[4]));
-    coralMapping.put(new CoralKey(9, B_RIGHT, L1), new CoralLocation(redL1[5]));
-    coralMapping.put(new CoralKey(8, A_LEFT, L1), new CoralLocation(redL1[2]));
-    coralMapping.put(new CoralKey(8, B_RIGHT, L1), new CoralLocation(redL1[3]));
+    int[] redFaceIdsForL1 = {7, 8, 9, 10, 11, 6}; // example order for each face
+    populateCoralMappingForPreset(redL1, CoralSystemPresets.L1, redFaceIdsForL1);
 
     Pose3d[] redL2 =
         generateScoredCoralPosesAngled(
@@ -914,18 +934,8 @@ public final class FieldConstants {
             L2_HEIGHT,
             L2_FIXED_PITCH_DEG,
             L2_BASE_ANGLE_DEG);
-    coralMapping.put(new CoralKey(7, A_LEFT, L2), new CoralLocation(redL2[0]));
-    coralMapping.put(new CoralKey(7, B_RIGHT, L2), new CoralLocation(redL2[1]));
-    coralMapping.put(new CoralKey(6, A_LEFT, L2), new CoralLocation(redL2[10]));
-    coralMapping.put(new CoralKey(6, B_RIGHT, L2), new CoralLocation(redL2[11]));
-    coralMapping.put(new CoralKey(11, A_LEFT, L2), new CoralLocation(redL2[8]));
-    coralMapping.put(new CoralKey(11, B_RIGHT, L2), new CoralLocation(redL2[9]));
-    coralMapping.put(new CoralKey(10, A_LEFT, L2), new CoralLocation(redL2[6]));
-    coralMapping.put(new CoralKey(10, B_RIGHT, L2), new CoralLocation(redL2[7]));
-    coralMapping.put(new CoralKey(9, A_LEFT, L2), new CoralLocation(redL2[4]));
-    coralMapping.put(new CoralKey(9, B_RIGHT, L2), new CoralLocation(redL2[5]));
-    coralMapping.put(new CoralKey(8, A_LEFT, L2), new CoralLocation(redL2[2]));
-    coralMapping.put(new CoralKey(8, B_RIGHT, L2), new CoralLocation(redL2[3]));
+    int[] redFaceIdsForL2 = {7, 8, 9, 10, 11, 6}; // example order for each face
+    populateCoralMappingForPreset(redL2, CoralSystemPresets.L2, redFaceIdsForL2);
 
     Pose3d[] redL3 =
         generateScoredCoralPosesAngled(
@@ -935,18 +945,8 @@ public final class FieldConstants {
             L3_HEIGHT,
             L3_FIXED_PITCH_DEG,
             L3_BASE_ANGLE_DEG);
-    coralMapping.put(new CoralKey(7, A_LEFT, L3), new CoralLocation(redL3[0]));
-    coralMapping.put(new CoralKey(7, B_RIGHT, L3), new CoralLocation(redL3[1]));
-    coralMapping.put(new CoralKey(6, A_LEFT, L3), new CoralLocation(redL3[10]));
-    coralMapping.put(new CoralKey(6, B_RIGHT, L3), new CoralLocation(redL3[11]));
-    coralMapping.put(new CoralKey(11, A_LEFT, L3), new CoralLocation(redL3[8]));
-    coralMapping.put(new CoralKey(11, B_RIGHT, L3), new CoralLocation(redL3[9]));
-    coralMapping.put(new CoralKey(10, A_LEFT, L3), new CoralLocation(redL3[6]));
-    coralMapping.put(new CoralKey(10, B_RIGHT, L3), new CoralLocation(redL3[7]));
-    coralMapping.put(new CoralKey(9, A_LEFT, L3), new CoralLocation(redL3[4]));
-    coralMapping.put(new CoralKey(9, B_RIGHT, L3), new CoralLocation(redL3[5]));
-    coralMapping.put(new CoralKey(8, A_LEFT, L3), new CoralLocation(redL3[2]));
-    coralMapping.put(new CoralKey(8, B_RIGHT, L3), new CoralLocation(redL3[3]));
+    int[] redFaceIdsForL3 = {7, 8, 9, 10, 11, 6}; // example order for each face
+    populateCoralMappingForPreset(redL3, CoralSystemPresets.L3, redFaceIdsForL3);
 
     Pose3d[] redL4 =
         generateScoredCoralPosesL4(
@@ -956,18 +956,8 @@ public final class FieldConstants {
             L4_HEIGHT,
             L4_FIXED_PITCH_DEG,
             L4_BASE_ANGLE_DEG);
-    coralMapping.put(new CoralKey(7, A_LEFT, L4), new CoralLocation(redL4[0]));
-    coralMapping.put(new CoralKey(7, B_RIGHT, L4), new CoralLocation(redL4[1]));
-    coralMapping.put(new CoralKey(6, A_LEFT, L4), new CoralLocation(redL4[10]));
-    coralMapping.put(new CoralKey(6, B_RIGHT, L4), new CoralLocation(redL4[11]));
-    coralMapping.put(new CoralKey(11, A_LEFT, L4), new CoralLocation(redL4[8]));
-    coralMapping.put(new CoralKey(11, B_RIGHT, L4), new CoralLocation(redL4[9]));
-    coralMapping.put(new CoralKey(10, A_LEFT, L4), new CoralLocation(redL4[6]));
-    coralMapping.put(new CoralKey(10, B_RIGHT, L4), new CoralLocation(redL4[7]));
-    coralMapping.put(new CoralKey(9, A_LEFT, L4), new CoralLocation(redL4[4]));
-    coralMapping.put(new CoralKey(9, B_RIGHT, L4), new CoralLocation(redL4[5]));
-    coralMapping.put(new CoralKey(8, A_LEFT, L4), new CoralLocation(redL4[2]));
-    coralMapping.put(new CoralKey(8, B_RIGHT, L4), new CoralLocation(redL4[3]));
+    int[] redFaceIdsForL4 = {7, 8, 9, 10, 11, 6}; // example order for each face
+    populateCoralMappingForPreset(redL4, CoralSystemPresets.L4, redFaceIdsForL4);
 
     // Build red coral mapping for L1
     Pose3d[] blueL1 =
@@ -1054,5 +1044,60 @@ public final class FieldConstants {
     coralMapping.put(new CoralKey(19, B_RIGHT, L4), new CoralLocation(blueL4[5]));
     coralMapping.put(new CoralKey(20, A_LEFT, L4), new CoralLocation(blueL4[2]));
     coralMapping.put(new CoralKey(20, B_RIGHT, L4), new CoralLocation(blueL4[3]));
+  }
+
+  private static void populateCoralMappingForPreset(
+      Pose3d[] coralPoses, CoralSystemPresets preset, int[] redFaceIds) {
+
+    // We assume coralPoses.length == 12 and redFaceIds.length == 6.
+    for (int i = 0; i < 6; i++) {
+      int faceId = redFaceIds[i];
+      // Each face provides two poles (assumed to be consecutive in the array)
+      Pose3d poseA = coralPoses[2 * i];
+      Pose3d poseB = coralPoses[2 * i + 1];
+
+      // Convert Pose3d translations to Translation2d
+      Translation2d tA =
+          new Translation2d(poseA.getTranslation().getX(), poseA.getTranslation().getY());
+      Translation2d tB =
+          new Translation2d(poseB.getTranslation().getX(), poseB.getTranslation().getY());
+
+      // Compute the 2D center of the two poles.
+      Translation2d center =
+          new Translation2d((tA.getX() + tB.getX()) / 2.0, (tA.getY() + tB.getY()) / 2.0);
+
+      // Get the face’s forward direction from one of the poses.
+      // Use getAngle() (or getYaw() if available) to obtain the heading.
+      double yaw = poseA.getRotation().getAngle();
+      // The left direction is a 90° counterclockwise rotation of the forward vector.
+      Translation2d leftVector = new Translation2d(-Math.sin(yaw), Math.cos(yaw));
+
+      // Compute vectors from center to each pole.
+      Translation2d vecA = tA.minus(center);
+      Translation2d vecB = tB.minus(center);
+
+      // Compute dot products using our helper.
+      double dotA = dot(vecA, leftVector);
+      double dotB = dot(vecB, leftVector);
+
+      // The one with the higher dot product is further in the left direction.
+      Pose3d leftPose, rightPose;
+      if (dotA > dotB) {
+        leftPose = poseA;
+        rightPose = poseB;
+      } else {
+        leftPose = poseB;
+        rightPose = poseA;
+      }
+
+      // Add the entries to coralMapping using your CoralKey keys.
+      coralMapping.put(new CoralKey(faceId, A_LEFT, preset), new CoralLocation(leftPose));
+      coralMapping.put(new CoralKey(faceId, B_RIGHT, preset), new CoralLocation(rightPose));
+    }
+  }
+
+  // Helper: dot product for Translation2d
+  private static double dot(Translation2d v1, Translation2d v2) {
+    return v1.getX() * v2.getX() + v1.getY() * v2.getY();
   }
 }
