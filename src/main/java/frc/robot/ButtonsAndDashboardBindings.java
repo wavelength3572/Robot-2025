@@ -186,10 +186,6 @@ public class ButtonsAndDashboardBindings {
     // Gyro Reset
     oi.getResetGyroButton()
         .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
-  private static void configureDriverButtonBindings() {
-    // Gyro Reset
-    oi.getResetGyroButton()
-        .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
 
     oi.getButtonFPosition0() // Push Relay Arm
         .onTrue(
