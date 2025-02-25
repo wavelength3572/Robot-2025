@@ -1,6 +1,7 @@
 package frc.robot.subsystems.algae;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -45,7 +46,7 @@ public class AlgaeIOSpark implements AlgaeIO {
         AlgaeConfigs.AlgaeSubsystem.algaeDeployConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
-    // algaeDeployEncoder.setPosition(angleToRotations(AlgaeConstants.kAlgaeDeployInitalAngle));
+    algaeDeployEncoder.setPosition(angleToRotations(AlgaeConstants.kAlgaeDeployInitalAngle));
   }
 
   @Override
@@ -84,13 +85,6 @@ public class AlgaeIOSpark implements AlgaeIO {
 
     algaeCaptureMotor.set(algaeRotorSpeed);
 
-    // Closed-loop position control for deploy motor
-    // algaeDeployController.setReference(
-    //     targetEncoderRotations,
-    //     ControlType.kMAXMotionPositionControl,
-    //     ClosedLoopSlot.kSlot0,
-    //     AlgaeConstants.kAlgaeDeployKf * Math.cos(Math.toRadians(inputs.currentAngle)));
-
     // Game piece detection
     inputs.algaeInRobot = false; // Placeholder; add sensor logic if needed
   }
@@ -104,15 +98,9 @@ public class AlgaeIOSpark implements AlgaeIO {
   }
 
   @Override
-  public void setPIDValues(double kP, double kD, double VelocityMax, double AccelerationMax) {
+  public void setPIDValues(double kP, double kD) {
     final SparkMaxConfig config = new SparkMaxConfig();
-    config
-        .closedLoop
-        .pidf(kP, 0.0, kD, 0.0)
-        .maxMotion
-        .maxVelocity(VelocityMax)
-        .maxAcceleration(AccelerationMax)
-        .allowedClosedLoopError(AlgaeConstants.kAlgaeDeployAllowableError);
+    config.closedLoop.pidf(kP, 0.0, kD, 0.0);
     algaeDeployMotor.configure(
         config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
@@ -157,7 +145,18 @@ public class AlgaeIOSpark implements AlgaeIO {
   }
 
   @Override
+  public void setDeployVolts(double requestedVolts) {
+    algaeDeployMotor.setVoltage(requestedVolts);
+  }
+
+  @Override
+  public void setIntakeVolts(double requestedVolts) {
+    algaeCaptureMotor.setVoltage(requestedVolts);
+  }
+
+  @Override
   public void setDeployPositionAngle(double angle) {
     targetEncoderRotations = angleToRotations(angle);
+    algaeDeployController.setReference(targetEncoderRotations, ControlType.kPosition);
   }
 }

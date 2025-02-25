@@ -187,10 +187,6 @@ public class ButtonsAndDashboardBindings {
     oi.getResetGyroButton()
         .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
 
-    oi.getButtonV()
-        .onTrue(Commands.runOnce(() -> coralSystem.setCoralInRobot(true), coralSystem))
-        .onFalse(Commands.runOnce(() -> coralSystem.setCoralInRobot(false), coralSystem));
-
     oi.getButtonFPosition0() // Push Relay Arm
         .onTrue(
             Commands.runOnce(
@@ -217,27 +213,27 @@ public class ButtonsAndDashboardBindings {
     oi.getButtonGPosition1().onTrue(Commands.runOnce(AlignmentUtils::setMidCage));
     oi.getButtonGPosition2().onTrue(Commands.runOnce(AlignmentUtils::setRightCage));
 
-    oi.getRightJoyLeftButton()
-        .onTrue(
-            DriveToCommands.driveToPole(
-                drive,
-                true,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                oi::getRotate,
-                FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-                coralSystem::isCoralInRobot));
+    // oi.getRightJoyLeftButton()
+    //         .onTrue(
+    //                 DriveToCommands.driveToPole(
+    //                         drive,
+    //                         true,
+    //                         oi::getTranslateX,
+    //                         oi::getTranslateY,
+    //                         oi::getRotate,
+    //                         FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
+    //                         coralSystem::isCoralInRobot));
 
-    oi.getRightJoyRightButton()
-        .onTrue(
-            DriveToCommands.driveToPole(
-                drive,
-                false,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                oi::getRotate,
-                FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-                coralSystem::isCoralInRobot));
+    // oi.getRightJoyRightButton()
+    //         .onTrue(
+    //                 DriveToCommands.driveToPole(
+    //                         drive,
+    //                         false,
+    //                         oi::getTranslateX,
+    //                         oi::getTranslateY,
+    //                         oi::getRotate,
+    //                         FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
+    //                         coralSystem::isCoralInRobot));
   }
 
   private static void configureOperatorButtonBindings() {

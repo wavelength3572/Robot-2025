@@ -16,6 +16,7 @@ import frc.robot.util.ReefScoringLogger;
 import frc.robot.util.RobotStatus;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -27,30 +28,35 @@ public class CoralSystem extends SubsystemBase {
   private static final double TIME_OF_FLIGHT_THRESHOLD = 1250; // adjust this constant as needed
   private static final int MOVING_AVG_WINDOW = 10;
 
-  @Getter private Elevator elevator;
-  @Getter public final CoralSystemPresetChooser coralSystemPresetChooser;
-  @Getter private Arm arm;
-  @Getter private Intake intake;
-
-  @Getter public boolean coralInRobot;
-  @Getter public boolean justNearReef;
-  @Getter public boolean justScored;
+  @Getter
+  private Elevator elevator;
+  @Getter
+  public final CoralSystemPresetChooser coralSystemPresetChooser;
+  @Getter
+  private Arm arm;
+  @Getter
+  private Intake intake;
 
   @Getter
-  @AutoLogOutput(key = "CoralStation/safeToMoveArm")
+  public boolean coralInRobot;
+  @Getter
+  public boolean justNearReef;
+  @Getter
+  public boolean justScored;
+
+  @Getter
+  @AutoLogOutput(key = "CoralSystem/safeToMoveArmAfterPickupFromStation")
   public boolean safeToMoveArmAfterPickupFromStation;
 
   private TimeOfFlight timeOfFlight = new TimeOfFlight(31); // Back of Robot on Elevator
 
   @AutoLogOutput(key = "CoralSystem/targetCoralPreset")
   @Getter
-  public CoralSystemPresets targetCoralPreset =
-      CoralSystemPresets.STARTUP; // Default startup position
+  public CoralSystemPresets targetCoralPreset = CoralSystemPresets.STARTUP; // Default startup position
 
   @AutoLogOutput(key = "CoralSystem/currentCoralPreset")
   @Getter
-  public CoralSystemPresets currentCoralPreset =
-      CoralSystemPresets.STARTUP; // Tracks last reached preset
+  public CoralSystemPresets currentCoralPreset = CoralSystemPresets.STARTUP; // Tracks last reached preset
 
   private enum CoralSystemMovementState {
     STABLE,
@@ -85,6 +91,12 @@ public class CoralSystem extends SubsystemBase {
     this.arm = arm;
     this.intake = intake;
     timeOfFlight.setRangingMode(RangingMode.Short, 20);
+
+    try {
+      TimeUnit.SECONDS.sleep(1);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
 
     this.arm.setInitialAngle(this.intake.get_Arm_TBE_DEG());
 
@@ -162,10 +174,25 @@ public class CoralSystem extends SubsystemBase {
     // threshold
   }
 
+  public void setTargetPreset(CoralSystemPresets preset) {
+    // We are trying to go to a different location AND
+    // We ARE NOT Climbing AND
+    // We are not currently traveling to a location
+    if (preset != this.currentCoralPreset
+        && targetCoralPreset != CLIMB
+        && systemState == CoralSystemMovementState.STABLE) {
+      // We are allowed to move
+      this.targetCoralPreset = preset;
+      // Start Moving Arm to Safe
+      this.arm.setTargetPreset(CoralSystemPresets.STOW);
+      // Change state
+      systemState = CoralSystemMovementState.SAFE_ARM;
+    }
+  }
+
   private void automationTriggerChecks() {
 
-    boolean nearReef =
-        RobotStatus.getReefFaceSelection().getAcceptedDistance() < NEAR_REEF_DISTANCE;
+    boolean nearReef = RobotStatus.getReefFaceSelection().getAcceptedDistance() < NEAR_REEF_DISTANCE;
 
     Logger.recordOutput("Automation/justNearReef", justNearReef);
     justNearReef = false;
@@ -191,16 +218,6 @@ public class CoralSystem extends SubsystemBase {
         && nearReef
         && systemState == CoralSystemMovementState.STABLE) {
       justScored = true;
-    }
-  }
-
-  public void setTargetPreset(CoralSystemPresets preset) {
-    if (preset != this.currentCoralPreset && targetCoralPreset != CLIMB) {
-      this.targetCoralPreset = preset;
-      // Start Moving Arm to Safe
-      this.arm.setTargetPreset(CoralSystemPresets.STOW);
-      // Change state
-      systemState = CoralSystemMovementState.SAFE_ARM;
     }
   }
 
@@ -242,8 +259,10 @@ public class CoralSystem extends SubsystemBase {
   }
 
   /**
-   * Checks if the robot just picked up a coral while being near the coral station and if the
-   * time-of-flight sensor reading (moving average of last 10 values) exceeds a threshold. If so,
+   * Checks if the robot just picked up a coral while being near the coral station
+   * and if the
+   * time-of-flight sensor reading (moving average of last 10 values) exceeds a
+   * threshold. If so,
    * set the target preset to STOW.
    */
   public void checkAndStowOnCoralPickup() {
