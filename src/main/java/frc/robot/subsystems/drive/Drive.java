@@ -54,6 +54,7 @@ import frc.robot.util.AlignmentUtils;
 import frc.robot.util.AlignmentUtils.CageSelection;
 import frc.robot.util.AlignmentUtils.CoralStationSelection;
 import frc.robot.util.AlignmentUtils.ReefFaceSelection;
+import frc.robot.util.BranchAlignmentUtils;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.RobotStatus;
 import java.util.concurrent.locks.Lock;
@@ -178,6 +179,25 @@ public class Drive extends SubsystemBase {
         cageSelection =
             AlignmentUtils.getCageAlignmentTarget(
                 getPose(), FieldConstants.selectedCageTranslation);
+
+      BranchAlignmentUtils.BranchAlignmentStatus status =
+          BranchAlignmentUtils.getBranchAlignmentStatus(
+              getPose(), reefFaceSelection.getAcceptedFaceId());
+
+      switch (status) {
+        case NONE:
+          // Robot is not close enough to either branch; do nothing
+          break;
+        case RED:
+          // Robot is within the outer threshold (red zone)
+          break;
+        case YELLOW:
+          // Robot is closer (yellow zone)
+          break;
+        case GREEN:
+          // Robot is within scoring range (green zone)
+          break;
+      }
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -482,7 +502,8 @@ public class Drive extends SubsystemBase {
             0.0 // z-coordinate on the ground
             );
 
-    // Create a 3D rotation with roll and pitch set to 0, and yaw from the 2D rotation.
+    // Create a 3D rotation with roll and pitch set to 0, and yaw from the 2D
+    // rotation.
     Rotation3d rotation3d =
         new Rotation3d(
             0.0, // roll
