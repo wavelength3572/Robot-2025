@@ -121,7 +121,8 @@ public class CoralSystem extends SubsystemBase {
         // Move Arm to Safe
         this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
         if (arm.getCurrentAngleDEG()
-            >= CoralSystemPresets.ARMSAFE.getArmAngle() - 1.0) { // Put in a 1 degree fudge factor
+            >= CoralSystemPresets.ARMSAFE.getArmAngle() - 1.0) { // Put in a 1 degree fudge
+          // factor
           systemState = CoralSystemMovementState.MOVE_ELEVATOR;
           // Start moving elevator
           this.elevator.setTargetPreset(targetCoralPreset);
@@ -216,8 +217,15 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public boolean isAtGoal() {
-    return systemState == CoralSystemMovementState.STABLE
-        && currentCoralPreset == targetCoralPreset;
+    boolean atTargetState =
+        systemState == CoralSystemMovementState.STABLE && currentCoralPreset == targetCoralPreset;
+
+    boolean preppedForDislodge =
+        ((currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+                || currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2)
+            && systemState == CoralSystemMovementState.STABLE);
+
+    return atTargetState || preppedForDislodge;
   }
 
   @AutoLogOutput(key = "CoralSystem/Rear TOF")

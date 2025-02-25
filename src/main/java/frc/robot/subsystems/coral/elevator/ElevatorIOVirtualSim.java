@@ -22,7 +22,7 @@ public class ElevatorIOVirtualSim implements ElevatorIO {
     inputs.elevatorHeightCalc =
         Units.metersToInches(
             (elevatorVirtualEncoder / ElevatorConstants.kElevatorGearing)
-                * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI));
+                * (ElevatorConstants.kSimElevatorDrumRadius * 2.0 * Math.PI));
 
     if (elevatorVirtualEncoder < elevatorCurrentTarget) {
       if (elevatorCurrentTarget - elevatorVirtualEncoder > 1.0) elevatorVirtualEncoder += 1.0;
@@ -40,13 +40,13 @@ public class ElevatorIOVirtualSim implements ElevatorIO {
 
   @Override
   public double getSetpointInMeters() {
-    return (this.elevatorCurrentTarget * ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI)
+    return (this.elevatorCurrentTarget * ElevatorConstants.kSimElevatorDrumRadius * 2.0 * Math.PI)
         / ElevatorConstants.kElevatorGearing;
   }
 
   @Override
   public double getHeightInMeters() {
     return (elevatorVirtualEncoder / ElevatorConstants.kElevatorGearing)
-        * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI);
+        * (ElevatorConstants.kSimElevatorDrumRadius * 2.0 * Math.PI);
   }
 }

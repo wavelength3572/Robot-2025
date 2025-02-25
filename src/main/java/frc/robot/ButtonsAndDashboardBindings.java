@@ -154,6 +154,32 @@ public class ButtonsAndDashboardBindings {
               algae.stowAlgae(); // does mechanism need to move?
               algae.stopAlgae(); // run algae intake
             }));
+
+    SmartDashboard.putData(
+        "Prepare Dislodge L1",
+        new SequentialCommandGroup(
+            new InstantCommand(
+                () ->
+                    coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1)),
+            new WaitUntilCommand(coralSystem::isAtGoal),
+            new InstantCommand(
+                () ->
+                    coralSystem.setSimultaneousTargetPreset(
+                        CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1))));
+
+    SmartDashboard.putData(
+        "Dislodge",
+        Commands.runOnce(
+            () -> {
+              if (coralSystem.currentCoralPreset
+                      == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+                  || coralSystem.currentCoralPreset
+                      == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
+                AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi).schedule();
+              } else {
+                new ScoreCoralCommand(coralSystem.getIntake()).schedule();
+              }
+            }));
   }
 
   private static void configureDriverButtonBindings() {
@@ -273,12 +299,14 @@ public class ButtonsAndDashboardBindings {
                 new InstantCommand(
                     () ->
                         coralSystem.setTargetPreset(
-                            CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1)),
+                            CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1),
+                    coralSystem),
                 new WaitUntilCommand(coralSystem::isAtGoal),
                 new InstantCommand(
                     () ->
                         coralSystem.setSimultaneousTargetPreset(
-                            CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1))));
+                            CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1),
+                    coralSystem)));
 
     oi.getButtonBox1Button2()
         .onTrue(
@@ -286,12 +314,14 @@ public class ButtonsAndDashboardBindings {
                 new InstantCommand(
                     () ->
                         coralSystem.setTargetPreset(
-                            CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2)),
+                            CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2),
+                    coralSystem),
                 new WaitUntilCommand(coralSystem::isAtGoal),
                 new InstantCommand(
                     () ->
                         coralSystem.setSimultaneousTargetPreset(
-                            CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2))));
+                            CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2),
+                    coralSystem)));
 
     oi.getButtonBox1Button4()
         .onTrue(
