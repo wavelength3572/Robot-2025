@@ -132,8 +132,7 @@ public class CoralSystem extends SubsystemBase {
       case SAFE_ARM:
         // Move Arm to Safe
         this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
-        if (arm.getCurrentAngleDEG()
-            >= CoralSystemPresets.ARMSAFE.getArmAngle() - 1.0) { // Put in a 1 degree fudge
+        if (arm.getCurrentAngleDEG() >= CoralSystemPresets.ARMSAFE.getArmAngle() - 1.0) { // Put in a 1 degree fudge
           // factor
           systemState = CoralSystemMovementState.MOVE_ELEVATOR;
           // Start moving elevator
@@ -234,13 +233,11 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public boolean isAtGoal() {
-    boolean atTargetState =
-        systemState == CoralSystemMovementState.STABLE && currentCoralPreset == targetCoralPreset;
+    boolean atTargetState = systemState == CoralSystemMovementState.STABLE && currentCoralPreset == targetCoralPreset;
 
-    boolean preppedForDislodge =
-        ((currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
-                || currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2)
-            && systemState == CoralSystemMovementState.STABLE);
+    boolean preppedForDislodge = ((currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+        || currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2)
+        && systemState == CoralSystemMovementState.STABLE);
 
     return atTargetState || preppedForDislodge;
   }
