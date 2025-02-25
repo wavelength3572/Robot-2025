@@ -3,46 +3,28 @@ package frc.robot.subsystems.coral;
 import lombok.Getter;
 
 public enum CoralSystemPresets {
-  STARTUP(0, 105, CoralState.STARTUP),
-  STOW(22, 105, CoralState.STOW),
-  ARMSAFE(22, 85, CoralState.STOW),
-  PICKUP(39.0, 233, CoralState.PICKUP),
-  PICKUPFAR(37.0, 233, CoralState.PICKUPFAR), // TOF > 300
-  L1(0.00000, 92, CoralState.L1_SCORE),
-  L2(16.0, 77, CoralState.L2_SCORE),
-  L3(33, 77, CoralState.L3_SCORE),
-  L4(65, 45, CoralState.L4_SCORE),
-  PREPARE_DISLODGE_PART1_LEVEL_1(15, 45, CoralState.PREP_L1_DISLODGE),
-  PREPARE_DISLODGE_PART2_LEVEL_1(20, 45, CoralState.PREP_L1_DISLODGE),
-  FINAL_DISLODGE_LEVEL_1(27, 110, CoralState.FINAL_L1_DISLODGE),
-  PREPARE_DISLODGE_PART1_LEVEL_2(30, 45, CoralState.PREP_L2_DISLODGE),
-  PREPARE_DISLODGE_PART2_LEVEL_2(35, 45, CoralState.PREP_L2_DISLODGE), // untested
-  FINAL_DISLODGE_LEVEL_2(37, 110, CoralState.FINAL_L2_DISLODGE),
-  CLIMB(0, 175, CoralState.CLIMB);
+  STARTUP(0, 105),
+  STOW(22, 105),
+  ARMSAFE(22, 85),
+  PICKUP(39.0, 233),
+  PICKUPFAR(37.0, 233), // TOF > 300
+  L1(0.0, 92),
+  L2(16.0, 77),
+  L3(33, 77),
+  L4(65, 45),
+  PREPARE_DISLODGE_PART1_LEVEL_1(15, 45),
+  PREPARE_DISLODGE_PART2_LEVEL_1(20, 45),
+  FINAL_DISLODGE_LEVEL_1(27, 110),
+  PREPARE_DISLODGE_PART1_LEVEL_2(30, 45),
+  PREPARE_DISLODGE_PART2_LEVEL_2(35, 45),
+  FINAL_DISLODGE_LEVEL_2(37, 110),
+  CLIMB(0, 175);
 
   @Getter private final double elevatorHeight;
   @Getter private final double armAngle;
-  @Getter private final CoralState state;
 
-  CoralSystemPresets(double elevatorHeightINCHES, double armAngleDEGREES, CoralState state) {
+  CoralSystemPresets(double elevatorHeightINCHES, double armAngleDEGREES) {
     this.elevatorHeight = elevatorHeightINCHES;
     this.armAngle = armAngleDEGREES;
-    this.state = state;
-  }
-
-  public enum CoralState {
-    STARTUP,
-    STOW,
-    PICKUP,
-    PICKUPFAR,
-    L1_SCORE,
-    L2_SCORE,
-    L3_SCORE,
-    L4_SCORE,
-    PREP_L1_DISLODGE,
-    FINAL_L1_DISLODGE,
-    PREP_L2_DISLODGE,
-    FINAL_L2_DISLODGE,
-    CLIMB
   }
 }

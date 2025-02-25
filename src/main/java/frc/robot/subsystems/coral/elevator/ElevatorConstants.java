@@ -8,6 +8,7 @@ public class ElevatorConstants {
   public static final int elevatorCurrentLimit = 50;
   public static final double kElevatorGearing = 9.0;
   public static final double kElevatorDrumRadius = Units.inchesToMeters(2.677955) / 2.0;
+
   public static final double kCarriageMass = 7.0; // kg
 
   public static final double kMinElevatorHeightMeters = 0.0; // m
@@ -28,4 +29,6 @@ public class ElevatorConstants {
   public static final double kElevatorkA = 0.0; // volt per acceleration (V/(m/s²))
 
   public static final double kSetpointThresholdINCHES = 0.5;
+
+  public static final double kSimElevatorDrumRadius = Units.inchesToMeters(2.475) / 2.0;
 }

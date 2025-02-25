@@ -20,6 +20,10 @@ public final class ClimberConstants {
   public static final double climberKp = 0.03;
   public static final double climberKd = 0.0;
 
+  public static final double CLIMBING_TOLERANCE = 20.0;
+
+  public static final double kClimberGearing = 1.0; // FIXME!!!
+
   /**
    * Computes the climber tip pose based on the robot's current pose.
    *

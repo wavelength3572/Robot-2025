@@ -450,16 +450,16 @@ public class AlignmentUtils {
       if (faceEnum == null) {
         return PolePosition.A_LEFT; // Default
       }
-      leftPoleTrans = faceEnum.getLeftPole().getFrontTranslation();
-      rightPoleTrans = faceEnum.getRightPole().getFrontTranslation();
+      leftPoleTrans = faceEnum.getLeftPole().getBranchTranslation();
+      rightPoleTrans = faceEnum.getRightPole().getBranchTranslation();
 
     } else if (alliance == DriverStation.Alliance.Red) {
       ReefFacesRed faceEnum = ReefFacesRed.fromId(faceId);
       if (faceEnum == null) {
         return PolePosition.A_LEFT;
       }
-      leftPoleTrans = faceEnum.getLeftPole().getFrontTranslation();
-      rightPoleTrans = faceEnum.getRightPole().getFrontTranslation();
+      leftPoleTrans = faceEnum.getLeftPole().getBranchTranslation();
+      rightPoleTrans = faceEnum.getRightPole().getBranchTranslation();
 
     } else {
       return PolePosition.A_LEFT; // Default if no alliance

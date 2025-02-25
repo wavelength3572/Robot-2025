@@ -40,6 +40,9 @@ public class ClimberIOSpark implements ClimberIO {
 
   @Override
   public void updateInputs(ClimberIOInputs inputs) {
+
+    inputs.climbingFinished = isClimbingFinished();
+
     if (ClimberkP.hasChanged(hashCode())) {
       final SparkMaxConfig config = new SparkMaxConfig();
       config.closedLoop.pidf(ClimberkP.get(), 0.0, 0.0, 0.0);
@@ -100,5 +103,14 @@ public class ClimberIOSpark implements ClimberIO {
   @Override
   public boolean isClimberDeployed() {
     return (this.currentClimberState != CLIMB_STATE.STOWED);
+  }
+
+  @Override
+  public boolean isClimbingFinished() {
+    if (currentClimberState == CLIMB_STATE.CLIMB) {
+      double difference =
+          Math.abs(ClimberConstants.CLIMBED_POSITION - climberEncoder.getPosition());
+      return (difference < ClimberConstants.CLIMBING_TOLERANCE) ? true : false;
+    } else return false;
   }
 }

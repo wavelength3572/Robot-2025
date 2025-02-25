@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Mid-4A"
+            "pathName": "Cage2-3B-High"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.5
           }
         },
         {
@@ -23,15 +23,27 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "3B-StationLeft"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "Stow"
+            "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StationLeft-2B-High-OR-1A-Low"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Mid",
+  "folder": "Cage2",
   "choreoAuto": false
 }

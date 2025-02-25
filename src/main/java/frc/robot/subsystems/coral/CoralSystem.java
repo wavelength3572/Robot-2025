@@ -16,6 +16,7 @@ import frc.robot.util.ReefScoringLogger;
 import frc.robot.util.RobotStatus;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -57,6 +58,7 @@ public class CoralSystem extends SubsystemBase {
 
   @Getter
   @AutoLogOutput(key = "CoralSystem/safeToMoveArmAfterPickupFromStation")
+  @AutoLogOutput(key = "CoralSystem/safeToMoveArmAfterPickupFromStation")
   public boolean safeToMoveArmAfterPickupFromStation;
 
   @AutoLogOutput(key = "CoralSystem/targetCoralPreset")
@@ -88,6 +90,12 @@ public class CoralSystem extends SubsystemBase {
     this.arm = arm;
     this.intake = intake;
     timeOfFlight.setRangingMode(RangingMode.Short, 20);
+
+    try {
+      TimeUnit.SECONDS.sleep(1);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
 
     this.arm.setInitialAngle(this.intake.get_Arm_TBE_DEG());
 
@@ -164,6 +172,22 @@ public class CoralSystem extends SubsystemBase {
 
     // check the score timer and stop the intake if its greater than a score time
     // threshold
+  }
+
+  public void setTargetPreset(CoralSystemPresets preset) {
+    // We are trying to go to a different location AND
+    // We ARE NOT Climbing AND
+    // We are not currently traveling to a location
+    if (preset != this.currentCoralPreset
+        && targetCoralPreset != CLIMB
+        && systemState == CoralSystemMovementState.STABLE) {
+      // We are allowed to move
+      this.targetCoralPreset = preset;
+      // Start Moving Arm to Safe
+      this.arm.setTargetPreset(CoralSystemPresets.STOW);
+      // Change state
+      systemState = CoralSystemMovementState.SAFE_ARM;
+    }
   }
 
   private void automationTriggerChecks() {
@@ -246,7 +270,7 @@ public class CoralSystem extends SubsystemBase {
   public void checkAndStowOnCoralPickup() {
     // Log the current state and coral status at the start of the check
     Logger.recordOutput(
-        "CoralSystem/CoralPickupState",
+        "CoralSystem/CoralPickupStateStatus",
         "State: " + pickupState + " | coralInRobot: " + coralInRobot);
 
     // Always update the TOF moving average on every check
@@ -260,7 +284,7 @@ public class CoralSystem extends SubsystemBase {
         // Look for a transition from not having coral to having coral.
         if (!previousCoralInRobot && coralInRobot) {
           Logger.recordOutput(
-              "CoralPickupState",
+              "CoralSystem/CoralPickupState",
               "Coral just received. Transitioning to CHECK_IF_NEAR_CORAL_STATION.");
           pickupState = CoralPickupState.CHECK_IF_NEAR_CORAL_STATION;
         }
@@ -269,16 +293,18 @@ public class CoralSystem extends SubsystemBase {
       case CHECK_IF_NEAR_CORAL_STATION:
         // Check if the robot was near the coral station when the coral was picked up.
         Logger.recordOutput(
-            "CoralPickupState",
+            "CoralSystem/CoralPickupState",
             "Distance from station: " + distanceFromStation + " | nearStation: " + nearStation);
 
         if (nearStation && currentCoralPreset == PICKUP) {
           Logger.recordOutput(
-              "CoralPickupState", "Transitioning to RECEIVED_CORAL_NEAR_CORAL_STATION.");
+              "CoralSystem/CoralPickupState",
+              "Transitioning to RECEIVED_CORAL_NEAR_CORAL_STATION.");
           pickupState = CoralPickupState.RECEIVED_CORAL_NEAR_CORAL_STATION;
         } else {
           Logger.recordOutput(
-              "CoralPickupState", "Not near coral station. Transitioning to HAVE_CORAL_WAITING.");
+              "CoralSystem/CoralPickupState",
+              "Not near coral station. Transitioning to HAVE_CORAL_WAITING.");
           pickupState = CoralPickupState.HAVE_CORAL_WAITING;
         }
         break;
@@ -290,7 +316,7 @@ public class CoralSystem extends SubsystemBase {
           if (currentTOFAvg > TIME_OF_FLIGHT_THRESHOLD
               && !nearStation) { // might want to only use TOF if the data is reliable.
             Logger.recordOutput(
-                "CoralPickupState",
+                "CoralSystem/CoralPickupState",
                 "TOF average ("
                     + currentTOFAvg
                     + ") above threshold ("
@@ -310,14 +336,15 @@ public class CoralSystem extends SubsystemBase {
         if (!coralInRobot) {
           safeToMoveArmAfterPickupFromStation = false;
           Logger.recordOutput(
-              "CoralPickupState", "Coral lost. Transitioning back to WAITING_FOR_CORAL.");
+              "CoralSystem/CoralPickupState",
+              "Coral Expelled. Transitioning back to WAITING_FOR_CORAL.");
           tofReadings.clear(); // Clear readings for the next cycle
           pickupState = CoralPickupState.WAITING_FOR_CORAL;
         }
         break;
 
       default:
-        Logger.recordOutput("CoralPickupState", "Unknown state encountered.");
+        Logger.recordOutput("CoralSystem/CoralPickupState", "Unknown state encountered.");
         break;
     }
 

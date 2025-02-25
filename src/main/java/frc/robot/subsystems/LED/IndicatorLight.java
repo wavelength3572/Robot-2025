@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.LED.IndicatorLightConstants.LED_EFFECTS;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.util.AlignmentUtils;
+import frc.robot.util.RobotStatus;
 import java.util.Random;
 import java.util.function.Supplier;
 
@@ -153,6 +154,8 @@ public class IndicatorLight extends SubsystemBase {
 
     updateElevatorLightingState();
 
+    if (RobotStatus.isClimbingFinished()) currentColor_GOAL = LED_EFFECTS.SEGMENTPARTY;
+
     if (LED_State != LED_EFFECTS.BLINK) {
       LED_State = currentColor_GOAL;
     }
@@ -190,6 +193,8 @@ public class IndicatorLight extends SubsystemBase {
     // under "StripB"
     publishLEDsToDashboardFlipped("StripA", wlLEDBuffer);
   }
+
+  private void updateClimbLighting() {}
 
   /**
    * Publishes the colors from an AddressableLEDBuffer of length 20 to the SmartDashboard as a
@@ -298,9 +303,6 @@ public class IndicatorLight extends SubsystemBase {
 
   private void doSegmentParty() {
     // First, turn off all LEDs
-    // for (int i = 0; i < wlLEDBuffer.getLength(); i++) {
-    // wlLEDBuffer.setRGB(i, 255,255, 255);
-    // }
     if (counter > IndicatorLightConstants.UPDATE_FREQUENCY) {
       counter = 0;
 
@@ -565,24 +567,24 @@ public class IndicatorLight extends SubsystemBase {
 
     int brightStart;
     int brightCount;
-    switch (preset.getState()) {
+    switch (preset) {
       case STOW -> {
         currentColor_GOAL = LED_EFFECTS.BLUEOMBRE;
         return;
       }
-      case L1_SCORE -> {
+      case L1 -> {
         brightStart = 0;
         brightCount = 5;
       }
-      case L2_SCORE -> {
+      case L2 -> {
         brightStart = 5;
         brightCount = 5;
       }
-      case L3_SCORE -> {
+      case L3 -> {
         brightStart = 10;
         brightCount = 5;
       }
-      case L4_SCORE -> {
+      case L4 -> {
         brightStart = 15;
         brightCount = 19;
       }
@@ -623,7 +625,7 @@ public class IndicatorLight extends SubsystemBase {
     }
 
     // 1) If the SELECTED preset is PICKUP, but CURRENT is NOT yet PICKUP,
-    //    then use the SEARCH_LIGHT effect and reset the pickupBlinkTriggered.
+    // then use the SEARCH_LIGHT effect and reset the pickupBlinkTriggered.
     if (selectedPreset != null
         && selectedPreset.equals(CoralSystemPresets.PICKUP)
         && currentPreset != CoralSystemPresets.PICKUP) {
@@ -656,7 +658,8 @@ public class IndicatorLight extends SubsystemBase {
       return; // We handled PICKUP case fully; exit the method.
     }
 
-    // If not STARTUP or PICKUP, handle your usual elevator lighting (selection changed, etc).
+    // If not STARTUP or PICKUP, handle your usual elevator lighting (selection
+    // changed, etc).
     if ((lastSelectedCoralPreset == null || !lastSelectedCoralPreset.equals(selectedPreset))
         && selectedPreset != null) {
       currentColor_GOAL = LED_EFFECTS.ELEVATOR_SELECTION_CHANGED;

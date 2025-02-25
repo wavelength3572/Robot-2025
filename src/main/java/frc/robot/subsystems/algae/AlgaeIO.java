@@ -33,12 +33,13 @@ public interface AlgaeIO {
   /** Update the set of loggable inputs. */
   public default void updateInputs(AlgaeIOInputs inputs) {}
 
-  /** Set intake motor speed (open-loop). */
-  public default void setSpeed(double requestedSpeed) {}
+  /** Set deploy motor speed (open-loop). */
+  public default void setDeployVolts(double requestedVolts) {}
+
+  public default void setIntakeVolts(double requestedVolts) {}
 
   /** Set PID values dynamically for position control tuning. */
-  public default void setPIDValues(
-      double kP, double kD, double velocityMax, double accelerationMax) {}
+  public default void setPIDValues(double kP, double kD) {}
 
   /** Run intake motor to pull in algae (game piece). */
   public default void pullAlgae() {}

@@ -9,8 +9,8 @@ public class AlgaeConstants {
   public static final double algaeInSpeed = 0.50;
   public static final double algaeOutSpeed = -1.0;
 
-  public static final double kAlgaeDeployKp = 1.0;
-  public static final double kAlgaeDeployKd = 0.04;
+  public static final double kAlgaeDeployKp = 0.0;
+  public static final double kAlgaeDeployKd = 0.00;
   public static final double kAlgaeDeployVel = 100;
   public static final double kAlgaeDeployAcc = 200;
   public static final double kAlgaeDeployAllowableError = .01;
