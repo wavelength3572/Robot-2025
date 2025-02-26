@@ -58,6 +58,8 @@ public final class BranchAlignmentUtils {
    * @param faceId The reef face’s AprilTag ID.
    * @return BranchAlignmentStatus indicating the alignment quality.
    */
+
+  // TODO: consider making the green blink frequency change depending on how close you are?
   public static BranchAlignmentStatus getBranchAlignmentStatus(Pose2d robotPose, int faceId) {
     // Retrieve the reef face pose directly from the AprilTag layout.
     Optional<Pose3d> reefFacePose3d = VisionConstants.aprilTagLayout.getTagPose(faceId);

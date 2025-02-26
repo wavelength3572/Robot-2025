@@ -14,6 +14,8 @@ public class StrategyManager implements AlignmentStrategy {
   private static final double THRESHOLD_DISTANCE_TO_CORAL_STATION = 2.0;
   private static final double THRESHOLD_DISTANCE_TO_CAGE = 1.0;
 
+  private static final double TOLERANCE_IN_DEGREES = 1.0;
+
   // Shared PID controller for all rotational alignment strategies
   private final ProfiledPIDController sharedAngleController;
   // Shared manual override flag
@@ -36,13 +38,13 @@ public class StrategyManager implements AlignmentStrategy {
     // Initialize shared PID controller
     this.sharedAngleController =
         new ProfiledPIDController(
-            0.37, // ANGLE_KP
+            0.5, // ANGLE_KP
             0.0,
             0.0, // ANGLE_KD
             new TrapezoidProfile.Constraints(
                 Units.degreesToRadians(360.0), Units.degreesToRadians(360.0)));
     this.sharedAngleController.enableContinuousInput(-Math.PI, Math.PI);
-    this.sharedAngleController.setTolerance(Math.toRadians(1.0));
+    this.sharedAngleController.setTolerance(Math.toRadians(TOLERANCE_IN_DEGREES));
 
     // Instantiate alignment strategies with shared controller and override flag
     reefStrategy = new ReefAlignmentStrategy(sharedAngleController);
@@ -63,12 +65,19 @@ public class StrategyManager implements AlignmentStrategy {
 
     boolean haveCoral = context.isCoralInRobot();
     boolean climberDeployed = context.isClimberDeployed();
+
     boolean nearReef =
-        context.getReefFaceSelection().getAcceptedDistance() <= THRESHOLD_DISTANCE_TO_REEF;
+        context.getReefFaceSelection() != null
+            && context.getReefFaceSelection().getAcceptedDistance() <= THRESHOLD_DISTANCE_TO_REEF;
+
     boolean nearCoralStation =
-        context.getCoralStationSelection().getAcceptedDistance()
-            <= THRESHOLD_DISTANCE_TO_CORAL_STATION;
-    boolean nearCage = context.getCageSelection().getDistanceToCage() <= THRESHOLD_DISTANCE_TO_CAGE;
+        context.getCoralStationSelection() != null
+            && context.getCoralStationSelection().getAcceptedDistance()
+                <= THRESHOLD_DISTANCE_TO_CORAL_STATION;
+
+    boolean nearCage =
+        context.getCageSelection() != null
+            && context.getCageSelection().getDistanceToCage() <= THRESHOLD_DISTANCE_TO_CAGE;
 
     if (nearReef && haveCoral && !climberDeployed) {
       currentActiveStrategy = reefStrategy;
@@ -95,7 +104,16 @@ public class StrategyManager implements AlignmentStrategy {
       resetAngleController(context.getRobotPose(), getGoalRotation(context));
       isManualOverride.set(false);
     }
-    return currentActiveStrategy.getRotationalCorrection(context, manualRotationInput);
+
+    // Get correction from the active strategy.
+    double correction = currentActiveStrategy.getRotationalCorrection(context, manualRotationInput);
+
+    // Apply deadband to zero out small fluctuations.
+    if (Math.abs(correction) < Math.toRadians(TOLERANCE_IN_DEGREES)) {
+      return 0.0;
+    }
+
+    return correction;
   }
 
   @Override
