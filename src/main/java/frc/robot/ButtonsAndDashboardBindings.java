@@ -337,8 +337,7 @@ public class ButtonsAndDashboardBindings {
                     coralSystem)));
 
     oi.getButtonBox1Button4() // Pickup button
-        // If you click the pickup button and you have coral then
-        // make the button act like you pressed the reef score button.
+        // If you click the pickup button and you have coral then do nothing
         .onTrue(
             Commands.runOnce(
                 () -> {
