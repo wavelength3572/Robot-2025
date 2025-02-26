@@ -13,16 +13,12 @@ import frc.robot.subsystems.algae.AlgaeConstants.algaeIntakeState;
 
 public class AlgaeIOSpark implements AlgaeIO {
 
-  private SparkMax algaeCaptureMotor =
-      new SparkMax(AlgaeConstants.algaeCaptureCanId, MotorType.kBrushless);
-  private SparkClosedLoopController algaeCaptureController =
-      algaeCaptureMotor.getClosedLoopController();
+  private SparkMax algaeCaptureMotor = new SparkMax(AlgaeConstants.algaeCaptureCanId, MotorType.kBrushless);
+  private SparkClosedLoopController algaeCaptureController = algaeCaptureMotor.getClosedLoopController();
   private RelativeEncoder algaeCaptureEncoder = algaeCaptureMotor.getEncoder();
 
-  private SparkMax algaeDeployMotor =
-      new SparkMax(AlgaeConstants.algaeDeployCanId, MotorType.kBrushless);
-  private SparkClosedLoopController algaeDeployController =
-      algaeDeployMotor.getClosedLoopController();
+  private SparkMax algaeDeployMotor = new SparkMax(AlgaeConstants.algaeDeployCanId, MotorType.kBrushless);
+  private SparkClosedLoopController algaeDeployController = algaeDeployMotor.getClosedLoopController();
   private RelativeEncoder algaeDeployEncoder = algaeDeployMotor.getEncoder();
 
   private double targetEncoderRotations = angleToRotations(AlgaeConstants.kAlgaeDeployInitalAngle);
@@ -55,8 +51,7 @@ public class AlgaeIOSpark implements AlgaeIO {
     // Capture Motor Inputs
     inputs.captureRequestedSpeed = algaeCaptureMotor.get();
     inputs.captureVelocityRPM = algaeCaptureMotor.getEncoder().getVelocity();
-    inputs.captureAppliedVolts =
-        algaeCaptureMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
+    inputs.captureAppliedVolts = algaeCaptureMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.captureCurrentAmps = algaeCaptureMotor.getOutputCurrent();
     inputs.captureEncRotations = algaeCaptureEncoder.getPosition();
 
@@ -66,9 +61,8 @@ public class AlgaeIOSpark implements AlgaeIO {
     inputs.targetEncoderRotations = algaeDeployEncoder.getPosition();
     inputs.currentAngle = rotationsToAngle(inputs.targetEncoderRotations);
 
-    inputs.armArbFF = AlgaeConstants.kAlgaeDeployKf * Math.cos(Math.toRadians(inputs.currentAngle));
-    inputs.deployAppliedVolts =
-        algaeDeployMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
+    inputs.armArbFF = Math.cos(Math.toRadians(inputs.currentAngle + 21.5)) * AlgaeConstants.deployPullBackFF;
+    inputs.deployAppliedVolts = algaeDeployMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.deployCurrentAmps = algaeDeployMotor.getOutputCurrent();
     inputs.deployVelocityRPM = algaeDeployEncoder.getVelocity();
 
@@ -78,32 +72,36 @@ public class AlgaeIOSpark implements AlgaeIO {
     switch (currentAlgIntakeState) {
       case OFF:
         algaeCaptureMotor.setVoltage(0.0);
-        algaeCaptureController.setReference(captureEncoderValue, ControlType.kPosition);
+        algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldVolts);
         previousCaptureVel = inputs.captureVelocityRPM;
         detectionCount = 0;
         break;
       case BURST:
-        algaeCaptureMotor.setVoltage(8.0);
-        algaeDeployMotor.setVoltage(2.0);
+        algaeCaptureMotor.setVoltage(AlgaeConstants.captureIntakeVolts);
+        algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
         detectionCount++;
-        if (detectionCount > 20) {
+        if (detectionCount > 50) {
           currentAlgIntakeState = algaeIntakeState.PULL;
           detectionCount = 0;
         }
       case PULL:
-        algaeCaptureMotor.setVoltage(8.0);
-        algaeDeployMotor.setVoltage(0.4);
+        algaeCaptureMotor.setVoltage(AlgaeConstants.captureIntakeVolts);
+        algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldOutVolts);
         detectionCount++;
         if (inputs.captureVelocityRPM != previousCaptureVel) {
           if (inputs.captureVelocityRPM - previousCaptureVel <= 10.0 && detectionCount > 10) {
             currentAlgIntakeState = algaeIntakeState.DETECT;
+            // TargetRPM is the near max RPM value we think the intake roller reached
+            // we'll use it to compare to the real time RPM to try and
+            // determine if we captured an algae by looking for an RPM drop
             targetRPM = inputs.captureVelocityRPM;
           }
         }
         previousCaptureVel = inputs.captureVelocityRPM;
         break;
       case DETECT:
-        algaeCaptureMotor.setVoltage(8.0);
+        algaeCaptureMotor.setVoltage(AlgaeConstants.captureIntakeVolts);
+        algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldOutVolts);
         detectionCount = 0;
         if (targetRPM - inputs.captureVelocityRPM > 75) {
           captureEncoderValue = inputs.captureEncRotations;
@@ -111,41 +109,47 @@ public class AlgaeIOSpark implements AlgaeIO {
         }
         break;
       case CAPTURE:
+        // This hold the capture motor position so
+        // hopefully the algae doesn't move
         algaeCaptureController.setReference(captureEncoderValue, ControlType.kPosition);
-        // Pull arm back
-        algaeDeployMotor.setVoltage(-1.0);
         detectionCount = 0;
         currentAlgIntakeState = algaeIntakeState.PULL_ARM;
         break;
       case PULL_ARM:
-        if (detectionCount > 50) // about 1 seconds
-        {
-          currentAlgIntakeState = algaeIntakeState.HOLD_ARM;
-        } else {
-          algaeDeployMotor.setVoltage(-2.0);
-        }
-        detectionCount++;
-        break;
-      case HOLD_ARM:
-        algaeDeployMotor.setVoltage(-0.6);
+        algaeDeployMotor.setVoltage(inputs.armArbFF);
         break;
       case PUSH:
         if (detectionCount < 100) // about 2 seconds
         {
-          algaeDeployMotor.setVoltage(0.4);
-          algaeCaptureMotor.setVoltage(-8.0);
+          algaeDeployMotor.setVoltage(AlgaeConstants.deployPushAlgaeVolts);
+          algaeCaptureMotor.setVoltage(AlgaeConstants.capturePushVolts);
         } else {
-          algaeDeployMotor.setVoltage(0.0);
+          algaeDeployMotor.setVoltage(AlgaeConstants.deployPullBackVolts);
           algaeCaptureMotor.setVoltage(0.0);
           currentAlgIntakeState = algaeIntakeState.STOW;
+          detectionCount = 0;
         }
         detectionCount++;
         break;
       case STOW:
-        algaeDeployMotor.setVoltage(0.0);
         algaeCaptureMotor.setVoltage(0.0);
-        captureEncoderValue = inputs.captureEncRotations;
-        currentAlgIntakeState = algaeIntakeState.OFF;
+        algaeDeployMotor.setVoltage(AlgaeConstants.deployPullBackVolts);
+        detectionCount++;
+        if (detectionCount > 100) {
+          currentAlgIntakeState = algaeIntakeState.OFF;
+          algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldVolts);
+          detectionCount = 0;
+        }
+        break;
+      case MANUAL:
+        break;
+      case CLIMB:
+        algaeCaptureMotor.setVoltage(0.0);
+        algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
+        detectionCount++;
+        if (detectionCount > 50) {
+          algaeDeployMotor.setVoltage(0.0);
+        }
         break;
       default:
         break;
@@ -179,17 +183,6 @@ public class AlgaeIOSpark implements AlgaeIO {
   }
 
   @Override
-  public void deployAlgae() {
-    targetEncoderRotations = angleToRotations(AlgaeConstants.algaeDeployPosition);
-  }
-
-  @Override
-  public void stowAlgae() {
-    targetEncoderRotations = angleToRotations(AlgaeConstants.algaeStowPosition);
-    currentAlgIntakeState = algaeIntakeState.STOW;
-  }
-
-  @Override
   public void pushAlgae() {
     detectionCount = 0;
     currentAlgIntakeState = algaeIntakeState.PUSH;
@@ -197,8 +190,8 @@ public class AlgaeIOSpark implements AlgaeIO {
 
   @Override
   public void pullAlgae() {
-    algaeCaptureMotor.setVoltage(8.0);
-    algaeDeployMotor.setVoltage(1.0);
+    algaeCaptureMotor.setVoltage(AlgaeConstants.captureIntakeVolts);
+    algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
     detectionCount = 0;
     previousCaptureVel = algaeCaptureMotor.getEncoder().getVelocity();
     currentAlgIntakeState = algaeIntakeState.BURST;
@@ -216,6 +209,7 @@ public class AlgaeIOSpark implements AlgaeIO {
 
   @Override
   public void setDeployVolts(double requestedVolts) {
+    currentAlgIntakeState = algaeIntakeState.MANUAL;
     algaeDeployMotor.setVoltage(requestedVolts);
   }
 
@@ -224,9 +218,7 @@ public class AlgaeIOSpark implements AlgaeIO {
     // algaeCaptureMotor.setVoltage(requestedVolts);
   }
 
-  @Override
-  public void setDeployPositionAngle(double angle) {
-    targetEncoderRotations = angleToRotations(angle);
-    algaeDeployController.setReference(targetEncoderRotations, ControlType.kPosition);
+  public double getDeployPositionAngle() {
+    return rotationsToAngle(algaeDeployEncoder.getPosition());
   }
 }
