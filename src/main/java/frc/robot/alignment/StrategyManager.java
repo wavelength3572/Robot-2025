@@ -36,7 +36,7 @@ public class StrategyManager implements AlignmentStrategy {
     // Initialize shared PID controller
     this.sharedAngleController =
         new ProfiledPIDController(
-            0.4, // ANGLE_KP
+            0.37, // ANGLE_KP
             0.0,
             0.0, // ANGLE_KD
             new TrapezoidProfile.Constraints(

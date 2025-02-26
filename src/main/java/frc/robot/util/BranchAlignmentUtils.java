@@ -1,10 +1,13 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.FieldConstants.ReefFacesBlue;
-import frc.robot.FieldConstants.ReefFacesRed;
+import frc.robot.subsystems.vision.VisionConstants;
+import java.util.Optional;
+import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
 public final class BranchAlignmentUtils {
@@ -17,87 +20,113 @@ public final class BranchAlignmentUtils {
   }
 
   // ----------------- TUNE THESE DISTANCES (meters) -----------------
-  private static final double THRESHOLD_RED = 0.15; // If distance < 1.0m => at least RED
-  private static final double THRESHOLD_YELLOW = 0.05; // If distance < 0.5m => at least YELLOW
-  private static final double THRESHOLD_GREEN = 0.01; // If distance < 0.25m => GREEN
+  // Threshold for forward alignment—if the robot isn’t within this distance,
+  // we consider it not aligned regardless of lateral offset.
+  private static final double FORWARD_THRESHOLD = 0.10;
+
+  // Lateral thresholds for traffic-light style alignment.
+  private static final double LATERAL_THRESHOLD_RED = 0.80;
+  private static final double LATERAL_THRESHOLD_YELLOW = 0.030;
+  // (Within LATERAL_THRESHOLD_YELLOW is considered GREEN.)
+
+  // ----------------- OFFSET VALUES (meters) -----------------
+  // Offsets for scoring positions relative to the AprilTag pose.
+  // One for the left pole and one for the right pole.
+  private static final Transform2d RIGHT_POLE_OFFSET =
+      new Transform2d(new Translation2d(.445, .001), new Rotation2d(0));
+  private static final Transform2d LEFT_POLE_OFFSET =
+      new Transform2d(new Translation2d(.445, -.345), new Rotation2d(0));
+
+  @Getter
+  public static BranchAlignmentStatus currentBranchAlignmentStatus = BranchAlignmentStatus.NONE;
 
   private BranchAlignmentUtils() {
     // prevent instantiation
   }
 
   /**
-   * Returns how close the robot is to the nearest branch (pole) on a given reef face, using only
-   * the front translation of each pole. The result is a traffic-light style status: NONE, RED,
-   * YELLOW, GREEN.
+   * Returns how close the robot is to the nearest branch (pole) on a given reef face. This method
+   * computes the scoring poses for both left and right poles by applying offsets to the AprilTag
+   * pose (using plus() to combine poses), logs both sets of relative pose data, and then selects
+   * the scoring pose that is closest to the robot for determining the alignment status.
    *
-   * @param robotPose The robot's current position.
-   * @param faceId The reef face’s AprilTag ID (e.g., 17..22 for Blue or 6..11 for Red).
-   * @return BranchAlignmentStatus.
+   * <p>The robot's pose is transformed into the scoring coordinate frame where: - x:
+   * forward/backward offset (normal to the face) - y: lateral (left/right) offset.
+   *
+   * @param robotPose The robot's global Pose2d.
+   * @param faceId The reef face’s AprilTag ID.
+   * @return BranchAlignmentStatus indicating the alignment quality.
    */
   public static BranchAlignmentStatus getBranchAlignmentStatus(Pose2d robotPose, int faceId) {
-    // 1) Which alliance are we?
-    DriverStation.Alliance alliance = DriverStation.getAlliance().get();
-    Logger.recordOutput("Alignment/Branch/Alliance", alliance.toString());
-    Logger.recordOutput("Alignment/Branch/FaceId", faceId);
-
-    double minDistance = Double.POSITIVE_INFINITY; // track the closest branch distance
-
-    // 2) For Blue alliance => look up ReefFacesBlue
-    if (alliance == DriverStation.Alliance.Blue) {
-      ReefFacesBlue faceEnum = ReefFacesBlue.fromId(faceId);
-      if (faceEnum != null) {
-        // Use only the front translation from left and right poles.
-        Translation2d leftFront = faceEnum.getLeftPole().getBranchTranslation();
-        Translation2d rightFront = faceEnum.getRightPole().getBranchTranslation();
-
-        double distLF = robotPose.getTranslation().getDistance(leftFront);
-        double distRF = robotPose.getTranslation().getDistance(rightFront);
-
-        Logger.recordOutput("Alignment/Branch/Blue/LeftFront", leftFront);
-        Logger.recordOutput("Alignment/Branch/Blue/RightFront", rightFront);
-        Logger.recordOutput("Alignment/Branch/Blue/DistanceLeftFront", distLF);
-        Logger.recordOutput("Alignment/Branch/Blue/DistanceRightFront", distRF);
-
-        minDistance = Math.min(distLF, distRF);
-      }
+    // Retrieve the reef face pose directly from the AprilTag layout.
+    Optional<Pose3d> reefFacePose3d = VisionConstants.aprilTagLayout.getTagPose(faceId);
+    if (!reefFacePose3d.isPresent()) {
+      Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.NONE.toString());
+      return BranchAlignmentStatus.NONE;
     }
-    // 3) For Red alliance => look up ReefFacesRed
-    else if (alliance == DriverStation.Alliance.Red) {
-      ReefFacesRed faceEnum = ReefFacesRed.fromId(faceId);
-      if (faceEnum != null) {
-        Translation2d leftFront = faceEnum.getLeftPole().getBranchTranslation();
-        Translation2d rightFront = faceEnum.getRightPole().getBranchTranslation();
 
-        double distLF = robotPose.getTranslation().getDistance(leftFront);
-        double distRF = robotPose.getTranslation().getDistance(rightFront);
+    // Convert the AprilTag pose to 2d.
+    Pose2d tagPose2d = reefFacePose3d.get().toPose2d();
 
-        Logger.recordOutput("Alignment/Branch/Red/LeftFront", leftFront);
-        Logger.recordOutput("Alignment/Branch/Red/RightFront", rightFront);
-        Logger.recordOutput("Alignment/Branch/Red/DistanceLeftFront", distLF);
-        Logger.recordOutput("Alignment/Branch/Red/DistanceRightFront", distRF);
+    // Use plus() to apply the scoring offsets.
+    Pose2d leftScoringPose = tagPose2d.plus(LEFT_POLE_OFFSET);
+    Pose2d rightScoringPose = tagPose2d.plus(RIGHT_POLE_OFFSET);
 
-        minDistance = Math.min(distLF, distRF);
-      }
-    }
-    // If alliance is invalid or no face was found, minDistance remains Infinity
+    // Transform the robot's pose relative to both scoring poses.
+    Pose2d leftRelativePose = robotPose.relativeTo(leftScoringPose);
+    Pose2d rightRelativePose = robotPose.relativeTo(rightScoringPose);
 
-    Logger.recordOutput("Alignment/Branch/MinDistance", minDistance);
+    double leftForward = leftRelativePose.getTranslation().getX();
+    double leftLateral = leftRelativePose.getTranslation().getY();
+    double rightForward = rightRelativePose.getTranslation().getX();
+    double rightLateral = rightRelativePose.getTranslation().getY();
 
-    // 4) Compare minDistance to thresholds to decide the traffic-light status
-    BranchAlignmentStatus status;
-    if (minDistance == Double.POSITIVE_INFINITY) {
-      status = BranchAlignmentStatus.NONE;
-    } else if (minDistance > THRESHOLD_RED) {
-      status = BranchAlignmentStatus.NONE;
-    } else if (minDistance > THRESHOLD_YELLOW) {
-      status = BranchAlignmentStatus.RED;
-    } else if (minDistance > THRESHOLD_GREEN) {
-      status = BranchAlignmentStatus.YELLOW;
+    // Log both sets of scoring data.
+    Logger.recordOutput("Alignment/Branch/LeftScoringPose", leftScoringPose);
+    Logger.recordOutput("Alignment/Branch/RightScoringPose", rightScoringPose);
+    Logger.recordOutput("Alignment/Branch/LeftForwardOffset", leftForward);
+    Logger.recordOutput("Alignment/Branch/LeftLateralOffset", leftLateral);
+    Logger.recordOutput("Alignment/Branch/RightForwardOffset", rightForward);
+    Logger.recordOutput("Alignment/Branch/RightLateralOffset", rightLateral);
+
+    // Determine which scoring pose is closer to the robot.
+    double leftDistance = robotPose.getTranslation().getDistance(leftScoringPose.getTranslation());
+    double rightDistance =
+        robotPose.getTranslation().getDistance(rightScoringPose.getTranslation());
+    Pose2d chosenRelativePose;
+    String chosenSide;
+    if (leftDistance < rightDistance) {
+      chosenRelativePose = leftRelativePose;
+      chosenSide = "Left";
     } else {
-      status = BranchAlignmentStatus.GREEN;
+      chosenRelativePose = rightRelativePose;
+      chosenSide = "Right";
     }
 
-    Logger.recordOutput("Alignment/Branch/Status", status.toString());
-    return status;
+    Logger.recordOutput("Alignment/Branch/ChosenSide", chosenSide);
+
+    // Use the chosen relative pose to decide alignment.
+    double forwardOffset = chosenRelativePose.getTranslation().getX();
+    double lateralOffset = chosenRelativePose.getTranslation().getY();
+
+    // Check the forward alignment.
+    if (Math.abs(forwardOffset) > FORWARD_THRESHOLD) {
+      Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.NONE.toString());
+      currentBranchAlignmentStatus = BranchAlignmentStatus.NONE;
+      return currentBranchAlignmentStatus;
+    }
+
+    // Evaluate the lateral offset to decide the traffic-light status.
+    if (Math.abs(lateralOffset) > LATERAL_THRESHOLD_RED) {
+      Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.RED.toString());
+      currentBranchAlignmentStatus = BranchAlignmentStatus.RED;
+    } else if (Math.abs(lateralOffset) > LATERAL_THRESHOLD_YELLOW) {
+      Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.YELLOW.toString());
+      currentBranchAlignmentStatus = BranchAlignmentStatus.YELLOW;
+    } else {
+      Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.GREEN.toString());
+      currentBranchAlignmentStatus = BranchAlignmentStatus.GREEN;
+    }
+    return currentBranchAlignmentStatus;
   }
 }
