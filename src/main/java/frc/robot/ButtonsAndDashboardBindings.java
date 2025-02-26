@@ -188,7 +188,7 @@ public class ButtonsAndDashboardBindings {
 
     SmartDashboard.putData(
         "Toggle Branch Alignment Indicator",
-        Commands.runOnce(indicatorLight::toggleBranchAlignmentIndicator));
+        Commands.runOnce(indicatorLight::toggleBranchAlignmentIndicator).ignoringDisable(true));
   }
 
   /****************************** */

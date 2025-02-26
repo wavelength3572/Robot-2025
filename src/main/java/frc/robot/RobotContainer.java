@@ -225,16 +225,25 @@ public class RobotContainer {
 
   public void SetupAutoChooser() {
     // Set up auto routines
-    competitionAutoChooser = new LoggedDashboardChooser<>("Lake City Auto Test Package"); //This wont work unless we change the code - just for thinking right now
+    competitionAutoChooser =
+        new LoggedDashboardChooser<>(
+            "Lake City Auto Test Package"); // This wont work unless we change the code - just for
+    // thinking right now
     competitionAutoChooser.addDefaultOption("None", Commands.none());
-    
-    //Best Option for Mid
-    competitionAutoChooser.addOption("Mid-4AHigh-Dislodge", AutoBuilder.buildAuto("Mid-4AHigh-Dislodge"));
-    //Best Option for Cage2
-    competitionAutoChooser.addOption("Score3Cage2-3BHigh-2AHigh-2BHigh", AutoBuilder.buildAuto("Score3Cage2-3BHigh-2AHigh-2BHigh"));
-    competitionAutoChooser.addOption("FastConditionalCage2-3BHigh-Station", AutoBuilder.buildAuto("FastConditionalCage2-3BHigh-Station"));
-    //Best Option for Cage5
-    competitionAutoChooser.addOption("Cage5-5AHigh-6AHigh", AutoBuilder.buildAuto("Cage5-5AHigh-6AHigh"));
+
+    // Best Option for Mid
+    competitionAutoChooser.addOption(
+        "Mid-4AHigh-Dislodge", AutoBuilder.buildAuto("Mid-4AHigh-Dislodge"));
+    // Best Option for Cage2
+    competitionAutoChooser.addOption(
+        "Score3Cage2-3BHigh-2AHigh-2BHigh",
+        AutoBuilder.buildAuto("Score3Cage2-3BHigh-2AHigh-2BHigh"));
+    competitionAutoChooser.addOption(
+        "FastConditionalCage2-3BHigh-Station",
+        AutoBuilder.buildAuto("FastConditionalCage2-3BHigh-Station"));
+    // Best Option for Cage5
+    competitionAutoChooser.addOption(
+        "Cage5-5AHigh-6AHigh", AutoBuilder.buildAuto("Cage5-5AHigh-6AHigh"));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
