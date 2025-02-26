@@ -17,11 +17,22 @@ import java.util.Random;
 import java.util.function.Supplier;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class IndicatorLight extends SubsystemBase {
 
   private LED_EFFECTS currentColor_GOAL = LED_EFFECTS.BLACK;
   private LED_EFFECTS LED_State = LED_EFFECTS.BLACK;
+
+  // Define constants for the blink period (in seconds)
+  private static final double MAX_BLINK_PERIOD = 0.5; // far from target, slow blink
+  private static final double MIN_BLINK_PERIOD = 0.001; // very close, fast blink
+
+  public static final double MIN_TOLERANCE_BLINK = 0.025; // below this, blink is at min period
+  public static final double MAX_TOLERANCE_BLINK = 0.100; // above this, blink is at max period
+
+  // Variable to hold the current blink period computed from the error
+  private double currentBlinkPeriod = MAX_BLINK_PERIOD;
 
   Supplier<CoralSystemPresets> getCurrentCoralPreset;
   Supplier<CoralSystemPresets> getSelectedCoralPreset;
@@ -67,6 +78,7 @@ public class IndicatorLight extends SubsystemBase {
   private Supplier<Boolean> getIsCoralInRobot;
   private boolean pickupBlinkTriggered = false;
   @AutoLogOutput @Getter private boolean branchAlignmentOn = false;
+  private AddressableLEDBuffer currentActiveBuffer;
 
   public void setupLightingSuppliers(
       Supplier<CoralSystemPresets> currentPreset,
@@ -88,6 +100,7 @@ public class IndicatorLight extends SubsystemBase {
     wlLEDBuffer = new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
     wlLED.setLength(wlLEDBuffer.getLength());
     center = wlLEDBuffer.getLength() / 2;
+    currentActiveBuffer = wlLEDBuffer; // Set the default active buffer
     wlLED.setData(wlLEDBuffer);
     wlLED.start();
 
@@ -117,8 +130,11 @@ public class IndicatorLight extends SubsystemBase {
 
     wlYellowLEDBuffer =
         new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
-    for (var i = 0; i < wlYellowLEDBuffer.getLength(); i++) {
-      wlYellowLEDBuffer.setHSV(i, IndicatorLightConstants.YELLOW_HUE, 255, 128);
+    // for (var i = 0; i < wlYellowLEDBuffer.getLength(); i++) {
+    // wlYellowLEDBuffer.setHSV(i, IndicatorLightConstants.YELLOW_HUE, 255, 128);
+    // }
+    for (int i = 0; i < wlYellowLEDBuffer.getLength(); i++) {
+      wlYellowLEDBuffer.setLED(i, Color.kYellow);
     }
 
     wlBlueLEDBuffer =
@@ -172,14 +188,14 @@ public class IndicatorLight extends SubsystemBase {
       case ELEVATOR_SELECTION_CHANGED, ELEVATOR_TARGET_CHANGED, ELEVATOR_CURRENT_CHANGED -> {
         // Elevator lighting is already updated.
       } // General states:
-      case RED -> wlLED.setData(wlRedLEDBuffer);
-      case YELLOW -> wlLED.setData(wlYellowLEDBuffer);
-      case GREEN -> wlLED.setData(wlGreenLEDBuffer);
-      case ORANGE -> wlLED.setData(wlOrangeLEDBuffer);
-      case PURPLE -> wlLED.setData(wlPurpleLEDBuffer);
-      case BLUE -> wlLED.setData(wlBlueLEDBuffer);
-      case BLACK -> wlLED.setData(wlBlackLEDBuffer);
-      case WHITE -> wlLED.setData(wlWhiteLEDBuffer);
+      case RED -> setActiveBuffer(wlRedLEDBuffer);
+      case YELLOW -> setActiveBuffer(wlYellowLEDBuffer);
+      case GREEN -> setActiveBuffer(wlGreenLEDBuffer);
+      case ORANGE -> setActiveBuffer(wlOrangeLEDBuffer);
+      case PURPLE -> setActiveBuffer(wlPurpleLEDBuffer);
+      case BLUE -> setActiveBuffer(wlBlueLEDBuffer);
+      case BLACK -> setActiveBuffer(wlBlackLEDBuffer);
+      case WHITE -> setActiveBuffer(wlWhiteLEDBuffer);
       case RAINBOW -> doRainbow();
       case BLUEOMBRE -> doBlueOmbre();
       case BLINK -> blink();
@@ -190,6 +206,7 @@ public class IndicatorLight extends SubsystemBase {
       case EXPLOSION -> doExplosionEffect();
       case POLKADOT -> doPokadot();
       case SEARCH_LIGHT -> doSearchlightSingleEffect();
+      case DYNAMIC_BLINK -> dynamicBlink();
       case DRIVE_TO_REEF -> {} // TODO: Implement reef lighting logic
 
       default -> {}
@@ -197,15 +214,23 @@ public class IndicatorLight extends SubsystemBase {
 
     // Publish the first 10 LEDs of wlLEDBuffer under "StripA" and the second 10
     // under "StripB"
-    publishLEDsToDashboardFlipped("StripA", wlLEDBuffer);
+    publishLEDsToDashboardFlipped("StripA", currentActiveBuffer);
   }
 
   private void updateBranchAlignmentLighting() {
+
+    double lateralError = BranchAlignmentUtils.getLateralErrorToNearestPole();
+    updateBlinkPeriod(lateralError);
+
     if (branchAlignmentOn) {
       BranchAlignmentStatus state = BranchAlignmentUtils.getCurrentBranchAlignmentStatus();
       switch (state) {
         case GREEN:
-          currentColor_GOAL = LED_EFFECTS.GREEN;
+          if (lateralError <= BranchAlignmentUtils.LATERAL_THRESHOLD_SOLID_GREEN) {
+            currentColor_GOAL = LED_EFFECTS.GREEN;
+          } else {
+            currentColor_GOAL = LED_EFFECTS.DYNAMIC_BLINK;
+          }
           break;
         case RED:
           currentColor_GOAL = LED_EFFECTS.RED;
@@ -383,7 +408,7 @@ public class IndicatorLight extends SubsystemBase {
     // Check bounds
     rainbowFirstPixelHue %= 180;
     // Set the LEDs
-    wlLED.setData(wlLEDBuffer);
+    setActiveBuffer(wlLEDBuffer);
   }
 
   public void doBlueOmbre() {
@@ -414,7 +439,7 @@ public class IndicatorLight extends SubsystemBase {
     }
 
     // Set the LEDs
-    wlLED.setData(wlLEDBuffer);
+    setActiveBuffer(wlLEDBuffer);
   }
 
   public void blink() {
@@ -438,7 +463,7 @@ public class IndicatorLight extends SubsystemBase {
       wlLEDBuffer.setLED(i, blinkColor);
     }
 
-    wlLED.setData(wlLEDBuffer);
+    setActiveBuffer(wlLEDBuffer);
   }
 
   public void blinkRed() {
@@ -452,9 +477,9 @@ public class IndicatorLight extends SubsystemBase {
       lastTime = timeStamp;
     }
     if (on) {
-      wlLED.setData(wlRedLEDBuffer);
+      setActiveBuffer(wlRedLEDBuffer);
     } else {
-      wlLED.setData(wlBlackLEDBuffer);
+      setActiveBuffer(wlBlackLEDBuffer);
     }
   }
 
@@ -469,13 +494,31 @@ public class IndicatorLight extends SubsystemBase {
       lastTime = timeStamp;
       skittleCount++;
       skittleCount = skittleCount % 7;
-      if (skittleCount == 0) wlLED.setData(wlRedLEDBuffer);
-      if (skittleCount == 1) wlLED.setData(wlOrangeLEDBuffer);
-      if (skittleCount == 2) wlLED.setData(wlYellowLEDBuffer);
-      if (skittleCount == 3) wlLED.setData(wlGreenLEDBuffer);
-      if (skittleCount == 4) wlLED.setData(wlBlueLEDBuffer);
-      if (skittleCount == 5) wlLED.setData(wlIndigoLEDBuffer);
-      if (skittleCount == 6) wlLED.setData(wlVioletLEDBuffer);
+      switch (skittleCount) {
+        case 0:
+          setActiveBuffer(wlRedLEDBuffer);
+          break;
+        case 1:
+          setActiveBuffer(wlOrangeLEDBuffer);
+          break;
+        case 2:
+          setActiveBuffer(wlYellowLEDBuffer);
+          break;
+        case 3:
+          setActiveBuffer(wlGreenLEDBuffer);
+          break;
+        case 4:
+          setActiveBuffer(wlBlueLEDBuffer);
+          break;
+        case 5:
+          setActiveBuffer(wlIndigoLEDBuffer);
+          break;
+        case 6:
+          setActiveBuffer(wlVioletLEDBuffer);
+          break;
+        default:
+          break;
+      }
     }
     if (timeStamp - blinkTime > 1.5) {
       blinkTime = 0.0;
@@ -498,9 +541,9 @@ public class IndicatorLight extends SubsystemBase {
       LED_State = currentColor_GOAL;
     }
     if (on) {
-      wlLED.setData(wlWhiteLEDBuffer);
+      setActiveBuffer(wlWhiteLEDBuffer);
     } else {
-      wlLED.setData(wlPurpleLEDBuffer);
+      setActiveBuffer(wlPurpleLEDBuffer);
     }
   }
 
@@ -583,7 +626,7 @@ public class IndicatorLight extends SubsystemBase {
     }
 
     // Apply LED updates
-    wlLED.setData(wlLEDBuffer);
+    setActiveBuffer(wlLEDBuffer);
   }
 
   private void setElevatorHeightEffect(CoralSystemPresets preset, Color brightColor) {
@@ -628,7 +671,7 @@ public class IndicatorLight extends SubsystemBase {
       wlLEDBuffer.setLED(i, brightColor);
     }
 
-    wlLED.setData(wlLEDBuffer);
+    setActiveBuffer(wlLEDBuffer);
   }
 
   /**
@@ -766,7 +809,7 @@ public class IndicatorLight extends SubsystemBase {
     wlLEDBuffer.setLED(half + pos, searchlightColor);
 
     // Send the updated buffer to the LED hardware.
-    wlLED.setData(wlLEDBuffer);
+    setActiveBuffer(wlLEDBuffer);
 
     // Increment the counter and reset the timer.
     counter++;
@@ -775,5 +818,47 @@ public class IndicatorLight extends SubsystemBase {
 
   public void toggleBranchAlignmentIndicator() {
     branchAlignmentOn = !branchAlignmentOn;
+  }
+
+  private void setActiveBuffer(AddressableLEDBuffer buffer) {
+    currentActiveBuffer = buffer;
+    wlLED.setData(buffer);
+  }
+
+  public void updateBlinkPeriod(double lateralError) {
+    // Clamp lateralError to be at least MIN_TOLERANCE_BLINK.
+    if (lateralError <= MIN_TOLERANCE_BLINK) {
+      currentBlinkPeriod = MIN_BLINK_PERIOD;
+    } else if (lateralError >= MAX_TOLERANCE_BLINK) {
+      currentBlinkPeriod = MAX_BLINK_PERIOD;
+    } else {
+      double fraction =
+          (lateralError - MIN_TOLERANCE_BLINK) / (MAX_TOLERANCE_BLINK - MIN_TOLERANCE_BLINK);
+      currentBlinkPeriod = MIN_BLINK_PERIOD + fraction * (MAX_BLINK_PERIOD - MIN_BLINK_PERIOD);
+    }
+    Logger.recordOutput("Alignment/Branch/DynamicBlink/currentBlinkPeriod", currentBlinkPeriod);
+  }
+
+  public void dynamicBlink() {
+    double timeStamp = Timer.getFPGATimestamp();
+
+    // Initialize timing if necessary.
+    if (blinkTime == 0.0) {
+      blinkTime = timeStamp;
+      lastTime = timeStamp;
+    }
+
+    // Check if it's time to toggle based on currentBlinkPeriod.
+    if (timeStamp - lastTime >= currentBlinkPeriod) {
+      on = !on;
+      lastTime = timeStamp;
+
+      // Show green when "on" and black when "off"
+      if (on) {
+        setActiveBuffer(wlGreenLEDBuffer);
+      } else {
+        setActiveBuffer(wlBlackLEDBuffer);
+      }
+    }
   }
 }

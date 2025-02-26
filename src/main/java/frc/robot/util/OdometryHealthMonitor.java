@@ -49,17 +49,17 @@ public class OdometryHealthMonitor {
     lastUpdateTime = currentTime;
 
     // Logging
-    Logger.recordOutput("OdometryHealth/HealthScore", odometryHealth);
-    Logger.recordOutput("OdometryHealth/Working", odometryWorking);
-    Logger.recordOutput("OdometryHealth/PoseFrozen", frozen);
-    Logger.recordOutput("OdometryHealth/PositionJump", jump);
-    Logger.recordOutput("OdometryHealth/IMUDrift", imuDrift);
-    Logger.recordOutput("OdometryHealth/VisionFailed", visionFailed);
-    Logger.recordOutput("OdometryHealth/CurrentPose", currentPose);
-    Logger.recordOutput("OdometryHealth/GyroHeading", gyroHeading);
-    Logger.recordOutput("OdometryHealth/OdometryHeading", odometryHeading);
-    Logger.recordOutput("OdometryHealth/CurrentVelocity", currentVelocity);
-    Logger.recordOutput("OdometryHealth/TagConfidence", tagConfidence);
+    Logger.recordOutput("Odometry/OdometryHealth/HealthScore", odometryHealth);
+    Logger.recordOutput("Odometry/OdometryHealth/Working", odometryWorking);
+    Logger.recordOutput("Odometry/OdometryHealth/PoseFrozen", frozen);
+    Logger.recordOutput("Odometry/OdometryHealth/PositionJump", jump);
+    Logger.recordOutput("Odometry/OdometryHealth/IMUDrift", imuDrift);
+    Logger.recordOutput("Odometry/OdometryHealth/VisionFailed", visionFailed);
+    Logger.recordOutput("Odometry/OdometryHealth/CurrentPose", currentPose);
+    Logger.recordOutput("Odometry/OdometryHealth/GyroHeading", gyroHeading);
+    Logger.recordOutput("Odometry/OdometryHealth/OdometryHeading", odometryHeading);
+    Logger.recordOutput("Odometry/OdometryHealth/CurrentVelocity", currentVelocity);
+    Logger.recordOutput("Odometry/OdometryHealth/TagConfidence", tagConfidence);
 
     return odometryWorking;
   }
