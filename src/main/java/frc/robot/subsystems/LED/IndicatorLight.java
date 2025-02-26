@@ -117,8 +117,11 @@ public class IndicatorLight extends SubsystemBase {
 
     wlYellowLEDBuffer =
         new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
-    for (var i = 0; i < wlYellowLEDBuffer.getLength(); i++) {
-      wlYellowLEDBuffer.setHSV(i, IndicatorLightConstants.YELLOW_HUE, 255, 128);
+    // for (var i = 0; i < wlYellowLEDBuffer.getLength(); i++) {
+    // wlYellowLEDBuffer.setHSV(i, IndicatorLightConstants.YELLOW_HUE, 255, 128);
+    // }
+    for (int i = 0; i < wlYellowLEDBuffer.getLength(); i++) {
+      wlYellowLEDBuffer.setLED(i, Color.kYellow);
     }
 
     wlBlueLEDBuffer =

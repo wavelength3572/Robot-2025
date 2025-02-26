@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.vision.VisionConstants;
 import java.util.Optional;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public final class BranchAlignmentUtils {
   private static final double FORWARD_THRESHOLD = 0.10;
 
   // Lateral thresholds for traffic-light style alignment.
-  private static final double LATERAL_THRESHOLD_RED = 0.80;
+  private static final double LATERAL_THRESHOLD_RED = 0.060;
   private static final double LATERAL_THRESHOLD_YELLOW = 0.030;
   // (Within LATERAL_THRESHOLD_YELLOW is considered GREEN.)
 
@@ -60,7 +61,14 @@ public final class BranchAlignmentUtils {
   public static BranchAlignmentStatus getBranchAlignmentStatus(Pose2d robotPose, int faceId) {
     // Retrieve the reef face pose directly from the AprilTag layout.
     Optional<Pose3d> reefFacePose3d = VisionConstants.aprilTagLayout.getTagPose(faceId);
-    if (!reefFacePose3d.isPresent()) {
+
+    // If we don't have a reef face or if we aren't  in a scoring position, then don't do this work.
+    if (!reefFacePose3d.isPresent()
+        || (!RobotStatus.haveCoral())
+        || (RobotStatus.getCurrentPreset() != CoralSystemPresets.L1
+            && RobotStatus.getCurrentPreset() != CoralSystemPresets.L2
+            && RobotStatus.getCurrentPreset() != CoralSystemPresets.L3
+            && RobotStatus.getCurrentPreset() != CoralSystemPresets.L4)) {
       Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.NONE.toString());
       return BranchAlignmentStatus.NONE;
     }
