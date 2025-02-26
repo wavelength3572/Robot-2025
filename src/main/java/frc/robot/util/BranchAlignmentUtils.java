@@ -26,9 +26,10 @@ public final class BranchAlignmentUtils {
   private static final double FORWARD_THRESHOLD = 0.10;
 
   // Lateral thresholds for traffic-light style alignment.
-  private static final double LATERAL_THRESHOLD_RED = 0.060;
-  private static final double LATERAL_THRESHOLD_YELLOW = 0.030;
-  // (Within LATERAL_THRESHOLD_YELLOW is considered GREEN.)
+  public static final double LATERAL_THRESHOLD_RED = 0.150;
+  public static final double LATERAL_THRESHOLD_YELLOW = 0.100; // below this make it green
+  public static final double LATERAL_THRESHOLD_SOLID_GREEN =
+      0.025; // this is only used to make the blinking solid
 
   // ----------------- OFFSET VALUES (meters) -----------------
   // Offsets for scoring positions relative to the AprilTag pose.
@@ -40,6 +41,8 @@ public final class BranchAlignmentUtils {
 
   @Getter
   public static BranchAlignmentStatus currentBranchAlignmentStatus = BranchAlignmentStatus.NONE;
+
+  @Getter public static double lateralErrorToNearestPole = Double.POSITIVE_INFINITY;
 
   private BranchAlignmentUtils() {
     // prevent instantiation
@@ -86,34 +89,38 @@ public final class BranchAlignmentUtils {
     Pose2d leftRelativePose = robotPose.relativeTo(leftScoringPose);
     Pose2d rightRelativePose = robotPose.relativeTo(rightScoringPose);
 
-    double leftForward = leftRelativePose.getTranslation().getX();
-    double leftLateral = leftRelativePose.getTranslation().getY();
-    double rightForward = rightRelativePose.getTranslation().getX();
-    double rightLateral = rightRelativePose.getTranslation().getY();
+    double leftForwardError = leftRelativePose.getTranslation().getX();
+    double leftLateralError = leftRelativePose.getTranslation().getY();
+    double rightForwardError = rightRelativePose.getTranslation().getX();
+    double rightLateralError = rightRelativePose.getTranslation().getY();
 
     // Log both sets of scoring data.
     Logger.recordOutput("Alignment/Branch/LeftScoringPose", leftScoringPose);
     Logger.recordOutput("Alignment/Branch/RightScoringPose", rightScoringPose);
-    Logger.recordOutput("Alignment/Branch/LeftForwardOffset", leftForward);
-    Logger.recordOutput("Alignment/Branch/LeftLateralOffset", leftLateral);
-    Logger.recordOutput("Alignment/Branch/RightForwardOffset", rightForward);
-    Logger.recordOutput("Alignment/Branch/RightLateralOffset", rightLateral);
+    Logger.recordOutput("Alignment/Branch/LeftForwardError", leftForwardError);
+    Logger.recordOutput("Alignment/Branch/LeftLateralError", leftLateralError);
+    Logger.recordOutput("Alignment/Branch/RightForwardError", rightForwardError);
+    Logger.recordOutput("Alignment/Branch/RightLateralError", rightLateralError);
 
     // Determine which scoring pose is closer to the robot.
     double leftDistance = robotPose.getTranslation().getDistance(leftScoringPose.getTranslation());
     double rightDistance =
         robotPose.getTranslation().getDistance(rightScoringPose.getTranslation());
+
     Pose2d chosenRelativePose;
     String chosenSide;
     if (leftDistance < rightDistance) {
       chosenRelativePose = leftRelativePose;
+      lateralErrorToNearestPole = Math.abs(leftLateralError);
       chosenSide = "Left";
     } else {
       chosenRelativePose = rightRelativePose;
+      lateralErrorToNearestPole = Math.abs(rightLateralError);
       chosenSide = "Right";
     }
 
     Logger.recordOutput("Alignment/Branch/ChosenSide", chosenSide);
+    Logger.recordOutput("Alignment/Branch/LateralErrorToChosenPole", lateralErrorToNearestPole);
 
     // Use the chosen relative pose to decide alignment.
     double forwardOffset = chosenRelativePose.getTranslation().getX();

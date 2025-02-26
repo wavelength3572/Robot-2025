@@ -17,11 +17,22 @@ import java.util.Random;
 import java.util.function.Supplier;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class IndicatorLight extends SubsystemBase {
 
   private LED_EFFECTS currentColor_GOAL = LED_EFFECTS.BLACK;
   private LED_EFFECTS LED_State = LED_EFFECTS.BLACK;
+
+  // Define constants for the blink period (in seconds)
+  private static final double MAX_BLINK_PERIOD = 0.5; // far from target, slow blink
+  private static final double MIN_BLINK_PERIOD = 0.001; // very close, fast blink
+
+  public static final double MIN_TOLERANCE_BLINK = 0.025; // below this, blink is at min period
+  public static final double MAX_TOLERANCE_BLINK = 0.100; // above this, blink is at max period
+
+  // Variable to hold the current blink period computed from the error
+  private double currentBlinkPeriod = MAX_BLINK_PERIOD;
 
   Supplier<CoralSystemPresets> getCurrentCoralPreset;
   Supplier<CoralSystemPresets> getSelectedCoralPreset;
@@ -195,6 +206,7 @@ public class IndicatorLight extends SubsystemBase {
       case EXPLOSION -> doExplosionEffect();
       case POLKADOT -> doPokadot();
       case SEARCH_LIGHT -> doSearchlightSingleEffect();
+      case DYNAMIC_BLINK -> dynamicBlink();
       case DRIVE_TO_REEF -> {} // TODO: Implement reef lighting logic
 
       default -> {}
@@ -206,11 +218,19 @@ public class IndicatorLight extends SubsystemBase {
   }
 
   private void updateBranchAlignmentLighting() {
+
+    double lateralError = BranchAlignmentUtils.getLateralErrorToNearestPole();
+    updateBlinkPeriod(lateralError);
+
     if (branchAlignmentOn) {
       BranchAlignmentStatus state = BranchAlignmentUtils.getCurrentBranchAlignmentStatus();
       switch (state) {
         case GREEN:
-          currentColor_GOAL = LED_EFFECTS.GREEN;
+          if (lateralError <= BranchAlignmentUtils.LATERAL_THRESHOLD_SOLID_GREEN) {
+            currentColor_GOAL = LED_EFFECTS.GREEN;
+          } else {
+            currentColor_GOAL = LED_EFFECTS.DYNAMIC_BLINK;
+          }
           break;
         case RED:
           currentColor_GOAL = LED_EFFECTS.RED;
@@ -803,5 +823,42 @@ public class IndicatorLight extends SubsystemBase {
   private void setActiveBuffer(AddressableLEDBuffer buffer) {
     currentActiveBuffer = buffer;
     wlLED.setData(buffer);
+  }
+
+  public void updateBlinkPeriod(double lateralError) {
+    // Clamp lateralError to be at least MIN_TOLERANCE_BLINK.
+    if (lateralError <= MIN_TOLERANCE_BLINK) {
+      currentBlinkPeriod = MIN_BLINK_PERIOD;
+    } else if (lateralError >= MAX_TOLERANCE_BLINK) {
+      currentBlinkPeriod = MAX_BLINK_PERIOD;
+    } else {
+      double fraction =
+          (lateralError - MIN_TOLERANCE_BLINK) / (MAX_TOLERANCE_BLINK - MIN_TOLERANCE_BLINK);
+      currentBlinkPeriod = MIN_BLINK_PERIOD + fraction * (MAX_BLINK_PERIOD - MIN_BLINK_PERIOD);
+    }
+    Logger.recordOutput("Alignment/Branch/DynamicBlink/currentBlinkPeriod", currentBlinkPeriod);
+  }
+
+  public void dynamicBlink() {
+    double timeStamp = Timer.getFPGATimestamp();
+
+    // Initialize timing if necessary.
+    if (blinkTime == 0.0) {
+      blinkTime = timeStamp;
+      lastTime = timeStamp;
+    }
+
+    // Check if it's time to toggle based on currentBlinkPeriod.
+    if (timeStamp - lastTime >= currentBlinkPeriod) {
+      on = !on;
+      lastTime = timeStamp;
+
+      // Show green when "on" and black when "off"
+      if (on) {
+        setActiveBuffer(wlGreenLEDBuffer);
+      } else {
+        setActiveBuffer(wlBlackLEDBuffer);
+      }
+    }
   }
 }

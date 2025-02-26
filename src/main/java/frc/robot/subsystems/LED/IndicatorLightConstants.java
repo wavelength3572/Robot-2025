@@ -37,7 +37,8 @@ public class IndicatorLightConstants {
     AUTO_SPEAKER_TARGETING,
     ELEVATOR_SELECTION_CHANGED,
     ELEVATOR_TARGET_CHANGED,
-    ELEVATOR_CURRENT_CHANGED
+    ELEVATOR_CURRENT_CHANGED,
+    DYNAMIC_BLINK
   }
 
   // Define an array with 20 chosen colors (as RGB values)

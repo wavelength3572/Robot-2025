@@ -11,6 +11,8 @@ import frc.robot.commands.*;
 import frc.robot.subsystems.coral.arm.Arm;
 import frc.robot.subsystems.coral.elevator.Elevator;
 import frc.robot.subsystems.coral.intake.Intake;
+import frc.robot.util.BranchAlignmentUtils;
+import frc.robot.util.BranchAlignmentUtils.BranchAlignmentStatus;
 import frc.robot.util.CoralRPStatusLogger;
 import frc.robot.util.ReefScoringLogger;
 import frc.robot.util.RobotStatus;
@@ -42,8 +44,6 @@ public class CoralSystem extends SubsystemBase {
   private static final double TIME_OF_FLIGHT_THRESHOLD = 1250; // adjust this constant as needed
 
   private double SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE = 1.5;
-  private double NEAR_REEF_DISTANCE = 1;
-
   private static final int MOVING_AVG_WINDOW = 10;
 
   @Getter private Elevator elevator;
@@ -52,8 +52,14 @@ public class CoralSystem extends SubsystemBase {
   @Getter private Intake intake;
 
   @Getter public boolean coralInRobot;
-  @Getter public boolean justNearReef;
-  @Getter public boolean justScored;
+
+  @Getter
+  @AutoLogOutput(key = "CoralSystem/justMissed")
+  public boolean justMissedCoralScoral;
+
+  @Getter
+  @AutoLogOutput(key = "CoralSystem/justScored")
+  public boolean justScoredCoral;
 
   @Getter
   @AutoLogOutput(key = "CoralSystem/safeToMoveArmAfterPickupFromStation")
@@ -90,9 +96,9 @@ public class CoralSystem extends SubsystemBase {
     timeOfFlight.setRangingMode(RangingMode.Short, 20);
 
     // try {
-    //   TimeUnit.SECONDS.sleep(1);
+    // TimeUnit.SECONDS.sleep(1);
     // } catch (InterruptedException e) {
-    //   Thread.currentThread().interrupt();
+    // Thread.currentThread().interrupt();
     // }
 
     this.arm.setInitialAngle(this.intake.get_Arm_TBE_DEG());
@@ -120,7 +126,6 @@ public class CoralSystem extends SubsystemBase {
     CoralRPStatusLogger.logCoralStatus(false);
 
     if (DriverStation.isEnabled()) {
-      automationTriggerChecks();
       checkAndStowOnCoralPickup();
     }
 
@@ -171,38 +176,6 @@ public class CoralSystem extends SubsystemBase {
 
     // check the score timer and stop the intake if its greater than a score time
     // threshold
-  }
-
-  private void automationTriggerChecks() {
-
-    boolean nearReef =
-        RobotStatus.getReefFaceSelection().getAcceptedDistance() < NEAR_REEF_DISTANCE;
-
-    Logger.recordOutput("Automation/justNearReef", justNearReef);
-    justNearReef = false;
-    Logger.recordOutput("Automation/justScored", justScored);
-    justScored = false;
-
-    if (DriverStation.isTeleop()
-        && nearReef
-        && coralInRobot
-        && currentCoralPreset == STOW
-        && coralSystemState == CoralSystemMovementState.STABLE) {
-      justNearReef = true;
-    }
-
-    if (DriverStation.isTeleop()
-        && !coralInRobot
-        && (currentCoralPreset != CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1
-            && currentCoralPreset != CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2)
-        && (currentCoralPreset == L1
-            || currentCoralPreset == L2
-            || currentCoralPreset == L3
-            || currentCoralPreset == L4)
-        && nearReef
-        && coralSystemState == CoralSystemMovementState.STABLE) {
-      justScored = true;
-    }
   }
 
   public void setTargetPreset(CoralSystemPresets preset) {
@@ -285,6 +258,8 @@ public class CoralSystem extends SubsystemBase {
       case WAITING_FOR_CORAL:
         // Look for a transition from not having coral to having coral.
         if (!previousCoralInRobot && coralInRobot) {
+          justMissedCoralScoral = false;
+          justScoredCoral = false;
           Logger.recordOutput(
               "CoralSystem/CoralPickupState",
               "Coral just received. Transitioning to CHECK_IF_NEAR_CORAL_STATION.");
@@ -336,6 +311,12 @@ public class CoralSystem extends SubsystemBase {
       case HAVE_CORAL_WAITING:
         // Wait until the robot no longer has a coral.
         if (!coralInRobot) {
+
+          if (BranchAlignmentUtils.getCurrentBranchAlignmentStatus()
+              == BranchAlignmentStatus.GREEN) {
+            justScoredCoral = true;
+          } else justMissedCoralScoral = true;
+
           safeToMoveArmAfterPickupFromStation = false;
           Logger.recordOutput(
               "CoralSystem/CoralPickupState",
