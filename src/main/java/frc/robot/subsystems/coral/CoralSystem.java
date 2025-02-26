@@ -241,7 +241,8 @@ public class CoralSystem extends SubsystemBase {
 
   public boolean isAtGoal() {
     boolean atTargetState =
-    coralSystemState == CoralSystemMovementState.STABLE && currentCoralPreset == targetCoralPreset;
+        coralSystemState == CoralSystemMovementState.STABLE
+            && currentCoralPreset == targetCoralPreset;
 
     boolean preppedForDislodge =
         ((currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1

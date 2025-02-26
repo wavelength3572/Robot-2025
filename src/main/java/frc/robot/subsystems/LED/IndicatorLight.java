@@ -15,6 +15,8 @@ import frc.robot.util.BranchAlignmentUtils.BranchAlignmentStatus;
 import frc.robot.util.RobotStatus;
 import java.util.Random;
 import java.util.function.Supplier;
+import lombok.Getter;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class IndicatorLight extends SubsystemBase {
 
@@ -64,7 +66,7 @@ public class IndicatorLight extends SubsystemBase {
   private final double updateInterval = 0.05; // Interval in seconds for updates
   private Supplier<Boolean> getIsCoralInRobot;
   private boolean pickupBlinkTriggered = false;
-  private boolean branchAlignmentOn = false;
+  @AutoLogOutput @Getter private boolean branchAlignmentOn = false;
 
   public void setupLightingSuppliers(
       Supplier<CoralSystemPresets> currentPreset,
@@ -199,20 +201,22 @@ public class IndicatorLight extends SubsystemBase {
   }
 
   private void updateBranchAlignmentLighting() {
-    BranchAlignmentStatus state = BranchAlignmentUtils.getCurrentBranchAlignmentStatus();
-    switch (state) {
-      case GREEN:
-        currentColor_GOAL = LED_EFFECTS.GREEN;
-        break;
-      case RED:
-        currentColor_GOAL = LED_EFFECTS.RED;
-        break;
-      case YELLOW:
-        currentColor_GOAL = LED_EFFECTS.YELLOW;
-        break;
-      case NONE:
-      default:
-        break;
+    if (branchAlignmentOn) {
+      BranchAlignmentStatus state = BranchAlignmentUtils.getCurrentBranchAlignmentStatus();
+      switch (state) {
+        case GREEN:
+          currentColor_GOAL = LED_EFFECTS.GREEN;
+          break;
+        case RED:
+          currentColor_GOAL = LED_EFFECTS.RED;
+          break;
+        case YELLOW:
+          currentColor_GOAL = LED_EFFECTS.YELLOW;
+          break;
+        case NONE:
+        default:
+          break;
+      }
     }
   }
 
@@ -769,7 +773,7 @@ public class IndicatorLight extends SubsystemBase {
     effectTimer.reset();
   }
 
-  public void toggleBranchAlignment() {
+  public void toggleBranchAlignmentIndicator() {
     branchAlignmentOn = !branchAlignmentOn;
   }
 }

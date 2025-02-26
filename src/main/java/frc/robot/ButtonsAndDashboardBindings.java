@@ -187,8 +187,8 @@ public class ButtonsAndDashboardBindings {
             }));
 
     SmartDashboard.putData(
-        "Toggle Vision Alignment",
-        Commands.runOnce(indicatorLight::toggleBranchAlignment).ignoringDisable(true));
+        "Toggle Branch Alignment Indicator",
+        Commands.runOnce(indicatorLight::toggleBranchAlignmentIndicator).ignoringDisable(true));
   }
 
   /****************************** */
