@@ -98,10 +98,18 @@ public class AlgaeIOSpark implements AlgaeIO {
   }
 
   @Override
-  public void setPIDValues(double kP, double kD) {
+  public void setDeployPIDValues(double kP, double kD) {
     final SparkMaxConfig config = new SparkMaxConfig();
     config.closedLoop.pidf(kP, 0.0, kD, 0.0);
     algaeDeployMotor.configure(
+        config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+  }
+
+  @Override
+  public void setCapturePIDValues(double kP, double kD) {
+    final SparkMaxConfig config = new SparkMaxConfig();
+    config.closedLoop.pidf(kP, 0.0, kD, 0.0);
+    algaeCaptureMotor.configure(
         config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 

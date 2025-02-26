@@ -44,7 +44,7 @@ public class CoralSystem extends SubsystemBase {
 
   private double SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE = 1.5;
   private double NEAR_REEF_DISTANCE = 1;
-  
+
   private static final int MOVING_AVG_WINDOW = 10;
 
   @Getter private Elevator elevator;
@@ -57,7 +57,6 @@ public class CoralSystem extends SubsystemBase {
   @Getter public boolean justScored;
 
   @Getter
-  @AutoLogOutput(key = "CoralSystem/safeToMoveArmAfterPickupFromStation")
   @AutoLogOutput(key = "CoralSystem/safeToMoveArmAfterPickupFromStation")
   public boolean safeToMoveArmAfterPickupFromStation;
 
@@ -100,7 +99,7 @@ public class CoralSystem extends SubsystemBase {
     this.arm.setInitialAngle(this.intake.get_Arm_TBE_DEG());
 
     // Puts the button/command on the dashboard to go to the choosed preset
-    SmartDashboard.putData("Set Coral Config", CoralSystemCommands.runPreset(this)); // 
+    SmartDashboard.putData("Set Coral Config", CoralSystemCommands.runPreset(this)); //
   }
 
   @Override
@@ -134,7 +133,8 @@ public class CoralSystem extends SubsystemBase {
         // Move Arm to Safe
         this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
         if (arm.getCurrentAngleDEG()
-            >= CoralSystemPresets.ARMSAFE.getArmAngle() - 1.0) { // Put in a 1 degree fudge factor
+            >= CoralSystemPresets.ARMSAFE.getArmAngle() - 1.0) { // Put in a 1 degree fudge
+          // factor
           coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
           // Start moving elevator
           this.elevator.setTargetPreset(targetCoralPreset);
@@ -174,22 +174,6 @@ public class CoralSystem extends SubsystemBase {
     // threshold
   }
 
-  public void setTargetPreset(CoralSystemPresets preset) {
-    // We are trying to go to a different location AND
-    // We ARE NOT Climbing AND
-    // We are not currently traveling to a location
-    if (preset != this.currentCoralPreset
-        && targetCoralPreset != CLIMB
-        && systemState == CoralSystemMovementState.STABLE) {
-      // We are allowed to move
-      this.targetCoralPreset = preset;
-      // Start Moving Arm to Safe
-      this.arm.setTargetPreset(CoralSystemPresets.STOW);
-      // Change state
-      systemState = CoralSystemMovementState.SAFE_ARM;
-    }
-  }
-
   private void automationTriggerChecks() {
 
     boolean nearReef =
@@ -223,7 +207,13 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public void setTargetPreset(CoralSystemPresets preset) {
-    if (preset != this.currentCoralPreset && targetCoralPreset != CLIMB) {
+    // We are trying to go to a different location AND
+    // We ARE NOT Climbing AND
+    // We are not currently traveling to a location
+    if (preset != this.currentCoralPreset
+        && targetCoralPreset != CLIMB
+        && coralSystemState == CoralSystemMovementState.STABLE) {
+      // We are allowed to move
       this.targetCoralPreset = preset;
       // Start Moving Arm to Safe
       this.arm.setTargetPreset(CoralSystemPresets.STOW);
@@ -233,7 +223,12 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public void setSimultaneousTargetPreset(CoralSystemPresets preset) {
-    if (preset != this.currentCoralPreset && targetCoralPreset != CLIMB) {
+    // We are trying to go to a different location AND
+    // We ARE NOT Climbing AND
+    // We are not currently traveling to a location
+    if (preset != this.currentCoralPreset
+        && targetCoralPreset != CLIMB
+        && coralSystemState == CoralSystemMovementState.STABLE) {
       this.targetCoralPreset = preset;
       coralSystemState = CoralSystemMovementState.MOVE_SIMULTANEOUS;
     }

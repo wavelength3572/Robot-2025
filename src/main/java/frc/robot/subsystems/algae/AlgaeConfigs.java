@@ -16,29 +16,29 @@ public final class AlgaeConfigs {
           .idleMode(IdleMode.kBrake)
           .smartCurrentLimit(AlgaeConstants.algaeCaptureCurrentLimit)
           .openLoopRampRate(.5)
+          .closedLoopRampRate(.25)
           .voltageCompensation(12);
+      algaeCaptureConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          // Set PID values for position control
+          .p(AlgaeConstants.kAlgaeCaptureKp)
+          .d(AlgaeConstants.kAlgaeCaptureKd)
+          .outputRange(-1, 1);
 
       algaeDeployConfig
           .idleMode(IdleMode.kBrake)
           .smartCurrentLimit(AlgaeConstants.algaeDeployCurrentLimit)
+          .openLoopRampRate(.5)
+          .closedLoopRampRate(.25)
           .voltageCompensation(12);
-
-      /*
-       * Configure the closed loop controller. We want to make sure we set the
-       * feedback sensor as the primary encoder.
-       */
       algaeDeployConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           // Set PID values for position control
           .p(AlgaeConstants.kAlgaeDeployKp)
           .d(AlgaeConstants.kAlgaeDeployKd)
-          .outputRange(-1, 1)
-          .maxMotion
-          // Set MAXMotion parameters for position control
-          .maxVelocity(AlgaeConstants.kAlgaeDeployVel)
-          .maxAcceleration(AlgaeConstants.kAlgaeDeployAcc)
-          .allowedClosedLoopError(AlgaeConstants.kAlgaeDeployAllowableError);
+          .outputRange(-1, 1);
     }
   }
 }

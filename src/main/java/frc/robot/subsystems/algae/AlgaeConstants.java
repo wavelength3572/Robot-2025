@@ -10,10 +10,10 @@ public class AlgaeConstants {
   public static final double algaeOutSpeed = -1.0;
 
   public static final double kAlgaeDeployKp = 0.0;
-  public static final double kAlgaeDeployKd = 0.00;
-  public static final double kAlgaeDeployVel = 100;
-  public static final double kAlgaeDeployAcc = 200;
-  public static final double kAlgaeDeployAllowableError = .01;
+  public static final double kAlgaeDeployKd = 0.0;
+
+  public static final double kAlgaeCaptureKp = 0.0;
+  public static final double kAlgaeCaptureKd = 0.0;
 
   public static final double kAlgaeDeployGearing = 7.5;
   public static final double kAlgaeDeployKf = .924; // Feedforward gain for gravity compensation

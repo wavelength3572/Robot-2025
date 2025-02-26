@@ -10,12 +10,16 @@ public class Algae extends SubsystemBase {
 
   private boolean isDeployClimberTriggered = false;
 
-  private static final LoggedTunableNumber AlgaekP =
+  private static final LoggedTunableNumber AlgaeDeploykP =
       new LoggedTunableNumber("Algae/kEp", AlgaeConstants.kAlgaeDeployKp);
-  private static final LoggedTunableNumber AlgaekD =
+  private static final LoggedTunableNumber AlgaeDeploykD =
       new LoggedTunableNumber("Algae/kEd", AlgaeConstants.kAlgaeDeployKd);
   private static final LoggedTunableNumber AlgaeTargetAngle =
       new LoggedTunableNumber("Algae/AlgaeTargetPosition", AlgaeConstants.kAlgaeDeployInitalAngle);
+  private static final LoggedTunableNumber AlgaeCapturekP =
+      new LoggedTunableNumber("Algae/kEp", AlgaeConstants.kAlgaeCaptureKp);
+  private static final LoggedTunableNumber AlgaeCapturekD =
+      new LoggedTunableNumber("Algae/kEd", AlgaeConstants.kAlgaeCaptureKd);
   private static final LoggedTunableNumber AlgaeDeployVolts =
       new LoggedTunableNumber("Algae/AlgaeDeployVolts", 0.0);
   private static final LoggedTunableNumber AlgaeIntakeVolts =
@@ -26,12 +30,16 @@ public class Algae extends SubsystemBase {
   }
 
   public void periodic() {
-    if (AlgaekP.hasChanged(hashCode()) || AlgaekD.hasChanged(hashCode())) {
-      io.setPIDValues(AlgaekP.get(), AlgaekD.get());
+    if (AlgaeDeploykP.hasChanged(hashCode()) || AlgaeDeploykD.hasChanged(hashCode())) {
+      io.setDeployPIDValues(AlgaeDeploykP.get(), AlgaeDeploykD.get());
     }
 
     if (AlgaeTargetAngle.hasChanged(hashCode())) {
       io.setDeployPositionAngle(AlgaeTargetAngle.get());
+    }
+
+    if (AlgaeCapturekP.hasChanged(hashCode()) || AlgaeCapturekD.hasChanged(hashCode())) {
+      io.setCapturePIDValues(AlgaeCapturekP.get(), AlgaeCapturekD.get());
     }
 
     if (AlgaeDeployVolts.hasChanged(hashCode())) {
@@ -39,7 +47,7 @@ public class Algae extends SubsystemBase {
     }
 
     if (AlgaeIntakeVolts.hasChanged(hashCode())) {
-      io.setDeployVolts(AlgaeIntakeVolts.get());
+      io.setIntakeVolts(AlgaeIntakeVolts.get());
     }
 
     io.updateInputs(inputs);
