@@ -240,8 +240,15 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public boolean isAtGoal() {
-    return coralSystemState == CoralSystemMovementState.STABLE
-        && currentCoralPreset == targetCoralPreset;
+    boolean atTargetState =
+        systemState == CoralSystemMovementState.STABLE && currentCoralPreset == targetCoralPreset;
+
+    boolean preppedForDislodge =
+        ((currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+                || currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2)
+            && systemState == CoralSystemMovementState.STABLE);
+
+    return atTargetState || preppedForDislodge;
   }
 
   @AutoLogOutput(key = "CoralSystem/Rear TOF")

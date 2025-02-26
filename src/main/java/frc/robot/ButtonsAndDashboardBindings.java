@@ -185,6 +185,10 @@ public class ButtonsAndDashboardBindings {
                 new ScoreCoralCommand(coralSystem.getIntake()).schedule();
               }
             }));
+
+    SmartDashboard.putData(
+        "Toggle Vision Alignment",
+        Commands.runOnce(indicatorLight::toggleBranchAlignment).ignoringDisable(true));
   }
 
   /****************************** */

@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.util.AlignmentUtils.ReefFaceSelection.PolePosition;
+import frc.robot.util.NewBranchTranslations;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -183,19 +184,33 @@ public final class FieldConstants {
   }
 
   // -------------- BLUE BRANCHES -----------------
-  public enum ReefBranchesBlue {
-    BRANCH_A_ID_18_FACE_1_POLE_A(new Translation2d(3.2385, 4.3807)),
-    BRANCH_B_ID_18_FACE_1_POLE_B(new Translation2d(3.2385, 4.0521)),
-    BRANCH_C_ID_17_FACE_6_POLE_A(new Translation2d(3.5566, 3.1201)),
-    BRANCH_D_ID_17_FACE_6_POLE_B(new Translation2d(3.7863, 2.9875)),
-    BRANCH_E_ID_22_FACE_5_POLE_A(new Translation2d(4.8075, 2.7652)),
-    BRANCH_F_ID_22_FACE_5_POLE_B(new Translation2d(5.0921, 2.9296)),
-    BRANCH_G_ID_21_FACE_4_POLE_A(new Translation2d(5.7402, 3.6711)),
-    BRANCH_H_ID_21_FACE_4_POLE_B(new Translation2d(5.7402, 3.9997)),
-    BRANCH_I_ID_20_FACE_3_POLE_A(new Translation2d(5.4220, 4.9317)),
-    BRANCH_J_ID_20_FACE_3_POLE_B(new Translation2d(5.168, 5.213)),
-    BRANCH_K_ID_19_FACE_2_POLE_A(new Translation2d(4.1712, 5.2866)),
-    BRANCH_L_ID_19_FACE_2_POLE_B(new Translation2d(3.8866, 5.1222));
+  public enum
+      ReefBranchesBlue { // this is the pose the robot needs to be at to score on these branches
+    // BRANCH_A_ID_18_FACE_1_POLE_A(new Translation2d(3.175, 4.360)),
+    // BRANCH_B_ID_18_FACE_1_POLE_B(new Translation2d(3.175, 4.067)),
+    // BRANCH_C_ID_17_FACE_6_POLE_A(new Translation2d(3.572, 3.036)),
+    // BRANCH_D_ID_17_FACE_6_POLE_B(new Translation2d(3.827, 2.895)),
+    // BRANCH_E_ID_22_FACE_5_POLE_A(new Translation2d(4.861, 2.714)),
+    // BRANCH_F_ID_22_FACE_5_POLE_B(new Translation2d(5.155, 2.906)),
+    // BRANCH_G_ID_21_FACE_4_POLE_A(new Translation2d(5.785, 3.694)),
+    // BRANCH_H_ID_21_FACE_4_POLE_B(new Translation2d(5.785, 4.040)),
+    // BRANCH_I_ID_20_FACE_3_POLE_A(new Translation2d(5.416, 5.001)),
+    // BRANCH_J_ID_20_FACE_3_POLE_B(new Translation2d(5.122, 5.168)),
+    // BRANCH_K_ID_19_FACE_2_POLE_A(new Translation2d(4.124, 5.330)),
+    // BRANCH_L_ID_19_FACE_2_POLE_B(new Translation2d(3.842, 5.159));
+
+    BRANCH_A_ID_18_FACE_1_POLE_A(NewBranchTranslations.getLeftBranchTranslation(18)),
+    BRANCH_B_ID_18_FACE_1_POLE_B(NewBranchTranslations.getRightBranchTranslation(18)),
+    BRANCH_C_ID_17_FACE_6_POLE_A(NewBranchTranslations.getLeftBranchTranslation(17)),
+    BRANCH_D_ID_17_FACE_6_POLE_B(NewBranchTranslations.getRightBranchTranslation(17)),
+    BRANCH_E_ID_22_FACE_5_POLE_A(NewBranchTranslations.getLeftBranchTranslation(22)),
+    BRANCH_F_ID_22_FACE_5_POLE_B(NewBranchTranslations.getRightBranchTranslation(22)),
+    BRANCH_G_ID_21_FACE_4_POLE_A(NewBranchTranslations.getLeftBranchTranslation(21)),
+    BRANCH_H_ID_21_FACE_4_POLE_B(NewBranchTranslations.getRightBranchTranslation(21)),
+    BRANCH_I_ID_20_FACE_3_POLE_A(NewBranchTranslations.getLeftBranchTranslation(20)),
+    BRANCH_J_ID_20_FACE_3_POLE_B(NewBranchTranslations.getRightBranchTranslation(20)),
+    BRANCH_K_ID_19_FACE_2_POLE_A(NewBranchTranslations.getLeftBranchTranslation(19)),
+    BRANCH_L_ID_19_FACE_2_POLE_B(NewBranchTranslations.getRightBranchTranslation(19));
 
     private final Translation2d branchTranslation;
 
@@ -309,28 +324,28 @@ public final class FieldConstants {
   public enum ReefFacesRed {
     FACE_6(
         6,
-        ReefBranchesRed.BRANCH_L_ID_6_FACE_2_POLE_B,
-        ReefBranchesRed.BRANCH_K_ID_6_FACE_2_POLE_A),
+        ReefBranchesRed.BRANCH_K_ID_6_FACE_2_POLE_A,
+        ReefBranchesRed.BRANCH_L_ID_6_FACE_2_POLE_B),
     FACE_7(
         7,
-        ReefBranchesRed.BRANCH_B_ID_7_FACE_1_POLE_B,
-        ReefBranchesRed.BRANCH_A_ID_7_FACE_1_POLE_A),
+        ReefBranchesRed.BRANCH_A_ID_7_FACE_1_POLE_A,
+        ReefBranchesRed.BRANCH_B_ID_7_FACE_1_POLE_B),
     FACE_8(
         8,
-        ReefBranchesRed.BRANCH_D_ID_8_FACE_6_POLE_B,
-        ReefBranchesRed.BRANCH_C_ID_8_FACE_6_POLE_A),
+        ReefBranchesRed.BRANCH_C_ID_8_FACE_6_POLE_A,
+        ReefBranchesRed.BRANCH_D_ID_8_FACE_6_POLE_B),
     FACE_9(
         9,
         ReefBranchesRed.BRANCH_F_ID_9_FACE_5_POLE_B,
         ReefBranchesRed.BRANCH_E_ID_9_FACE_5_POLE_A),
     FACE_10(
         10,
-        ReefBranchesRed.BRANCH_H_ID_10_FACE_4_POLE_B,
-        ReefBranchesRed.BRANCH_G_ID_10_FACE_4_POLE_A),
+        ReefBranchesRed.BRANCH_G_ID_10_FACE_4_POLE_A,
+        ReefBranchesRed.BRANCH_H_ID_10_FACE_4_POLE_B),
     FACE_11(
         11,
-        ReefBranchesRed.BRANCH_J_ID_11_FACE_3_POLE_B,
-        ReefBranchesRed.BRANCH_I_ID_11_FACE_3_POLE_A);
+        ReefBranchesRed.BRANCH_I_ID_11_FACE_3_POLE_A,
+        ReefBranchesRed.BRANCH_J_ID_11_FACE_3_POLE_B);
 
     private final int faceId;
     private final ReefBranchesRed leftPole;

@@ -103,9 +103,9 @@ public class PathPlannerCommands {
 
       autoPathConditionals.add(
           new AutoPathConditional(
-              "StationLeft-2B-High-OR-1A-Low",
-              PathPlannerPath.fromPathFile("StationLeft-2B-High"),
-              PathPlannerPath.fromPathFile("StationLeft-1A-Low"),
+              "StationLeft-2B-High-FAST-OR-1A-Low-FAST",
+              PathPlannerPath.fromPathFile("StationLeft-2B-High-FAST"),
+              PathPlannerPath.fromPathFile("StationLeft-1A-Low-FAST"),
               coralSystem));
 
       // Register each combination as a NamedCommand

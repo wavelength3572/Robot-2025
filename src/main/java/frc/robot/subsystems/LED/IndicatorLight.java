@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.LED.IndicatorLightConstants.LED_EFFECTS;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.util.AlignmentUtils;
+import frc.robot.util.BranchAlignmentUtils;
+import frc.robot.util.BranchAlignmentUtils.BranchAlignmentStatus;
 import frc.robot.util.RobotStatus;
 import java.util.Random;
 import java.util.function.Supplier;
@@ -62,6 +64,7 @@ public class IndicatorLight extends SubsystemBase {
   private final double updateInterval = 0.05; // Interval in seconds for updates
   private Supplier<Boolean> getIsCoralInRobot;
   private boolean pickupBlinkTriggered = false;
+  private boolean branchAlignmentOn = false;
 
   public void setupLightingSuppliers(
       Supplier<CoralSystemPresets> currentPreset,
@@ -153,6 +156,7 @@ public class IndicatorLight extends SubsystemBase {
   public void periodic() {
 
     updateElevatorLightingState();
+    updateBranchAlignmentLighting();
 
     if (RobotStatus.isClimbingFinished()) currentColor_GOAL = LED_EFFECTS.SEGMENTPARTY;
 
@@ -194,7 +198,23 @@ public class IndicatorLight extends SubsystemBase {
     publishLEDsToDashboardFlipped("StripA", wlLEDBuffer);
   }
 
-  private void updateClimbLighting() {}
+  private void updateBranchAlignmentLighting() {
+    BranchAlignmentStatus state = BranchAlignmentUtils.getCurrentBranchAlignmentStatus();
+    switch (state) {
+      case GREEN:
+        currentColor_GOAL = LED_EFFECTS.GREEN;
+        break;
+      case RED:
+        currentColor_GOAL = LED_EFFECTS.RED;
+        break;
+      case YELLOW:
+        currentColor_GOAL = LED_EFFECTS.YELLOW;
+        break;
+      case NONE:
+      default:
+        break;
+    }
+  }
 
   /**
    * Publishes the colors from an AddressableLEDBuffer of length 20 to the SmartDashboard as a
@@ -620,7 +640,8 @@ public class IndicatorLight extends SubsystemBase {
     CoralSystemPresets targetPreset = getTargetCoralPreset.get();
 
     // If we're in STARTUP, do nothing else
-    if (currentPreset.equals(CoralSystemPresets.STARTUP)) {
+    if (currentPreset.equals(CoralSystemPresets.STARTUP)
+        || BranchAlignmentUtils.getCurrentBranchAlignmentStatus() != BranchAlignmentStatus.NONE) {
       return;
     }
 
@@ -746,5 +767,9 @@ public class IndicatorLight extends SubsystemBase {
     // Increment the counter and reset the timer.
     counter++;
     effectTimer.reset();
+  }
+
+  public void toggleBranchAlignment() {
+    branchAlignmentOn = !branchAlignmentOn;
   }
 }
