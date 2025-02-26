@@ -16,7 +16,6 @@ import frc.robot.util.ReefScoringLogger;
 import frc.robot.util.RobotStatus;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -90,11 +89,11 @@ public class CoralSystem extends SubsystemBase {
     this.intake = intake;
     timeOfFlight.setRangingMode(RangingMode.Short, 20);
 
-    try {
-      TimeUnit.SECONDS.sleep(1);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
+    // try {
+    //   TimeUnit.SECONDS.sleep(1);
+    // } catch (InterruptedException e) {
+    //   Thread.currentThread().interrupt();
+    // }
 
     this.arm.setInitialAngle(this.intake.get_Arm_TBE_DEG());
 
@@ -241,7 +240,8 @@ public class CoralSystem extends SubsystemBase {
 
   public boolean isAtGoal() {
     boolean atTargetState =
-    coralSystemState == CoralSystemMovementState.STABLE && currentCoralPreset == targetCoralPreset;
+        coralSystemState == CoralSystemMovementState.STABLE
+            && currentCoralPreset == targetCoralPreset;
 
     boolean preppedForDislodge =
         ((currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.algae;
 
+import frc.robot.subsystems.algae.AlgaeConstants.algaeIntakeState;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface AlgaeIO {
@@ -11,12 +12,16 @@ public interface AlgaeIO {
     public double captureVelocityRPM = 0.0;
     public double captureAppliedVolts = 0.0;
     public double captureCurrentAmps = 0.0;
+    public double captureEncRotations = 0.0; // Current capture encoder rotations
+    public double captureTargetRotations = 0.0;
 
     // Deploy Motor Values (Tracked in Both Degrees and Rotations)
-    public double encoderRotations = 0.0; // Current deploy encoder rotations
+    public double deployEncRotations = 0.0; // Current deploy encoder rotations
     public double currentAngle = 0.0;
     public double targetEncoderRotations = 0.0; // Target encoder rotations
     public double targetAngle = 0.0;
+
+    public algaeIntakeState currentIntakeState = algaeIntakeState.OFF;
 
     // Feedforward and Control Values
     public double armArbFF = 0.0; // Raw feedforward value

@@ -141,7 +141,7 @@ public class ButtonsAndDashboardBindings {
         "Deploy Algae Collector",
         Commands.runOnce( // this is the collect algae - YELLOW INTAKE BUTTON
             () -> {
-              algae.deployAlgae(); // deploy the algae mechanism
+              // algae.deployAlgae(); // deploy the algae mechanism
               algae.pullAlgae();
             }));
 

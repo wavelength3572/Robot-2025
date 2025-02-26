@@ -11,19 +11,19 @@ public class Algae extends SubsystemBase {
   private boolean isDeployClimberTriggered = false;
 
   private static final LoggedTunableNumber AlgaeDeploykP =
-      new LoggedTunableNumber("Algae/kEp", AlgaeConstants.kAlgaeDeployKp);
+      new LoggedTunableNumber("Algae/kADp", AlgaeConstants.kAlgaeDeployKp);
   private static final LoggedTunableNumber AlgaeDeploykD =
-      new LoggedTunableNumber("Algae/kEd", AlgaeConstants.kAlgaeDeployKd);
+      new LoggedTunableNumber("Algae/kADd", AlgaeConstants.kAlgaeDeployKd);
   private static final LoggedTunableNumber AlgaeTargetAngle =
       new LoggedTunableNumber("Algae/AlgaeTargetPosition", AlgaeConstants.kAlgaeDeployInitalAngle);
   private static final LoggedTunableNumber AlgaeCapturekP =
-      new LoggedTunableNumber("Algae/kEp", AlgaeConstants.kAlgaeCaptureKp);
+      new LoggedTunableNumber("Algae/kACp", AlgaeConstants.kAlgaeCaptureKp);
   private static final LoggedTunableNumber AlgaeCapturekD =
-      new LoggedTunableNumber("Algae/kEd", AlgaeConstants.kAlgaeCaptureKd);
+      new LoggedTunableNumber("Algae/kACd", AlgaeConstants.kAlgaeCaptureKd);
   private static final LoggedTunableNumber AlgaeDeployVolts =
       new LoggedTunableNumber("Algae/AlgaeDeployVolts", 0.0);
   private static final LoggedTunableNumber AlgaeIntakeVolts =
-      new LoggedTunableNumber("Algae/AlgaeDeployVolts", 0.0);
+      new LoggedTunableNumber("Algae/AlgaeIntakeVolts", 0.0);
 
   public Algae(AlgaeIO io) {
     this.io = io;

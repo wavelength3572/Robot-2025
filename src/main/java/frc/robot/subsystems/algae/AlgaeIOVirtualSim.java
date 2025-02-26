@@ -21,7 +21,7 @@ public class AlgaeIOVirtualSim implements AlgaeIO {
     inputs.targetAngle = this.algaeTargetDEG;
     inputs.currentAngle = virtualEncoderRotations * 360.0 / AlgaeConstants.kAlgaeDeployGearing;
     inputs.targetEncoderRotations = targetEncoderRotations;
-    inputs.encoderRotations = virtualEncoderRotations;
+    // inputs.encoderRotations = virtualEncoderRotations;
 
     // Simulate the applied voltage (this is just stored for logging/simulation
     // purposes)
