@@ -83,29 +83,29 @@ public class PathPlannerCommands {
       autoPathConditionals.add(
           new AutoPathConditional(
               "StationLeft-1A-High-OR-1A-Low",
-              PathPlannerPath.fromPathFile("StationLeft-1A-High"),
-              PathPlannerPath.fromPathFile("StationLeft-1A-Low"),
+              PathPlannerPath.fromPathFile("StationLeft-1AHigh"),
+              PathPlannerPath.fromPathFile("StationLeft-1ALow"),
               coralSystem));
 
       autoPathConditionals.add(
           new AutoPathConditional(
               "StationLeft-1B-High-OR-1B-Low",
-              PathPlannerPath.fromPathFile("StationLeft-1B-High"),
-              PathPlannerPath.fromPathFile("StationLeft-1B-Low"),
+              PathPlannerPath.fromPathFile("StationLeft-1BHigh"),
+              PathPlannerPath.fromPathFile("StationLeft-1BLow"),
               coralSystem));
 
       autoPathConditionals.add(
           new AutoPathConditional(
               "StationLeft-2A-High-OR-1A-Low",
-              PathPlannerPath.fromPathFile("StationLeft-2A-High"),
-              PathPlannerPath.fromPathFile("StationLeft-1A-Low"),
+              PathPlannerPath.fromPathFile("StationLeft-2AHigh"),
+              PathPlannerPath.fromPathFile("StationLeft-1ALow"),
               coralSystem));
 
       autoPathConditionals.add(
           new AutoPathConditional(
-              "StationLeft-2B-High-FAST-OR-1A-Low-FAST",
-              PathPlannerPath.fromPathFile("StationLeft-2B-High-FAST"),
-              PathPlannerPath.fromPathFile("StationLeft-1A-Low-FAST"),
+              "StationLeft-2B-High-OR-1A-Low",
+              PathPlannerPath.fromPathFile("StationLeft-2BHigh"),
+              PathPlannerPath.fromPathFile("StationLeft-1ALow"),
               coralSystem));
 
       // Register each combination as a NamedCommand

@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "3B-StationLeft-Fast"
+            "pathName": "3B-StationLeft"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StationLeft-2A-High-FAST"
+            "pathName": "StationLeft-2AHigh"
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "2A-StationLeft-FAST"
+            "pathName": "2A-StationLeft"
           }
         },
         {
@@ -55,7 +55,7 @@
         {
           "type": "named",
           "data": {
-            "name": "StationLeft-2B-High-FAST-OR-1A-Low-FAST"
+            "name": "StationLeft-2B-High-OR-1A-Low"
           }
         }
       ]
