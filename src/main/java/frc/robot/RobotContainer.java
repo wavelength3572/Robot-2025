@@ -16,8 +16,11 @@ package frc.robot;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PathPlannerCommands;
 import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
@@ -47,6 +50,8 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.OdometryHealthMonitor;
 import frc.robot.util.RobotStatus;
 import frc.robot.util.Visualizer;
+import java.util.Comparator;
+import java.util.stream.Stream;
 import lombok.Getter;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -70,7 +75,6 @@ public class RobotContainer {
   private final IndicatorLight indicatorLight;
   private OperatorInterface oi = new OperatorInterface() {};
   private LoggedDashboardChooser<Command> autoChooser;
-  private LoggedDashboardChooser<Command> competitionAutoChooser;
 
   @Getter private final OdometryHealthMonitor odometryHealthMonitor;
 
@@ -217,65 +221,41 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     // return autoChooser.get();
-    return competitionAutoChooser.get(); // use the Lake City Auto Chooser
+    return autoChooser.get(); // use the Lake City Auto Chooser
   }
 
   public void SetupAutoChooser() {
 
-    // **LAKE CITY AUTO CHOOSER */
+    autoChooser =
+        new LoggedDashboardChooser<>(
+            "Auto Chooser",
+            AutoBuilder.buildAutoChooserWithOptionsModifier(
+                "compDefaultMoveOnly",
+                stream -> {
+                  Stream<PathPlannerAuto> modified =
+                      Constants.isCompetition
+                          ? stream.filter(auto -> auto.getName().startsWith("comp"))
+                          : stream;
+                  return modified.sorted(Comparator.comparing(PathPlannerAuto::getName));
+                }));
 
-    competitionAutoChooser = new LoggedDashboardChooser<>("Lake City Autos");
-
-    // Default Move Only
-    competitionAutoChooser.addDefaultOption(
-        "DefaultMoveOnly", AutoBuilder.buildAuto("DefaultMoveOnly"));
-
-    // Mid
-    competitionAutoChooser.addOption(
-        "Mid-4AHigh-Dislodge", AutoBuilder.buildAuto("Mid-4AHigh-Dislodge"));
-
-    // Cage 2
-    competitionAutoChooser.addOption( // Score 2 - conditional
-        "Score2-Cage2-3BHigh-2BHigh-OR-1ALow",
-        AutoBuilder.buildAuto("Score2-Cage2-3BHigh-2BHigh-OR-1ALow"));
-
-    // Cage5
-    competitionAutoChooser.addOption( //  Score 2 - conditional
-        "Score2-Cage5-5AHigh-6AHigh-OR-1ALow",
-        AutoBuilder.buildAuto("Score2-Cage5-5AHigh-6AHigh-OR-1ALow"));
-
-    // Safe Option
-    competitionAutoChooser.addOption("Cage1Wall-3ALow", AutoBuilder.buildAuto("Cage1Wall-3ALow"));
-
-    // Experimental Score3-Cage2
-    competitionAutoChooser.addOption( // Score 3 - conditional
-        "Score3-Cage2-3BHigh-2AHigh-2BHighOR1ALow",
-        AutoBuilder.buildAuto("Score3-Cage2-3BHigh-2AHigh-2BHighOR1ALow"));
-
-    // Experimental Score3-Cage5
-    competitionAutoChooser.addOption( // Score 3 - conditional
-        "Score3-Cage5-5AHigh-6AHigh-6BHighOR1ALow",
-        AutoBuilder.buildAuto("Score3-Cage5-5AHigh-6AHigh-6BHighOR1ALow"));
-
-    // **REAL AUTO CHOOSER */
-
-    // Set up auto routines
-    // autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-    // // Set up SysId routines
-    // autoChooser.addOption(
-    //     "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    // autoChooser.addOption(
-    //     "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    // autoChooser.addOption(
-    //     "Drive SysId (Quasistatic Forward)",
-    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Drive SysId (Quasistatic Reverse)",
-    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // autoChooser.addOption(
-    //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // add these if we aren't at competition
+    if (!Constants.isCompetition) {
+      // Set up SysId routines
+      autoChooser.addOption(
+          "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+      autoChooser.addOption(
+          "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+      autoChooser.addOption(
+          "Drive SysId (Quasistatic Forward)",
+          drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      autoChooser.addOption(
+          "Drive SysId (Quasistatic Reverse)",
+          drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      autoChooser.addOption(
+          "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      autoChooser.addOption(
+          "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    }
   }
 }
