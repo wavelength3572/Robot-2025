@@ -27,19 +27,19 @@ public class Elevator {
   }
 
   public void periodic() {
-    if (ElevatorkP.hasChanged(hashCode())
-        || ElevatorkD.hasChanged(hashCode())
-        || ElevatorVel.hasChanged(hashCode())
-        || ElevatorAcc.hasChanged(hashCode())) {
-      io.setPIDValues(ElevatorkP.get(), ElevatorkD.get(), ElevatorVel.get(), ElevatorAcc.get());
-    }
+    // if (ElevatorkP.hasChanged(hashCode())
+    //     || ElevatorkD.hasChanged(hashCode())
+    //     || ElevatorVel.hasChanged(hashCode())
+    //     || ElevatorAcc.hasChanged(hashCode())) {
+    //   io.setPIDValues(ElevatorkP.get(), ElevatorkD.get(), ElevatorVel.get(), ElevatorAcc.get());
+    // }
     // if (ElevatorPosInches.hasChanged(hashCode()) ||
     // ElevatorkF.hasChanged(hashCode())) {
     // setPosition(ElevatorPosInches.get(), ElevatorkF.get());
     // }
-    if (ElevatorPosInches.hasChanged(hashCode())) {
-      setPositionInches(ElevatorPosInches.get());
-    }
+    // if (ElevatorPosInches.hasChanged(hashCode())) {
+    //   setPositionInches(ElevatorPosInches.get());
+    // }
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
   }

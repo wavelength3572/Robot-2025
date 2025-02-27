@@ -10,12 +10,6 @@ public class Algae extends SubsystemBase {
 
   private boolean isDeployClimberTriggered = false;
 
-  private static final LoggedTunableNumber AlgaeDeploykP =
-      new LoggedTunableNumber("Algae/kADp", AlgaeConstants.kAlgaeDeployKp);
-  private static final LoggedTunableNumber AlgaeDeploykD =
-      new LoggedTunableNumber("Algae/kADd", AlgaeConstants.kAlgaeDeployKd);
-  private static final LoggedTunableNumber AlgaeTargetAngle =
-      new LoggedTunableNumber("Algae/AlgaeTargetPosition", AlgaeConstants.kAlgaeDeployInitalAngle);
   private static final LoggedTunableNumber AlgaeCapturekP =
       new LoggedTunableNumber("Algae/kACp", AlgaeConstants.kAlgaeCaptureKp);
   private static final LoggedTunableNumber AlgaeCapturekD =
@@ -30,25 +24,18 @@ public class Algae extends SubsystemBase {
   }
 
   public void periodic() {
-    if (AlgaeDeploykP.hasChanged(hashCode()) || AlgaeDeploykD.hasChanged(hashCode())) {
-      io.setDeployPIDValues(AlgaeDeploykP.get(), AlgaeDeploykD.get());
-    }
 
-    if (AlgaeTargetAngle.hasChanged(hashCode())) {
-      io.setDeployPositionAngle(AlgaeTargetAngle.get());
-    }
+    // if (AlgaeCapturekP.hasChanged(hashCode()) || AlgaeCapturekD.hasChanged(hashCode())) {
+    //   io.setCapturePIDValues(AlgaeCapturekP.get(), AlgaeCapturekD.get());
+    // }
 
-    if (AlgaeCapturekP.hasChanged(hashCode()) || AlgaeCapturekD.hasChanged(hashCode())) {
-      io.setCapturePIDValues(AlgaeCapturekP.get(), AlgaeCapturekD.get());
-    }
+    // if (AlgaeDeployVolts.hasChanged(hashCode())) {
+    //   io.setDeployVolts(AlgaeDeployVolts.get());
+    // }
 
-    if (AlgaeDeployVolts.hasChanged(hashCode())) {
-      io.setDeployVolts(AlgaeDeployVolts.get());
-    }
-
-    if (AlgaeIntakeVolts.hasChanged(hashCode())) {
-      io.setIntakeVolts(AlgaeIntakeVolts.get());
-    }
+    // if (AlgaeIntakeVolts.hasChanged(hashCode())) {
+    //   io.setIntakeVolts(AlgaeIntakeVolts.get());
+    // }
 
     io.updateInputs(inputs);
     Logger.processInputs("Algae", inputs);
@@ -75,32 +62,9 @@ public class Algae extends SubsystemBase {
     }
   }
 
-  public void stopAlgae() {
-    io.stopAlgae();
-  }
-
-  public double getCurrentSpeedRPM() {
-    return io.getCurrentSpeedRPM();
-  }
-
-  // Deploy Motor Methods
-  public void deployAlgae() {
-    if (!isDeployClimberTriggered) {
-      io.deployAlgae();
-    }
-  }
-
   public void stowAlgae() {
     if (!isDeployClimberTriggered) {
       io.stowAlgae();
-    }
-  }
-
-  public void setDeployPositionAngle(double angle) {
-    if (!isDeployClimberTriggered) {
-      if (angle >= AlgaeConstants.MIN_ANGLE && angle <= AlgaeConstants.MAX_ANGLE) {
-        io.setDeployPositionAngle(angle);
-      }
     }
   }
 
@@ -109,7 +73,8 @@ public class Algae extends SubsystemBase {
   }
 
   public void deployClimberTriggered() {
-    deployAlgae(); // deploy the algae before we disable the ability to do so
+    // The climb switch was switched
+    io.algaeInClimbPosition();
     isDeployClimberTriggered = true;
   }
 }

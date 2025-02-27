@@ -180,8 +180,7 @@ public class RobotContainer {
             arm::getCurrentAngleDEG,
             coralSystem::isCoralInRobot,
             algae::isAlgaeInRobot,
-            algae::getDeployPositionAngle,
-            algae::getCurrentSpeedRPM);
+            algae::getDeployPositionAngle);
 
     odometryHealthMonitor = new OdometryHealthMonitor(drive, vision);
 
@@ -194,7 +193,7 @@ public class RobotContainer {
     }
 
     // give static access to certain methods across subsystems
-    RobotStatus.initialize(drive, coralSystem, vision, climber);
+    RobotStatus.initialize(drive, coralSystem, vision, climber, algae);
 
     PathPlannerCommands.Setup(coralSystem, drive, vision);
     SetupAutoChooser();

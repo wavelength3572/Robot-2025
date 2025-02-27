@@ -13,7 +13,6 @@ import frc.robot.commands.NamedCommands.ScoreCoralCommand;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
 import frc.robot.subsystems.algae.Algae;
-import frc.robot.subsystems.algae.AlgaeConstants;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
@@ -125,23 +124,10 @@ public class ButtonsAndDashboardBindings {
         "Toggle Cage Alignment Mode",
         Commands.runOnce(drive.getStrategyManager()::toggleAutoCageAlignmentMode));
 
-    // Algae Deploy Angle Control (Adjust arm angle)
-    SmartDashboard.putNumber("Set Algae Rotation Target", 0.0); // Default to 0 degrees
-    SmartDashboard.putData(
-        "Apply Algae Rotation Target",
-        Commands.runOnce(
-            () -> {
-              double angle =
-                  SmartDashboard.getNumber(
-                      "Set Algae Angle Target", AlgaeConstants.kAlgaeDeployInitalAngle);
-              algae.setDeployPositionAngle(angle);
-            }));
-
     SmartDashboard.putData(
         "Deploy Algae Collector",
         Commands.runOnce( // this is the collect algae - YELLOW INTAKE BUTTON
             () -> {
-              // algae.deployAlgae(); // deploy the algae mechanism
               algae.pullAlgae();
             }));
 
@@ -150,14 +136,6 @@ public class ButtonsAndDashboardBindings {
         Commands.runOnce( // this is the process algae button
             () -> {
               algae.pushAlgae(); // run algae intake
-            }));
-
-    SmartDashboard.putData(
-        "Stow Algae",
-        Commands.runOnce( // this is the process algae button
-            () -> {
-              algae.stowAlgae(); // does mechanism need to move?
-              algae.stopAlgae(); // run algae intake
             }));
 
     SmartDashboard.putData(
@@ -276,26 +254,24 @@ public class ButtonsAndDashboardBindings {
 
     oi.getButtonBox1Button8().onTrue(Commands.runOnce(climber::climb));
 
-    // oi.getButtonBox1Button6()
-    // .onTrue(
-    // Commands.runOnce( // this is the collect algae - YELLOW INTAKE BUTTON
-    // () -> {
-    // algae.deployAlgae(); // deploy the algae mechanism
-    // algae.pullAlgae();
-    // }));
+    oi.getButtonBox1Button6()
+        .onTrue(
+            Commands.runOnce( // this is the collect algae - YELLOW INTAKE BUTTON
+                () -> {
+                  algae.pullAlgae();
+                }));
 
-    // oi.getButtonBox1Button5()
-    // .onTrue(
-    // Commands.runOnce( // this is the process algae button
-    // () -> {
-    // algae.pushAlgae(); // run algae intake
-    // }))
-    // .onFalse(
-    // Commands.runOnce( // this is the process algae button
-    // () -> {
-    // algae.stowAlgae(); // does mechanism need to move?
-    // algae.stopAlgae(); // run algae intake
-    // }));
+    oi.getButtonBox1Button5()
+        .onTrue(
+            Commands.runOnce( // this is the process algae button
+                () -> {
+                  algae.pushAlgae(); // run algae intake
+                }))
+        .onFalse(
+            Commands.runOnce( // this is the process algae button
+                () -> {
+                  algae.stowAlgae(); // does mechanism need to move?
+                }));
 
     oi.getButtonBox1YAxisPositive()
         .onTrue(Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L1))); // L1

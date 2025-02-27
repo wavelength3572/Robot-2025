@@ -90,8 +90,8 @@ public final class VisionConstants {
       new Transform3d( // new camera 2-23-2025
           -0.273075,
           -0.088951,
-          0.740613,
-          new Rotation3d(0.0, Math.toRadians(-20), Math.toRadians(180)));
+          0.74201,
+          new Rotation3d(0.0, Math.toRadians(-38), Math.toRadians(180)));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;

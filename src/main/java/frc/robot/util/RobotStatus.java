@@ -1,6 +1,7 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.subsystems.algae.Algae;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
@@ -14,13 +15,16 @@ public class RobotStatus {
   private static CoralSystem coralSystem;
   private static Vision visionSystem;
   private static Climber climberSystem;
+  private static Algae algaeSystem;
 
   // Called once from RobotContainer to initialize with the actual Drive instance
-  public static void initialize(Drive drive, CoralSystem coral, Vision vision, Climber climber) {
+  public static void initialize(
+      Drive drive, CoralSystem coral, Vision vision, Climber climber, Algae algae) {
     driveSystem = drive;
     coralSystem = coral;
     visionSystem = vision;
     climberSystem = climber;
+    algaeSystem = algae;
   }
 
   // Globally accessible method to get the robot's pose
@@ -76,5 +80,9 @@ public class RobotStatus {
 
   public static boolean isClimbingFinished() {
     return climberSystem.isClimbingFinished();
+  }
+
+  public static boolean algaeArmIsSafeForClimbing() {
+    return (algaeSystem.getDeployPositionAngle() > 120.0);
   }
 }
