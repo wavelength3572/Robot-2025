@@ -475,14 +475,6 @@ public class Drive extends SubsystemBase {
     return elevatorHeightLimitsSpeed;
   }
 
-  public void toggleDriveMode() {
-    if (isDriveModeSmart) {
-      setDriveModeNormal();
-    } else {
-      setDriveModeSmart();
-    }
-  }
-
   /**
    * Converts a 2D pose (Pose2d) into a 3D pose (Pose3d) by assuming: - The z-coordinate is 0. -
    * Roll and pitch are 0. - Yaw comes directly from the Pose2d rotation.

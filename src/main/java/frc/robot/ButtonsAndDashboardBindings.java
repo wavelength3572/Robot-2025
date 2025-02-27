@@ -210,7 +210,6 @@ public class ButtonsAndDashboardBindings {
 
     // Give Driver ability to toggle Smart Drive
     oi.getButtonI()
-        .onTrue(Commands.runOnce(drive::toggleDriveMode, drive))
         .onTrue(
             DriveCommands.toggleSmartDriveCmd(
                 drive,
