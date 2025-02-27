@@ -143,10 +143,11 @@ public class AlgaeIOSpark implements AlgaeIO {
       case MANUAL:
         break;
       case CLIMB:
-        algaeCaptureMotor.setVoltage(AlgaeConstants.capturePushVolts);
-        algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
         detectionCount++;
-        if (detectionCount > 50) {
+        if (detectionCount <= 50) { // About 1 second
+          algaeCaptureMotor.setVoltage(AlgaeConstants.capturePushVolts);
+          algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
+        } else {
           // Purposly setting speed here because I got some twitches in algae arm duing
           // testing.
           algaeDeployMotor.set(0.0);
