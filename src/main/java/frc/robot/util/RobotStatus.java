@@ -1,6 +1,7 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.FieldConstants.CageTarget;
 import frc.robot.subsystems.algae.Algae;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.coral.CoralSystem;
@@ -75,11 +76,15 @@ public class RobotStatus {
   }
 
   public static boolean haveCoral() {
-    return coralSystem.getIntake().getCoralInRobot();
+    return coralSystem.getIntake().haveCoral();
   }
 
   public static boolean isClimbingFinished() {
     return climberSystem.isClimbingFinished();
+  }
+
+  public static CageTarget getSelectedCageTarget() {
+    return climberSystem.getSelectedCageTarget();
   }
 
   public static boolean algaeArmIsSafeForClimbing() {

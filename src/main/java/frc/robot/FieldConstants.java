@@ -36,6 +36,7 @@ public final class FieldConstants {
   public static final double THRESHOLD_DISTANCE_FOR_DISLODGE = 3.0; // meters
 
   public static Translation2d selectedCageTranslation = new Translation2d();
+
   // Assume these are your fixed cage positions defined somewhere (using WPILib's
   // coordinates)
   private static Translation2d BLUE_CAGE_LEFT = new Translation2d(8.56, 7.26);

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.2834669238635144,
-        "y": 7.107982727624235
+        "x": 1.2677386660126404,
+        "y": 7.103081677236112
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2834669238635144,
-        "y": 7.107982727624235
+        "x": 2.4648387096774185,
+        "y": 6.874959677419355
       },
       "isLocked": false,
       "linkedName": "StationLeft"
@@ -33,7 +33,7 @@
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0.804240282685513,
+      "maxWaypointRelativePos": 0.9,
       "constraints": {
         "maxVelocity": 2.0,
         "maxAcceleration": 2.5,

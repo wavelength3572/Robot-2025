@@ -17,16 +17,17 @@ import frc.robot.commands.NamedCommands.ScoreCoralCommand;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.vision.Vision;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PathPlannerCommands {
-  public static void Setup(CoralSystem coralSystem, Drive drive) {
-    NamedCommands.registerCommand(
-        "WaitForCoral", new WaitUntilCommand(coralSystem::isCoralInRobot));
+  public static void Setup(CoralSystem coralSystem, Drive drive, Vision vision) {
+    NamedCommands.registerCommand("WaitForCoral", new WaitUntilCommand(coralSystem::isHaveCoral));
     NamedCommands.registerCommand("WaitForPreset", new WaitUntilCommand(coralSystem::isAtGoal));
 
-    // Register our preset-commands so they finish atGoal
+    NamedCommands.registerCommand("TurnVisionOff", new InstantCommand(vision::setVisionOff));
+
     NamedCommands.registerCommand("L4", new RunPresetCommand(coralSystem, L4));
     NamedCommands.registerCommand("L3", new RunPresetCommand(coralSystem, L3));
     NamedCommands.registerCommand("L2", new RunPresetCommand(coralSystem, L2));
@@ -79,33 +80,32 @@ public class PathPlannerCommands {
     try {
       List<AutoPathConditional> autoPathConditionals = new ArrayList<>();
 
-      //   Create each combination by loading the appropriate paths.
       autoPathConditionals.add(
           new AutoPathConditional(
-              "StationLeft-1A-High-OR-1A-Low",
-              PathPlannerPath.fromPathFile("StationLeft-1AHigh"),
-              PathPlannerPath.fromPathFile("StationLeft-1ALow"),
+              "StationRight-6BHigh-OR-1ALow",
+              PathPlannerPath.fromPathFile("StationRight-6BHigh"),
+              PathPlannerPath.fromPathFile("StationRight-1ALow"),
               coralSystem));
 
       autoPathConditionals.add(
           new AutoPathConditional(
-              "StationLeft-1B-High-OR-1B-Low",
-              PathPlannerPath.fromPathFile("StationLeft-1BHigh"),
-              PathPlannerPath.fromPathFile("StationLeft-1BLow"),
+              "Score3-StationRight-6BHigh-OR-1ALow",
+              PathPlannerPath.fromPathFile("Score3-StationRight-6BHigh"),
+              PathPlannerPath.fromPathFile("Score3-StationRight-1ALow"),
               coralSystem));
 
-      autoPathConditionals.add(
+      autoPathConditionals.add( // this is part of our Score2 for LakeCity
           new AutoPathConditional(
-              "StationLeft-2A-High-OR-1A-Low",
-              PathPlannerPath.fromPathFile("StationLeft-2AHigh"),
-              PathPlannerPath.fromPathFile("StationLeft-1ALow"),
-              coralSystem));
-
-      autoPathConditionals.add(
-          new AutoPathConditional(
-              "StationLeft-2B-High-OR-1A-Low",
+              "StationLeft-2BHigh-OR-1ALow",
               PathPlannerPath.fromPathFile("StationLeft-2BHigh"),
               PathPlannerPath.fromPathFile("StationLeft-1ALow"),
+              coralSystem));
+
+      autoPathConditionals.add( // SCORE 3
+          new AutoPathConditional(
+              "Score3-StationLeft-2BHigh-OR-1ALow",
+              PathPlannerPath.fromPathFile("Score3-StationLeft-2BHigh"),
+              PathPlannerPath.fromPathFile("Score3-StationLeft-1ALow"),
               coralSystem));
 
       // Register each combination as a NamedCommand

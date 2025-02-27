@@ -29,11 +29,11 @@ public class PickupCoralCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    boolean coralInRobot = intake.getCoralInRobot();
-    if (coralInRobot) {
+    boolean haveCoral = intake.haveCoral();
+    if (haveCoral) {
       Logger.recordOutput("Commands/PickupCoralCommand", "Coral detected, command finishing.");
     }
-    return coralInRobot;
+    return haveCoral;
   }
 
   @Override

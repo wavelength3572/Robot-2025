@@ -8,11 +8,11 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.301267860521079,
-        "y": 1.739087769186267
+        "x": 6.62550542390697,
+        "y": 1.91
       },
       "isLocked": false,
-      "linkedName": "Cage2"
+      "linkedName": "Cage5"
     },
     {
       "anchor": {
@@ -48,7 +48,7 @@
   "eventMarkers": [
     {
       "name": "L4",
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": null
     }

@@ -16,9 +16,9 @@ package frc.robot;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PathPlannerCommands;
@@ -50,6 +50,8 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.OdometryHealthMonitor;
 import frc.robot.util.RobotStatus;
 import frc.robot.util.Visualizer;
+import java.util.Comparator;
+import java.util.stream.Stream;
 import lombok.Getter;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -61,7 +63,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Subsystems
-  private final Vision vision;
+  @Getter private final Vision vision;
   @Getter private final Drive drive;
   private final Elevator elevator;
   private final Arm arm;
@@ -73,7 +75,6 @@ public class RobotContainer {
   private final IndicatorLight indicatorLight;
   private OperatorInterface oi = new OperatorInterface() {};
   private LoggedDashboardChooser<Command> autoChooser;
-  private LoggedDashboardChooser<Command> competitionAutoChooser;
 
   @Getter private final OdometryHealthMonitor odometryHealthMonitor;
 
@@ -110,7 +111,7 @@ public class RobotContainer {
             coralSystem::getCurrentCoralPreset,
             coralSystem.coralSystemPresetChooser::getSelected,
             coralSystem::getTargetCoralPreset,
-            coralSystem::isCoralInRobot);
+            coralSystem::isHaveCoral);
         break;
 
       case SIM:
@@ -143,7 +144,7 @@ public class RobotContainer {
             coralSystem::getCurrentCoralPreset,
             coralSystem.coralSystemPresetChooser::getSelected,
             coralSystem::getTargetCoralPreset,
-            coralSystem::isCoralInRobot);
+            coralSystem::isHaveCoral);
 
         break;
 
@@ -178,8 +179,8 @@ public class RobotContainer {
             drive::getPose,
             elevator::getHeightInMeters,
             arm::getCurrentAngleDEG,
-            coralSystem::isCoralInRobot,
-            algae::isAlgaeInRobot,
+            coralSystem::isHaveCoral,
+            algae::haveAlgae,
             algae::getDeployPositionAngle);
 
     odometryHealthMonitor = new OdometryHealthMonitor(drive, vision);
@@ -195,7 +196,7 @@ public class RobotContainer {
     // give static access to certain methods across subsystems
     RobotStatus.initialize(drive, coralSystem, vision, climber, algae);
 
-    PathPlannerCommands.Setup(coralSystem, drive);
+    PathPlannerCommands.Setup(coralSystem, drive, vision);
     SetupAutoChooser();
     updateOI();
   }
@@ -224,56 +225,48 @@ public class RobotContainer {
 
   public void SetupAutoChooser() {
 
-    // **LAKE CITY AUTO CHOOSER */
+    autoChooser =
+        new LoggedDashboardChooser<>(
+            "Auto Chooser",
+            AutoBuilder.buildAutoChooserWithOptionsModifier(
+                "compDefaultMoveOnly",
+                stream -> {
+                  Stream<PathPlannerAuto> modified =
+                      Constants.isCompetition
+                          ? stream.filter(auto -> auto.getName().startsWith("comp"))
+                          : stream;
+                  return modified.sorted(Comparator.comparing(PathPlannerAuto::getName));
+                }));
 
-    competitionAutoChooser = new LoggedDashboardChooser<>("Lake City Auto Test Package");
+    // add these if we aren't at competition
+    if (!Constants.isCompetition) {
+      // Set up SysId routines
+      autoChooser.addOption(
+          "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+      autoChooser.addOption(
+          "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+      autoChooser.addOption(
+          "Drive SysId (Quasistatic Forward)",
+          drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      autoChooser.addOption(
+          "Drive SysId (Quasistatic Reverse)",
+          drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      autoChooser.addOption(
+          "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      autoChooser.addOption(
+          "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    }
+  }
 
-    competitionAutoChooser.addDefaultOption("None", Commands.none());
-
-    // Best Option for Mid
-    competitionAutoChooser.addOption(
-        "Mid-4AHigh-Dislodge", AutoBuilder.buildAuto("Mid-4AHigh-Dislodge"));
-
-    // Best Option for Cage2
-    competitionAutoChooser.addOption( // Score 3 - conditional
-        "Score3-Cage2-3BHigh-2AHigh-2BHighOR1ALow",
-        AutoBuilder.buildAuto("Score3-Cage2-3BHigh-2AHigh-2BHighOR1ALow"));
-
-    // Second Best Option for Cage 2
-    competitionAutoChooser.addOption( // Score 2 - conditional
-        "Score2-Cage2-3BHigh-2BHighOR1ALow",
-        AutoBuilder.buildAuto("Score2-Cage2-3BHigh-2BHighOR1ALow"));
-
-    // Best Option for Cage5
-    competitionAutoChooser.addOption( // Score 2 - no conditional
-        "Cage5-5AHigh-6AHigh", AutoBuilder.buildAuto("Cage5-5AHigh-6AHigh"));
-
-    // Best Option for Cage1
-    competitionAutoChooser.addOption("Cage1Wall-3ALow", AutoBuilder.buildAuto("Cage1Wall-3ALow"));
-
-    // Best Option for Cage6
-    competitionAutoChooser.addOption(
-        "Cage6Wall-6AHigh-1BHigh", AutoBuilder.buildAuto("Cage6Wall-6AHigh-1BHigh"));
-
-    // **REAL AUTO CHOOSER */
-
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-    // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+  public void teleopInitTurnSmartDriveOn() {
+    DriveCommands.setSmartDriveCmd(
+            drive,
+            oi::getTranslateX,
+            oi::getTranslateY,
+            oi::getRotate,
+            coralSystem::isHaveCoral,
+            climber::isClimberDeployed,
+            coralSystem.getElevator()::getHeightInInches)
+        .schedule();
   }
 }

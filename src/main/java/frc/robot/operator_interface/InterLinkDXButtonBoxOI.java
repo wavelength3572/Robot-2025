@@ -117,6 +117,11 @@ public class InterLinkDXButtonBoxOI implements OperatorInterface {
                 && !interLinkJoystickJoystickButtons[9].getAsBoolean());
   }
 
+  @Override
+  public Trigger getButtonI() {
+    return interLinkJoystickJoystickButtons[13]; // Button I left side of top face - temp button
+  }
+
   // * BUTTON BOX BUTTONS */
 
   @Override
@@ -271,6 +276,14 @@ public class InterLinkDXButtonBoxOI implements OperatorInterface {
   @Override
   public Trigger getButtonDPosition0() {
     return interLinkJoystickJoystickButtons[6]; // Button D top left of front face - Up position
+  }
+
+  @Override
+  public Trigger getButtonDPosition1() {
+    return new Trigger(
+        () ->
+            !interLinkJoystickJoystickButtons[6].getAsBoolean()
+                && !interLinkJoystickJoystickButtons[7].getAsBoolean());
   }
 
   @Override

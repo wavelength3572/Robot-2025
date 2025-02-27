@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.FieldConstants;
@@ -30,43 +31,51 @@ public class AlgaeCommands {
    */
   public static Command AlgaeAlignment(Drive drive, CoralSystem coralSystem, OperatorInterface oi) {
     return new ConditionalCommand(
-        // True branch: run the sequence if conditions are met.
-        new SequentialCommandGroup(
-            SetAppropriateDislodgePresetCommand(drive, coralSystem),
-            // Wait until the system reaches the dislodge preset.
+        new ParallelCommandGroup(
+            // Get the Elevator and Arm prepped for dislodge
+            new SequentialCommandGroup(
+                SetAppropriateDislodgePresetPart1Command(drive, coralSystem),
+                new WaitUntilCommand(coralSystem::isAtGoal),
+                SetAppropriateDislodgePresetPart2Command(coralSystem)),
             new WaitUntilCommand(coralSystem::isAtGoal),
-            // Finally, drive to the dislodge (algae removal) target pose.
+            // Drive to the dislodge spot simultaneously
             DriveToCommands.createDriveToPose(
                 drive,
                 drive::getAlgaeTargetPose,
                 oi::getTranslateX,
                 oi::getTranslateY,
                 oi::getRotate)),
-        // False branch: do nothing.
         Commands.none(),
         // Condition: Only execute if:
-        // - The coral system is NOT already in a prepare dislodge preset,
         // - The accepted reef face is within the threshold distance,
         // - AND there is NO coral currently in the robot.
         () -> {
-          // boolean notAtDislodgePreset =
-          // !(coralSystem.isAtGoal()
-          // && (coralSystem.getCurrentCoralPreset()
-          // == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_1
-          // || coralSystem.getCurrentCoralPreset()
-          // == CoralSystemPresets.PREPARE_DISLODGE_LEVEL_2));
-
           AlignmentUtils.ReefFaceSelection selection = drive.getReefFaceSelection();
           boolean withinThreshold = false;
           if (selection != null) {
             double distance = selection.getAcceptedDistance();
             withinThreshold = (distance < FieldConstants.THRESHOLD_DISTANCE_FOR_DISLODGE);
           }
-
-          boolean noCoral = !coralSystem.isCoralInRobot();
+          boolean noCoral = !coralSystem.isHaveCoral();
 
           return withinThreshold && noCoral;
         });
+  }
+
+  private static Command SetAppropriateDislodgePresetPart2Command(CoralSystem coralSystem) {
+    return Commands.runOnce(
+        () -> {
+          if (coralSystem.getCurrentCoralPreset()
+              == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1) {
+            coralSystem.setSimultaneousTargetPreset(
+                CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1);
+          } else if (coralSystem.getCurrentCoralPreset()
+              == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2) {
+            coralSystem.setSimultaneousTargetPreset(
+                CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
+          }
+        },
+        coralSystem);
   }
 
   /**
@@ -137,7 +146,7 @@ public class AlgaeCommands {
                       || coralSystem.getCurrentCoralPreset()
                           == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
 
-          boolean noCoral = !coralSystem.isCoralInRobot();
+          boolean noCoral = !coralSystem.isHaveCoral();
           return isInDislodgePreset && noCoral;
         });
   }
@@ -197,12 +206,13 @@ public class AlgaeCommands {
                       || coralSystem.getCurrentCoralPreset()
                           == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
 
-          boolean noCoral = !coralSystem.isCoralInRobot();
+          boolean noCoral = !coralSystem.isHaveCoral();
           return isInDislodgePreset && noCoral;
         });
   }
 
-  public static Command SetAppropriateDislodgePresetCommand(Drive drive, CoralSystem coralSystem) {
+  public static Command SetAppropriateDislodgePresetPart1Command(
+      Drive drive, CoralSystem coralSystem) {
     return Commands.runOnce(
         () -> {
           // Get the current reef face selection from the drive subsystem.

@@ -41,12 +41,12 @@ public class Algae extends SubsystemBase {
     Logger.processInputs("Algae", inputs);
   }
 
-  public boolean isAlgaeInRobot() {
-    return io.isAlgaeInRobot();
+  public boolean haveAlgae() {
+    return io.haveAlgae();
   }
 
-  public void setAlgaeInRobot(boolean algaeInRobot) {
-    io.setAlgaeInRobot(algaeInRobot);
+  public void setHaveAlgae(boolean haveAlgae) {
+    io.setHaveAlgae(haveAlgae);
   }
 
   // Capture Motor Methods

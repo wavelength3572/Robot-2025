@@ -9,7 +9,7 @@ public interface IntakeIO {
     public double velocityRPM = 0.0;
     public double appliedVolts = 0.0;
     public double motorPosition = 0.0;
-    public boolean coralInRobot = false;
+    public boolean haveCoral = false;
     public double currentAmps = 0.0;
     public double Arm_TBE = 0.0;
     public double Arm_TBE_DEG = 0.0;
@@ -27,7 +27,7 @@ public interface IntakeIO {
 
   public default void stopIntake() {}
 
-  public default boolean getCoralInRobot() {
+  public default boolean haveCoral() {
     return false;
   }
 
@@ -35,5 +35,5 @@ public interface IntakeIO {
     return 0.0;
   }
 
-  public default void setCoralInRobot(boolean coralInRobot) {}
+  public default void autoSetHaveCoral(boolean haveCoral) {}
 }

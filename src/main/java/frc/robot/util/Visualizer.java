@@ -25,8 +25,8 @@ public class Visualizer {
   private final Supplier<Pose2d> robotPoseSupplier;
   private final Supplier<Double> elevatorHeightSupplier;
   private final Supplier<Double> armAngleSupplier;
-  private final Supplier<Boolean> isCoralInRobotSupplier;
-  private final Supplier<Boolean> isAlgaeInRobotSupplier;
+  private final Supplier<Boolean> haveCoralSupplier;
+  private final Supplier<Boolean> haveAlgaeSupplier;
 
   private final Supplier<Double> algaeDeployPositionSupplier;
 
@@ -45,14 +45,14 @@ public class Visualizer {
       Supplier<Pose2d> robotPoseSupplier,
       Supplier<Double> elevatorHeightSupplier,
       Supplier<Double> armAngleSupplier,
-      Supplier<Boolean> isCoralInRobotSupplier,
-      Supplier<Boolean> isAlgaeInRobotSupplier,
+      Supplier<Boolean> haveCoralSupplier,
+      Supplier<Boolean> haveAlgaeSupplier,
       Supplier<Double> algaeDeployPositionSupplier) {
     this.robotPoseSupplier = robotPoseSupplier;
     this.elevatorHeightSupplier = elevatorHeightSupplier;
     this.armAngleSupplier = armAngleSupplier;
-    this.isCoralInRobotSupplier = isCoralInRobotSupplier;
-    this.isAlgaeInRobotSupplier = isAlgaeInRobotSupplier;
+    this.haveCoralSupplier = haveCoralSupplier;
+    this.haveAlgaeSupplier = haveAlgaeSupplier;
     this.algaeDeployPositionSupplier = algaeDeployPositionSupplier;
     initializeCoral2DVisualization();
     initializeAlgae2DVisualization();
@@ -126,13 +126,13 @@ public class Visualizer {
         "Visualizer/FinalComponentPoses",
         new Pose3d[] {elevatorPose, armCalibratedPose, algaeCalibratedPose});
 
-    if (isCoralInRobotSupplier.get()) {
+    if (haveCoralSupplier.get()) {
       // ✅ Move coral relative to the robot's 2D pose, applying zeroed position &
       // rotations
       Pose3d coralPose = attachCoralToRobot(robotPose2d, armCalibratedPose);
-      Logger.recordOutput("Visualizer/CoralInRobotPose", coralPose);
+      Logger.recordOutput("Visualizer/HaveCoralRobotPose", coralPose);
     } else {
-      Logger.recordOutput("Visualizer/CoralInRobotPose", new Pose3d());
+      Logger.recordOutput("Visualizer/HaveCoralRobotPose", new Pose3d());
     }
 
     // 🔹 Log scored corals on the reef poles

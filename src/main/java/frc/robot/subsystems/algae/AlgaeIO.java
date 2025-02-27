@@ -30,7 +30,7 @@ public interface AlgaeIO {
     public double deployCurrentAmps = 0.0;
 
     // Algae Detection
-    public boolean algaeInRobot = false;
+    public boolean haveAlgae = false;
   }
 
   /** Update the set of loggable inputs. */
@@ -60,12 +60,12 @@ public interface AlgaeIO {
   }
 
   /** Check if an algae (game piece) is in the system. */
-  public default boolean isAlgaeInRobot() {
+  public default boolean haveAlgae() {
     return false;
   }
 
   /** Manually set algae detection status. */
-  public default void setAlgaeInRobot(boolean algaeInRobot) {}
+  public default void setHaveAlgae(boolean haveAlgae) {}
 
   public default double getCurrentSpeedRPM() {
     return 0.0;

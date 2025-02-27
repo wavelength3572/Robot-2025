@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.110817307689941,
-        "y": 7.559775641028642
+        "x": 7.162375827814569,
+        "y": 7.5335471854304625
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8851580317450587,
-        "y": 7.1900783584603
+        "x": 2.9367165518696865,
+        "y": 7.163849902862121
       },
       "isLocked": false,
-      "linkedName": "Cage6"
+      "linkedName": "Cage1"
     },
     {
       "anchor": {
@@ -30,20 +30,34 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.22999369880277154,
+      "waypointRelativePos": 0.1,
       "rotationDegrees": 180.0
     },
     {
-      "waypointRelativePos": 0.46691871455576794,
+      "waypointRelativePos": 0.55,
       "rotationDegrees": -59.99999999999999
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.8,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 2.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "L4",
-      "waypointRelativePos": 0.5260323159784561,
+      "waypointRelativePos": 0.40282685512367106,
       "endWaypointRelativePos": null,
       "command": null
     }

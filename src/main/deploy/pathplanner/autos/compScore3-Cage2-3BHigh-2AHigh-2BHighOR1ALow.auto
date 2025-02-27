@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Cage2-3B-High"
+            "pathName": "Score3-Cage2-3B-High"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "3B-StationLeft"
+            "pathName": "Score3-3B-StationLeft"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StationLeft-2AHigh"
+            "pathName": "Score3-StationLeft-2AHigh"
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "2A-StationLeft"
+            "pathName": "Score3-2A-StationLeft"
           }
         },
         {
@@ -55,13 +55,13 @@
         {
           "type": "named",
           "data": {
-            "name": "StationLeft-2B-High-OR-1A-Low"
+            "name": "Score3-StationLeft-2BHigh-OR-1ALow"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Cage2",
+  "folder": "LakeCityAutos",
   "choreoAuto": false
 }

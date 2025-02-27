@@ -2,11 +2,20 @@ package frc.robot.subsystems.climber;
 
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.FieldConstants.CageTarget;
+import lombok.Getter;
+import lombok.Setter;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Climber extends SubsystemBase {
   private final ClimberIO io;
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
+
+  @AutoLogOutput(key = "Alignment/Cage Target")
+  @Getter
+  @Setter
+  private CageTarget selectedCageTarget = CageTarget.MID;
 
   public Climber(ClimberIO io) {
     this.io = io;

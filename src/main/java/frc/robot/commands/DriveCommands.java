@@ -283,7 +283,7 @@ public class DriveCommands {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier,
-      Supplier<Boolean> coralInRobotSupplier,
+      Supplier<Boolean> haveCoralSupplier,
       Supplier<Boolean> climberDeployedSupplier,
       DoubleSupplier elevatorHeightInchesSupplier) {
     return new InstantCommand(
@@ -302,12 +302,40 @@ public class DriveCommands {
                     omegaSupplier,
                     drive::getPose,
                     elevatorHeightInchesSupplier,
-                    coralInRobotSupplier,
+                    haveCoralSupplier,
                     climberDeployedSupplier,
                     drive::getReefFaceSelection,
                     drive::getCoralStationSelection,
                     drive::getCageSelection));
           }
+        },
+        drive);
+  }
+
+  public static InstantCommand setSmartDriveCmd(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier,
+      Supplier<Boolean> haveCoralSupplier,
+      Supplier<Boolean> climberDeployedSupplier,
+      DoubleSupplier elevatorHeightInchesSupplier) {
+    return new InstantCommand(
+        () -> {
+          drive.setDriveModeSmart();
+          drive.setDefaultCommand(
+              JoystickAlignmentStrategyDrive(
+                  drive,
+                  xSupplier,
+                  ySupplier,
+                  omegaSupplier,
+                  drive::getPose,
+                  elevatorHeightInchesSupplier,
+                  haveCoralSupplier,
+                  climberDeployedSupplier,
+                  drive::getReefFaceSelection,
+                  drive::getCoralStationSelection,
+                  drive::getCageSelection));
         },
         drive);
   }
@@ -320,7 +348,7 @@ public class DriveCommands {
       DoubleSupplier omegaSupplier,
       Supplier<Pose2d> robotPoseSupplier,
       DoubleSupplier elevatorHeightInchesSupplier,
-      Supplier<Boolean> coralInRobotSupplier,
+      Supplier<Boolean> haveCoralSupplier,
       Supplier<Boolean> climberDeployedSupplier,
       Supplier<AlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
       Supplier<AlignmentUtils.CoralStationSelection> coralStationSelectionSupplier,
@@ -329,45 +357,68 @@ public class DriveCommands {
     // Step 2: Get the StrategyManager to dynamically select alignment strat
     StrategyManager strategyManager = drive.getStrategyManager();
 
-    return Commands.run(
-        () -> {
-          // Step 1: Get joystick inputs
-          double rawX = xSupplier.getAsDouble();
-          double rawY = ySupplier.getAsDouble();
-          double rawOmega = omegaSupplier.getAsDouble();
+    // Create an initialization command that resets the controller using current
+    // sensor values.
+    Command initCommand =
+        new InstantCommand(
+            () -> {
+              AlignmentContext initContext =
+                  new AlignmentContext(
+                      robotPoseSupplier.get(),
+                      haveCoralSupplier.get(),
+                      elevatorHeightInchesSupplier.getAsDouble(),
+                      climberDeployedSupplier.get(),
+                      reefFaceSelectionSupplier.get(),
+                      coralStationSelectionSupplier.get(),
+                      cageSelectionSupplier.get());
+              strategyManager.initialControllerReset(initContext);
+            },
+            drive);
 
-          // Convert joystick inputs to a field-relative translation
-          Translation2d rawTranslationInput = getLinearVelocityFromJoysticks(rawX, rawY);
-          double rawRotationInput = MathUtil.applyDeadband(rawOmega, DEADBAND);
-          rawRotationInput =
-              Math.copySign(
-                  rawRotationInput * rawRotationInput,
-                  rawRotationInput); // Squaring for finer control
+    // Create the main drive command as before.
+    Command driveCommand =
+        Commands.run(
+            () -> {
+              // Step 1: Get joystick inputs
+              double rawX = xSupplier.getAsDouble();
+              double rawY = ySupplier.getAsDouble();
+              double rawOmega = omegaSupplier.getAsDouble();
 
-          // Step 2: Construct the AlignmentContext
-          AlignmentContext context =
-              new AlignmentContext(
-                  robotPoseSupplier.get(),
-                  coralInRobotSupplier.get(),
-                  elevatorHeightInchesSupplier.getAsDouble(),
-                  climberDeployedSupplier.get(),
-                  reefFaceSelectionSupplier.get(),
-                  coralStationSelectionSupplier.get(),
-                  cageSelectionSupplier.get());
+              // Convert joystick inputs to a field-relative translation
+              Translation2d rawTranslationInput = getLinearVelocityFromJoysticks(rawX, rawY);
+              double rawRotationInput = MathUtil.applyDeadband(rawOmega, DEADBAND);
+              rawRotationInput =
+                  Math.copySign(
+                      rawRotationInput * rawRotationInput,
+                      rawRotationInput); // Squaring for finer control
 
-          // Step 3: Update alignment strategy
-          strategyManager.updateStrategyForCycle(context);
+              // Step 2: Construct the AlignmentContext
+              AlignmentContext context =
+                  new AlignmentContext(
+                      robotPoseSupplier.get(),
+                      haveCoralSupplier.get(),
+                      elevatorHeightInchesSupplier.getAsDouble(),
+                      climberDeployedSupplier.get(),
+                      reefFaceSelectionSupplier.get(),
+                      coralStationSelectionSupplier.get(),
+                      cageSelectionSupplier.get());
 
-          // Step 4: Apply corrections
-          double adjustedRotationInput =
-              strategyManager.getRotationalCorrection(context, rawRotationInput);
-          Translation2d adjustedTranslationInput =
-              strategyManager.getTranslationalCorrection(context, rawTranslationInput);
+              // Step 3: Update alignment strategy
+              strategyManager.updateStrategyForCycle(context);
 
-          // Step 5: Send to drive system
-          sendSpeedsToDrive(drive, adjustedTranslationInput, adjustedRotationInput);
-        },
-        drive);
+              // Step 4: Apply corrections
+              double adjustedRotationInput =
+                  strategyManager.getRotationalCorrection(context, rawRotationInput);
+              Translation2d adjustedTranslationInput =
+                  strategyManager.getTranslationalCorrection(context, rawTranslationInput);
+
+              // Step 5: Send to drive system
+              sendSpeedsToDrive(drive, adjustedTranslationInput, adjustedRotationInput);
+            },
+            drive);
+
+    // Sequence the initialization command before the drive command.
+    return Commands.sequence(initCommand, driveCommand);
   }
 
   /**

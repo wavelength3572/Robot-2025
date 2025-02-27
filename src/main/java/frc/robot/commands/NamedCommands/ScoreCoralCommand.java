@@ -37,11 +37,11 @@ public class ScoreCoralCommand extends Command {
   public void execute() {
     // Log the current time and sensor state
     Logger.recordOutput("ScoreCoral/CurrentTime", timer.get());
-    Logger.recordOutput("ScoreCoral/CoralInRobot", intake.getCoralInRobot());
+    Logger.recordOutput("ScoreCoral/HaveCoral", intake.haveCoral());
     Logger.recordOutput("ScoreCoral/CoralCleared", coralCleared);
 
     // 1) Check limit switch (or sensor) to see if the piece has left the robot
-    if (!intake.getCoralInRobot() && !coralCleared) {
+    if (!intake.haveCoral() && !coralCleared) {
       // The moment we see it's gone, record the time
       coralCleared = true;
       timeWhenCoralCleared = timer.get();
