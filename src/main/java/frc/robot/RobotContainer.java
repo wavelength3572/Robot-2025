@@ -223,26 +223,39 @@ public class RobotContainer {
   }
 
   public void SetupAutoChooser() {
-    // Set up auto routines
-    competitionAutoChooser =
-        new LoggedDashboardChooser<>(
-            "Lake City Auto Test Package"); // This wont work unless we change the code - just for
-    // thinking right now
+
+    // **LAKE CITY AUTO CHOOSER */
+
+    competitionAutoChooser = new LoggedDashboardChooser<>("Lake City Auto Test Package");
+
     competitionAutoChooser.addDefaultOption("None", Commands.none());
 
     // Best Option for Mid
     competitionAutoChooser.addOption(
         "Mid-4AHigh-Dislodge", AutoBuilder.buildAuto("Mid-4AHigh-Dislodge"));
+
     // Best Option for Cage2
-    competitionAutoChooser.addOption(
-        "Score3Cage2-3BHigh-2AHigh-2BHigh",
-        AutoBuilder.buildAuto("Score3Cage2-3BHigh-2AHigh-2BHigh"));
-    competitionAutoChooser.addOption(
-        "FastConditionalCage2-3BHigh-Station",
-        AutoBuilder.buildAuto("FastConditionalCage2-3BHigh-Station"));
+    competitionAutoChooser.addOption( // Score 3 - conditional
+        "Score3-Cage2-3BHigh-2AHigh-2BHighOR1ALow",
+        AutoBuilder.buildAuto("Score3-Cage2-3BHigh-2AHigh-2BHighOR1ALow"));
+
+    // Second Best Option for Cage 2
+    competitionAutoChooser.addOption( // Score 2 - conditional
+        "Score2-Cage2-3BHigh-2BHighOR1ALow",
+        AutoBuilder.buildAuto("Score2-Cage2-3BHigh-2BHighOR1ALow"));
+
     // Best Option for Cage5
-    competitionAutoChooser.addOption(
+    competitionAutoChooser.addOption( // Score 2 - no conditional
         "Cage5-5AHigh-6AHigh", AutoBuilder.buildAuto("Cage5-5AHigh-6AHigh"));
+
+    // Best Option for Cage1
+    competitionAutoChooser.addOption("Cage1Wall-3ALow", AutoBuilder.buildAuto("Cage1Wall-3ALow"));
+
+    // Best Option for Cage6
+    competitionAutoChooser.addOption(
+        "Cage6Wall-6AHigh-1BHigh", AutoBuilder.buildAuto("Cage6Wall-6AHigh-1BHigh"));
+
+    // **REAL AUTO CHOOSER */
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

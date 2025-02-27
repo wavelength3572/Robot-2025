@@ -16,7 +16,6 @@ public final class BranchAlignmentUtils {
   public enum BranchAlignmentStatus {
     NONE,
     RED,
-    YELLOW,
     GREEN
   }
 
@@ -27,7 +26,6 @@ public final class BranchAlignmentUtils {
 
   // Lateral thresholds for traffic-light style alignment.
   public static final double LATERAL_THRESHOLD_RED = 0.150;
-  public static final double LATERAL_THRESHOLD_YELLOW = 0.100; // below this make it green
   public static final double LATERAL_THRESHOLD_SOLID_GREEN =
       0.025; // this is only used to make the blinking solid
 
@@ -137,9 +135,6 @@ public final class BranchAlignmentUtils {
     if (Math.abs(lateralOffset) > LATERAL_THRESHOLD_RED) {
       Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.RED.toString());
       currentBranchAlignmentStatus = BranchAlignmentStatus.RED;
-    } else if (Math.abs(lateralOffset) > LATERAL_THRESHOLD_YELLOW) {
-      Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.YELLOW.toString());
-      currentBranchAlignmentStatus = BranchAlignmentStatus.YELLOW;
     } else {
       Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.GREEN.toString());
       currentBranchAlignmentStatus = BranchAlignmentStatus.GREEN;

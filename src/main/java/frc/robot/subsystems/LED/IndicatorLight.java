@@ -29,7 +29,7 @@ public class IndicatorLight extends SubsystemBase {
   private static final double MIN_BLINK_PERIOD = 0.001; // very close, fast blink
 
   public static final double MIN_TOLERANCE_BLINK = 0.025; // below this, blink is at min period
-  public static final double MAX_TOLERANCE_BLINK = 0.100; // above this, blink is at max period
+  public static final double MAX_TOLERANCE_BLINK = 0.150; // above this, blink is at max period
 
   // Variable to hold the current blink period computed from the error
   private double currentBlinkPeriod = MAX_BLINK_PERIOD;
@@ -234,9 +234,6 @@ public class IndicatorLight extends SubsystemBase {
           break;
         case RED:
           currentColor_GOAL = LED_EFFECTS.RED;
-          break;
-        case YELLOW:
-          currentColor_GOAL = LED_EFFECTS.YELLOW;
           break;
         case NONE:
         default:
