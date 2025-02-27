@@ -57,7 +57,8 @@ public class ButtonsAndDashboardBindings {
     ButtonsAndDashboardBindings.algae = algae;
     ButtonsAndDashboardBindings.vision = vision;
 
-    // Note that we are turning on smart drive in Robot.java teleopInit() if isCompetition is true
+    // Note that we are turning on smart drive in Robot.java teleopInit() if
+    // isCompetition is true
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(drive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
 
@@ -208,7 +209,17 @@ public class ButtonsAndDashboardBindings {
                 coralSystem::isHaveCoral));
 
     // Give Driver ability to toggle Smart Drive
-    oi.getButtonI().onTrue(Commands.runOnce(drive::toggleDriveMode, drive));
+    oi.getButtonI()
+        .onTrue(Commands.runOnce(drive::toggleDriveMode, drive))
+        .onTrue(
+            DriveCommands.toggleSmartDriveCmd(
+                drive,
+                oi::getTranslateX,
+                oi::getTranslateY,
+                oi::getRotate,
+                coralSystem::isHaveCoral,
+                climber::isClimberDeployed,
+                coralSystem.getElevator()::getHeightInInches));
   }
 
   private static void setInitialCageSelectionToMatchSwitch() {

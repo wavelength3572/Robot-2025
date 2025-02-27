@@ -13,11 +13,14 @@ import frc.robot.subsystems.algae.AlgaeConstants.algaeIntakeState;
 
 public class AlgaeIOSpark implements AlgaeIO {
 
-  private SparkMax algaeCaptureMotor = new SparkMax(AlgaeConstants.algaeCaptureCanId, MotorType.kBrushless);
-  private SparkClosedLoopController algaeCaptureController = algaeCaptureMotor.getClosedLoopController();
+  private SparkMax algaeCaptureMotor =
+      new SparkMax(AlgaeConstants.algaeCaptureCanId, MotorType.kBrushless);
+  private SparkClosedLoopController algaeCaptureController =
+      algaeCaptureMotor.getClosedLoopController();
   private RelativeEncoder algaeCaptureEncoder = algaeCaptureMotor.getEncoder();
 
-  private SparkMax algaeDeployMotor = new SparkMax(AlgaeConstants.algaeDeployCanId, MotorType.kBrushless);
+  private SparkMax algaeDeployMotor =
+      new SparkMax(AlgaeConstants.algaeDeployCanId, MotorType.kBrushless);
   private RelativeEncoder algaeDeployEncoder = algaeDeployMotor.getEncoder();
 
   private double captureEncoderValue = 0.0;
@@ -49,7 +52,8 @@ public class AlgaeIOSpark implements AlgaeIO {
   public void updateInputs(AlgaeIOInputs inputs) {
     // Capture Motor Inputs
     inputs.captureVelocityRPM = algaeCaptureMotor.getEncoder().getVelocity();
-    inputs.captureAppliedVolts = algaeCaptureMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
+    inputs.captureAppliedVolts =
+        algaeCaptureMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.captureCurrentAmps = algaeCaptureMotor.getOutputCurrent();
     inputs.captureEncRotations = algaeCaptureEncoder.getPosition();
 
@@ -57,8 +61,10 @@ public class AlgaeIOSpark implements AlgaeIO {
     inputs.deployEncRotations = algaeDeployEncoder.getPosition();
     inputs.currentAngle = rotationsToAngle(inputs.deployEncRotations);
 
-    inputs.armArbFF = Math.cos(Math.toRadians(inputs.currentAngle + 21.5)) * AlgaeConstants.deployPullBackFF;
-    inputs.deployAppliedVolts = algaeDeployMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
+    inputs.armArbFF =
+        Math.cos(Math.toRadians(inputs.currentAngle + 21.5)) * AlgaeConstants.deployPullBackFF;
+    inputs.deployAppliedVolts =
+        algaeDeployMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.deployCurrentAmps = algaeDeployMotor.getOutputCurrent();
     inputs.deployVelocityRPM = algaeDeployEncoder.getVelocity();
 

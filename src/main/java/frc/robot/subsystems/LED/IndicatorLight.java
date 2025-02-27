@@ -684,8 +684,7 @@ public class IndicatorLight extends SubsystemBase {
     CoralSystemPresets targetPreset = getTargetCoralPreset.get();
 
     // If we're in STARTUP, do nothing else
-    if (currentPreset.equals(CoralSystemPresets.STARTUP)
-        || BranchAlignmentUtils.getCurrentBranchAlignmentStatus() != BranchAlignmentStatus.NONE) {
+    if (currentPreset.equals(CoralSystemPresets.STARTUP)) {
       return;
     }
 
