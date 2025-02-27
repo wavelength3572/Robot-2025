@@ -13,6 +13,8 @@ import frc.robot.commands.NamedCommands.RunPresetCommand;
 import frc.robot.commands.NamedCommands.ScoreCoralCommand;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
+import frc.robot.subsystems.drive.DriveConstants;
+
 import org.littletonrobotics.junction.Logger;
 
 public class AutoPathConditional {
@@ -48,7 +50,7 @@ public class AutoPathConditional {
   public ConditionalCommand getCommand() {
     // Load the configuration once.
     try {
-      config = RobotConfig.fromGUISettings();
+      config = DriveConstants.ppConfig;
       Logger.recordOutput("AutoPathConditional/RobotConfig", config.toString());
     } catch (Exception e) {
       DriverStation.reportError(
