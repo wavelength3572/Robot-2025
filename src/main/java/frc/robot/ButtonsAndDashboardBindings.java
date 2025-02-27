@@ -224,18 +224,6 @@ public class ButtonsAndDashboardBindings {
                 coralSystem::isHaveCoral,
                 climber::isClimberDeployed,
                 coralSystem.getElevator()::getHeightInInches));
-  }
-        // Give Driver ability to toggle Smart Drive
-        oi.getButtonI()
-                .onTrue(
-                        DriveCommands.toggleSmartDriveCmd(
-                                drive,
-                                oi::getTranslateX,
-                                oi::getTranslateY,
-                                oi::getRotate,
-                                coralSystem::isHaveCoral,
-                                climber::isClimberDeployed,
-                                coralSystem.getElevator()::getHeightInInches));
     }
 
     private static void setInitialCageSelectionToMatchSwitch() {
