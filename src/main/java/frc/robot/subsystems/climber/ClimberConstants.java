@@ -10,7 +10,7 @@ public final class ClimberConstants {
   public static final double deployPower = -1.0;
   public static final double climbPower = 1.0;
 
-  public static final double DEPLOY_POSITION = -500;
+  public static final double DEPLOY_POSITION = -525;
   public static final double CLIMBED_POSITION = -140;
 
   // Define the climber tip offset relative to the robot's center
@@ -38,6 +38,7 @@ public final class ClimberConstants {
   }
 
   public static enum CLIMB_STATE {
+    FAST_DEPLOY,
     DEPLOY,
     STOWED,
     CLIMB,

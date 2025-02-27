@@ -54,6 +54,12 @@ public class ClimberIOSpark implements ClimberIO {
       case STOWED:
         climberMotor.set(0.0);
         break;
+      case FAST_DEPLOY:
+        climberMotor.set(-1.0); // Deploy as fast as we can
+        if (climberEncoder.getPosition() < -400) {
+          currentClimberState = CLIMB_STATE.DEPLOY;
+        }
+        break;
       case DEPLOY:
         if (RobotStatus.algaeArmIsSafeForClimbing())
           climberController.setReference(ClimberConstants.DEPLOY_POSITION, ControlType.kPosition);
@@ -78,7 +84,7 @@ public class ClimberIOSpark implements ClimberIO {
   }
 
   public void deployClimber() {
-    currentClimberState = CLIMB_STATE.DEPLOY;
+    currentClimberState = CLIMB_STATE.FAST_DEPLOY;
   }
 
   public void stopClimber() {

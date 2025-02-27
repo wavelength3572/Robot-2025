@@ -84,6 +84,7 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
+        intake = new Intake(new IntakeIOSpark() {});
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -101,11 +102,10 @@ public class RobotContainer {
                 new VisionIOPhotonVision(elevatorBackCam, robotToElevatorBackCam));
 
         elevator = new Elevator(new ElevatorIOSpark() {});
-        arm = new Arm(new ArmIOMMSpark() {});
-        intake = new Intake(new IntakeIOSpark() {});
-        coralSystem = new CoralSystem(elevator, arm, intake);
         algae = new Algae(new AlgaeIOSpark());
         climber = new Climber(new ClimberIOSpark() {});
+        arm = new Arm(new ArmIOMMSpark() {});
+        coralSystem = new CoralSystem(elevator, arm, intake);
         indicatorLight = new IndicatorLight();
         indicatorLight.setupLightingSuppliers(
             coralSystem::getCurrentCoralPreset,
