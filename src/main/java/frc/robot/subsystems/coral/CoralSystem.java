@@ -178,15 +178,15 @@ public class CoralSystem extends SubsystemBase {
     // threshold
   }
 
-  public void setTargetPreset(CoralSystemPresets preset) {
+  public void setTargetPreset(CoralSystemPresets requestedPreset) {
     // We are trying to go to a different location AND
     // We ARE NOT Climbing AND
     // We are not currently traveling to a location
-    if (preset != this.currentCoralPreset
+    if (requestedPreset != this.currentCoralPreset
         && targetCoralPreset != CLIMB
         && coralSystemState == CoralSystemMovementState.STABLE) {
       // We are allowed to move
-      this.targetCoralPreset = preset;
+      this.targetCoralPreset = requestedPreset;
       // Start Moving Arm to Safe
       this.arm.setTargetPreset(CoralSystemPresets.STOW);
       // Change state

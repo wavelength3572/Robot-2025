@@ -223,7 +223,7 @@ public class ButtonsAndDashboardBindings {
                 coralSystem::isHaveCoral,
                 climber::isClimberDeployed,
                 coralSystem.getElevator()::getHeightInInches));
-    }
+  }
 
   private static void setInitialCageSelectionToMatchSwitch() {
     if (oi.getButtonDPosition0().getAsBoolean()) {
