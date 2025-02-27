@@ -8,7 +8,6 @@ public interface AlgaeIO {
   public static class AlgaeIOInputs {
 
     // Capture Motor Values
-    public double captureRequestedSpeed = 0.0;
     public double captureVelocityRPM = 0.0;
     public double captureAppliedVolts = 0.0;
     public double captureCurrentAmps = 0.0;
@@ -18,8 +17,6 @@ public interface AlgaeIO {
     // Deploy Motor Values (Tracked in Both Degrees and Rotations)
     public double deployEncRotations = 0.0; // Current deploy encoder rotations
     public double currentAngle = 0.0;
-    public double targetEncoderRotations = 0.0; // Target encoder rotations
-    public double targetAngle = 0.0;
 
     public algaeIntakeState currentIntakeState = algaeIntakeState.OFF;
 
@@ -46,25 +43,16 @@ public interface AlgaeIO {
   /** Set PID values dynamically for position control tuning. */
   public default void setCapturePIDValues(double kP, double kD) {}
 
-  /** Set PID values dynamically for position control tuning. */
-  public default void setDeployPIDValues(double kP, double kD) {}
-
   /** Run intake motor to pull in algae (game piece). */
   public default void pullAlgae() {}
 
   /** Run intake motor to push out algae. */
   public default void pushAlgae() {}
 
-  /** Stop intake motor. */
-  public default void stopAlgae() {}
-
-  /** Deploy the arm to the predefined position. */
-  public default void deployAlgae() {}
-
-  /** Stow the arm to the predefined position. */
+  /** Stop running stuff and pull in the arm. */
   public default void stowAlgae() {}
 
-  public default void setDeployPositionAngle(double angle) {}
+  public default void algaeInClimbPosition() {}
 
   public default double getDeployPositionAngle() {
     return 0.0;

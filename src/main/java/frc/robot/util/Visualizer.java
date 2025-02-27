@@ -29,7 +29,6 @@ public class Visualizer {
   private final Supplier<Boolean> isAlgaeInRobotSupplier;
 
   private final Supplier<Double> algaeDeployPositionSupplier;
-  private final Supplier<Double> algaeCaptureSpeedSupplier;
 
   private LoggedMechanism2d coralSystem2D;
   private LoggedMechanismRoot2d coralRoot;
@@ -48,15 +47,13 @@ public class Visualizer {
       Supplier<Double> armAngleSupplier,
       Supplier<Boolean> isCoralInRobotSupplier,
       Supplier<Boolean> isAlgaeInRobotSupplier,
-      Supplier<Double> algaeDeployPositionSupplier,
-      Supplier<Double> algaeCaptureSpeedSupplier) {
+      Supplier<Double> algaeDeployPositionSupplier) {
     this.robotPoseSupplier = robotPoseSupplier;
     this.elevatorHeightSupplier = elevatorHeightSupplier;
     this.armAngleSupplier = armAngleSupplier;
     this.isCoralInRobotSupplier = isCoralInRobotSupplier;
     this.isAlgaeInRobotSupplier = isAlgaeInRobotSupplier;
     this.algaeDeployPositionSupplier = algaeDeployPositionSupplier;
-    this.algaeCaptureSpeedSupplier = algaeCaptureSpeedSupplier;
     initializeCoral2DVisualization();
     initializeAlgae2DVisualization();
   }
@@ -200,7 +197,7 @@ public class Visualizer {
     m_elevator.setLength(ElevatorConstants.kGroundToElevator + elevatorHeight);
 
     double algaeDeployPosition = algaeDeployPositionSupplier.get();
-    double algaeCaptureSpeed = algaeCaptureSpeedSupplier.get();
+    // double algaeCaptureSpeed = algaeCaptureSpeedSupplier.get();
 
     // Update algae arm position
 
@@ -211,13 +208,13 @@ public class Visualizer {
     algaeDeployArm.setAngle(-angleDegrees);
 
     // Change color of capture motor based on speed (indicating intake/outtake)
-    if (algaeCaptureSpeed > 0.1) {
-      algaeCaptureMotor.setColor(new Color8Bit(Color.kGreen)); // Intake
-    } else if (algaeCaptureSpeed < -0.1) {
-      algaeCaptureMotor.setColor(new Color8Bit(Color.kRed)); // Outtake
-    } else {
-      algaeCaptureMotor.setColor(new Color8Bit(Color.kGray)); // Idle
-    }
+    // if (algaeCaptureSpeed > 0.1) {
+    //   algaeCaptureMotor.setColor(new Color8Bit(Color.kGreen)); // Intake
+    // } else if (algaeCaptureSpeed < -0.1) {
+    //   algaeCaptureMotor.setColor(new Color8Bit(Color.kRed)); // Outtake
+    // } else {
+    //   algaeCaptureMotor.setColor(new Color8Bit(Color.kGray)); // Idle
+    // }
 
     // ✅ Log the separate 2D visualizations
     Logger.recordOutput("Visualizer/Coral System 2D", coralSystem2D);

@@ -26,18 +26,18 @@ public class Arm {
   }
 
   public void periodic() {
-    if (ArmkP.hasChanged(hashCode())
-        || ArmkD.hasChanged(hashCode())
-        || ArmVel.hasChanged(hashCode())
-        || ArmAcc.hasChanged(hashCode())) {
-      io.setPIDValues(ArmkP.get(), ArmkD.get(), ArmVel.get(), ArmAcc.get());
-    }
-    if (ArmPosDegrees.hasChanged(hashCode())) {
-      setAngleDEG(ArmPosDegrees.get());
-    }
-    if (ArmkF.hasChanged(hashCode())) {
-      io.setArbFFConstant(ArmkF.get());
-    }
+    // if (ArmkP.hasChanged(hashCode())
+    //     || ArmkD.hasChanged(hashCode())
+    //     || ArmVel.hasChanged(hashCode())
+    //     || ArmAcc.hasChanged(hashCode())) {
+    //   io.setPIDValues(ArmkP.get(), ArmkD.get(), ArmVel.get(), ArmAcc.get());
+    // }
+    // if (ArmPosDegrees.hasChanged(hashCode())) {
+    //   setAngleDEG(ArmPosDegrees.get());
+    // }
+    // if (ArmkF.hasChanged(hashCode())) {
+    //   io.setArbFFConstant(ArmkF.get());
+    // }
 
     io.updateInputs(inputs);
     Logger.processInputs("Arm", inputs);

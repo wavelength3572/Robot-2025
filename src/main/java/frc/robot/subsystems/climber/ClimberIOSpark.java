@@ -7,11 +7,11 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.subsystems.climber.ClimberConstants.CLIMB_STATE;
 import frc.robot.util.LoggedTunableNumber;
+import frc.robot.util.RobotStatus;
 
 public class ClimberIOSpark implements ClimberIO {
 
@@ -43,30 +43,26 @@ public class ClimberIOSpark implements ClimberIO {
 
     inputs.climbingFinished = isClimbingFinished();
 
-    if (ClimberkP.hasChanged(hashCode())) {
-      final SparkMaxConfig config = new SparkMaxConfig();
-      config.closedLoop.pidf(ClimberkP.get(), 0.0, 0.0, 0.0);
-      climberMotor.configure(
-          config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-    }
+    // if (ClimberkP.hasChanged(hashCode())) {
+    //   final SparkMaxConfig config = new SparkMaxConfig();
+    //   config.closedLoop.pidf(ClimberkP.get(), 0.0, 0.0, 0.0);
+    //   climberMotor.configure(
+    //       config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    // }
 
     switch (currentClimberState) {
       case STOWED:
         climberMotor.set(0.0);
-        // setRelayState(Relay.Value.kForward); //Foot shorter
         break;
       case DEPLOY:
-        // climberMotor.set(ClimberConstants.deployPower);
-        climberController.setReference(ClimberConstants.DEPLOY_POSITION, ControlType.kPosition);
-        // setRelayState(Relay.Value.kForward); //Foot shorter
+        if (RobotStatus.algaeArmIsSafeForClimbing())
+          climberController.setReference(ClimberConstants.DEPLOY_POSITION, ControlType.kPosition);
         break;
       case CLIMB:
-        // climberMotor.set(ClimberConstants.climbPower);
         climberController.setReference(ClimberConstants.CLIMBED_POSITION, ControlType.kPosition);
         setRelayState(Relay.Value.kReverse); // Foot longer
         break;
       case FINAL:
-        // climberMotor.set(0.0);
         climberController.setReference(targetPosition, ControlType.kPosition);
         break;
       default:
