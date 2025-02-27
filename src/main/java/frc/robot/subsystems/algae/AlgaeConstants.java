@@ -3,11 +3,19 @@ package frc.robot.subsystems.algae;
 public class AlgaeConstants {
   public static final int algaeDeployCanId = 33;
   public static final int algaeCaptureCanId = 30;
-  public static final int algaeDeployCurrentLimit = 50;
+  public static final int algaeDeployCurrentLimit = 40;
   public static final int algaeCaptureCurrentLimit = 30;
 
-  public static final double algaeInSpeed = 0.50;
-  public static final double algaeOutSpeed = -1.0;
+  public static final double captureIntakeVolts = 8.0;
+  public static final double capturePushVolts = -8.0;
+
+  public static final double deployBurstVolts = 1.5;
+  public static final double deployHoldOutVolts = 0.4;
+  public static final double deployPullBackVolts = -0.6;
+  public static final double deployHoldVolts = -0.6;
+  public static final double deployPushAlgaeVolts = 0.4;
+  public static final double deployStowVolts = -1.5;
+  public static final double deployPullBackFF = 1.788545;
 
   public static final double kAlgaeDeployKp = 0.1;
   public static final double kAlgaeDeployKd = 0.0;
@@ -26,11 +34,13 @@ public class AlgaeConstants {
   public static enum algaeIntakeState {
     OFF,
     PUSH,
+    BURST,
     PULL,
     DETECT,
     CAPTURE,
     PULL_ARM,
-    HOLD_ARM,
-    STOW
+    STOW,
+    CLIMB,
+    MANUAL
   }
 }
