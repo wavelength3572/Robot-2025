@@ -183,7 +183,6 @@ public class Robot extends LoggedRobot {
       autonomousCommand.cancel();
     }
     robotContainer.getVision().setVisionOn();
-    
   }
 
   /** This function is called periodically during operator control. */
