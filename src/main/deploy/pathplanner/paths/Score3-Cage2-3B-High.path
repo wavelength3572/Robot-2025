@@ -3,39 +3,44 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.1507211538461533,
-        "y": 1.0062499999999988
+        "x": 6.985,
+        "y": 6.171
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9188440534082347,
-        "y": 1.6635110793060228
+        "x": 6.139793808568272,
+        "y": 5.579180253417985
       },
       "isLocked": false,
-      "linkedName": "StationRight"
+      "linkedName": "Cage2"
     },
     {
       "anchor": {
-        "x": 3.572031885630066,
-        "y": 3.0364588949735296
+        "x": 5.164238769222129,
+        "y": 5.138844086630764
       },
       "prevControl": {
-        "x": 3.0163044226434814,
-        "y": 2.0739106939194127
+        "x": 5.3285672588508985,
+        "y": 5.327248299684313
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "6A"
+      "linkedName": "3B"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -119.99999999999999
+    }
+  ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0.9,
+      "maxWaypointRelativePos": 0.8,
       "constraints": {
-        "maxVelocity": 2.0,
+        "maxVelocity": 2.75,
         "maxAcceleration": 2.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -48,28 +53,28 @@
   "eventMarkers": [
     {
       "name": "L4",
-      "waypointRelativePos": 0.5664794007490783,
+      "waypointRelativePos": 0.1,
       "endWaypointRelativePos": null,
       "command": null
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 0.5,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 1.25,
+    "maxAcceleration": 1.75,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 59.99999999999999
+    "velocity": 0.0,
+    "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": "StationRight",
+  "folder": "Score3Cage2",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 54.0
+    "rotation": -135.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

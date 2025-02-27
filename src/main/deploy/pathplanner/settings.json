@@ -6,6 +6,8 @@
     "Tests",
     "StationRight",
     "StationLeft",
+    "Score3Cage2",
+    "Score3Cage5",
     "Mid",
     "Face6",
     "Face5",
@@ -19,9 +21,10 @@
   "autoFolders": [
     "Cage1",
     "Cage2",
-    "Cage6",
     "Cage5",
+    "Cage6",
     "Mid",
+    "LakeCityAutos",
     "Tests"
   ],
   "defaultMaxVel": 0.5,

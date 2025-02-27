@@ -5,27 +5,21 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "TurnVisionOff"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 10.0
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "Cage1Wall-3A"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "WaitForPreset"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stow"
+            "pathName": "DefaultMoveOnly"
           }
         }
       ]

@@ -61,7 +61,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Subsystems
-  private final Vision vision;
+  @Getter private final Vision vision;
   @Getter private final Drive drive;
   private final Elevator elevator;
   private final Arm arm;
@@ -196,7 +196,7 @@ public class RobotContainer {
     // give static access to certain methods across subsystems
     RobotStatus.initialize(drive, coralSystem, vision, climber);
 
-    PathPlannerCommands.Setup(coralSystem, drive);
+    PathPlannerCommands.Setup(coralSystem, drive, vision);
     SetupAutoChooser();
     updateOI();
   }

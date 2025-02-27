@@ -8,31 +8,31 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9188440534082347,
-        "y": 1.6635110793060228
+        "x": 2.5061051324503314,
+        "y": 2.5286009933774833
       },
       "isLocked": false,
       "linkedName": "StationRight"
     },
     {
       "anchor": {
-        "x": 3.572031885630066,
-        "y": 3.0364588949735296
+        "x": 3.826830474880629,
+        "y": 2.8946849994911212
       },
       "prevControl": {
-        "x": 3.0163044226434814,
-        "y": 2.0739106939194127
+        "x": 3.3850579470198676,
+        "y": 2.5867135761589397
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "6A"
+      "linkedName": "6B"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0,
+      "minWaypointRelativePos": 0.0,
       "maxWaypointRelativePos": 0.9,
       "constraints": {
         "maxVelocity": 2.0,
@@ -48,7 +48,7 @@
   "eventMarkers": [
     {
       "name": "L4",
-      "waypointRelativePos": 0.5664794007490783,
+      "waypointRelativePos": 0.40686695278969925,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -66,7 +66,7 @@
     "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": "StationRight",
+  "folder": "Score3Cage5",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 54.0

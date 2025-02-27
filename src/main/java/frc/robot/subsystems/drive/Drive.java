@@ -191,9 +191,6 @@ public class Drive extends SubsystemBase {
         case RED:
           // Robot is within the outer threshold (red zone)
           break;
-        case YELLOW:
-          // Robot is closer (yellow zone)
-          break;
         case GREEN:
           // Robot is within scoring range (green zone)
           break;

@@ -37,13 +37,13 @@
         {
           "type": "named",
           "data": {
-            "name": "StationLeft-2B-High-OR-1A-Low"
+            "name": "StationLeft-2BHigh-OR-1ALow"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Cage2",
+  "folder": "LakeCityAutos",
   "choreoAuto": false
 }
