@@ -329,7 +329,15 @@ public interface OperatorInterface {
     return new Trigger(() -> false);
   }
 
+  public default Trigger getButtonDPosition1() {
+    return new Trigger(() -> false);
+  }
+
   public default Trigger getButtonDPosition2() {
+    return new Trigger(() -> false);
+  }
+
+  public default Trigger getButtonI() {
     return new Trigger(() -> false);
   }
 }

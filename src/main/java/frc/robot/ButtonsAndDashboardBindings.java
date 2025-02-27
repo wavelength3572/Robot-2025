@@ -1,11 +1,11 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.FieldConstants.CageTarget;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
@@ -73,7 +73,7 @@ public class ButtonsAndDashboardBindings {
   private static void configureDashboardBindings() {
 
     SmartDashboard.putData(
-        "Set Coral In Robot",
+        "Toggle Coral In Robot",
         Commands.runOnce(() -> coralSystem.setCoralInRobot(true)).ignoringDisable(true));
 
     SmartDashboard.putData(
@@ -178,53 +178,64 @@ public class ButtonsAndDashboardBindings {
     oi.getResetGyroButton()
         .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
 
-    oi.getButtonFPosition0() // Push Relay Arm
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  climber.setRelayState(Relay.Value.kForward);
-                }));
+    setInitialCageSelectionToMatchSwitch();
 
-    oi.getButtonFPosition2() // Pull Relay Arm
+    oi.getButtonDPosition0()
         .onTrue(
-            Commands.runOnce(
-                () -> {
-                  climber.setRelayState(Relay.Value.kReverse);
-                }));
+            Commands.runOnce(AlignmentUtils::setLeftCage)
+                .ignoringDisable(true)
+                .alongWith(Commands.runOnce(() -> climber.setSelectedCageTarget(CageTarget.LEFT)))
+                .ignoringDisable(true));
+    oi.getButtonDPosition1()
+        .onTrue(
+            Commands.runOnce(AlignmentUtils::setMidCage)
+                .ignoringDisable(true)
+                .alongWith(Commands.runOnce(() -> climber.setSelectedCageTarget(CageTarget.MID)))
+                .ignoringDisable(true));
+    oi.getButtonDPosition2()
+        .onTrue(
+            Commands.runOnce(AlignmentUtils::setRightCage)
+                .ignoringDisable(true)
+                .alongWith(Commands.runOnce(() -> climber.setSelectedCageTarget(CageTarget.RIGHT)))
+                .ignoringDisable(true));
 
-    if (oi.getButtonGPosition0().getAsBoolean()) {
+    oi.getRightJoyLeftButton()
+        .onTrue(
+            DriveToCommands.driveToPole(
+                drive,
+                true,
+                oi::getTranslateX,
+                oi::getTranslateY,
+                oi::getRotate,
+                FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
+                coralSystem::isCoralInRobot));
+
+    oi.getRightJoyRightButton()
+        .onTrue(
+            DriveToCommands.driveToPole(
+                drive,
+                false,
+                oi::getTranslateX,
+                oi::getTranslateY,
+                oi::getRotate,
+                FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
+                coralSystem::isCoralInRobot));
+
+    // Give Driver ability to toggle Smart Drive
+    oi.getButtonI().onTrue(Commands.runOnce(drive::toggleDriveMode, drive));
+  }
+
+  private static void setInitialCageSelectionToMatchSwitch() {
+    if (oi.getButtonDPosition0().getAsBoolean()) {
       AlignmentUtils.setLeftCage();
-    } else if (oi.getButtonGPosition1().getAsBoolean()) {
+      climber.setSelectedCageTarget(CageTarget.LEFT);
+    } else if (oi.getButtonDPosition1().getAsBoolean()) {
       AlignmentUtils.setMidCage();
+      climber.setSelectedCageTarget(CageTarget.MID);
     } else {
       AlignmentUtils.setRightCage();
+      climber.setSelectedCageTarget(CageTarget.RIGHT);
     }
-
-    oi.getButtonGPosition0().onTrue(Commands.runOnce(AlignmentUtils::setLeftCage));
-    oi.getButtonGPosition1().onTrue(Commands.runOnce(AlignmentUtils::setMidCage));
-    oi.getButtonGPosition2().onTrue(Commands.runOnce(AlignmentUtils::setRightCage));
-
-    // oi.getRightJoyLeftButton()
-    // .onTrue(
-    // DriveToCommands.driveToPole(
-    // drive,
-    // true,
-    // oi::getTranslateX,
-    // oi::getTranslateY,
-    // oi::getRotate,
-    // FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-    // coralSystem::isCoralInRobot));
-
-    // oi.getRightJoyRightButton()
-    // .onTrue(
-    // DriveToCommands.driveToPole(
-    // drive,
-    // false,
-    // oi::getTranslateX,
-    // oi::getTranslateY,
-    // oi::getRotate,
-    // FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-    // coralSystem::isCoralInRobot));
   }
 
   /****************************** */

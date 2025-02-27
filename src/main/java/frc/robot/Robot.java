@@ -184,9 +184,11 @@ public class Robot extends LoggedRobot {
     }
     robotContainer.getVision().setVisionOn();
 
-    if (Constants.isCompetition) {
+    if (Constants.isCompetition)
+    {
       robotContainer.getDrive().setDriveModeSmart();
     }
+
   }
 
   /** This function is called periodically during operator control. */

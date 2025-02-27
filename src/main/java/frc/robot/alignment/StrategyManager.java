@@ -30,9 +30,9 @@ public class StrategyManager implements AlignmentStrategy {
   // Store the currently active strategy for consistency across a loop cycle
   private AlignmentStrategy currentActiveStrategy = noOpStrategy;
 
-  @AutoLogOutput(key = "Alignment/useFullCageAlignment")
+  @AutoLogOutput(key = "Alignment/fullCageAlignment")
   @Getter
-  private boolean useFullCageAlignment = false; // 🔥 Toggle flag
+  private boolean fullCageAlignment = false; // 🔥 Toggle flag
 
   public StrategyManager() {
     // Initialize shared PID controller
@@ -54,7 +54,7 @@ public class StrategyManager implements AlignmentStrategy {
   }
 
   public void toggleAutoCageAlignmentMode() {
-    useFullCageAlignment = !useFullCageAlignment;
+    fullCageAlignment = !fullCageAlignment;
   }
 
   /**
@@ -84,7 +84,7 @@ public class StrategyManager implements AlignmentStrategy {
     } else if (nearCoralStation && !haveCoral && !climberDeployed) {
       currentActiveStrategy = coralStationStrategy;
     } else if (nearCage && climberDeployed) {
-      currentActiveStrategy = useFullCageAlignment ? cageFullAlignmentStrategy : cageStrategy;
+      currentActiveStrategy = fullCageAlignment ? cageFullAlignmentStrategy : cageStrategy;
     } else {
       currentActiveStrategy = noOpStrategy;
     }
