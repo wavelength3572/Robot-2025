@@ -51,7 +51,7 @@ public class CoralSystem extends SubsystemBase {
   @Getter private Arm arm;
   @Getter private Intake intake;
 
-  @Getter public boolean coralInRobot;
+  @Getter public boolean haveCoral;
 
   @Getter
   @AutoLogOutput(key = "CoralSystem/justMissed")
@@ -79,7 +79,7 @@ public class CoralSystem extends SubsystemBase {
   private CoralPickupState pickupState = CoralPickupState.WAITING_FOR_CORAL;
 
   // Field to track the previous coral state
-  private boolean previousCoralInRobot = false;
+  private boolean previousHaveCoral = false;
 
   // For calculating a moving average of the TOF sensor readings
   private final Deque<Double> tofReadings = new ArrayDeque<>();
@@ -114,10 +114,10 @@ public class CoralSystem extends SubsystemBase {
     this.arm.periodic();
     this.intake.periodic();
 
-    coralInRobot = this.intake.getCoralInRobot();
+    haveCoral = this.intake.haveCoral();
     ReefScoringLogger.checkAndLogScoringEvent(RobotStatus.getRobotPose(), this);
 
-    Logger.recordOutput("CoralSystem/CoralInRobot", coralInRobot);
+    Logger.recordOutput("CoralSystem/HaveCoral", haveCoral);
     Logger.recordOutput("CoralSystem/ElevatorAtGoal", elevator.isAtGoal());
     Logger.recordOutput("CoralSystem/ArmAtGoal", arm.isAtGoal());
     Logger.recordOutput("CoralSystem/AtGoal", isAtGoal());
@@ -206,9 +206,9 @@ public class CoralSystem extends SubsystemBase {
     }
   }
 
-  public void setCoralInRobot(Boolean coralInRobot) {
-    this.coralInRobot = coralInRobot;
-    this.intake.setCoralInRobot(coralInRobot);
+  public void autoSetHaveCoral(Boolean haveCoral) {
+    this.haveCoral = haveCoral;
+    this.intake.autoSetHaveCoral(haveCoral);
   }
 
   public boolean isAtGoal() {
@@ -246,7 +246,7 @@ public class CoralSystem extends SubsystemBase {
     // Log the current state and coral status at the start of the check
     Logger.recordOutput(
         "CoralSystem/CoralPickupStateStatus",
-        "State: " + pickupState + " | coralInRobot: " + coralInRobot);
+        "State: " + pickupState + " | HaveCoral: " + haveCoral);
 
     // Always update the TOF moving average on every check
     addTOFReading(getTimeOfFlightRange());
@@ -257,7 +257,7 @@ public class CoralSystem extends SubsystemBase {
     switch (pickupState) {
       case WAITING_FOR_CORAL:
         // Look for a transition from not having coral to having coral.
-        if (!previousCoralInRobot && coralInRobot) {
+        if (!previousHaveCoral && haveCoral) {
           justMissedCoralScoral = false;
           justScoredCoral = false;
           Logger.recordOutput(
@@ -310,7 +310,7 @@ public class CoralSystem extends SubsystemBase {
 
       case HAVE_CORAL_WAITING:
         // Wait until the robot no longer has a coral.
-        if (!coralInRobot) {
+        if (!haveCoral) {
 
           if (BranchAlignmentUtils.getCurrentBranchAlignmentStatus()
               == BranchAlignmentStatus.GREEN) {
@@ -332,7 +332,7 @@ public class CoralSystem extends SubsystemBase {
     }
 
     // Update the previous coral state for the next cycle.
-    previousCoralInRobot = coralInRobot;
+    previousHaveCoral = haveCoral;
   }
 
   // Helper method to add a TOF reading and keep a window of the last

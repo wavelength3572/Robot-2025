@@ -27,12 +27,12 @@ public class Intake {
     io.stopIntake();
   }
 
-  public boolean getCoralInRobot() {
-    return io.getCoralInRobot();
+  public boolean haveCoral() {
+    return io.haveCoral();
   }
 
-  public void setCoralInRobot(boolean coralInRobot) {
-    io.setCoralInRobot(coralInRobot);
+  public void autoSetHaveCoral(boolean haveCoral) {
+    io.autoSetHaveCoral(haveCoral);
   }
 
   public double get_Arm_TBE_DEG() {

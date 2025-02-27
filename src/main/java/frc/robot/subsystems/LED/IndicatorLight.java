@@ -75,7 +75,7 @@ public class IndicatorLight extends SubsystemBase {
   private final int maxBrightness = 255;
   private int center = 9;
   private final double updateInterval = 0.05; // Interval in seconds for updates
-  private Supplier<Boolean> getIsCoralInRobot;
+  private Supplier<Boolean> getHaveCoral;
   private boolean pickupBlinkTriggered = false;
   @AutoLogOutput @Getter private boolean branchAlignmentOn = false;
   private AddressableLEDBuffer currentActiveBuffer;
@@ -84,11 +84,11 @@ public class IndicatorLight extends SubsystemBase {
       Supplier<CoralSystemPresets> currentPreset,
       Supplier<CoralSystemPresets> selectedPreset,
       Supplier<CoralSystemPresets> targetPreset,
-      Supplier<Boolean> isCoralInRobot) {
+      Supplier<Boolean> getHaveCoral) {
     this.getCurrentCoralPreset = currentPreset;
     this.getSelectedCoralPreset = selectedPreset;
     this.getTargetCoralPreset = targetPreset;
-    this.getIsCoralInRobot = isCoralInRobot;
+    this.getHaveCoral = getHaveCoral;
   }
 
   public IndicatorLight() {
@@ -703,7 +703,7 @@ public class IndicatorLight extends SubsystemBase {
     // 2) If CURRENT preset is PICKUP, handle coral presence.
     else if (currentPreset.equals(CoralSystemPresets.PICKUP)) {
 
-      boolean coralPresent = (getIsCoralInRobot != null && getIsCoralInRobot.get());
+      boolean coralPresent = (getHaveCoral != null && getHaveCoral.get());
 
       if (!coralPresent) {
         // No coral → reset blink so we blink again next time a coral appears

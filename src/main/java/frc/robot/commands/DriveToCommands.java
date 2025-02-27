@@ -68,10 +68,10 @@ public class DriveToCommands {
       DoubleSupplier yJoystickSupplier,
       DoubleSupplier rotationJoystickSupplier,
       double distanceThresholdMeters,
-      BooleanSupplier isCoralInRobotSupplier) {
+      BooleanSupplier haveCoralSupplier) {
     return Commands.runOnce(
         () -> {
-          if (!isCoralInRobotSupplier.getAsBoolean()) {
+          if (!haveCoralSupplier.getAsBoolean()) {
             System.out.println("No coral in the robot. Aborting drive to pole.");
             return;
           }

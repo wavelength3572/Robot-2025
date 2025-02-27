@@ -30,16 +30,16 @@ public class AlgaeIOVirtualSim implements AlgaeIO {
     }
 
     // Algae Detection (Simulating Intake State)
-    inputs.algaeInRobot = haveAlgae;
+    inputs.haveAlgae = haveAlgae;
   }
 
   @Override
-  public void setAlgaeInRobot(boolean algaeInRobot) {
-    haveAlgae = algaeInRobot;
+  public void setHaveAlgae(boolean haveAlgae) {
+    this.haveAlgae = haveAlgae;
   }
 
   @Override
-  public boolean isAlgaeInRobot() {
+  public boolean haveAlgae() {
     return haveAlgae;
   }
 

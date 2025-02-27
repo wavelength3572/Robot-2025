@@ -74,7 +74,7 @@ public class IntakeIOVirtualSim implements IntakeIO {
     }
 
     inputs.requestedSpeed = this.requestedSpeed;
-    inputs.coralInRobot = haveCoral;
+    inputs.haveCoral = haveCoral;
   }
 
   @Override
@@ -98,7 +98,7 @@ public class IntakeIOVirtualSim implements IntakeIO {
   }
 
   @Override
-  public boolean getCoralInRobot() {
+  public boolean haveCoral() {
     return haveCoral;
   }
 
@@ -108,8 +108,8 @@ public class IntakeIOVirtualSim implements IntakeIO {
   }
 
   @Override
-  public void setCoralInRobot(boolean coralInRobot) {
-    haveCoral = coralInRobot;
+  public void autoSetHaveCoral(boolean haveCoral) {
+    this.haveCoral = haveCoral;
   }
 
   private boolean isNearCorrectFeeder() {

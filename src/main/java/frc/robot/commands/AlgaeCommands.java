@@ -63,7 +63,7 @@ public class AlgaeCommands {
             withinThreshold = (distance < FieldConstants.THRESHOLD_DISTANCE_FOR_DISLODGE);
           }
 
-          boolean noCoral = !coralSystem.isCoralInRobot();
+          boolean noCoral = !coralSystem.isHaveCoral();
 
           return withinThreshold && noCoral;
         });
@@ -137,7 +137,7 @@ public class AlgaeCommands {
                       || coralSystem.getCurrentCoralPreset()
                           == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
 
-          boolean noCoral = !coralSystem.isCoralInRobot();
+          boolean noCoral = !coralSystem.isHaveCoral();
           return isInDislodgePreset && noCoral;
         });
   }
@@ -197,7 +197,7 @@ public class AlgaeCommands {
                       || coralSystem.getCurrentCoralPreset()
                           == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
 
-          boolean noCoral = !coralSystem.isCoralInRobot();
+          boolean noCoral = !coralSystem.isHaveCoral();
           return isInDislodgePreset && noCoral;
         });
   }

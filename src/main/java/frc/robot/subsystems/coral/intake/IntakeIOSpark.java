@@ -61,7 +61,7 @@ public class IntakeIOSpark implements IntakeIO {
     inputs.motorPosition = intakeEncoder.getPosition();
     inputs.Arm_TBE = armEncoder.getPosition();
     inputs.Arm_TBE_DEG = ArmConstants.armTBEOffset + ((1.0 - inputs.Arm_TBE) * 120.0);
-    inputs.coralInRobot = haveCoral;
+    inputs.haveCoral = haveCoral;
   }
 
   @Override
@@ -70,7 +70,7 @@ public class IntakeIOSpark implements IntakeIO {
   }
 
   @Override
-  public boolean getCoralInRobot() {
+  public boolean haveCoral() {
     return haveCoral;
   }
 
@@ -97,5 +97,10 @@ public class IntakeIOSpark implements IntakeIO {
     double Arm_TBE_Local = armEncoder.getPosition();
     double Arm_TBE_DEG_local = ArmConstants.armTBEOffset + ((1.0 - Arm_TBE_Local) * 120.0);
     return Arm_TBE_DEG_local;
+  }
+
+  @Override
+  public void autoSetHaveCoral(boolean haveCoral) {
+    this.haveCoral = haveCoral;
   }
 }

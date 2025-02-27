@@ -76,7 +76,7 @@ public class RobotStatus {
   }
 
   public static boolean haveCoral() {
-    return coralSystem.getIntake().getCoralInRobot();
+    return coralSystem.getIntake().haveCoral();
   }
 
   public static boolean isClimbingFinished() {

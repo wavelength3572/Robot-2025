@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -56,13 +57,12 @@ public class ButtonsAndDashboardBindings {
     ButtonsAndDashboardBindings.algae = algae;
     ButtonsAndDashboardBindings.vision = vision;
 
-    drive.setDriveModeNormal();
+    // Note that we are turning on smart drive in Robot.java teleopInit() if isCompetition is true
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(drive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
 
     configureDriverButtonBindings();
     configureOperatorButtonBindings();
-
     configureDashboardBindings();
   }
 
@@ -72,9 +72,39 @@ public class ButtonsAndDashboardBindings {
 
   private static void configureDashboardBindings() {
 
+    // Dashboard Buttons to Mimic the Button Box
     SmartDashboard.putData(
-        "Toggle Coral In Robot",
-        Commands.runOnce(() -> coralSystem.setCoralInRobot(true)).ignoringDisable(true));
+        "Shelf - L1", Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L1)));
+    SmartDashboard.putData(
+        "Low - L2",
+        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L2))); // L2
+    SmartDashboard.putData(
+        "Mid - L3",
+        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L3))); // L3
+    SmartDashboard.putData(
+        "High - L4",
+        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L4))); // L4
+
+    SmartDashboard.putData("Pickup Coral", createPickupCoralCommand());
+    SmartDashboard.putData("Reef Action", createReefActionCommand()); // Score OR Dislodge
+    SmartDashboard.putData("Prep L1 Dislodge", createPrepL1DislodgeCommand());
+    SmartDashboard.putData("Prep L2 Dislodge", createPrepL2DislodgeCommand());
+
+    SmartDashboard.putData(
+        "Deploy & Capture Algae",
+        Commands.runOnce(algae::pullAlgae)); // Deploy Algae Collector & Capture Algae
+
+    // This is one button on the Button Box, not sure how to simulate the same thing
+    // from dashbaord
+    SmartDashboard.putData(
+        "Deploy & Process Algae",
+        Commands.runOnce(algae::pushAlgae)); // Depoloy Algae Collector & Process Algae
+    SmartDashboard.putData(
+        "Stow Algae Collector", Commands.runOnce(algae::stowAlgae)); // Stow Algae Collector
+
+    // Dashboard Toggles
+    SmartDashboard.putData(
+        "Toggle Vision", Commands.runOnce(vision::toggleVision).ignoringDisable(true));
 
     SmartDashboard.putData(
         "Toggle Smart Drive",
@@ -83,17 +113,22 @@ public class ButtonsAndDashboardBindings {
             oi::getTranslateX,
             oi::getTranslateY,
             oi::getRotate,
-            coralSystem::isCoralInRobot,
+            coralSystem::isHaveCoral,
             climber::isClimberDeployed,
             coralSystem.getElevator()::getHeightInInches));
 
     SmartDashboard.putData(
-        "Toggle Elevator Height Speed Limits",
-        Commands.runOnce(drive::toggleElevatorHeightLimitsSpeed));
+        "Toggle Cage Alignment Mode",
+        Commands.runOnce(drive.getStrategyManager()::toggleAutoCageAlignmentMode));
 
     SmartDashboard.putData(
-        "Toggle Vision", Commands.runOnce(vision::toggleVision).ignoringDisable(true));
+        "Toggle Alignment Indicator",
+        Commands.runOnce(indicatorLight::toggleBranchAlignmentIndicator).ignoringDisable(true));
 
+    SmartDashboard.putData(
+        "Toggle Elevator Limits Speed", Commands.runOnce(drive::toggleElevatorHeightLimitsSpeed));
+
+    // SmartDashboard Alignment Buttons
     SmartDashboard.putData(
         "Closest A Pole",
         DriveToCommands.driveToPole(
@@ -103,7 +138,7 @@ public class ButtonsAndDashboardBindings {
             oi::getTranslateY,
             oi::getRotate,
             FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-            coralSystem::isCoralInRobot));
+            coralSystem::isHaveCoral));
 
     SmartDashboard.putData(
         "Closest B Pole",
@@ -114,59 +149,10 @@ public class ButtonsAndDashboardBindings {
             oi::getTranslateY,
             oi::getRotate,
             FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-            coralSystem::isCoralInRobot));
-
-    SmartDashboard.putData("Algae Alignment", AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
-    SmartDashboard.putData(
-        "Algae Dislodge", AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi));
+            coralSystem::isHaveCoral));
 
     SmartDashboard.putData(
-        "Toggle Cage Alignment Mode",
-        Commands.runOnce(drive.getStrategyManager()::toggleAutoCageAlignmentMode));
-
-    SmartDashboard.putData(
-        "Deploy Algae Collector",
-        Commands.runOnce( // this is the collect algae - YELLOW INTAKE BUTTON
-            () -> {
-              algae.pullAlgae();
-            }));
-
-    SmartDashboard.putData(
-        "Process Algae",
-        Commands.runOnce( // this is the process algae button
-            () -> {
-              algae.pushAlgae(); // run algae intake
-            }));
-
-    SmartDashboard.putData(
-        "Prepare Dislodge L1",
-        new SequentialCommandGroup(
-            new InstantCommand(
-                () ->
-                    coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1)),
-            new WaitUntilCommand(coralSystem::isAtGoal),
-            new InstantCommand(
-                () ->
-                    coralSystem.setSimultaneousTargetPreset(
-                        CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1))));
-
-    SmartDashboard.putData(
-        "Dislodge",
-        Commands.runOnce(
-            () -> {
-              if (coralSystem.currentCoralPreset
-                      == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
-                  || coralSystem.currentCoralPreset
-                      == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
-                AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi).schedule();
-              } else {
-                new ScoreCoralCommand(coralSystem.getIntake()).schedule();
-              }
-            }));
-
-    SmartDashboard.putData(
-        "Toggle Branch Alignment Indicator",
-        Commands.runOnce(indicatorLight::toggleBranchAlignmentIndicator).ignoringDisable(true));
+        "Closest Staged Algae", AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
   }
 
   /****************************** */
@@ -208,7 +194,7 @@ public class ButtonsAndDashboardBindings {
                 oi::getTranslateY,
                 oi::getRotate,
                 FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-                coralSystem::isCoralInRobot));
+                coralSystem::isHaveCoral));
 
     oi.getRightJoyRightButton()
         .onTrue(
@@ -219,7 +205,7 @@ public class ButtonsAndDashboardBindings {
                 oi::getTranslateY,
                 oi::getRotate,
                 FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-                coralSystem::isCoralInRobot));
+                coralSystem::isHaveCoral));
 
     // Give Driver ability to toggle Smart Drive
     oi.getButtonI().onTrue(Commands.runOnce(drive::toggleDriveMode, drive));
@@ -244,46 +230,6 @@ public class ButtonsAndDashboardBindings {
 
   private static void configureOperatorButtonBindings() {
 
-    oi.getButtonBox1Button3() // Reef Button - So either dislodge sequence or spit out coral
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  if (coralSystem.currentCoralPreset
-                          == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
-                      || coralSystem.currentCoralPreset
-                          == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
-                    AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi).schedule();
-                  } else {
-                    new ScoreCoralCommand(coralSystem.getIntake()).schedule();
-                  }
-                }));
-
-    oi.getButtonBox1Button7() // the big switch
-        .onTrue(Commands.runOnce(climber::deployClimber))
-        .onTrue(Commands.runOnce(coralSystem::deployClimberTriggered))
-        .onTrue(Commands.runOnce(algae::deployClimberTriggered));
-
-    oi.getButtonBox1Button8().onTrue(Commands.runOnce(climber::climb));
-
-    oi.getButtonBox1Button6()
-        .onTrue(
-            Commands.runOnce( // this is the collect algae - YELLOW INTAKE BUTTON
-                () -> {
-                  algae.pullAlgae();
-                }));
-
-    oi.getButtonBox1Button5()
-        .onTrue(
-            Commands.runOnce( // this is the process algae button
-                () -> {
-                  algae.pushAlgae(); // run algae intake
-                }))
-        .onFalse(
-            Commands.runOnce( // this is the process algae button
-                () -> {
-                  algae.stowAlgae(); // does mechanism need to move?
-                }));
-
     oi.getButtonBox1YAxisPositive()
         .onTrue(Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L1))); // L1
     oi.getButtonBox1YAxisNegative()
@@ -293,45 +239,80 @@ public class ButtonsAndDashboardBindings {
     oi.getButtonBox1XAxisPositive()
         .onTrue(Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L4))); // L4
 
-    oi.getButtonBox1Button1() // Prepare to dislodge L1 Algae
-        .onTrue(
-            new SequentialCommandGroup(
-                new InstantCommand(
-                    () ->
-                        coralSystem.setTargetPreset(
-                            CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1),
-                    coralSystem),
-                new WaitUntilCommand(coralSystem::isAtGoal),
-                new InstantCommand(
-                    () ->
-                        coralSystem.setSimultaneousTargetPreset(
-                            CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1),
-                    coralSystem)));
+    oi.getButtonBox1Button1() // Prep L1 Algae Dislodge
+        .onTrue(createPrepL1DislodgeCommand());
 
-    oi.getButtonBox1Button2() // Prepare to dislodge L2 Algae
-        .onTrue(
-            new SequentialCommandGroup(
-                new InstantCommand(
-                    () ->
-                        coralSystem.setTargetPreset(
-                            CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2),
-                    coralSystem),
-                new WaitUntilCommand(coralSystem::isAtGoal),
-                new InstantCommand(
-                    () ->
-                        coralSystem.setSimultaneousTargetPreset(
-                            CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2),
-                    coralSystem)));
+    oi.getButtonBox1Button2() // Prep L2 Algae Dislodge
+        .onTrue(createPrepL2DislodgeCommand());
 
-    oi.getButtonBox1Button4() // Pickup button
-        // If you click the pickup button and you have coral then do nothing
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  if (RobotStatus.haveCoral() == false) {
-                    coralSystem.setTargetPreset(CoralSystemPresets.PICKUP);
-                    coralSystem.getIntake().pullCoral();
-                  }
-                }));
+    oi.getButtonBox1Button3() // Reef Action - Dislodge Algae Sequence OR score coral
+        .onTrue(createReefActionCommand());
+
+    oi.getButtonBox1Button4() // Pickup Coral
+        .onTrue(createPickupCoralCommand());
+
+    oi.getButtonBox1Button5() // Process Algae / Stow Collector
+        .onTrue(Commands.runOnce(algae::pushAlgae))
+        .onFalse(Commands.runOnce(algae::stowAlgae));
+
+    oi.getButtonBox1Button6() // Deploy Collector & Capture Algae
+        .onTrue(Commands.runOnce(algae::pullAlgae));
+
+    oi.getButtonBox1Button7() // Deploy Climber - the big switch
+        .onTrue(Commands.runOnce(climber::deployClimber))
+        .onTrue(Commands.runOnce(coralSystem::deployClimberTriggered))
+        .onTrue(Commands.runOnce(algae::deployClimberTriggered));
+
+    oi.getButtonBox1Button8().onTrue(Commands.runOnce(climber::climb)); // Climb
+  }
+
+  // If you click the pickup button and you have coral then do nothing
+  private static Command createPickupCoralCommand() {
+    return Commands.runOnce(
+        () -> {
+          if (RobotStatus.haveCoral() == false) {
+            coralSystem.setTargetPreset(CoralSystemPresets.PICKUP);
+            coralSystem.getIntake().pullCoral();
+          }
+        });
+  }
+
+  private static Command createReefActionCommand() {
+    return Commands.runOnce(
+        () -> {
+          if (coralSystem.currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+              || coralSystem.currentCoralPreset
+                  == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
+            AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi).schedule();
+          } else {
+            new ScoreCoralCommand(coralSystem.getIntake()).schedule();
+          }
+        });
+  }
+
+  private static Command createPrepL2DislodgeCommand() {
+    return new SequentialCommandGroup(
+        new InstantCommand(
+            () -> coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2),
+            coralSystem),
+        new WaitUntilCommand(coralSystem::isAtGoal),
+        new InstantCommand(
+            () ->
+                coralSystem.setSimultaneousTargetPreset(
+                    CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2),
+            coralSystem));
+  }
+
+  private static Command createPrepL1DislodgeCommand() {
+    return new SequentialCommandGroup(
+        new InstantCommand(
+            () -> coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1),
+            coralSystem),
+        new WaitUntilCommand(coralSystem::isAtGoal),
+        new InstantCommand(
+            () ->
+                coralSystem.setSimultaneousTargetPreset(
+                    CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1),
+            coralSystem));
   }
 }

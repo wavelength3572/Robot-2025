@@ -153,7 +153,7 @@ public class AlgaeIOSpark implements AlgaeIO {
         break;
     }
     // Game piece detection
-    inputs.algaeInRobot = haveAlgae; // Placeholder; add sensor logic if needed
+    inputs.haveAlgae = haveAlgae; // Placeholder; add sensor logic if needed
   }
 
   public double angleToRotations(double angle) {
@@ -213,7 +213,7 @@ public class AlgaeIOSpark implements AlgaeIO {
     return rotationsToAngle(algaeDeployEncoder.getPosition());
   }
 
-  public boolean isAlgaeInRobot() {
+  public boolean haveAlgae() {
     return haveAlgae;
   }
 }

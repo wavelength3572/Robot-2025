@@ -58,13 +58,13 @@ public class ReefScoringLogger {
   private static final List<ScoringEvent> events = new ArrayList<>();
 
   // Track the previous value of coral in robot so we detect transitions
-  private static boolean prevCoralInRobot = false;
+  private static boolean prevHaveCoral = false;
 
   public static void checkAndLogScoringEvent(Pose2d currentPose, CoralSystem coralSystem) {
-    boolean currentCoralInRobot = coralSystem.isCoralInRobot();
+    boolean currentHaveCoral = coralSystem.isHaveCoral();
 
     // If we used to have coral, and now we don't, that's a potential scoring event
-    if (prevCoralInRobot && !currentCoralInRobot) {
+    if (prevHaveCoral && !currentHaveCoral) {
       // 1) Find the closest reef face
       AlignmentUtils.ReefFaceSelection faceSelection =
           AlignmentUtils.findClosestReefFaceAndRejectOthers(currentPose);
@@ -112,7 +112,7 @@ public class ReefScoringLogger {
     }
 
     // Update the previous state
-    prevCoralInRobot = currentCoralInRobot;
+    prevHaveCoral = currentHaveCoral;
   }
 
   /** If you want to retrieve the full list of scored events later on. */

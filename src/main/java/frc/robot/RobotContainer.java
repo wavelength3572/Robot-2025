@@ -111,7 +111,7 @@ public class RobotContainer {
             coralSystem::getCurrentCoralPreset,
             coralSystem.coralSystemPresetChooser::getSelected,
             coralSystem::getTargetCoralPreset,
-            coralSystem::isCoralInRobot);
+            coralSystem::isHaveCoral);
         break;
 
       case SIM:
@@ -144,7 +144,7 @@ public class RobotContainer {
             coralSystem::getCurrentCoralPreset,
             coralSystem.coralSystemPresetChooser::getSelected,
             coralSystem::getTargetCoralPreset,
-            coralSystem::isCoralInRobot);
+            coralSystem::isHaveCoral);
 
         break;
 
@@ -179,8 +179,8 @@ public class RobotContainer {
             drive::getPose,
             elevator::getHeightInMeters,
             arm::getCurrentAngleDEG,
-            coralSystem::isCoralInRobot,
-            algae::isAlgaeInRobot,
+            coralSystem::isHaveCoral,
+            algae::haveAlgae,
             algae::getDeployPositionAngle);
 
     odometryHealthMonitor = new OdometryHealthMonitor(drive, vision);
@@ -256,5 +256,17 @@ public class RobotContainer {
       autoChooser.addOption(
           "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     }
+  }
+
+  public void teleopInitTurnSmartDriveOn() {
+    DriveCommands.setSmartDriveCmd(
+            drive,
+            oi::getTranslateX,
+            oi::getTranslateY,
+            oi::getRotate,
+            coralSystem::isHaveCoral,
+            climber::isClimberDeployed,
+            coralSystem.getElevator()::getHeightInInches)
+        .schedule();
   }
 }

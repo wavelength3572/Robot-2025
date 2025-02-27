@@ -161,11 +161,9 @@ public class Robot extends LoggedRobot {
 
     ReefScoringLogger.clearScoringEvents(); // Clears previous scoring data
 
-    if (Constants.currentMode == Constants.simMode) {
-      robotContainer
-          .getCoralSystem()
-          .setCoralInRobot(true); // Start with coral in robot during simulation
-    }
+    robotContainer
+        .getCoralSystem()
+        .autoSetHaveCoral(true); // Start with coral in robot during autonomous
   }
 
   /** This function is called periodically during autonomous. */
@@ -184,11 +182,9 @@ public class Robot extends LoggedRobot {
     }
     robotContainer.getVision().setVisionOn();
 
-    if (Constants.isCompetition)
-    {
-      robotContainer.getDrive().setDriveModeSmart();
+    if (Constants.isCompetition) {
+      robotContainer.teleopInitTurnSmartDriveOn();
     }
-
   }
 
   /** This function is called periodically during operator control. */

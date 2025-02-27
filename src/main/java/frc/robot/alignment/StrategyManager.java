@@ -63,7 +63,7 @@ public class StrategyManager implements AlignmentStrategy {
    */
   public void updateStrategyForCycle(AlignmentContext context) {
 
-    boolean haveCoral = context.isCoralInRobot();
+    boolean haveCoral = context.isHaveCoral();
     boolean climberDeployed = context.isClimberDeployed();
 
     boolean nearReef =
@@ -130,5 +130,9 @@ public class StrategyManager implements AlignmentStrategy {
   @Override
   public double getGoalRotation(AlignmentContext context) {
     return currentActiveStrategy.getGoalRotation(context);
+  }
+
+  public void initialControllerReset(AlignmentContext context) {
+    resetAngleController(context.getRobotPose(), getGoalRotation(context));
   }
 }
