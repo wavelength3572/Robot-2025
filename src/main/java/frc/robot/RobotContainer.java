@@ -220,8 +220,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    // return autoChooser.get();
-    return autoChooser.get(); // use the Lake City Auto Chooser
+    return autoChooser.get();
   }
 
   public void SetupAutoChooser() {
