@@ -14,7 +14,6 @@ import frc.robot.commands.NamedCommands.ScoreCoralCommand;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.DriveConstants;
-
 import org.littletonrobotics.junction.Logger;
 
 public class AutoPathConditional {
