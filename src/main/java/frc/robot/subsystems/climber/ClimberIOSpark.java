@@ -44,10 +44,10 @@ public class ClimberIOSpark implements ClimberIO {
     inputs.climbingFinished = isClimbingFinished();
 
     // if (ClimberkP.hasChanged(hashCode())) {
-    //   final SparkMaxConfig config = new SparkMaxConfig();
-    //   config.closedLoop.pidf(ClimberkP.get(), 0.0, 0.0, 0.0);
-    //   climberMotor.configure(
-    //       config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    // final SparkMaxConfig config = new SparkMaxConfig();
+    // config.closedLoop.pidf(ClimberkP.get(), 0.0, 0.0, 0.0);
+    // climberMotor.configure(
+    // config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     // }
 
     switch (currentClimberState) {
@@ -55,14 +55,15 @@ public class ClimberIOSpark implements ClimberIO {
         climberMotor.set(0.0);
         break;
       case FAST_DEPLOY:
-        climberMotor.set(-1.0); // Deploy as fast as we can
-        if (climberEncoder.getPosition() < -400) {
-          currentClimberState = CLIMB_STATE.DEPLOY;
+        if (RobotStatus.algaeArmIsSafeForClimbing()) {
+          climberMotor.set(-1.0); // Deploy as fast as we can
+          if (climberEncoder.getPosition() < -400) {
+            currentClimberState = CLIMB_STATE.DEPLOY;
+          }
         }
         break;
       case DEPLOY:
-        if (RobotStatus.algaeArmIsSafeForClimbing())
-          climberController.setReference(ClimberConstants.DEPLOY_POSITION, ControlType.kPosition);
+        climberController.setReference(ClimberConstants.DEPLOY_POSITION, ControlType.kPosition);
         break;
       case CLIMB:
         climberController.setReference(ClimberConstants.CLIMBED_POSITION, ControlType.kPosition);
