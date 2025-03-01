@@ -13,7 +13,6 @@ public interface AlgaeIO {
     public double captureCurrentAmps = 0.0;
     public double captureEncRotations = 0.0; // Current capture encoder rotations
     public double captureTargetRotations = 0.0;
-    public double targetRPM = 0.0;
 
     // Deploy Motor Values (Tracked in Both Degrees and Rotations)
     public double deployEncRotations = 0.0; // Current deploy encoder rotations

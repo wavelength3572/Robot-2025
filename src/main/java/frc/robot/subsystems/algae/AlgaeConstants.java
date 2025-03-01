@@ -28,12 +28,12 @@ public class AlgaeConstants {
 
   public static enum algaeIntakeState {
     OFF,
-    PUSH,
     BURST,
     PULL,
     DETECT,
     CAPTURE,
     PULL_ARM,
+    PUSH,
     STOW,
     CLIMB,
     MANUAL

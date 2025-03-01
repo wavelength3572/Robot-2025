@@ -27,8 +27,7 @@ public class AlgaeIOSpark implements AlgaeIO {
 
   private algaeIntakeState currentAlgIntakeState = algaeIntakeState.OFF;
 
-  private double previousCaptureVel = 0.0;
-  private double targetRPM = 0.0;
+  private double previousArmAngle = 0.0;
   private double detectionCount = 0;
 
   private boolean haveAlgae = false;
@@ -74,45 +73,51 @@ public class AlgaeIOSpark implements AlgaeIO {
       case OFF:
         algaeCaptureMotor.setVoltage(0.0);
         algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldVolts);
-        previousCaptureVel = inputs.captureVelocityRPM;
+        previousArmAngle = inputs.currentAngle;
         detectionCount = 0;
         break;
       case BURST:
         algaeCaptureMotor.setVoltage(AlgaeConstants.captureIntakeVolts);
         algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
-
         detectionCount++;
         if (detectionCount > 50) {
           currentAlgIntakeState = algaeIntakeState.PULL;
           detectionCount = 0;
+          previousArmAngle = inputs.currentAngle;
         }
         break;
       case PULL:
+        // Pull until we see the angle decrease, the arm is moving upward
         algaeCaptureMotor.setVoltage(AlgaeConstants.captureIntakeVolts);
         algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldOutVolts);
-        if (inputs.captureVelocityRPM - previousCaptureVel <= 10.0) {
+        if (previousArmAngle - inputs.currentAngle > 0.0) {
+          // Checking to see if the arm is rising
           detectionCount++;
-          if (detectionCount >= 10) {
+          if (detectionCount >= 3) {
+            // We have detected 3 consecutive samples of the arm rising
             currentAlgIntakeState = algaeIntakeState.DETECT;
-            // TargetRPM is the near max RPM value we think the intake roller reached
-            // we'll use it to compare to the real time RPM to try and
-            // determine if we captured an algae by looking for an RPM drop
-            targetRPM = inputs.captureVelocityRPM;
-            inputs.targetRPM = targetRPM;
+            detectionCount = 0;
           }
         } else {
           detectionCount = 0;
         }
-        previousCaptureVel = inputs.captureVelocityRPM;
+        previousArmAngle = inputs.currentAngle;
         break;
       case DETECT:
         algaeCaptureMotor.setVoltage(AlgaeConstants.captureIntakeVolts);
         algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldOutVolts);
-        detectionCount = 0;
-        if (targetRPM - inputs.captureVelocityRPM > 100) {
-          captureEncoderValue = inputs.captureEncRotations;
-          currentAlgIntakeState = algaeIntakeState.CAPTURE;
+        if (inputs.currentAngle - previousArmAngle > 0) {
+          // Checking to see if the arm is lowering
+          detectionCount++;
+          if (detectionCount >= 3) {
+            // We have detected 3 consecutive samples of the arm lowering
+            captureEncoderValue = inputs.captureEncRotations;
+            currentAlgIntakeState = algaeIntakeState.CAPTURE;
+          }
+        } else {
+          detectionCount = 0;
         }
+        previousArmAngle = inputs.currentAngle;
         break;
       case CAPTURE:
         // This hold the capture motor position so
@@ -193,7 +198,6 @@ public class AlgaeIOSpark implements AlgaeIO {
     algaeCaptureMotor.setVoltage(AlgaeConstants.captureIntakeVolts);
     algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
     detectionCount = 0;
-    previousCaptureVel = algaeCaptureMotor.getEncoder().getVelocity();
     currentAlgIntakeState = algaeIntakeState.BURST;
   }
 
