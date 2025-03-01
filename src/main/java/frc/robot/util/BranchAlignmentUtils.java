@@ -73,6 +73,7 @@ public final class BranchAlignmentUtils {
             && RobotStatus.getCurrentPreset() != CoralSystemPresets.L3
             && RobotStatus.getCurrentPreset() != CoralSystemPresets.L4)) {
       Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.NONE.toString());
+      lateralErrorToNearestPole = Double.POSITIVE_INFINITY;
       return BranchAlignmentStatus.NONE;
     }
 
@@ -128,6 +129,7 @@ public final class BranchAlignmentUtils {
     if (Math.abs(forwardOffset) > FORWARD_THRESHOLD) {
       Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.NONE.toString());
       currentBranchAlignmentStatus = BranchAlignmentStatus.NONE;
+      lateralErrorToNearestPole = Double.POSITIVE_INFINITY;
       return currentBranchAlignmentStatus;
     }
 

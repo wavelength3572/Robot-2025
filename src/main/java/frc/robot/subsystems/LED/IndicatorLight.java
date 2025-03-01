@@ -3,6 +3,8 @@ package frc.robot.subsystems.LED;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -198,6 +200,7 @@ public class IndicatorLight extends SubsystemBase {
       case WHITE -> setActiveBuffer(wlWhiteLEDBuffer);
       case RAINBOW -> doRainbow();
       case BLUEOMBRE -> doBlueOmbre();
+      case REDOMBRE -> doRedOmbre();
       case BLINK -> blink();
       case BLINK_RED -> doBlinkRed();
       case BLINK_PURPLE -> blinkPurple();
@@ -222,7 +225,7 @@ public class IndicatorLight extends SubsystemBase {
     double lateralError = BranchAlignmentUtils.getLateralErrorToNearestPole();
     updateBlinkPeriod(lateralError);
 
-    if (branchAlignmentOn) {
+    if (branchAlignmentOn && RobotStatus.haveCoral()) {
       BranchAlignmentStatus state = BranchAlignmentUtils.getCurrentBranchAlignmentStatus();
       switch (state) {
         case GREEN:
@@ -270,6 +273,10 @@ public class IndicatorLight extends SubsystemBase {
 
   public void blueOmbre() {
     currentColor_GOAL = LED_EFFECTS.BLUEOMBRE;
+  }
+
+  public void redOmbre() {
+    currentColor_GOAL = LED_EFFECTS.REDOMBRE;
   }
 
   public void rainbow() {
@@ -633,7 +640,7 @@ public class IndicatorLight extends SubsystemBase {
     int brightCount;
     switch (preset) {
       case STOW -> {
-        currentColor_GOAL = LED_EFFECTS.BLUEOMBRE;
+        allianceOmbre();
         return;
       }
       case L1 -> {
@@ -694,7 +701,8 @@ public class IndicatorLight extends SubsystemBase {
         && selectedPreset.equals(CoralSystemPresets.PICKUP)
         && currentPreset != CoralSystemPresets.PICKUP) {
 
-      currentColor_GOAL = LED_EFFECTS.SEARCH_LIGHT;
+      searchLight();
+
       pickupBlinkTriggered = false;
       return;
     }
@@ -707,7 +715,7 @@ public class IndicatorLight extends SubsystemBase {
       if (!coralPresent) {
         // No coral → reset blink so we blink again next time a coral appears
         pickupBlinkTriggered = false;
-        currentColor_GOAL = LED_EFFECTS.SEARCH_LIGHT;
+        searchLight();
       } else {
         // Coral is present
         if (!pickupBlinkTriggered) {
@@ -716,7 +724,7 @@ public class IndicatorLight extends SubsystemBase {
           pickupBlinkTriggered = true;
         } else {
           // Already blinked → go steady with BLUEOMBRE
-          currentColor_GOAL = LED_EFFECTS.BLUEOMBRE;
+          allianceOmbre();
         }
       }
       return; // We handled PICKUP case fully; exit the method.
@@ -743,6 +751,10 @@ public class IndicatorLight extends SubsystemBase {
       updateFinalLighting(targetPreset);
       lastFinalLightingPreset = targetPreset;
     }
+  }
+
+  private void searchLight() {
+    currentColor_GOAL = LED_EFFECTS.SEARCH_LIGHT;
   }
 
   private void updateSelectedLighting(CoralSystemPresets selectedPreset) {
@@ -856,5 +868,41 @@ public class IndicatorLight extends SubsystemBase {
         setActiveBuffer(wlBlackLEDBuffer);
       }
     }
+  }
+
+  public void allianceOmbre() {
+    if (DriverStation.getAlliance().isPresent()
+        && DriverStation.getAlliance().get() == Alliance.Red) {
+      redOmbre();
+    } else blueOmbre();
+  }
+
+  private void doRedOmbre() {
+    // For every pixel
+    for (var i = 0; i < wlLEDBuffer.getLength(); i++) {
+      // Calculate the brightness gradient for the red ombre effect
+      final var brightness = (currentSaturation + (i * 255 / wlLEDBuffer.getLength())) % 255;
+      // Set each LED to red (hue 0) with full saturation and variable brightness
+      wlLEDBuffer.setHSV(i, 0, 255, brightness);
+    }
+
+    // Update currentSaturation (or brightness) and ensure it stays within the 0-255
+    // range
+    if (forward) {
+      currentSaturation += 3;
+      if (currentSaturation >= 255) {
+        currentSaturation = 255;
+        forward = false;
+      }
+    } else {
+      currentSaturation -= 3;
+      if (currentSaturation <= 0) {
+        currentSaturation = 0;
+        forward = true;
+      }
+    }
+
+    // Update the LED buffer with the new values
+    setActiveBuffer(wlLEDBuffer);
   }
 }

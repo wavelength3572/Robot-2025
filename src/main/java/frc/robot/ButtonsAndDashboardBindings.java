@@ -301,6 +301,7 @@ public class ButtonsAndDashboardBindings {
           } else {
             new ScoreCoralCommand(coralSystem.getIntake()).schedule();
           }
+          indicatorLight.allianceOmbre();
         });
   }
 
