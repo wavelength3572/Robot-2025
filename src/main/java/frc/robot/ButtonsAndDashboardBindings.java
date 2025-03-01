@@ -110,14 +110,14 @@ public class ButtonsAndDashboardBindings {
 
     SmartDashboard.putData(
         "Toggle Smart Drive",
-        DriveCommands.toggleSmartDriveCmd(
+        DriveCommands.toggleDriveMode(
             drive,
             oi::getTranslateX,
             oi::getTranslateY,
             oi::getRotate,
             coralSystem::isHaveCoral,
             climber::isClimberDeployed,
-            coralSystem.getElevator()::getHeightInInches));
+            coralSystem.getElevator()::getHeightInInches).ignoringDisable(true));
 
     SmartDashboard.putData(
         "Toggle Cage Alignment Mode",
@@ -215,14 +215,14 @@ public class ButtonsAndDashboardBindings {
     // Give Driver ability to toggle Smart Drive
     oi.getButtonI()
         .onTrue(
-            DriveCommands.toggleSmartDriveCmd(
+            DriveCommands.toggleDriveMode(
                 drive,
                 oi::getTranslateX,
                 oi::getTranslateY,
                 oi::getRotate,
                 coralSystem::isHaveCoral,
                 climber::isClimberDeployed,
-                coralSystem.getElevator()::getHeightInInches));
+                coralSystem.getElevator()::getHeightInInches).ignoringDisable(true));
   }
 
   private static void setInitialCageSelectionToMatchSwitch() {

@@ -258,8 +258,8 @@ public class RobotContainer {
     }
   }
 
-  public void teleopInitTurnSmartDriveOn() {
-    DriveCommands.setSmartDriveCmd(
+  public void teleopInitSetDriveModeBasedOnBoolean() {
+    DriveCommands.setDriveModeBasedOnBoolean(
             drive,
             oi::getTranslateX,
             oi::getTranslateY,
@@ -267,6 +267,15 @@ public class RobotContainer {
             coralSystem::isHaveCoral,
             climber::isClimberDeployed,
             coralSystem.getElevator()::getHeightInInches)
+        .schedule();
+  }
+
+  public void autoInitSetSmartDriveOff() {
+    DriveCommands.setNormalDrive(
+            drive,
+            oi::getTranslateX,
+            oi::getTranslateY,
+            oi::getRotate)
         .schedule();
   }
 }

@@ -152,6 +152,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    robotContainer.autoInitSetSmartDriveOff();
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -183,7 +184,7 @@ public class Robot extends LoggedRobot {
     robotContainer.getVision().setVisionOn();
 
     if (Constants.isCompetition) {
-      robotContainer.teleopInitTurnSmartDriveOn();
+      robotContainer.teleopInitSetDriveModeBasedOnBoolean();
     }
   }
 
