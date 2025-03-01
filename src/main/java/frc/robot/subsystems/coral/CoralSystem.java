@@ -52,7 +52,10 @@ public class CoralSystem extends SubsystemBase {
   @Getter private Intake intake;
 
   @Getter public boolean haveCoral;
-  @Getter public boolean climbASAP = false;
+
+  @AutoLogOutput(key = "CoralSystem/climbASAP")
+  @Getter
+  public boolean climbASAP = false;
 
   @Getter
   @AutoLogOutput(key = "CoralSystem/justMissed")
