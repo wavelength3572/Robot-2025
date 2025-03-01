@@ -52,6 +52,7 @@ public class CoralSystem extends SubsystemBase {
   @Getter private Intake intake;
 
   @Getter public boolean haveCoral;
+  @Getter public boolean climbASAP = false;
 
   @Getter
   @AutoLogOutput(key = "CoralSystem/justMissed")
@@ -132,6 +133,7 @@ public class CoralSystem extends SubsystemBase {
     switch (coralSystemState) {
       case STABLE:
         // Do Nothing
+        if (climbASAP) deployClimberTriggered();
         break;
       case SAFE_ARM:
         // Move Arm to Safe
@@ -357,6 +359,7 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public void deployClimberTriggered() {
+    climbASAP = true;
     if (targetCoralPreset != CLIMB) {
       setTargetPreset(CLIMB);
     }

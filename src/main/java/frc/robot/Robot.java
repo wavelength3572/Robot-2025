@@ -183,7 +183,7 @@ public class Robot extends LoggedRobot {
     robotContainer.getVision().setVisionOn();
 
     if (Constants.isCompetition) {
-      robotContainer.teleopInitTurnSmartDriveOn();
+      // robotContainer.teleopInitTurnSmartDriveOn();
     }
   }
 
