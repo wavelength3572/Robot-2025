@@ -194,14 +194,14 @@ public class CoralSystem extends SubsystemBase {
     }
   }
 
-  public void setSimultaneousTargetPreset(CoralSystemPresets preset) {
+  public void setSimultaneousTargetPreset(CoralSystemPresets requestedPreset) {
     // We are trying to go to a different location AND
     // We ARE NOT Climbing AND
     // We are not currently traveling to a location
-    if (preset != this.currentCoralPreset
+    if (requestedPreset != this.currentCoralPreset
         && targetCoralPreset != CLIMB
         && coralSystemState == CoralSystemMovementState.STABLE) {
-      this.targetCoralPreset = preset;
+      this.targetCoralPreset = requestedPreset;
       coralSystemState = CoralSystemMovementState.MOVE_SIMULTANEOUS;
     }
   }
