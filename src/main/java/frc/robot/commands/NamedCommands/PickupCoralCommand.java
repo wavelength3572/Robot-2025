@@ -43,6 +43,5 @@ public class PickupCoralCommand extends Command {
     } else {
       Logger.recordOutput("Commands/PickupCoralCommand", "Completed - stopping intake.");
     }
-    intake.stopIntake();
   }
 }

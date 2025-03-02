@@ -378,7 +378,9 @@ public class Vision extends SubsystemBase {
 
     PhotonPoseEstimator estimator =
         new PhotonPoseEstimator(
-            VisionConstants.aprilTagLayout, PoseStrategy.LOWEST_AMBIGUITY, cameraTransform);
+            VisionConstants.aprilTagLayout,
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+            cameraTransform);
 
     return estimator;
   }
