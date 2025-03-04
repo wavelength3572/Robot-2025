@@ -11,7 +11,7 @@ import frc.robot.FieldConstants.CageTarget;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
-import frc.robot.commands.NamedCommands.ScoreCoralCommand;
+import frc.robot.commands.ScoreCoralTeleopCommand;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
 import frc.robot.subsystems.algae.Algae;
@@ -299,7 +299,7 @@ public class ButtonsAndDashboardBindings {
                   == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
             AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi).schedule();
           } else {
-            new ScoreCoralCommand(coralSystem.getIntake()).schedule();
+            new ScoreCoralTeleopCommand(coralSystem.getIntake()).schedule();
           }
         });
   }

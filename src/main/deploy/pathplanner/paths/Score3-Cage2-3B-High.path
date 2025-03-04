@@ -3,37 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.985,
-        "y": 6.171
+        "x": 7.009068112126492,
+        "y": 5.206873821683193
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.139793808568272,
-        "y": 5.579180253417985
+        "x": 6.509068112126492,
+        "y": 5.206873821683193
       },
       "isLocked": false,
-      "linkedName": "Cage2"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.186862748136724,
-        "y": 5.161260510884135
+        "x": 5.176262449985776,
+        "y": 5.145268273822971
       },
       "prevControl": {
-        "x": 5.3511912377654935,
-        "y": 5.349664723937685
+        "x": 5.301262449985776,
+        "y": 5.3617746247690805
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "3B"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": -119.99999999999999
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
@@ -74,7 +69,7 @@
   "folder": "Score3Cage2",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -135.0
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": false
 }

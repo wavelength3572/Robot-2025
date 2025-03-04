@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.coral.intake.Intake;
 import org.littletonrobotics.junction.Logger;
 
-public class ScoreCoralCommand extends Command {
+public class ScoreCoralAutoCommand extends Command {
   private static final double MAX_OUTTAKE_TIME = 0.6; // total hard stop, in seconds
   private static final double ADDITIONAL_CLEAR_TIME =
       0.3; // how long to keep running after the coral is gone
@@ -16,7 +16,7 @@ public class ScoreCoralCommand extends Command {
   private boolean coralCleared = false;
   private double timeWhenCoralCleared = 0.0;
 
-  public ScoreCoralCommand(Intake intake) {
+  public ScoreCoralAutoCommand(Intake intake) {
     this.intake = intake;
   }
 
@@ -35,6 +35,7 @@ public class ScoreCoralCommand extends Command {
 
   @Override
   public void execute() {
+
     // Log the current time and sensor state
     Logger.recordOutput("ScoreCoral/CurrentTime", timer.get());
     Logger.recordOutput("ScoreCoral/HaveCoral", intake.haveCoral());
@@ -54,7 +55,6 @@ public class ScoreCoralCommand extends Command {
     // 2) If we reached the total max time, we stop no matter what
     if (timer.get() >= MAX_OUTTAKE_TIME) {
       Logger.recordOutput("ScoreCoral/FinishReason", "MaxOuttakeTimeExceeded");
-
       return true;
     }
 

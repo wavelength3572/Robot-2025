@@ -9,8 +9,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.NamedCommands.RunPresetCommand;
-import frc.robot.commands.NamedCommands.ScoreCoralCommand;
+import frc.robot.commands.NamedCommands.ScoreCoralAutoCommand;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -19,10 +20,10 @@ import org.littletonrobotics.junction.Logger;
 public class AutoPathConditional {
   // TODO determine these empirically
   private static final double HIGH_SCORE_EXTRA_TIME_TO_BE_SAFE =
-      ScoreCoralCommand.getExpectedDuration() + RunPresetCommand.getExpectedDurationToStowFromL4();
+      ScoreCoralAutoCommand.getExpectedDuration() + RunPresetCommand.getExpectedDurationToStowFromL4();
 
   private static final double LOW_SCORE_EXTRA_TIME_TO_BE_SAFE =
-      ScoreCoralCommand.getExpectedDuration() + RunPresetCommand.getExpectedDurationToStowFromL2();
+      ScoreCoralAutoCommand.getExpectedDuration() + RunPresetCommand.getExpectedDurationToStowFromL2();
 
   private final String conditionalCommandName;
   private final PathPlannerPath highScorePath;
@@ -47,34 +48,21 @@ public class AutoPathConditional {
    * command.
    */
   public ConditionalCommand getCommand() {
-    // Load the configuration once.
-    try {
-      config = DriveConstants.ppConfig;
-      Logger.recordOutput("AutoPathConditional/RobotConfig", config.toString());
-    } catch (Exception e) {
-      DriverStation.reportError(
-          "Failed to load RobotConfig from GUI settings: " + e.getMessage(), e.getStackTrace());
-      Logger.recordOutput(
-          "AutoPathConditional/Error", "Failed to load RobotConfig: " + e.getMessage());
-      // Returning a fallback if config can't be loaded.
-      return new ConditionalCommand(Commands.none(), Commands.none(), () -> false);
-    }
-
+  
+    config = DriveConstants.ppConfig;
+  
     Command highScoreCommand = createHighScoreCommand();
     Command lowScoreCommand = createLowScoreCommand();
     Command fallbackCommand = Commands.none();
 
     highScoreThresholdTime = calcualteHighScoreTimeThreshold();
     lowScoreThresholdTime = calcualteLowScoreTimeThreshold();
-
-    // Create nested conditional for the low score decision.
+    
     // If enough time for low score, run lowScoreCommand; otherwise, safeCommand.
     ConditionalCommand lowScoreConditional =
         new ConditionalCommand(lowScoreCommand, fallbackCommand, this::enoughTimeForLowScore);
 
-    // If enough time for high score, run highScoreCommand; otherwise, evaluate the
-    // low score
-    // condition.
+    // If enough time for high score, run highScoreCommand; otherwise, eval low
     ConditionalCommand finalDecisionCommand =
         new ConditionalCommand(highScoreCommand, lowScoreConditional, this::enoughTimeForHighScore);
 
@@ -89,8 +77,9 @@ public class AutoPathConditional {
     Command highScoreCommand =
         new SequentialCommandGroup(
             AutoBuilder.followPath(highScorePath),
-            new ScoreCoralCommand(coralSystem.getIntake()),
-            new RunPresetCommand(coralSystem, CoralSystemPresets.STOW));
+            new WaitUntilCommand(coralSystem::isAtGoal),
+            new ScoreCoralAutoCommand(coralSystem.getIntake()),
+            new RunPresetCommand(coralSystem, CoralSystemPresets.PICKUP));
     return highScoreCommand;
   }
 
@@ -98,8 +87,9 @@ public class AutoPathConditional {
     Command lowScoreCommand =
         new SequentialCommandGroup(
             AutoBuilder.followPath(lowScorePath),
-            new ScoreCoralCommand(coralSystem.getIntake()),
-            new RunPresetCommand(coralSystem, CoralSystemPresets.STOW));
+            new WaitUntilCommand(coralSystem::isAtGoal),
+            new ScoreCoralAutoCommand(coralSystem.getIntake()),
+            new RunPresetCommand(coralSystem, CoralSystemPresets.PICKUP));
     return lowScoreCommand;
   }
 

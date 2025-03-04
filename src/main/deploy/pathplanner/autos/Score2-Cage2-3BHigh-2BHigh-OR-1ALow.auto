@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Cage1Wall-3A"
+            "pathName": "Cage2-3B-High"
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "WaitForPreset"
+            "waitTime": 0.5
           }
         },
         {
@@ -23,15 +23,27 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "3B-StationLeft"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "Stow"
+            "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StationLeft-2BHigh-OR-1ALow"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "LakeCityAutos",
+  "folder": "Cage2",
   "choreoAuto": false
 }
