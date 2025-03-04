@@ -20,10 +20,12 @@ import org.littletonrobotics.junction.Logger;
 public class AutoPathConditional {
   // TODO determine these empirically
   private static final double HIGH_SCORE_EXTRA_TIME_TO_BE_SAFE =
-      ScoreCoralAutoCommand.getExpectedDuration() + RunPresetCommand.getExpectedDurationToStowFromL4();
+      ScoreCoralAutoCommand.getExpectedDuration()
+          + RunPresetCommand.getExpectedDurationToStowFromL4();
 
   private static final double LOW_SCORE_EXTRA_TIME_TO_BE_SAFE =
-      ScoreCoralAutoCommand.getExpectedDuration() + RunPresetCommand.getExpectedDurationToStowFromL2();
+      ScoreCoralAutoCommand.getExpectedDuration()
+          + RunPresetCommand.getExpectedDurationToStowFromL2();
 
   private final String conditionalCommandName;
   private final PathPlannerPath highScorePath;
@@ -48,16 +50,16 @@ public class AutoPathConditional {
    * command.
    */
   public ConditionalCommand getCommand() {
-  
+
     config = DriveConstants.ppConfig;
-  
+
     Command highScoreCommand = createHighScoreCommand();
     Command lowScoreCommand = createLowScoreCommand();
     Command fallbackCommand = Commands.none();
 
     highScoreThresholdTime = calcualteHighScoreTimeThreshold();
     lowScoreThresholdTime = calcualteLowScoreTimeThreshold();
-    
+
     // If enough time for low score, run lowScoreCommand; otherwise, safeCommand.
     ConditionalCommand lowScoreConditional =
         new ConditionalCommand(lowScoreCommand, fallbackCommand, this::enoughTimeForLowScore);

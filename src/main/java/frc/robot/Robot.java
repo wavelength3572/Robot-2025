@@ -138,10 +138,7 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {
-    // robotContainer.getDrive().setPose(new Pose2d(7.157, 7.547, new
-    // Rotation2d(Math.PI)));
-  }
+  public void disabledInit() {}
 
   /** This function is called periodically when disabled. */
   @Override
@@ -153,17 +150,19 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     autonomousCommand = robotContainer.getAutonomousCommand();
+    //robotContainer.getDrive().setPose(robotContainer.getStartPose());
+    ReefScoringLogger.clearScoringEvents(); // Clears previous scoring data
+    robotContainer
+        .getCoralSystem()
+        .autoSetHaveCoral(true); // Start with coral in robot during autonomous
+    
+    
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
     }
 
-    ReefScoringLogger.clearScoringEvents(); // Clears previous scoring data
-
-    robotContainer
-        .getCoralSystem()
-        .autoSetHaveCoral(true); // Start with coral in robot during autonomous
   }
 
   /** This function is called periodically during autonomous. */

@@ -75,7 +75,8 @@ public class PathPlannerCommands {
             Commands.print("Running preset: Stow")
                 .andThen(new RunPresetCommand(coralSystem, STOW)));
     new EventTrigger("Score")
-        .onTrue(Commands.print("Scoring").andThen(new ScoreCoralAutoCommand(coralSystem.getIntake())));
+        .onTrue(
+            Commands.print("Scoring").andThen(new ScoreCoralAutoCommand(coralSystem.getIntake())));
 
     try {
       List<AutoPathConditional> autoPathConditionals = new ArrayList<>();

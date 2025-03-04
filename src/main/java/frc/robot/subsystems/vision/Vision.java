@@ -88,7 +88,7 @@ public class Vision extends SubsystemBase {
     Logger.recordOutput("Vision/isVisionOn", isVisionOn);
 
     // Existing pipeline for consumer
-    updateMainPipeline(); // your existing code
+    updateMainPipeline();
 
     // Separate pipeline for consumer2
     updatePhotonVisionEstimates();
