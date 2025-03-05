@@ -85,6 +85,9 @@ public class CoralSystem extends SubsystemBase {
   // Field to track the previous coral state
   private boolean previousHaveCoral = false;
 
+  // Should be move are safe or simultanious when responding to button press
+  private boolean moveArmSafely = true;
+
   // For calculating a moving average of the TOF sensor readings
   private final Deque<Double> tofReadings = new ArrayDeque<>();
 
@@ -159,21 +162,12 @@ public class CoralSystem extends SubsystemBase {
         break;
       case MOVE_ARM_FINAL:
         this.arm.setTargetPreset(targetCoralPreset);
-        if (arm.isAtGoal()) {
-          currentCoralPreset = targetCoralPreset;
-          coralSystemState = CoralSystemMovementState.STABLE;
-        }
-        break;
-
-      case MOVE_SIMULTANEOUS:
-        this.arm.setTargetPreset(targetCoralPreset);
         this.elevator.setTargetPreset(targetCoralPreset);
         if (arm.isAtGoal() && elevator.isAtGoal()) {
           currentCoralPreset = targetCoralPreset;
           coralSystemState = CoralSystemMovementState.STABLE;
         }
         break;
-
       default:
         // do nothing
         break;
@@ -191,11 +185,35 @@ public class CoralSystem extends SubsystemBase {
         && targetCoralPreset != CLIMB
         && coralSystemState == CoralSystemMovementState.STABLE) {
       // We are allowed to move
+      // Lets just hard code situations where we can just move the
+      // elevator and arm at the same time
+      moveArmSafely = true;
       this.targetCoralPreset = requestedPreset;
-      // Start Moving Arm to Safe
-      this.arm.setTargetPreset(CoralSystemPresets.STOW);
-      // Change state
-      coralSystemState = CoralSystemMovementState.SAFE_ARM;
+      if (this.targetCoralPreset == CoralSystemPresets.PICKUP
+          && !haveCoral
+          && (currentCoralPreset == CoralSystemPresets.L2
+              || currentCoralPreset == CoralSystemPresets.L3
+              || currentCoralPreset == CoralSystemPresets.L4
+              || currentCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_1
+              || currentCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_2)) {
+        moveArmSafely = false;
+      }
+      if (currentCoralPreset == CoralSystemPresets.PICKUP
+          && haveCoral
+          && (this.targetCoralPreset == CoralSystemPresets.L1
+              || this.targetCoralPreset == CoralSystemPresets.L2
+              || this.targetCoralPreset == CoralSystemPresets.L3
+              || this.targetCoralPreset == CoralSystemPresets.L4)) {
+        moveArmSafely = false;
+      }
+      if (moveArmSafely) {
+        // Start Moving Arm to Safe
+        this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
+        // Change state
+        coralSystemState = CoralSystemMovementState.SAFE_ARM;
+      } else {
+        coralSystemState = CoralSystemMovementState.MOVE_ARM_FINAL;
+      }
     }
   }
 
@@ -207,7 +225,7 @@ public class CoralSystem extends SubsystemBase {
         && targetCoralPreset != CLIMB
         && coralSystemState == CoralSystemMovementState.STABLE) {
       this.targetCoralPreset = requestedPreset;
-      coralSystemState = CoralSystemMovementState.MOVE_SIMULTANEOUS;
+      coralSystemState = CoralSystemMovementState.MOVE_ARM_FINAL;
     }
   }
 

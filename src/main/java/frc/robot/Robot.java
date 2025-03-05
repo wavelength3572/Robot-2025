@@ -15,11 +15,14 @@ package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.MatchType;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.util.Elastic;
 import frc.robot.util.ReefScoringLogger;
 import java.util.HashMap;
 import java.util.Map;
@@ -136,6 +139,13 @@ public class Robot extends LoggedRobot {
 
     if (robotContainer.getOdometryHealthMonitor() != null) {
       robotContainer.getOdometryHealthMonitor().checkOdometryHealth();
+    }
+
+    // Change to Climb Elastic Tab with 20 seconds left.
+    if (DriverStation.getMatchType() != MatchType.None && DriverStation.isTeleop()) {
+      if (DriverStation.getMatchTime() <= 20) {
+        Elastic.selectTab("Climb");
+      }
     }
   }
 

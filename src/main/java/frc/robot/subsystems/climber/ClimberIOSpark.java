@@ -23,7 +23,7 @@ public class ClimberIOSpark implements ClimberIO {
 
   private CLIMB_STATE currentClimberState = CLIMB_STATE.STOWED;
 
-  private double targetPosition = 0; 
+  private double targetPosition = 0;
 
   private static final LoggedTunableNumber ClimberkP =
       new LoggedTunableNumber("Climber/kp", ClimberConstants.climberKp);

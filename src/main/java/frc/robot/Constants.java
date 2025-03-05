@@ -24,7 +24,7 @@ public final class Constants {
   public static final Mode simMode = Mode.REAL;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
   public static final boolean tuningMode = false;
-  public static final boolean isCompetition = true;
+  public static final boolean isCompetition = false;
 
   public static enum Mode {
     /** Running on a real robot. */
