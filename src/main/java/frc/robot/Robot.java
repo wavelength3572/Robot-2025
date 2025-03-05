@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
@@ -108,6 +109,8 @@ public class Robot extends LoggedRobot {
     System.out.println(
         String.format("turnMotorReduction: %.5f", DriveConstants.turnMotorReduction));
     System.out.println(String.format("wheelRadiusMeters: %.5f", DriveConstants.wheelRadiusMeters));
+
+    CameraServer.startAutomaticCapture("Climber Cam", 0);
   }
 
   /** This function is called periodically during all modes. */

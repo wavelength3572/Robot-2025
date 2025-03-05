@@ -23,7 +23,7 @@ public class ClimberIOSpark implements ClimberIO {
 
   private CLIMB_STATE currentClimberState = CLIMB_STATE.STOWED;
 
-  private double targetPosition = 0.0;
+  private double targetPosition = 0; 
 
   private static final LoggedTunableNumber ClimberkP =
       new LoggedTunableNumber("Climber/kp", ClimberConstants.climberKp);
@@ -55,21 +55,25 @@ public class ClimberIOSpark implements ClimberIO {
         climberMotor.set(0.0);
         break;
       case FAST_DEPLOY:
+        targetPosition = ClimberConstants.FAST_DEPLOY_POSITION;
         if (RobotStatus.algaeArmIsSafeForClimbing()) {
           climberMotor.set(-1.0); // Deploy as fast as we can
-          if (climberEncoder.getPosition() < -400) {
+          if (climberEncoder.getPosition() < ClimberConstants.FAST_DEPLOY_POSITION) {
             currentClimberState = CLIMB_STATE.DEPLOY;
           }
         }
         break;
       case DEPLOY:
+        targetPosition = ClimberConstants.DEPLOY_POSITION;
         climberController.setReference(ClimberConstants.DEPLOY_POSITION, ControlType.kPosition);
         break;
       case CLIMB:
+        targetPosition = ClimberConstants.CLIMBED_POSITION;
         climberController.setReference(ClimberConstants.CLIMBED_POSITION, ControlType.kPosition);
         setRelayState(Relay.Value.kReverse); // Foot longer
         break;
       case FINAL:
+        // Target position will come from stopClimber command
         climberController.setReference(targetPosition, ControlType.kPosition);
         break;
       default:
