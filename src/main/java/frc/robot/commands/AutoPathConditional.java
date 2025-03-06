@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.NamedCommands.RunPresetCommand;
 import frc.robot.commands.NamedCommands.ScoreCoralInAutoCommand;
 import frc.robot.subsystems.coral.CoralSystem;
@@ -89,6 +90,7 @@ public class AutoPathConditional {
     Command highScoreCommand =
         new SequentialCommandGroup(
             AutoBuilder.followPath(highScorePath),
+            new WaitUntilCommand(coralSystem::isAtGoal),
             new ScoreCoralInAutoCommand(coralSystem.getIntake()),
             new RunPresetCommand(coralSystem, CoralSystemPresets.STOW));
     return highScoreCommand;
@@ -98,6 +100,7 @@ public class AutoPathConditional {
     Command lowScoreCommand =
         new SequentialCommandGroup(
             AutoBuilder.followPath(lowScorePath),
+            new WaitUntilCommand(coralSystem::isAtGoal),
             new ScoreCoralInAutoCommand(coralSystem.getIntake()),
             new RunPresetCommand(coralSystem, CoralSystemPresets.STOW));
     return lowScoreCommand;
