@@ -73,7 +73,7 @@ public final class BranchAlignmentUtils {
             && RobotStatus.getCurrentPreset() != CoralSystemPresets.L3
             && RobotStatus.getCurrentPreset() != CoralSystemPresets.L4)) {
       Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.NONE.toString());
-      currentBranchAlignmentStatus=BranchAlignmentStatus.NONE;
+      currentBranchAlignmentStatus = BranchAlignmentStatus.NONE;
       return currentBranchAlignmentStatus;
     }
 

@@ -172,7 +172,7 @@ public class IndicatorLight extends SubsystemBase {
   public void periodic() {
     currentColor_GOAL = updateLightingGoal();
 
-    updateBranchAlignmentLighting(); //override with branch alignment lighting if close enough
+    updateBranchAlignmentLighting(); // override with branch alignment lighting if close enough
 
     if (LED_State != LED_EFFECTS.BLINK) {
       LED_State = currentColor_GOAL;
