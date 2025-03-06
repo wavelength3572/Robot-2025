@@ -3,6 +3,7 @@ package frc.robot.util;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.FieldConstants;
+import frc.robot.FieldConstants.CoralLocation;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.util.AlignmentUtils.ReefFaceSelection.PolePosition;
@@ -122,5 +123,8 @@ public class ReefScoringLogger {
 
   public static void clearScoringEvents() {
     events.clear();
+    for (CoralLocation location : FieldConstants.coralMapping.values()) {
+      location.scored = false;
+    }
   }
 }

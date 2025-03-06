@@ -177,7 +177,6 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
     }
-
   }
 
   /** This function is called periodically during autonomous. */
@@ -194,11 +193,13 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+
     robotContainer.getVision().setVisionOn();
 
-    if (Constants.isCompetition) {
-      // robotContainer.teleopInitTurnSmartDriveOn();
-    }
+    // Set drive mode based on the boolean value
+    if (robotContainer.getDrive().isDriveModeSmart() && (DriverStation.isFMSAttached() || Constants.isCompetition)) {
+      robotContainer.SmartDriving();
+    } else robotContainer.NormalDriving();
   }
 
   /** This function is called periodically during operator control. */

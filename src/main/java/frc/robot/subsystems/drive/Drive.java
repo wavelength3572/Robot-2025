@@ -65,7 +65,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
 
-  private boolean isDriveModeSmart = false;
+  private boolean isDriveModeSmart = true;
   private boolean elevatorHeightLimitsSpeed = false;
 
   static final Lock odometryLock = new ReentrantLock();

@@ -270,7 +270,7 @@ public class RobotContainer {
     }
   }
 
-  public void teleopInitTurnSmartDriveOn() {
+  public void SmartDriving() {
     DriveCommands.setSmartDriveCmd(
             drive,
             oi::getTranslateX,
@@ -282,7 +282,7 @@ public class RobotContainer {
         .schedule();
   }
 
-  public void autoInitTurnSmartDriveOff() {
+  public void NormalDriving() {
     DriveCommands.setNormalDriveCmd(drive, oi::getTranslateX, oi::getTranslateY, oi::getRotate)
         .schedule();
   }

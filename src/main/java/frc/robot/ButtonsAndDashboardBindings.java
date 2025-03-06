@@ -58,11 +58,6 @@ public class ButtonsAndDashboardBindings {
     ButtonsAndDashboardBindings.algae = algae;
     ButtonsAndDashboardBindings.vision = vision;
 
-    // Note that we are turning on smart drive in Robot.java teleopInit() if
-    // isCompetition is true
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(drive, oi::getTranslateX, oi::getTranslateY, oi::getRotate));
-
     configureDriverButtonBindings();
     configureOperatorButtonBindings();
     configureDashboardBindings();
@@ -101,6 +96,7 @@ public class ButtonsAndDashboardBindings {
     SmartDashboard.putData(
         "Deploy & Process Algae",
         Commands.runOnce(algae::pushAlgae)); // Depoloy Algae Collector & Process Algae
+
     SmartDashboard.putData(
         "Stow Algae Collector", Commands.runOnce(algae::stowAlgae)); // Stow Algae Collector
 
@@ -111,13 +107,14 @@ public class ButtonsAndDashboardBindings {
     SmartDashboard.putData(
         "Toggle Smart Drive",
         DriveCommands.toggleSmartDriveCmd(
-            drive,
-            oi::getTranslateX,
-            oi::getTranslateY,
-            oi::getRotate,
-            coralSystem::isHaveCoral,
-            climber::isClimberDeployed,
-            coralSystem.getElevator()::getHeightInInches));
+                drive,
+                oi::getTranslateX,
+                oi::getTranslateY,
+                oi::getRotate,
+                coralSystem::isHaveCoral,
+                climber::isClimberDeployed,
+                coralSystem.getElevator()::getHeightInInches)
+            .ignoringDisable(true));
 
     SmartDashboard.putData(
         "Toggle Cage Alignment Mode",

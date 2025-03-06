@@ -20,10 +20,12 @@ import org.littletonrobotics.junction.Logger;
 public class AutoPathConditional {
   // TODO determine these empirically
   private static final double HIGH_SCORE_EXTRA_TIME_TO_BE_SAFE =
-      ScoreCoralInAutoCommand.getExpectedDuration() + RunPresetCommand.getExpectedDurationToStowFromL4();
+      ScoreCoralInAutoCommand.getExpectedDuration()
+          + RunPresetCommand.getExpectedDurationToStowFromL4();
 
   private static final double LOW_SCORE_EXTRA_TIME_TO_BE_SAFE =
-      ScoreCoralInAutoCommand.getExpectedDuration() + RunPresetCommand.getExpectedDurationToStowFromL2();
+      ScoreCoralInAutoCommand.getExpectedDuration()
+          + RunPresetCommand.getExpectedDurationToStowFromL2();
 
   private final String conditionalCommandName;
   private final PathPlannerPath highScorePath;
