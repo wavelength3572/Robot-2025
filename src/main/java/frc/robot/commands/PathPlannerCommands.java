@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.NamedCommands.PickupCoralCommand;
 import frc.robot.commands.NamedCommands.RunPresetCommand;
-import frc.robot.commands.NamedCommands.ScoreCoralCommand;
+import frc.robot.commands.NamedCommands.ScoreCoralInAutoCommand;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
@@ -33,7 +33,7 @@ public class PathPlannerCommands {
     NamedCommands.registerCommand("L2", new RunPresetCommand(coralSystem, L2));
     NamedCommands.registerCommand("L1", new RunPresetCommand(coralSystem, L1));
     NamedCommands.registerCommand("Stow", new RunPresetCommand(coralSystem, STOW));
-    NamedCommands.registerCommand("Score", new ScoreCoralCommand(coralSystem.getIntake()));
+    NamedCommands.registerCommand("Score", new ScoreCoralInAutoCommand(coralSystem.getIntake()));
     NamedCommands.registerCommand(
         "DislodgeLow",
         new ParallelCommandGroup(
@@ -75,7 +75,7 @@ public class PathPlannerCommands {
             Commands.print("Running preset: Stow")
                 .andThen(new RunPresetCommand(coralSystem, STOW)));
     new EventTrigger("Score")
-        .onTrue(Commands.print("Scoring").andThen(new ScoreCoralCommand(coralSystem.getIntake())));
+        .onTrue(Commands.print("Scoring").andThen(new ScoreCoralInAutoCommand(coralSystem.getIntake())));
 
     try {
       List<AutoPathConditional> autoPathConditionals = new ArrayList<>();

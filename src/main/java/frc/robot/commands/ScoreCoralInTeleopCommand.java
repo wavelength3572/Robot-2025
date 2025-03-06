@@ -1,11 +1,11 @@
-package frc.robot.commands.NamedCommands;
+package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.coral.intake.Intake;
 import org.littletonrobotics.junction.Logger;
 
-public class ScoreCoralCommand extends Command {
+public class ScoreCoralInTeleopCommand extends Command {
   private static final double MAX_OUTTAKE_TIME = 0.6; // total hard stop, in seconds
   private static final double ADDITIONAL_CLEAR_TIME =
       0.3; // how long to keep running after the coral is gone
@@ -16,7 +16,7 @@ public class ScoreCoralCommand extends Command {
   private boolean coralCleared = false;
   private double timeWhenCoralCleared = 0.0;
 
-  public ScoreCoralCommand(Intake intake) {
+  public ScoreCoralInTeleopCommand(Intake intake) {
     this.intake = intake;
   }
 

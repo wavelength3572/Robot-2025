@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.NamedCommands.RunPresetCommand;
-import frc.robot.commands.NamedCommands.ScoreCoralCommand;
+import frc.robot.commands.NamedCommands.ScoreCoralInAutoCommand;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -19,10 +19,10 @@ import org.littletonrobotics.junction.Logger;
 public class AutoPathConditional {
   // TODO determine these empirically
   private static final double HIGH_SCORE_EXTRA_TIME_TO_BE_SAFE =
-      ScoreCoralCommand.getExpectedDuration() + RunPresetCommand.getExpectedDurationToStowFromL4();
+      ScoreCoralInAutoCommand.getExpectedDuration() + RunPresetCommand.getExpectedDurationToStowFromL4();
 
   private static final double LOW_SCORE_EXTRA_TIME_TO_BE_SAFE =
-      ScoreCoralCommand.getExpectedDuration() + RunPresetCommand.getExpectedDurationToStowFromL2();
+      ScoreCoralInAutoCommand.getExpectedDuration() + RunPresetCommand.getExpectedDurationToStowFromL2();
 
   private final String conditionalCommandName;
   private final PathPlannerPath highScorePath;
@@ -89,7 +89,7 @@ public class AutoPathConditional {
     Command highScoreCommand =
         new SequentialCommandGroup(
             AutoBuilder.followPath(highScorePath),
-            new ScoreCoralCommand(coralSystem.getIntake()),
+            new ScoreCoralInAutoCommand(coralSystem.getIntake()),
             new RunPresetCommand(coralSystem, CoralSystemPresets.STOW));
     return highScoreCommand;
   }
@@ -98,7 +98,7 @@ public class AutoPathConditional {
     Command lowScoreCommand =
         new SequentialCommandGroup(
             AutoBuilder.followPath(lowScorePath),
-            new ScoreCoralCommand(coralSystem.getIntake()),
+            new ScoreCoralInAutoCommand(coralSystem.getIntake()),
             new RunPresetCommand(coralSystem, CoralSystemPresets.STOW));
     return lowScoreCommand;
   }
