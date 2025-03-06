@@ -90,4 +90,16 @@ public class RobotStatus {
   public static boolean algaeArmIsSafeForClimbing() {
     return (algaeSystem.getDeployPositionAngle() > 120.0);
   }
+
+  public static boolean justScoredCoral() {
+    return coralSystem.justScoredCoral;
+  }
+
+  public static boolean justMissedCoralScoral() {
+    return coralSystem.justMissedCoralScore;
+  }
+
+  public static boolean justPickedUpCoral() {
+    return coralSystem.justPickedUpCoral;
+  }
 }

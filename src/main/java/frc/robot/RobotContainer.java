@@ -26,20 +26,25 @@ import frc.robot.operator_interface.OISelector;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.LED.IndicatorLight;
 import frc.robot.subsystems.algae.Algae;
+import frc.robot.subsystems.algae.AlgaeIO;
 import frc.robot.subsystems.algae.AlgaeIOSpark;
 import frc.robot.subsystems.algae.AlgaeIOVirtualSim;
 import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberIOSpark;
 import frc.robot.subsystems.climber.ClimberIOVirtualSim;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.coral.arm.Arm;
+import frc.robot.subsystems.coral.arm.ArmIO;
 import frc.robot.subsystems.coral.arm.ArmIOMMSpark;
 import frc.robot.subsystems.coral.arm.ArmIOVirtualSim;
 import frc.robot.subsystems.coral.elevator.Elevator;
+import frc.robot.subsystems.coral.elevator.ElevatorIO;
 import frc.robot.subsystems.coral.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.coral.elevator.ElevatorIOVirtualSim;
 import frc.robot.subsystems.coral.intake.Intake;
+import frc.robot.subsystems.coral.intake.IntakeIO;
 import frc.robot.subsystems.coral.intake.IntakeIOSpark;
 import frc.robot.subsystems.coral.intake.IntakeIOVirtualSim;
 import frc.robot.subsystems.drive.*;
@@ -163,14 +168,21 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 drive::addVisionMeasurementForLogging,
                 new VisionIO() {},
+                new VisionIO() {},
+                new VisionIO() {},
                 new VisionIO() {});
-        elevator = null;
-        arm = null;
-        algae = null;
-        coralSystem = null;
-        intake = null;
-        climber = null;
-        indicatorLight = null;
+        elevator = new Elevator(new ElevatorIO() {});
+        arm = new Arm(new ArmIO() {});
+        intake = new Intake(new IntakeIO() {});
+        coralSystem = new CoralSystem(elevator, arm, intake);
+        algae = new Algae(new AlgaeIO() {});
+        climber = new Climber(new ClimberIO() {});
+        indicatorLight = new IndicatorLight();
+        indicatorLight.setupLightingSuppliers(
+            coralSystem::getCurrentCoralPreset,
+            coralSystem.coralSystemPresetChooser::getSelected,
+            coralSystem::getTargetCoralPreset,
+            coralSystem::isHaveCoral);
         break;
     }
 
@@ -258,7 +270,7 @@ public class RobotContainer {
     }
   }
 
-  public void teleopInitTurnSmartDriveOn() {
+  public void SmartDriving() {
     DriveCommands.setSmartDriveCmd(
             drive,
             oi::getTranslateX,
@@ -270,7 +282,7 @@ public class RobotContainer {
         .schedule();
   }
 
-  public void autoInitTurnSmartDriveOff() {
+  public void NormalDriving() {
     DriveCommands.setNormalDriveCmd(drive, oi::getTranslateX, oi::getTranslateY, oi::getRotate)
         .schedule();
   }

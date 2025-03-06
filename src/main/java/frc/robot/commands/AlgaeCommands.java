@@ -36,8 +36,8 @@ public class AlgaeCommands {
             new SequentialCommandGroup(
                 SetAppropriateDislodgePresetPart1Command(drive, coralSystem),
                 new WaitUntilCommand(coralSystem::isAtGoal),
-                SetAppropriateDislodgePresetPart2Command(coralSystem)),
-            new WaitUntilCommand(coralSystem::isAtGoal),
+                SetAppropriateDislodgePresetPart2Command(coralSystem),
+                new WaitUntilCommand(coralSystem::isAtGoal)),
             // Drive to the dislodge spot simultaneously
             DriveToCommands.createDriveToPose(
                 drive,

@@ -33,7 +33,7 @@ public final class BranchAlignmentUtils {
   // Offsets for scoring positions relative to the AprilTag pose.
   // One for the left pole and one for the right pole.
   private static final Transform2d RIGHT_POLE_OFFSET =
-      new Transform2d(new Translation2d(.445, .001), new Rotation2d(0));
+      new Transform2d(new Translation2d(.445, -.02), new Rotation2d(0));
   private static final Transform2d LEFT_POLE_OFFSET =
       new Transform2d(new Translation2d(.445, -.345), new Rotation2d(0));
 
@@ -65,7 +65,7 @@ public final class BranchAlignmentUtils {
     // Retrieve the reef face pose directly from the AprilTag layout.
     Optional<Pose3d> reefFacePose3d = VisionConstants.aprilTagLayout.getTagPose(faceId);
 
-    // If we don't have a reef face or if we aren't  in a scoring position, then don't do this work.
+    // If we don't have a reef face or if we aren't in a scoring preset, then don't do this work.
     if (!reefFacePose3d.isPresent()
         || (!RobotStatus.haveCoral())
         || (RobotStatus.getCurrentPreset() != CoralSystemPresets.L1
@@ -73,7 +73,8 @@ public final class BranchAlignmentUtils {
             && RobotStatus.getCurrentPreset() != CoralSystemPresets.L3
             && RobotStatus.getCurrentPreset() != CoralSystemPresets.L4)) {
       Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.NONE.toString());
-      return BranchAlignmentStatus.NONE;
+      currentBranchAlignmentStatus = BranchAlignmentStatus.NONE;
+      return currentBranchAlignmentStatus;
     }
 
     // Convert the AprilTag pose to 2d.

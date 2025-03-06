@@ -29,6 +29,7 @@ public class IndicatorLightConstants {
     BLINK_PURPLE,
     POLKADOT,
     PARTY,
+    RSL,
     SEGMENTPARTY,
     EXPLOSION,
     CHARACTERS,

@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -23,6 +24,9 @@ import org.littletonrobotics.junction.Logger;
 
 @AutoLog
 public class AlignmentUtils {
+
+  public static Transform2d ALGAE_OFFSET =
+      new Transform2d(new Translation2d(.025, 0), new Rotation2d(0));
 
   public static class ReefFaceSelection {
     private final Integer acceptedFaceId;
@@ -415,6 +419,7 @@ public class AlignmentUtils {
   }
 
   public static Pose2d getAlgaeRemovalTargetPose(Pose2d robotPose, ReefFaceSelection selection) {
+
     if (selection == null || selection.getAcceptedFaceId() == null) {
       Logger.recordOutput("Alignment/AlgaeRemoval", "No valid reef face selection found");
       return null;
@@ -432,10 +437,12 @@ public class AlignmentUtils {
 
     // Optionally refine the orientation using the current heading.
     FieldConstants.ReefChosenOrientation chosen = pickClosestOrientationForReef(robotPose, faceId);
-    Pose2d refinedTargetPose = new Pose2d(targetPose.getTranslation(), chosen.rotation2D());
+    Pose2d reefFacePose = new Pose2d(targetPose.getTranslation(), chosen.rotation2D());
 
-    Logger.recordOutput("Alignment/AlgaeRemoval", refinedTargetPose);
-    return refinedTargetPose;
+    Pose2d algaeRemovalPose = reefFacePose.plus(ALGAE_OFFSET);
+
+    Logger.recordOutput("Alignment/AlgaeRemoval", algaeRemovalPose);
+    return algaeRemovalPose;
   }
 
   public static PolePosition findPolePosition(int faceId, Pose2d robotPose) {

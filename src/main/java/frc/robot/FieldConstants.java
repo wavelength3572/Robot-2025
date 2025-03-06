@@ -1069,51 +1069,12 @@ public final class FieldConstants {
     for (int i = 0; i < 6; i++) {
       int faceId = redFaceIds[i];
       // Each face provides two poles (assumed to be consecutive in the array)
-      Pose3d poseA = coralPoses[2 * i];
-      Pose3d poseB = coralPoses[2 * i + 1];
-
-      // Convert Pose3d translations to Translation2d
-      Translation2d tA =
-          new Translation2d(poseA.getTranslation().getX(), poseA.getTranslation().getY());
-      Translation2d tB =
-          new Translation2d(poseB.getTranslation().getX(), poseB.getTranslation().getY());
-
-      // Compute the 2D center of the two poles.
-      Translation2d center =
-          new Translation2d((tA.getX() + tB.getX()) / 2.0, (tA.getY() + tB.getY()) / 2.0);
-
-      // Get the face’s forward direction from one of the poses.
-      // Use getAngle() (or getYaw() if available) to obtain the heading.
-      double yaw = poseA.getRotation().getAngle();
-      // The left direction is a 90° counterclockwise rotation of the forward vector.
-      Translation2d leftVector = new Translation2d(-Math.sin(yaw), Math.cos(yaw));
-
-      // Compute vectors from center to each pole.
-      Translation2d vecA = tA.minus(center);
-      Translation2d vecB = tB.minus(center);
-
-      // Compute dot products using our helper.
-      double dotA = dot(vecA, leftVector);
-      double dotB = dot(vecB, leftVector);
-
-      // The one with the higher dot product is further in the left direction.
-      Pose3d leftPose, rightPose;
-      if (dotA > dotB) {
-        leftPose = poseA;
-        rightPose = poseB;
-      } else {
-        leftPose = poseB;
-        rightPose = poseA;
-      }
+      Pose3d leftPose = coralPoses[2 * i]; // Left pole, guaranteed by upstream order.
+      Pose3d rightPose = coralPoses[2 * i + 1]; // Right pole
 
       // Add the entries to coralMapping using your CoralKey keys.
       coralMapping.put(new CoralKey(faceId, A_LEFT, preset), new CoralLocation(leftPose));
       coralMapping.put(new CoralKey(faceId, B_RIGHT, preset), new CoralLocation(rightPose));
     }
-  }
-
-  // Helper: dot product for Translation2d
-  private static double dot(Translation2d v1, Translation2d v2) {
-    return v1.getX() * v2.getX() + v1.getY() * v2.getY();
   }
 }

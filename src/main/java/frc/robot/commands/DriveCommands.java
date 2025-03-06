@@ -350,7 +350,8 @@ public class DriveCommands {
           drive.setDriveModeNormal();
           drive.setDefaultCommand(
               DriveCommands.joystickDrive(drive, xSupplier, ySupplier, omegaSupplier));
-        });
+        },
+        drive);
   }
 
   /** Creates a joystick-based drive command that integrates alignment strategies. */
