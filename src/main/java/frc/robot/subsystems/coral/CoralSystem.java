@@ -128,7 +128,6 @@ public class CoralSystem extends SubsystemBase {
     Logger.recordOutput("CoralSystem/ElevatorAtGoal", elevator.isAtGoal());
     Logger.recordOutput("CoralSystem/ArmAtGoal", arm.isAtGoal());
     Logger.recordOutput("CoralSystem/AtGoal", isAtGoal());
-    Logger.recordOutput("CoralSystem/AtGoal", isAtGoal());
 
     CoralRPStatusLogger.logCoralStatus(false);
 
