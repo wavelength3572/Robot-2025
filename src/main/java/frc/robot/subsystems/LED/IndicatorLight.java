@@ -3,6 +3,7 @@ package frc.robot.subsystems.LED;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -15,8 +16,6 @@ import frc.robot.util.BranchAlignmentUtils.BranchAlignmentStatus;
 import frc.robot.util.RobotStatus;
 import java.util.Random;
 import java.util.function.Supplier;
-import lombok.Getter;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class IndicatorLight extends SubsystemBase {
@@ -77,7 +76,9 @@ public class IndicatorLight extends SubsystemBase {
   private final double updateInterval = 0.05; // Interval in seconds for updates
   private Supplier<Boolean> getHaveCoral;
   private boolean pickupBlinkTriggered = false;
-  @AutoLogOutput @Getter private boolean branchAlignmentOn = false;
+
+  private boolean branchAlignmentOn = true; // start with branchAlignment lighting on
+
   private AddressableLEDBuffer currentActiveBuffer;
 
   public void setupLightingSuppliers(
@@ -130,9 +131,6 @@ public class IndicatorLight extends SubsystemBase {
 
     wlYellowLEDBuffer =
         new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
-    // for (var i = 0; i < wlYellowLEDBuffer.getLength(); i++) {
-    // wlYellowLEDBuffer.setHSV(i, IndicatorLightConstants.YELLOW_HUE, 255, 128);
-    // }
     for (int i = 0; i < wlYellowLEDBuffer.getLength(); i++) {
       wlYellowLEDBuffer.setLED(i, Color.kYellow);
     }
@@ -172,11 +170,9 @@ public class IndicatorLight extends SubsystemBase {
 
   @Override
   public void periodic() {
+    currentColor_GOAL = updateLightingGoal();
 
-    updateElevatorLightingState();
-    updateBranchAlignmentLighting();
-
-    if (RobotStatus.isClimbingFinished()) currentColor_GOAL = LED_EFFECTS.SEGMENTPARTY;
+    updateBranchAlignmentLighting(); //override with branch alignment lighting if close enough
 
     if (LED_State != LED_EFFECTS.BLINK) {
       LED_State = currentColor_GOAL;
@@ -198,7 +194,7 @@ public class IndicatorLight extends SubsystemBase {
       case WHITE -> setActiveBuffer(wlWhiteLEDBuffer);
       case RAINBOW -> doRainbow();
       case BLUEOMBRE -> doBlueOmbre();
-      case BLINK -> blink();
+      case BLINK -> doBlink();
       case BLINK_RED -> doBlinkRed();
       case BLINK_PURPLE -> blinkPurple();
       case PARTY -> party();
@@ -207,7 +203,11 @@ public class IndicatorLight extends SubsystemBase {
       case POLKADOT -> doPokadot();
       case SEARCH_LIGHT -> doSearchlightSingleEffect();
       case DYNAMIC_BLINK -> dynamicBlink();
-      case DRIVE_TO_REEF -> {} // TODO: Implement reef lighting logic
+      case DRIVE_TO_REEF -> {} // TODO:
+        // Implement
+        // reef
+        // lighting
+        // logic
 
       default -> {}
     }
@@ -222,7 +222,7 @@ public class IndicatorLight extends SubsystemBase {
     double lateralError = BranchAlignmentUtils.getLateralErrorToNearestPole();
     updateBlinkPeriod(lateralError);
 
-    if (branchAlignmentOn) {
+    if (branchAlignmentOn && RobotStatus.haveCoral()) {
       BranchAlignmentStatus state = BranchAlignmentUtils.getCurrentBranchAlignmentStatus();
       switch (state) {
         case GREEN:
@@ -440,6 +440,10 @@ public class IndicatorLight extends SubsystemBase {
   }
 
   public void blink() {
+    currentColor_GOAL = LED_EFFECTS.BLINK;
+  }
+
+  public void doBlink() {
     LED_State = LED_EFFECTS.BLINK;
     double timeStamp = Timer.getFPGATimestamp();
 
@@ -671,98 +675,6 @@ public class IndicatorLight extends SubsystemBase {
     setActiveBuffer(wlLEDBuffer);
   }
 
-  /**
-   * Checks the current elevator presets and updates the LED state if a change is detected. This
-   * method sets LED_State to one of: - ELEVATOR_SELECTION_CHANGED (if the selected preset changed)
-   * - ELEVATOR_TARGET_CHANGED (if the target preset changed) - ELEVATOR_CURRENT_CHANGED (if the
-   * current preset now equals the target)
-   */
-  private void updateElevatorLightingState() {
-
-    CoralSystemPresets currentPreset = getCurrentCoralPreset.get();
-    CoralSystemPresets selectedPreset = getSelectedCoralPreset.get();
-    CoralSystemPresets targetPreset = getTargetCoralPreset.get();
-
-    // If we're in STARTUP, do nothing else
-    if (currentPreset.equals(CoralSystemPresets.STARTUP)) {
-      return;
-    }
-
-    // 1) If the SELECTED preset is PICKUP, but CURRENT is NOT yet PICKUP,
-    // then use the SEARCH_LIGHT effect and reset the pickupBlinkTriggered.
-    if (selectedPreset != null
-        && selectedPreset.equals(CoralSystemPresets.PICKUP)
-        && currentPreset != CoralSystemPresets.PICKUP) {
-
-      currentColor_GOAL = LED_EFFECTS.SEARCH_LIGHT;
-      pickupBlinkTriggered = false;
-      return;
-    }
-
-    // 2) If CURRENT preset is PICKUP, handle coral presence.
-    else if (currentPreset.equals(CoralSystemPresets.PICKUP)) {
-
-      boolean coralPresent = (getHaveCoral != null && getHaveCoral.get());
-
-      if (!coralPresent) {
-        // No coral → reset blink so we blink again next time a coral appears
-        pickupBlinkTriggered = false;
-        currentColor_GOAL = LED_EFFECTS.SEARCH_LIGHT;
-      } else {
-        // Coral is present
-        if (!pickupBlinkTriggered) {
-          // Blink once for a new pickup
-          currentColor_GOAL = LED_EFFECTS.BLINK;
-          pickupBlinkTriggered = true;
-        } else {
-          // Already blinked → go steady with BLUEOMBRE
-          currentColor_GOAL = LED_EFFECTS.BLUEOMBRE;
-        }
-      }
-      return; // We handled PICKUP case fully; exit the method.
-    }
-
-    // If not STARTUP or PICKUP, handle your usual elevator lighting (selection
-    // changed, etc).
-    if ((lastSelectedCoralPreset == null || !lastSelectedCoralPreset.equals(selectedPreset))
-        && selectedPreset != null) {
-      currentColor_GOAL = LED_EFFECTS.ELEVATOR_SELECTION_CHANGED;
-      updateSelectedLighting(selectedPreset);
-      lastSelectedCoralPreset = selectedPreset;
-    }
-
-    if (lastTargetCoralPreset == null || !lastTargetCoralPreset.equals(targetPreset)) {
-      currentColor_GOAL = LED_EFFECTS.ELEVATOR_TARGET_CHANGED;
-      updateTransitionLighting(targetPreset);
-      lastTargetCoralPreset = targetPreset;
-    }
-
-    if (currentPreset.equals(targetPreset)
-        && (lastFinalLightingPreset == null || !lastFinalLightingPreset.equals(targetPreset))) {
-      currentColor_GOAL = LED_EFFECTS.ELEVATOR_CURRENT_CHANGED;
-      updateFinalLighting(targetPreset);
-      lastFinalLightingPreset = targetPreset;
-    }
-  }
-
-  private void updateSelectedLighting(CoralSystemPresets selectedPreset) {
-    System.out.println("Elevator selection changed: " + selectedPreset);
-    // Use yellow for selection preview.
-    setElevatorHeightEffect(selectedPreset, Color.kYellow);
-  }
-
-  private void updateTransitionLighting(CoralSystemPresets targetPreset) {
-    System.out.println("Elevator target changed: " + targetPreset);
-    // Use blue for transition.
-    setElevatorHeightEffect(targetPreset, Color.kYellow);
-  }
-
-  private void updateFinalLighting(CoralSystemPresets targetPreset) {
-    System.out.println("Elevator current reached target: " + targetPreset);
-    // Use green to indicate the final state.
-    setElevatorHeightEffect(targetPreset, Color.kGreen);
-  }
-
   public void doSearchlightSingleEffect() {
     // Only update after the desired update interval.
     if (effectTimer.get() < updateInterval) {
@@ -856,5 +768,35 @@ public class IndicatorLight extends SubsystemBase {
         setActiveBuffer(wlBlackLEDBuffer);
       }
     }
+  }
+
+  private LED_EFFECTS updateLightingGoal() {
+
+    if (DriverStation.isDisabled()) {
+      return LED_EFFECTS.RSL; // implement RSL lighting
+    }
+
+    if (RobotStatus.isClimbingFinished()) return LED_EFFECTS.SEGMENTPARTY;
+
+    if (RobotStatus.justPickedUpCoral() && !pickupBlinkTriggered) {
+      pickupBlinkTriggered = true;
+      return LED_EFFECTS.BLINK;
+    }
+
+    if (this.getCurrentCoralPreset.get() == CoralSystemPresets.PICKUP && !RobotStatus.haveCoral()) {
+      return LED_EFFECTS.SEARCH_LIGHT;
+    }
+
+    if (RobotStatus.justScoredCoral()) {
+      pickupBlinkTriggered = false;
+      return LED_EFFECTS.PURPLE;
+    }
+
+    if (RobotStatus.justMissedCoralScoral()) {
+      pickupBlinkTriggered = false;
+      return LED_EFFECTS.BLUEOMBRE;
+    }
+
+    return LED_EFFECTS.BLUEOMBRE;
   }
 }

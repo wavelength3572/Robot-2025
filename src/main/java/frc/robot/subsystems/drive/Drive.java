@@ -87,10 +87,13 @@ public class Drive extends SubsystemBase {
         new SwerveModulePosition()
       };
   private SwerveDrivePoseEstimator poseEstimator =
-      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d(),
-      VecBuilder.fill(0.5, 0.5, 0.1), //change from defaults 
-      VecBuilder.fill(0.9, 0.9, 0.9)
-      );
+      new SwerveDrivePoseEstimator(
+          kinematics,
+          rawGyroRotation,
+          lastModulePositions,
+          new Pose2d(),
+          VecBuilder.fill(0.5, 0.5, 0.1), // change from defaults
+          VecBuilder.fill(0.9, 0.9, 0.9));
 
   private SwerveDrivePoseEstimator poseEstimator2 =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
