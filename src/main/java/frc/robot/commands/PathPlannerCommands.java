@@ -23,8 +23,11 @@ import java.util.List;
 
 public class PathPlannerCommands {
   public static void Setup(CoralSystem coralSystem, Drive drive, Vision vision) {
-    NamedCommands.registerCommand("WaitForCoral", new WaitUntilCommand(coralSystem::isHaveCoral));
-    NamedCommands.registerCommand("WaitForPreset", new WaitUntilCommand(coralSystem::isAtGoal));
+    NamedCommands.registerCommand(
+        "WaitForCoral", new TimedWaitUntilCommand("haveCoral", coralSystem::isHaveCoral));
+
+    NamedCommands.registerCommand(
+        "WaitForPreset", new TimedWaitUntilCommand("isAtGoal", coralSystem::isAtGoal));
 
     NamedCommands.registerCommand("TurnVisionOff", new InstantCommand(vision::setVisionOff));
 

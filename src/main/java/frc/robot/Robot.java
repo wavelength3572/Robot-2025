@@ -167,6 +167,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    timeLogged = false;
     ReefScoringLogger.clearScoringEvents(); // Clears previous scoring data
 
     robotContainer
@@ -181,9 +182,20 @@ public class Robot extends LoggedRobot {
     }
   }
 
+  private boolean timeLogged = false;
+
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    // If the autonomous command is no longer scheduled and we haven't logged the
+    // time yet...
+    if (autonomousCommand != null
+        && !CommandScheduler.getInstance().isScheduled(autonomousCommand)
+        && !timeLogged) {
+      Logger.recordOutput("AutoTiming/AutoTimeLeft", DriverStation.getMatchTime());
+      timeLogged = true;
+    }
+  }
 
   /** This function is called once when teleop is enabled. */
   @Override
