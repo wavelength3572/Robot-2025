@@ -14,6 +14,7 @@
 package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.MatchType;
@@ -113,7 +114,8 @@ public class Robot extends LoggedRobot {
         String.format("turnMotorReduction: %.5f", DriveConstants.turnMotorReduction));
     System.out.println(String.format("wheelRadiusMeters: %.5f", DriveConstants.wheelRadiusMeters));
 
-    CameraServer.startAutomaticCapture("Climber Cam", 0);
+    UsbCamera lifeCam = CameraServer.startAutomaticCapture("Climber Cam", 0);
+    lifeCam.setResolution(416, 240);
   }
 
   /** This function is called periodically during all modes. */
