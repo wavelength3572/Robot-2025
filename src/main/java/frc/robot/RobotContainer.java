@@ -103,7 +103,7 @@ public class RobotContainer {
                 drive::addVisionMeasurementForLogging,
                 new VisionIOPhotonVision(frontRightCam, robotToFrontRightCam),
                 new VisionIOPhotonVision(backRightCam, robotToBackRightCam),
-                new VisionIOPhotonVision(elevatorFrontCam, robotToFrontLeftCam),
+                new VisionIOPhotonVision(frontLeftCam, robotToFrontLeftCam),
                 new VisionIOPhotonVision(elevatorBackCam, robotToElevatorBackCam));
 
         elevator = new Elevator(new ElevatorIOSpark() {});
@@ -134,7 +134,7 @@ public class RobotContainer {
                 drive::addVisionMeasurementForLogging,
                 new VisionIOPhotonVisionSim(frontRightCam, robotToFrontRightCam, drive::getPose),
                 new VisionIOPhotonVisionSim(backRightCam, robotToBackRightCam, drive::getPose),
-                new VisionIOPhotonVisionSim(elevatorFrontCam, robotToFrontLeftCam, drive::getPose),
+                new VisionIOPhotonVisionSim(frontLeftCam, robotToFrontLeftCam, drive::getPose),
                 new VisionIOPhotonVisionSim(
                     elevatorBackCam, robotToElevatorBackCam, drive::getPose));
         elevator = new Elevator(new ElevatorIOVirtualSim() {});

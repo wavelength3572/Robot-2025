@@ -3,7 +3,6 @@ package frc.robot.subsystems.LED;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -97,52 +96,62 @@ public class IndicatorLight extends SubsystemBase {
     wlLED.setData(wlLEDBuffer);
     wlLED.start();
 
-    wlGreenLEDBuffer = new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
+    wlGreenLEDBuffer =
+        new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
     for (var i = 0; i < wlGreenLEDBuffer.getLength(); i++) {
       wlGreenLEDBuffer.setHSV(i, IndicatorLightConstants.GREEN_HUE, 255, 128);
     }
 
-    wlOrangeLEDBuffer = new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
+    wlOrangeLEDBuffer =
+        new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
     for (var i = 0; i < wlOrangeLEDBuffer.getLength(); i++) {
       wlOrangeLEDBuffer.setHSV(i, IndicatorLightConstants.ORANGE_HUE, 255, 128);
     }
 
-    wlPurpleLEDBuffer = new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
+    wlPurpleLEDBuffer =
+        new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
     for (var i = 0; i < wlPurpleLEDBuffer.getLength(); i++) {
       wlPurpleLEDBuffer.setHSV(i, IndicatorLightConstants.PURPLE_HUE, 63, 92);
     }
 
-    wlRedLEDBuffer = new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
+    wlRedLEDBuffer =
+        new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
     for (var i = 0; i < wlRedLEDBuffer.getLength(); i++) {
       wlRedLEDBuffer.setHSV(i, IndicatorLightConstants.RED_HUE, 255, 128);
     }
 
-    wlYellowLEDBuffer = new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
+    wlYellowLEDBuffer =
+        new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
     for (int i = 0; i < wlYellowLEDBuffer.getLength(); i++) {
       wlYellowLEDBuffer.setLED(i, Color.kYellow);
     }
 
-    wlBlueLEDBuffer = new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
+    wlBlueLEDBuffer =
+        new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
     for (var i = 0; i < wlBlueLEDBuffer.getLength(); i++) {
       wlBlueLEDBuffer.setLED(i, Color.kBlue);
     }
 
-    wlIndigoLEDBuffer = new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
+    wlIndigoLEDBuffer =
+        new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
     for (var i = 0; i < wlIndigoLEDBuffer.getLength(); i++) {
       wlIndigoLEDBuffer.setLED(i, Color.kIndigo);
     }
 
-    wlVioletLEDBuffer = new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
+    wlVioletLEDBuffer =
+        new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
     for (var i = 0; i < wlVioletLEDBuffer.getLength(); i++) {
       wlVioletLEDBuffer.setLED(i, Color.kViolet);
     }
 
-    wlWhiteLEDBuffer = new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
+    wlWhiteLEDBuffer =
+        new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
     for (var i = 0; i < wlWhiteLEDBuffer.getLength(); i++) {
       wlWhiteLEDBuffer.setLED(i, Color.kWhite);
     }
 
-    wlBlackLEDBuffer = new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
+    wlBlackLEDBuffer =
+        new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
     for (var i = 0; i < wlBlackLEDBuffer.getLength(); i++) {
       wlBlackLEDBuffer.setLED(i, Color.kBlack);
     }
@@ -160,9 +169,9 @@ public class IndicatorLight extends SubsystemBase {
       LED_State = currentColor_GOAL;
     }
     switch (LED_State) {
-      // Elevator-specific states: our updateElevatorLightingState() method has
-      // already applied
-      // the appropriate LED buffer. We simply do nothing here.
+        // Elevator-specific states: our updateElevatorLightingState() method has
+        // already applied
+        // the appropriate LED buffer. We simply do nothing here.
       case ELEVATOR_SELECTION_CHANGED, ELEVATOR_TARGET_CHANGED, ELEVATOR_CURRENT_CHANGED -> {
         // Elevator lighting is already updated.
       } // General states:
@@ -186,10 +195,8 @@ public class IndicatorLight extends SubsystemBase {
       case POLKADOT -> doPokadot();
       case SEARCH_LIGHT -> doSearchlightSingleEffect();
       case DYNAMIC_BLINK -> dynamicBlink();
-      case DRIVE_TO_REEF -> {
-      }
-      default -> {
-      }
+      case DRIVE_TO_REEF -> {}
+      default -> {}
     }
 
     // Publish the first 10 LEDs of wlLEDBuffer under "StripA" and the second 10
@@ -223,13 +230,11 @@ public class IndicatorLight extends SubsystemBase {
   }
 
   /**
-   * Publishes the colors from an AddressableLEDBuffer of length 20 to the
-   * SmartDashboard as a
+   * Publishes the colors from an AddressableLEDBuffer of length 20 to the SmartDashboard as a
    * single strip, flipping its order so LED 0 appears last on the dashboard.
    *
    * @param baseKey NetworkTable key prefix (e.g., "StripA")
-   * @param buffer  The AddressableLEDBuffer containing the full LED data (20
-   *                LEDs)
+   * @param buffer The AddressableLEDBuffer containing the full LED data (20 LEDs)
    */
   public void publishLEDsToDashboardFlipped(String baseKey, AddressableLEDBuffer buffer) {
     int length = buffer.getLength(); // Should be 20
@@ -339,7 +344,9 @@ public class IndicatorLight extends SubsystemBase {
 
       for (int segment = 0; segment < numberOfSegments; segment++) {
         // Select a random color from the palette
-        int[] color = IndicatorLightConstants.colorPalette[random.nextInt(IndicatorLightConstants.colorPalette.length)];
+        int[] color =
+            IndicatorLightConstants.colorPalette[
+                random.nextInt(IndicatorLightConstants.colorPalette.length)];
 
         // Choose random start point and length
         int start = random.nextInt(wlLEDBuffer.getLength());
@@ -350,8 +357,7 @@ public class IndicatorLight extends SubsystemBase {
           wlLEDBuffer.setRGB(i, color[0], color[1], color[2]);
         }
       }
-    } else
-      counter++;
+    } else counter++;
 
     // Update the LED strip
     wlLED.setData(wlLEDBuffer);
@@ -583,9 +589,10 @@ public class IndicatorLight extends SubsystemBase {
     } else if (distance > 10) {
       targetColor = Color.kGreen; // Very close
     } else {
-      targetColor = (Timer.getFPGATimestamp() % 0.5 < 0.25)
-          ? Color.kGreen
-          : Color.kBlack; // Flashing Green when at
+      targetColor =
+          (Timer.getFPGATimestamp() % 0.5 < 0.25)
+              ? Color.kGreen
+              : Color.kBlack; // Flashing Green when at
       // target
     }
 
@@ -720,7 +727,8 @@ public class IndicatorLight extends SubsystemBase {
     } else if (lateralError >= MAX_TOLERANCE_BLINK) {
       currentBlinkPeriod = MAX_BLINK_PERIOD;
     } else {
-      double fraction = (lateralError - MIN_TOLERANCE_BLINK) / (MAX_TOLERANCE_BLINK - MIN_TOLERANCE_BLINK);
+      double fraction =
+          (lateralError - MIN_TOLERANCE_BLINK) / (MAX_TOLERANCE_BLINK - MIN_TOLERANCE_BLINK);
       currentBlinkPeriod = MIN_BLINK_PERIOD + fraction * (MAX_BLINK_PERIOD - MIN_BLINK_PERIOD);
     }
     Logger.recordOutput("Alignment/Branch/DynamicBlink/currentBlinkPeriod", currentBlinkPeriod);
@@ -755,8 +763,7 @@ public class IndicatorLight extends SubsystemBase {
       return LED_EFFECTS.RSL;
     }
 
-    if (RobotStatus.isClimbingFinished())
-      return LED_EFFECTS.SEGMENTPARTY;
+    if (RobotStatus.isClimbingFinished()) return LED_EFFECTS.SEGMENTPARTY;
 
     if (RobotStatus.justPickedUpCoral() && !pickupBlinkTriggered) {
       pickupBlinkTriggered = true;
@@ -783,5 +790,4 @@ public class IndicatorLight extends SubsystemBase {
   private void rsl() {
     currentColor_GOAL = LED_EFFECTS.ORANGE;
   }
-
 }

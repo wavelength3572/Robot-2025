@@ -46,9 +46,9 @@ public final class VisionConstants {
   // _________________________________________________________________________________________________
 
   // Camera names, must match names configured on coprocessor
-  public static String frontRightCam = "CAMERA_A";
+  public static String frontRightCam = "CAMERA_B";
   public static String backRightCam = "CAMERA_D";
-  public static String elevatorFrontCam = "CAMERA_B";
+  public static String frontLeftCam = "CAMERA_A";
   public static String elevatorBackCam = "CAMERA_C";
 
   // Robot to camera transforms
