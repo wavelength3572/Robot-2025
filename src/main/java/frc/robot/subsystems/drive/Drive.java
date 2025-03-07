@@ -170,7 +170,7 @@ public class Drive extends SubsystemBase {
         robotPose3D.transformBy(VisionConstants.robotToBackRightCam));
     Logger.recordOutput(
         "Vision/CamPoses/FrontElevatorCam",
-        robotPose3D.transformBy(VisionConstants.robotToElevatorFrontCam));
+        robotPose3D.transformBy(VisionConstants.robotToFrontLeftCam));
     Logger.recordOutput(
         "Vision/CamPoses/BackElevatorCam",
         robotPose3D.transformBy(VisionConstants.robotToElevatorBackCam));
