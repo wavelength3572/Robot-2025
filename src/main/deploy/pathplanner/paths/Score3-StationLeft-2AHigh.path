@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.2677386660126404,
-        "y": 7.103081677236112
+        "x": 1.2712127483443707,
+        "y": 7.104966887417217
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0397784222580086,
-        "y": 6.51584969734069
+        "x": 2.0432525045897387,
+        "y": 6.517734907521795
       },
       "isLocked": false,
       "linkedName": "StationLeft"
     },
     {
       "anchor": {
-        "x": 4.11021745411027,
-        "y": 5.337414049867346
+        "x": 4.133257450331126,
+        "y": 5.368853476821191
       },
       "prevControl": {
-        "x": 3.739940554624068,
-        "y": 5.648257493927667
+        "x": 3.7629805508449237,
+        "y": 5.679696920881512
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0.0,
-      "maxWaypointRelativePos": 0.85,
+      "maxWaypointRelativePos": 0.88,
       "constraints": {
         "maxVelocity": 2.5,
         "maxAcceleration": 2.75,
@@ -48,14 +48,14 @@
   "eventMarkers": [
     {
       "name": "L4",
-      "waypointRelativePos": 0.39404466501241786,
+      "waypointRelativePos": 0.10035335689045352,
       "endWaypointRelativePos": null,
       "command": null
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 1.25,
-    "maxAcceleration": 1.75,
+    "maxVelocity": 0.8,
+    "maxAcceleration": 1.6,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

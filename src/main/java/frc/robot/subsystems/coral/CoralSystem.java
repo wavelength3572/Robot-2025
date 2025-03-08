@@ -189,8 +189,7 @@ public class CoralSystem extends SubsystemBase {
       if (this.targetCoralPreset == CoralSystemPresets.PICKUP
           && !haveCoral
           && (currentCoralPreset == CoralSystemPresets.L2
-              || currentCoralPreset == CoralSystemPresets.L3
-              || currentCoralPreset == CoralSystemPresets.L4
+              || currentCoralPreset == CoralSystemPresets.L3              
               || currentCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_1
               || currentCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_2)) {
         moveArmSafely = false;
@@ -199,10 +198,27 @@ public class CoralSystem extends SubsystemBase {
           && haveCoral
           && (this.targetCoralPreset == CoralSystemPresets.L1
               || this.targetCoralPreset == CoralSystemPresets.L2
-              || this.targetCoralPreset == CoralSystemPresets.L3
-              || this.targetCoralPreset == CoralSystemPresets.L4)) {
+              || this.targetCoralPreset == CoralSystemPresets.L3)) {
         moveArmSafely = false;
       }
+
+      // changes for autonomous only
+      if (currentCoralPreset == CoralSystemPresets.STARTUP
+          && this.targetCoralPreset == CoralSystemPresets.PREL4) {
+        moveArmSafely = false;
+      }
+
+      // changes for autonomous only
+      if (currentCoralPreset == CoralSystemPresets.PREL4
+          && this.targetCoralPreset == CoralSystemPresets.L4) {
+        moveArmSafely = false;
+      }
+
+      if (currentCoralPreset == CoralSystemPresets.PICKUP
+          && this.targetCoralPreset == CoralSystemPresets.PREL4) {
+        moveArmSafely = false;
+      }
+
       if (moveArmSafely) {
         // Start Moving Arm to Safe
         this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
@@ -226,9 +242,9 @@ public class CoralSystem extends SubsystemBase {
     }
   }
 
-  public void autoSetHaveCoral(Boolean haveCoral) {
-    this.haveCoral = haveCoral;
-    this.intake.autoSetHaveCoral(haveCoral);
+  public void autoSetHaveCoral(Boolean coral) {
+    this.haveCoral = coral;
+    this.intake.autoSetHaveCoral(coral);
   }
 
   public boolean isAtGoal() {

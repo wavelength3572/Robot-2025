@@ -100,7 +100,7 @@ public class IntakeIOSpark implements IntakeIO {
   }
 
   @Override
-  public void autoSetHaveCoral(boolean haveCoral) {
-    this.haveCoral = haveCoral;
+  public void autoSetHaveCoral(boolean coral) {
+    this.haveCoral = coral;
   }
 }

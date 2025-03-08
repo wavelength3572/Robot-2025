@@ -19,6 +19,12 @@
         {
           "type": "named",
           "data": {
+            "name": "L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Score"
           }
         },
@@ -65,9 +71,27 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "Score3-StationLeft-2BHigh"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "Score3-StationLeft-2BHigh-OR-1ALow"
+            "name": "WaitForPreset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score3-2B-StationLeft"
           }
         }
       ]
