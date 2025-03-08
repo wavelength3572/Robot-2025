@@ -2,8 +2,8 @@ package frc.robot.subsystems.coral;
 
 import static frc.robot.subsystems.coral.CoralSystemPresets.*;
 
-import com.playingwithfusion.TimeOfFlight;
-import com.playingwithfusion.TimeOfFlight.RangingMode;
+import com.ctre.phoenix6.configs.CANrangeConfiguration;
+import com.ctre.phoenix6.hardware.CANrange;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -38,9 +38,10 @@ public class CoralSystem extends SubsystemBase {
     HAVE_CORAL_NEAR_STATION,
   }
 
-  private TimeOfFlight timeOfFlight = new TimeOfFlight(31); // Back of Robot on Elevator
   private static final double TIME_OF_FLIGHT_THRESHOLD = 1250; // adjust this constant as needed
   private double SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE = 1.5;
+
+  private CANrange canRange = new CANrange(10);
 
   @Getter private Elevator elevator;
   @Getter public final CoralSystemPresetChooser coralSystemPresetChooser;
@@ -98,7 +99,12 @@ public class CoralSystem extends SubsystemBase {
     this.elevator = elevator;
     this.arm = arm;
     this.intake = intake;
-    timeOfFlight.setRangingMode(RangingMode.Short, 20);
+
+    // Configure the CANrange for basic use
+    CANrangeConfiguration configs = new CANrangeConfiguration();
+
+    // Write these configs to the CANrange
+    canRange.getConfigurator().apply(configs);
 
     // try {
     // TimeUnit.SECONDS.sleep(1);
@@ -186,15 +192,15 @@ public class CoralSystem extends SubsystemBase {
       // elevator and arm at the same time
       moveArmSafely = true;
       this.targetCoralPreset = requestedPreset;
-      if (this.targetCoralPreset == CoralSystemPresets.PICKUP
-          && !haveCoral
-          && (currentCoralPreset == CoralSystemPresets.L2
-              || currentCoralPreset == CoralSystemPresets.L3
-              || currentCoralPreset == CoralSystemPresets.L4
-              || currentCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_1
-              || currentCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_2)) {
-        moveArmSafely = false;
-      }
+      // if (this.targetCoralPreset == CoralSystemPresets.PICKUP
+      //     && !haveCoral
+      //     && (currentCoralPreset == CoralSystemPresets.L2
+      //         || currentCoralPreset == CoralSystemPresets.L3
+      //         || currentCoralPreset == CoralSystemPresets.L4
+      //         || currentCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_1
+      //         || currentCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_2)) {
+      //   moveArmSafely = false;
+      // }
       if (currentCoralPreset == CoralSystemPresets.PICKUP
           && haveCoral
           && (this.targetCoralPreset == CoralSystemPresets.L1
@@ -246,7 +252,7 @@ public class CoralSystem extends SubsystemBase {
 
   @AutoLogOutput(key = "CoralSystem/Rear TOF")
   public double getTimeOfFlightRange() {
-    return timeOfFlight.getRange();
+    return canRange.getDistance().getValueAsDouble();
   }
 
   public void scoreCoral() {
