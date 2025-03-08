@@ -2,8 +2,6 @@ package frc.robot.subsystems.coral;
 
 import static frc.robot.subsystems.coral.CoralSystemPresets.*;
 
-import com.ctre.phoenix6.configs.CANrangeConfiguration;
-import com.ctre.phoenix6.hardware.CANrange;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -41,19 +39,14 @@ public class CoralSystem extends SubsystemBase {
   private static final double TIME_OF_FLIGHT_THRESHOLD = 1250; // adjust this constant as needed
   private double SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE = 1.5;
 
-  private CANrange canRange = new CANrange(10);
+  // private CANrange canRange = new CANrange(31);
 
-  @Getter
-  private Elevator elevator;
-  @Getter
-  public final CoralSystemPresetChooser coralSystemPresetChooser;
-  @Getter
-  private Arm arm;
-  @Getter
-  private Intake intake;
+  @Getter private Elevator elevator;
+  @Getter public final CoralSystemPresetChooser coralSystemPresetChooser;
+  @Getter private Arm arm;
+  @Getter private Intake intake;
 
-  @Getter
-  public boolean haveCoral;
+  @Getter public boolean haveCoral;
 
   @AutoLogOutput(key = "CoralSystem/climbASAP")
   @Getter
@@ -73,11 +66,13 @@ public class CoralSystem extends SubsystemBase {
 
   @AutoLogOutput(key = "CoralSystem/targetCoralPreset")
   @Getter
-  public CoralSystemPresets targetCoralPreset = CoralSystemPresets.STARTUP; // Default startup position
+  public CoralSystemPresets targetCoralPreset =
+      CoralSystemPresets.STARTUP; // Default startup position
 
   @AutoLogOutput(key = "CoralSystem/currentCoralPreset")
   @Getter
-  public CoralSystemPresets currentCoralPreset = CoralSystemPresets.STARTUP; // Tracks last reached preset
+  public CoralSystemPresets currentCoralPreset =
+      CoralSystemPresets.STARTUP; // Tracks last reached preset
 
   // Current state of the pickup state machine
   @AutoLogOutput(key = "CoralSystem/coralPickupState")
@@ -104,10 +99,10 @@ public class CoralSystem extends SubsystemBase {
     this.intake = intake;
 
     // Configure the CANrange for basic use
-    CANrangeConfiguration configs = new CANrangeConfiguration();
+    // CANrangeConfiguration configs = new CANrangeConfiguration();
 
     // Write these configs to the CANrange
-    canRange.getConfigurator().apply(configs);
+    // canRange.getConfigurator().apply(configs);
 
     // try {
     // TimeUnit.SECONDS.sleep(1);
@@ -119,7 +114,6 @@ public class CoralSystem extends SubsystemBase {
 
     // Puts the button/command on the dashboard to go to the choosed preset
     SmartDashboard.putData("Set Coral Config", CoralSystemCommands.runPreset(this)); //
-
   }
 
   @Override
@@ -146,13 +140,13 @@ public class CoralSystem extends SubsystemBase {
     switch (coralSystemState) {
       case STABLE:
         // Do Nothing
-        if (climbASAP)
-          deployClimberTriggered();
+        if (climbASAP) deployClimberTriggered();
         break;
       case SAFE_ARM:
         // Move Arm to Safe
         this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
-        if (arm.getCurrentAngleDEG() >= CoralSystemPresets.ARMSAFE.getArmAngle() - 1.0) { // Put in a 1 degree fudge
+        if (arm.getCurrentAngleDEG()
+            >= CoralSystemPresets.ARMSAFE.getArmAngle() - 1.0) { // Put in a 1 degree fudge
           // factor
           coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
           // Start moving elevator
@@ -196,15 +190,12 @@ public class CoralSystem extends SubsystemBase {
       // elevator and arm at the same time
       moveArmSafely = true;
       this.targetCoralPreset = requestedPreset;
-      // if (this.targetCoralPreset == CoralSystemPresets.PICKUP
-      // && !haveCoral
-      // && (currentCoralPreset == CoralSystemPresets.L2
-      // || currentCoralPreset == CoralSystemPresets.L3
-      // || currentCoralPreset == CoralSystemPresets.L4
-      // || currentCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_1
-      // || currentCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_2)) {
-      // moveArmSafely = false;
-      // }
+      if (this.targetCoralPreset == CoralSystemPresets.PICKUP
+          && DriverStation.isAutonomousEnabled()
+          && !haveCoral
+          && (currentCoralPreset == CoralSystemPresets.L4)) {
+        moveArmSafely = false;
+      }
       // if (currentCoralPreset == CoralSystemPresets.PICKUP
       // && haveCoral
       // && (this.targetCoralPreset == CoralSystemPresets.L1
@@ -243,7 +234,6 @@ public class CoralSystem extends SubsystemBase {
         this.elevator.setTargetPreset(CoralSystemPresets.AUTO_START_L4);
         coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
       }
-
     }
   }
 
@@ -265,19 +255,22 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public boolean isAtGoal() {
-    boolean atTargetState = coralSystemState == CoralSystemMovementState.STABLE
-        && currentCoralPreset == targetCoralPreset;
+    boolean atTargetState =
+        coralSystemState == CoralSystemMovementState.STABLE
+            && currentCoralPreset == targetCoralPreset;
 
-    boolean preppedForDislodge = ((currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
-        || currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2)
-        && coralSystemState == CoralSystemMovementState.STABLE);
+    boolean preppedForDislodge =
+        ((currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+                || currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2)
+            && coralSystemState == CoralSystemMovementState.STABLE);
 
     return atTargetState || preppedForDislodge;
   }
 
   @AutoLogOutput(key = "CoralSystem/Rear TOF")
   public double getTimeOfFlightRange() {
-    return canRange.getDistance().getValueAsDouble();
+    // return canRange.getDistance().getValueAsDouble();
+    return 0;
   }
 
   public void scoreCoral() {
@@ -333,8 +326,7 @@ public class CoralSystem extends SubsystemBase {
         justScoredCoral = false;
       }
       return true;
-    } else
-      return false;
+    } else return false;
   }
 
   private boolean checkIfSafeDistanceFromCoralStation(double currentTOFAvg, boolean nearStation) {
@@ -342,8 +334,7 @@ public class CoralSystem extends SubsystemBase {
     // TIME_OF_FLIGHT_THRESHOLD
     if (!nearStation) {
       return true;
-    } else
-      return false;
+    } else return false;
   }
 
   public void deployClimberTriggered() {
