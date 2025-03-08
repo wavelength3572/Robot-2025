@@ -54,7 +54,7 @@
     },
     {
       "name": "L4",
-      "waypointRelativePos": 0.55,
+      "waypointRelativePos": 0.53,
       "endWaypointRelativePos": null,
       "command": null
     }
