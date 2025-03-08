@@ -363,8 +363,8 @@ public class Vision extends SubsystemBase {
         cameraTransform = VisionConstants.robotToBackRightCam;
         break;
       case 2:
-        cameraName = VisionConstants.elevatorFrontCam;
-        cameraTransform = VisionConstants.robotToElevatorFrontCam;
+        cameraName = VisionConstants.frontLeftCam;
+        cameraTransform = VisionConstants.robotToFrontLeftCam;
         break;
       case 3:
         cameraName = VisionConstants.elevatorBackCam;

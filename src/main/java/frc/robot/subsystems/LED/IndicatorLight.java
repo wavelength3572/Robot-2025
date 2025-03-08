@@ -3,7 +3,7 @@ package frc.robot.subsystems.LED;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -36,12 +36,6 @@ public class IndicatorLight extends SubsystemBase {
   Supplier<CoralSystemPresets> getCurrentCoralPreset;
   Supplier<CoralSystemPresets> getSelectedCoralPreset;
   Supplier<CoralSystemPresets> getTargetCoralPreset;
-
-  private CoralSystemPresets lastCurrentCoralPreset;
-  private CoralSystemPresets lastSelectedCoralPreset;
-  private CoralSystemPresets lastTargetCoralPreset;
-  private CoralSystemPresets lastFinalLightingPreset =
-      null; // Tracks last preset where final lighting applied
 
   private AddressableLED wlLED;
   private AddressableLEDBuffer wlLEDBuffer;
@@ -93,9 +87,6 @@ public class IndicatorLight extends SubsystemBase {
   }
 
   public IndicatorLight() {
-
-    lastSelectedCoralPreset = null;
-    lastTargetCoralPreset = null;
 
     wlLED = new AddressableLED(IndicatorLightConstants.ADDRESSABLE_LED_PORT);
     wlLEDBuffer = new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
@@ -198,17 +189,13 @@ public class IndicatorLight extends SubsystemBase {
       case BLINK_RED -> doBlinkRed();
       case BLINK_PURPLE -> blinkPurple();
       case PARTY -> party();
+      case RSL -> rsl();
       case SEGMENTPARTY -> doSegmentParty();
       case EXPLOSION -> doExplosionEffect();
       case POLKADOT -> doPokadot();
       case SEARCH_LIGHT -> doSearchlightSingleEffect();
       case DYNAMIC_BLINK -> dynamicBlink();
-      case DRIVE_TO_REEF -> {} // TODO:
-        // Implement
-        // reef
-        // lighting
-        // logic
-
+      case DRIVE_TO_REEF -> {}
       default -> {}
     }
 
@@ -772,8 +759,8 @@ public class IndicatorLight extends SubsystemBase {
 
   private LED_EFFECTS updateLightingGoal() {
 
-    if (DriverStation.isDisabled()) {
-      return LED_EFFECTS.RSL; // implement RSL lighting
+    if (RobotController.getRSLState()) {
+      return LED_EFFECTS.RSL;
     }
 
     if (RobotStatus.isClimbingFinished()) return LED_EFFECTS.SEGMENTPARTY;
@@ -798,5 +785,9 @@ public class IndicatorLight extends SubsystemBase {
     }
 
     return LED_EFFECTS.BLUEOMBRE;
+  }
+
+  private void rsl() {
+    currentColor_GOAL = LED_EFFECTS.ORANGE;
   }
 }

@@ -31,8 +31,8 @@ public class Intake {
     return io.haveCoral();
   }
 
-  public void autoSetHaveCoral(boolean haveCoral) {
-    io.autoSetHaveCoral(haveCoral);
+  public void autoSetHaveCoral(boolean coral) {
+    io.autoSetHaveCoral(coral);
   }
 
   public double get_Arm_TBE_DEG() {

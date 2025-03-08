@@ -4,15 +4,15 @@
     {
       "anchor": {
         "x": 6.985,
-        "y": 1.91
+        "y": 6.171
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.166503679647174,
-        "y": 1.281758094323684
+        "x": 6.000192246987792,
+        "y": 5.99735182233307
       },
       "isLocked": false,
-      "linkedName": "Cage5"
+      "linkedName": "Cage2"
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 5.165482636993822
       },
       "prevControl": {
-        "x": 5.39319757052104,
-        "y": 5.353886850047371
+        "x": 5.35386908089227,
+        "y": 5.381988987939932
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,8 +45,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 0.5,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 2.0,
+    "maxAcceleration": 2.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -57,10 +57,10 @@
     "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": "Cage2",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 135.0
+    "rotation": -135.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
