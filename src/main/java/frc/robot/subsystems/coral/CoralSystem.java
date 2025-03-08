@@ -190,6 +190,7 @@ public class CoralSystem extends SubsystemBase {
           && !haveCoral
           && (currentCoralPreset == CoralSystemPresets.L2
               || currentCoralPreset == CoralSystemPresets.L3
+              || currentCoralPreset == CoralSystemPresets.L4
               || currentCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_1
               || currentCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_2)) {
         moveArmSafely = false;
@@ -203,7 +204,7 @@ public class CoralSystem extends SubsystemBase {
       }
 
       // changes for autonomous only
-      if (currentCoralPreset == CoralSystemPresets.STARTUP
+      if (currentCoralPreset == CoralSystemPresets.PICKUP
           && this.targetCoralPreset == CoralSystemPresets.PREL4) {
         moveArmSafely = false;
       }
@@ -211,11 +212,6 @@ public class CoralSystem extends SubsystemBase {
       // changes for autonomous only
       if (currentCoralPreset == CoralSystemPresets.PREL4
           && this.targetCoralPreset == CoralSystemPresets.L4) {
-        moveArmSafely = false;
-      }
-
-      if (currentCoralPreset == CoralSystemPresets.PICKUP
-          && this.targetCoralPreset == CoralSystemPresets.PREL4) {
         moveArmSafely = false;
       }
 
