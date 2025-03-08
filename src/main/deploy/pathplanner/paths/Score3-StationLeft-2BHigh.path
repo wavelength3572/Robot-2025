@@ -48,13 +48,13 @@
   "eventMarkers": [
     {
       "name": "PREL4",
-      "waypointRelativePos": 0.1,
+      "waypointRelativePos": 0.05,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
       "name": "L4",
-      "waypointRelativePos": 0.75,
+      "waypointRelativePos": 0.55,
       "endWaypointRelativePos": null,
       "command": null
     }

@@ -83,9 +83,9 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Score3-2B-StationLeft"
+            "name": "L1"
           }
         }
       ]
