@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.2677386660126404,
-        "y": 7.103081677236112
+        "x": 1.2526961655991182,
+        "y": 7.087422078032054
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.7802673054095572,
-        "y": 6.764378852516129
+        "x": 1.765224804996035,
+        "y": 6.74871925331207
       },
       "isLocked": false,
       "linkedName": "StationLeft"
     },
     {
       "anchor": {
-        "x": 3.841765955565494,
-        "y": 5.158586791497726
+        "x": 3.8436618919190697,
+        "y": 5.185254970409189
       },
       "prevControl": {
-        "x": 3.5295552739659124,
-        "y": 5.3720089594970535
+        "x": 3.531451210319488,
+        "y": 5.398677138408517
       },
       "nextControl": null,
       "isLocked": false,
@@ -52,7 +52,7 @@
     "rotation": -59.99999999999999
   },
   "reversed": false,
-  "folder": "Score4",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": -54.0

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.2712127483443707,
-        "y": 7.104966887417217
+        "x": 1.2526961655991182,
+        "y": 7.087422078032054
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0432525045897387,
-        "y": 6.517734907521795
+        "x": 2.0247359218444863,
+        "y": 6.500190098136632
       },
       "isLocked": false,
       "linkedName": "StationLeft"
@@ -54,14 +54,14 @@
     },
     {
       "name": "L4",
-      "waypointRelativePos": 0.8,
+      "waypointRelativePos": 0.75,
       "endWaypointRelativePos": null,
       "command": null
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 0.5,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 1.25,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

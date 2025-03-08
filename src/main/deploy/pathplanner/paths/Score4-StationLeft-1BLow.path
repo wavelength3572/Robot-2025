@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.2677386660126404,
-        "y": 7.103081677236112
+        "x": 1.2526961655991182,
+        "y": 7.087422078032054
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.827754803728787,
-        "y": 6.252708875022491
+        "x": 1.8127123033152648,
+        "y": 6.237049275818433
       },
       "isLocked": false,
       "linkedName": "StationLeft"
@@ -71,7 +71,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Score4",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": -54.0
