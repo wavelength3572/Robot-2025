@@ -76,7 +76,6 @@ public class ScoreCoralInAutoCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     // Stop the outtake
-    intake.stopIntake();
     timer.stop();
   }
 

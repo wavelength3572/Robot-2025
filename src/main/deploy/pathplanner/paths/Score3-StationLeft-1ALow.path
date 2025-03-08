@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4497962092638956,
-        "y": 6.859300078215297
+        "x": 1.9908457276309828,
+        "y": 6.139214169138508
       },
       "isLocked": false,
       "linkedName": "StationLeft"
@@ -20,8 +20,8 @@
         "y": 4.360437983236584
       },
       "prevControl": {
-        "x": 2.175076565233334,
-        "y": 4.360437983236584
+        "x": 2.961381840405791,
+        "y": 4.49018606445893
       },
       "nextControl": null,
       "isLocked": false,
@@ -35,8 +35,8 @@
       "minWaypointRelativePos": 0,
       "maxWaypointRelativePos": 0.85,
       "constraints": {
-        "maxVelocity": 2.5,
-        "maxAcceleration": 2.75,
+        "maxVelocity": 2.25,
+        "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -48,7 +48,7 @@
   "eventMarkers": [
     {
       "name": "L2",
-      "waypointRelativePos": 0.4180257510729618,
+      "waypointRelativePos": 0.35107296137339006,
       "endWaypointRelativePos": null,
       "command": null
     }

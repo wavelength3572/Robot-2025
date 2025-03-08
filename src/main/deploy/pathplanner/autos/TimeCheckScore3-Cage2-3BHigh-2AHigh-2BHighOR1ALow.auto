@@ -86,6 +86,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "LakeCityAutos",
+  "folder": null,
   "choreoAuto": false
 }

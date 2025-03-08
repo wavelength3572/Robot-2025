@@ -14,9 +14,9 @@ public final class NewBranchTranslations {
   // Adjust these offset values based on your field measurements.
   // They represent the transformation from the AprilTag pose to the branch (pole) scoring position.
   private static final Transform2d RIGHT_POLE_OFFSET =
-      new Transform2d(new Translation2d(.48, -.02), new Rotation2d(0));
+      new Transform2d(new Translation2d(.44, -.02), new Rotation2d(0));
   private static final Transform2d LEFT_POLE_OFFSET =
-      new Transform2d(new Translation2d(.48, -.35), new Rotation2d(0));
+      new Transform2d(new Translation2d(.44, -.35), new Rotation2d(0));
 
   private NewBranchTranslations() {
     // Prevent instantiation.

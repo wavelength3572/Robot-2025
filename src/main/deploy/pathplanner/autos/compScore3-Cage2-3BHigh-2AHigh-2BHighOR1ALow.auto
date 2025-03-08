@@ -65,27 +65,9 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Score3-StationLeft-2BHigh"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "WaitForPreset"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L1"
+            "name": "Score3-StationLeft-2BHigh-OR-1ALow"
           }
         }
       ]

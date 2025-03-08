@@ -11,7 +11,7 @@ import org.littletonrobotics.junction.Logger; // Make sure this is the correct L
  */
 public class RunPresetCommand extends Command {
   private static final double EXPECTED_DURATION_TO_STOW_FROM_L4 = 0.3;
-  private static final double EXPECTED_DURATION_TO_STOW_FROM_L2 = 0.1;
+  private static final double EXPECTED_DURATION_TO_STOW_FROM_L2 = 0.0;
   private final CoralSystem coralSystem;
   private final CoralSystemPresets targetPreset;
 
