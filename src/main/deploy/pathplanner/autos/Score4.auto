@@ -85,7 +85,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "1A-StationLeft"
+            "pathName": "Score4-1A-StationLeft"
           }
         },
         {
@@ -97,7 +97,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StationLeft-1BLow"
+            "pathName": "Score4-StationLeft-1BLow"
           }
         },
         {
