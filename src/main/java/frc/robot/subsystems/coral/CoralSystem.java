@@ -189,7 +189,7 @@ public class CoralSystem extends SubsystemBase {
       if (this.targetCoralPreset == CoralSystemPresets.PICKUP
           && !haveCoral
           && (currentCoralPreset == CoralSystemPresets.L2
-              || currentCoralPreset == CoralSystemPresets.L3              
+              || currentCoralPreset == CoralSystemPresets.L3
               || currentCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_1
               || currentCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_2)) {
         moveArmSafely = false;

@@ -52,7 +52,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "PREL4",
+      "name": "L4",
       "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": null
