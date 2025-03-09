@@ -10,6 +10,7 @@ public interface ArmIO {
     public double targetEncoderRotations = 0.0;
     public double encoderRotations = 0.0;
     public boolean TBE_Valid = false;
+    public boolean ARM_STUCK_ERROR = false;
     public double armArbFF = 0.0;
     public double armArbFF_COS = 0.0;
     public double velocityRPM = 0.0;
@@ -37,4 +38,8 @@ public interface ArmIO {
 
   public default void setPIDValues(
       double kP, double kD, double VelocityMax, double AccelerationMax) {}
+
+  public default boolean isArmInError() {
+    return false;
+  }
 }

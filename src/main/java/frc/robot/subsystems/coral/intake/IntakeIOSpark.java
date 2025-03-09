@@ -18,7 +18,6 @@ public class IntakeIOSpark implements IntakeIO {
   private AbsoluteEncoder armEncoder = intakeMotor.getAbsoluteEncoder();
   private Double requestedSpeed = 0.0;
   private boolean haveCoral = false;
-  private int currentSpikeCounter = 0;
 
   private enum intakeState {
     OFF,
@@ -45,7 +44,6 @@ public class IntakeIOSpark implements IntakeIO {
       }
     } else {
       haveCoral = false;
-      currentSpikeCounter = 0;
     }
 
     if (currentIntakeState == intakeState.PULL && haveCoral) {
@@ -102,6 +100,6 @@ public class IntakeIOSpark implements IntakeIO {
   @Override
   public void autoSetHaveCoral(boolean coral) {
     this.haveCoral = coral;
-    pullCoral();
+    currentIntakeState = intakeState.PULL;
   }
 }

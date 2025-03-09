@@ -11,7 +11,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.util.RobotStatus;
-import org.littletonrobotics.junction.Logger;
 
 public class ArmIOMMSpark implements ArmIO {
 
@@ -23,10 +22,11 @@ public class ArmIOMMSpark implements ArmIO {
   private RelativeEncoder armEncoder = armMotor.getEncoder();
 
   private double armTargetDEG = ArmConstants.armStartAngle;
-  private double armTargetEncoderRotations =
-      ArmConstants.armStartAngle * ArmConstants.kArmGearing / 360.0;
+  private double armTargetEncoderRotations = angleToRotations(armTargetDEG);
 
   private boolean TBE_Valid = true;
+  private boolean ARM_STUCK_ERROR = false;
+  private double ARM_STUCK_ERROR_COUNT = 0;
 
   private double armArbFF = ArmConstants.kArmKfNoCoral;
 
@@ -40,51 +40,58 @@ public class ArmIOMMSpark implements ArmIO {
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
-    inputs.currentAngleDEG = armEncoder.getPosition() * 360.0 / ArmConstants.kArmGearing;
+    inputs.currentAmps = armMotor.getOutputCurrent();
+    inputs.encoderRotations = armEncoder.getPosition();
+    inputs.currentAngleDEG = rotationsToAngle(inputs.encoderRotations);
+
+    if (inputs.currentAmps > 48.0) {
+      ARM_STUCK_ERROR_COUNT++;
+      if (ARM_STUCK_ERROR == false && ARM_STUCK_ERROR_COUNT >= 13) { // Approx .25 seconds
+        ARM_STUCK_ERROR = true;
+        // turn off motor immediatly;
+        armMotor.set(0.0);
+        // It will get set very soon to it's own current position
+        // using MaxMotion
+      }
+    } else {
+      ARM_STUCK_ERROR_COUNT = 0;
+    }
+
     if (RobotStatus.haveCoral()) {
       armArbFF = ArmConstants.kArmKfCoral;
     } else {
       armArbFF = ArmConstants.kArmKfNoCoral;
     }
+
+    if (ARM_STUCK_ERROR) {
+      // Arm is in error
+      // Set the arm target to where it is right now.
+      armTargetEncoderRotations = inputs.encoderRotations;
+    }
+
     armClosedLoopController.setReference(
         armTargetEncoderRotations,
         ControlType.kMAXMotionPositionControl,
         ClosedLoopSlot.kSlot0,
         armArbFF * Math.cos(Math.toRadians(inputs.currentAngleDEG)));
-    inputs.targetAngleDEG = armTargetDEG;
+
+    inputs.targetAngleDEG = rotationsToAngle(this.armTargetEncoderRotations);
     inputs.targetEncoderRotations = this.armTargetEncoderRotations;
-    inputs.encoderRotations = armEncoder.getPosition();
     inputs.armArbFF = armArbFF;
+    inputs.ARM_STUCK_ERROR = this.ARM_STUCK_ERROR;
     inputs.TBE_Valid = this.TBE_Valid;
     inputs.armArbFF_COS = armArbFF * Math.cos(Math.toRadians(inputs.currentAngleDEG));
     inputs.velocityRPM = armEncoder.getVelocity();
     inputs.appliedVolts = armMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = armMotor.getOutputCurrent();
-
-    Logger.recordOutput(
-        "Arm/FaultInfo/FaultPeriodMs", armMotor.configAccessor.signals.getFaultsPeriodMs());
-    Logger.recordOutput(
-        "Arm/FaultInfo/WarningPeriodMs", armMotor.configAccessor.signals.getWarningsPeriodMs());
-    Logger.recordOutput(
-        "Arm/FaultInfo/FaultsAlwaysOn", armMotor.configAccessor.signals.getFaultsAlwaysOn());
-    Logger.recordOutput("Arm/FaultInfo/HasActiveFault", armMotor.hasActiveFault());
-    Logger.recordOutput("Arm/FaultInfo/HasStickFault", armMotor.hasStickyFault());
-    Logger.recordOutput("Arm/FaultInfo/HasActiveWarning", armMotor.hasActiveWarning());
-    Logger.recordOutput("Arm/FaultInfo/HasStickyWarning", armMotor.hasStickyWarning());
-
-    // armMotor.setPeriodicFrameTimeout(50);
-
-    if (armMotor.hasStickyFault()) {
-      // armMotor.clearFaults();
-    }
   }
 
   @Override
   public void setInitialAngle(double initialDegree) {
     if (initialDegree >= 65 && initialDegree <= 144) {
       TBE_Valid = true;
+      armTargetEncoderRotations = angleToRotations(initialDegree);
       armTargetDEG = initialDegree;
-      armTargetEncoderRotations = armTargetDEG * ArmConstants.kArmGearing / 360.0;
       armEncoder.setPosition(armTargetEncoderRotations);
     } else {
       // Bad ThroughBore Encoder Reading
@@ -99,9 +106,9 @@ public class ArmIOMMSpark implements ArmIO {
 
   @Override
   public void setTargetAngleDEG(double requestedPosition) {
-    if (TBE_Valid) {
+    if (TBE_Valid && ARM_STUCK_ERROR == false) {
       this.armTargetDEG = requestedPosition;
-      this.armTargetEncoderRotations = this.armTargetDEG * ArmConstants.kArmGearing / 360.0;
+      this.armTargetEncoderRotations = angleToRotations(requestedPosition);
     }
   }
 
@@ -112,7 +119,7 @@ public class ArmIOMMSpark implements ArmIO {
 
   @Override
   public double getCurrentArmDEG() {
-    return armEncoder.getPosition() * 360.0 / ArmConstants.kArmGearing;
+    return rotationsToAngle(armEncoder.getPosition());
   }
 
   @Override
@@ -127,5 +134,18 @@ public class ArmIOMMSpark implements ArmIO {
         .maxAcceleration(AccelerationMax)
         .allowedClosedLoopError(0.1);
     armMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+  }
+
+  @Override
+  public boolean isArmInError() {
+    return ARM_STUCK_ERROR;
+  }
+
+  public double angleToRotations(double angle) {
+    return angle * ArmConstants.kArmGearing / 360.0;
+  }
+
+  public double rotationsToAngle(double rotations) {
+    return (rotations / ArmConstants.kArmGearing) * 360.0;
   }
 }

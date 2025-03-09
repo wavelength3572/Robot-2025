@@ -2,6 +2,8 @@ package frc.robot.subsystems.coral;
 
 import static frc.robot.subsystems.coral.CoralSystemPresets.*;
 
+import com.ctre.phoenix6.configs.CANrangeConfiguration;
+import com.ctre.phoenix6.hardware.CANrange;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,7 +41,7 @@ public class CoralSystem extends SubsystemBase {
   private static final double TIME_OF_FLIGHT_THRESHOLD = 1250; // adjust this constant as needed
   private double SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE = 1.5;
 
-  // private CANrange canRange = new CANrange(31);
+  private CANrange canRange = new CANrange(31);
 
   @Getter private Elevator elevator;
   @Getter public final CoralSystemPresetChooser coralSystemPresetChooser;
@@ -92,6 +94,8 @@ public class CoralSystem extends SubsystemBase {
   @Getter
   private CoralSystemMovementState coralSystemState = CoralSystemMovementState.STABLE;
 
+  private double setArmIntialAngleTries = 0;
+
   public CoralSystem(Elevator elevator, Arm arm, Intake intake) {
     coralSystemPresetChooser = new CoralSystemPresetChooser();
     this.elevator = elevator;
@@ -99,18 +103,10 @@ public class CoralSystem extends SubsystemBase {
     this.intake = intake;
 
     // Configure the CANrange for basic use
-    // CANrangeConfiguration configs = new CANrangeConfiguration();
+    CANrangeConfiguration configs = new CANrangeConfiguration();
 
     // Write these configs to the CANrange
-    // canRange.getConfigurator().apply(configs);
-
-    // try {
-    // TimeUnit.SECONDS.sleep(1);
-    // } catch (InterruptedException e) {
-    // Thread.currentThread().interrupt();
-    // }
-
-    this.arm.setInitialAngle(this.intake.get_Arm_TBE_DEG());
+    canRange.getConfigurator().apply(configs);
 
     // Puts the button/command on the dashboard to go to the choosed preset
     SmartDashboard.putData("Set Coral Config", CoralSystemCommands.runPreset(this)); //
@@ -118,6 +114,12 @@ public class CoralSystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    // See if we can set the arm inital angle
+    if (setArmIntialAngleTries <= 100) {
+      setArmIntialAngleTries++;
+      this.arm.setInitialAngle(this.intake.get_Arm_TBE_DEG());
+    }
 
     this.elevator.periodic();
     this.arm.periodic();
@@ -179,60 +181,63 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public void setTargetPreset(CoralSystemPresets requestedPreset) {
-    // We are trying to go to a different location AND
-    // We ARE NOT Climbing AND
-    // We are not currently traveling to a location
-    if (requestedPreset != this.currentCoralPreset
-        && targetCoralPreset != CLIMB
-        && coralSystemState == CoralSystemMovementState.STABLE) {
-      // We are allowed to move
-      // Lets just hard code situations where we can just move the
-      // elevator and arm at the same time
-      moveArmSafely = true;
-      this.targetCoralPreset = requestedPreset;
-      if (this.targetCoralPreset == CoralSystemPresets.PICKUP
-          && DriverStation.isAutonomousEnabled()
-          && !haveCoral
-          && (currentCoralPreset == CoralSystemPresets.L4)) {
-        moveArmSafely = false;
-      }
-      // if (currentCoralPreset == CoralSystemPresets.PICKUP
-      // && haveCoral
-      // && (this.targetCoralPreset == CoralSystemPresets.L1
-      // || this.targetCoralPreset == CoralSystemPresets.L2
-      // || this.targetCoralPreset == CoralSystemPresets.L3)) {
-      // moveArmSafely = false;
-      // }
+    // If the ARM isn't Stuck then allow new presets
+    if (arm.isArmInError() == false) {
+      // We are trying to go to a different location AND
+      // We ARE NOT Climbing AND
+      // We are not currently traveling to a location
+      if (requestedPreset != this.currentCoralPreset
+          && targetCoralPreset != CLIMB
+          && coralSystemState == CoralSystemMovementState.STABLE) {
+        // We are allowed to move
+        // Lets just hard code situations where we can just move the
+        // elevator and arm at the same time
+        moveArmSafely = true;
+        this.targetCoralPreset = requestedPreset;
+        if (this.targetCoralPreset == CoralSystemPresets.PICKUP
+            && DriverStation.isAutonomousEnabled()
+            && !haveCoral
+            && (currentCoralPreset == CoralSystemPresets.L4)) {
+          moveArmSafely = false;
+        }
+        // if (currentCoralPreset == CoralSystemPresets.PICKUP
+        // && haveCoral
+        // && (this.targetCoralPreset == CoralSystemPresets.L1
+        // || this.targetCoralPreset == CoralSystemPresets.L2
+        // || this.targetCoralPreset == CoralSystemPresets.L3)) {
+        // moveArmSafely = false;
+        // }
 
-      // changes for autonomous only
-      if (currentCoralPreset == CoralSystemPresets.PICKUP
-          && this.targetCoralPreset == CoralSystemPresets.PREL4) {
-        moveArmSafely = false;
-      }
+        // changes for autonomous only
+        if (currentCoralPreset == CoralSystemPresets.PICKUP
+            && this.targetCoralPreset == CoralSystemPresets.PREL4) {
+          moveArmSafely = false;
+        }
 
-      // changes for autonomous only
-      if (currentCoralPreset == CoralSystemPresets.PREL4
-          && this.targetCoralPreset == CoralSystemPresets.L4) {
-        moveArmSafely = false;
-      }
+        // changes for autonomous only
+        if (currentCoralPreset == CoralSystemPresets.PREL4
+            && this.targetCoralPreset == CoralSystemPresets.L4) {
+          moveArmSafely = false;
+        }
 
-      if (moveArmSafely) {
-        // Start Moving Arm to Safe
-        this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
-        // Change state
-        coralSystemState = CoralSystemMovementState.SAFE_ARM;
-      } else {
-        coralSystemState = CoralSystemMovementState.MOVE_ARM_FINAL;
-      }
+        if (moveArmSafely) {
+          // Start Moving Arm to Safe
+          this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
+          // Change state
+          coralSystemState = CoralSystemMovementState.SAFE_ARM;
+        } else {
+          coralSystemState = CoralSystemMovementState.MOVE_ARM_FINAL;
+        }
 
-      // VERY SPEICAL CODE FOR AUTO INITAL PATH
-      // changes for autonomous only
-      if (currentCoralPreset == CoralSystemPresets.STARTUP
-          && this.targetCoralPreset == CoralSystemPresets.L4) {
-        // Start Moving Arm to First Path Arm Angle
-        this.arm.setTargetPreset(CoralSystemPresets.AUTO_START_L4);
-        this.elevator.setTargetPreset(CoralSystemPresets.AUTO_START_L4);
-        coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
+        // VERY SPEICAL CODE FOR AUTO INITAL PATH
+        // changes for autonomous only
+        if (currentCoralPreset == CoralSystemPresets.STARTUP
+            && this.targetCoralPreset == CoralSystemPresets.L4) {
+          // Start Moving Arm to First Path Arm Angle
+          this.arm.setTargetPreset(CoralSystemPresets.AUTO_START_L4);
+          this.elevator.setTargetPreset(CoralSystemPresets.AUTO_START_L4);
+          coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
+        }
       }
     }
   }
@@ -269,15 +274,12 @@ public class CoralSystem extends SubsystemBase {
 
   @AutoLogOutput(key = "CoralSystem/Rear TOF")
   public double getTimeOfFlightRange() {
-    // return canRange.getDistance().getValueAsDouble();
-    return 0;
+    return canRange.getDistance().getValueAsDouble();
   }
 
   public void scoreCoral() {
     if (targetCoralPreset != CLIMB) {
       intake.pushCoral();
-      // set state to running coral
-      // start a timer
     }
   }
 
@@ -342,5 +344,9 @@ public class CoralSystem extends SubsystemBase {
     if (targetCoralPreset != CLIMB) {
       setTargetPreset(CLIMB);
     }
+  }
+
+  public boolean isArmInError() {
+    return arm.isArmInError();
   }
 }

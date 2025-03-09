@@ -102,4 +102,8 @@ public class RobotStatus {
   public static boolean justPickedUpCoral() {
     return coralSystem.justPickedUpCoral;
   }
+
+  public static boolean isArmInError() {
+    return coralSystem.isArmInError();
+  }
 }
