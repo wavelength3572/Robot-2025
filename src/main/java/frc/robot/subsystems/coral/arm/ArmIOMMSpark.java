@@ -10,6 +10,8 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.subsystems.coral.CoralSystemPresets;
+import frc.robot.util.Elastic;
 import frc.robot.util.RobotStatus;
 
 public class ArmIOMMSpark implements ArmIO {
@@ -29,6 +31,8 @@ public class ArmIOMMSpark implements ArmIO {
   private double ARM_STUCK_ERROR_COUNT = 0;
 
   private double armArbFF = ArmConstants.kArmKfNoCoral;
+
+  private boolean inArmRecoveryMode = false;
 
   public ArmIOMMSpark() {
     armMotor.configure(
@@ -52,6 +56,7 @@ public class ArmIOMMSpark implements ArmIO {
         armMotor.set(0.0);
         // It will get set very soon to it's own current position
         // using MaxMotion
+        Elastic.selectTab("ARM ERROR");
       }
     } else {
       ARM_STUCK_ERROR_COUNT = 0;
@@ -63,7 +68,7 @@ public class ArmIOMMSpark implements ArmIO {
       armArbFF = ArmConstants.kArmKfNoCoral;
     }
 
-    if (ARM_STUCK_ERROR) {
+    if (ARM_STUCK_ERROR == true && inArmRecoveryMode == false) {
       // Arm is in error
       // Set the arm target to where it is right now.
       armTargetEncoderRotations = inputs.encoderRotations;
@@ -79,6 +84,7 @@ public class ArmIOMMSpark implements ArmIO {
     inputs.targetEncoderRotations = this.armTargetEncoderRotations;
     inputs.armArbFF = armArbFF;
     inputs.ARM_STUCK_ERROR = this.ARM_STUCK_ERROR;
+    inputs.inArmRecoveryMode = this.inArmRecoveryMode;
     inputs.TBE_Valid = this.TBE_Valid;
     inputs.armArbFF_COS = armArbFF * Math.cos(Math.toRadians(inputs.currentAngleDEG));
     inputs.velocityRPM = armEncoder.getVelocity();
@@ -113,6 +119,15 @@ public class ArmIOMMSpark implements ArmIO {
   }
 
   @Override
+  public void recoverArm() {
+    if (TBE_Valid) {
+      inArmRecoveryMode = true;
+      this.armTargetDEG = CoralSystemPresets.L1.getArmAngle();
+      this.armTargetEncoderRotations = angleToRotations(this.armTargetDEG);
+    }
+  }
+
+  @Override
   public double getTargetAngleDEG() {
     return this.armTargetDEG;
   }
@@ -139,6 +154,13 @@ public class ArmIOMMSpark implements ArmIO {
   @Override
   public boolean isArmInError() {
     return ARM_STUCK_ERROR;
+  }
+
+  @Override
+  public void clearArmError() {
+    ARM_STUCK_ERROR = false;
+    ARM_STUCK_ERROR_COUNT = 0;
+    inArmRecoveryMode = false;
   }
 
   public double angleToRotations(double angle) {

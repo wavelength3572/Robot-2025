@@ -8,10 +8,12 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.subsystems.coral.arm.ArmConstants;
+import frc.robot.util.RobotStatus;
 
 public class IntakeIOSpark implements IntakeIO {
 
-  // Initialize elevator SPARK. We will use MAXMotion position control for the elevator, so we also
+  // Initialize elevator SPARK. We will use MAXMotion position control for the
+  // elevator, so we also
   // need to initialize the closed loop controller and encoder.
   private SparkMax intakeMotor = new SparkMax(IntakeConstants.canId, MotorType.kBrushless);
   private RelativeEncoder intakeEncoder = intakeMotor.getEncoder();
@@ -46,10 +48,15 @@ public class IntakeIOSpark implements IntakeIO {
       haveCoral = false;
     }
 
-    if (currentIntakeState == intakeState.PULL && haveCoral) {
-      intakeMotor.set(0.03);
+    if (RobotStatus.isArmInError() == false) {
+      if (currentIntakeState == intakeState.PULL && haveCoral) {
+        intakeMotor.set(0.03);
+      } else {
+        intakeMotor.set(requestedSpeed);
+      }
     } else {
-      intakeMotor.set(requestedSpeed);
+      // Arm is in an emergency
+      stopIntake();
     }
 
     inputs.requestedSpeed = this.requestedSpeed;
@@ -87,6 +94,7 @@ public class IntakeIOSpark implements IntakeIO {
   @Override
   public void stopIntake() {
     currentIntakeState = intakeState.OFF;
+    requestedSpeed = 0.0;
     setSpeed(0.0);
   }
 

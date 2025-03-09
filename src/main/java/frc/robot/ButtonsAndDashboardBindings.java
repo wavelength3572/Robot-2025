@@ -87,6 +87,8 @@ public class ButtonsAndDashboardBindings {
     SmartDashboard.putData("Prep L1 Dislodge", createPrepL1DislodgeCommand());
     SmartDashboard.putData("Prep L2 Dislodge", createPrepL2DislodgeCommand());
 
+    SmartDashboard.putData("Recover E&A", Commands.runOnce(coralSystem::recoverArmAndElevator));
+
     SmartDashboard.putData(
         "Deploy & Capture Algae",
         Commands.runOnce(algae::pullAlgae)); // Deploy Algae Collector & Capture Algae

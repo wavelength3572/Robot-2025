@@ -87,6 +87,14 @@ public class Elevator {
     return io.getHeightInMeters();
   }
 
+  public void recoverElevator() {
+    io.recoverElevator();
+  }
+
+  public void clearElevatorError() {
+    io.clearElevatorError();
+  }
+
   public boolean isAtGoal() {
     return Math.abs(getHeightInInches() - getSetpointInInches())
         < ElevatorConstants.kSetpointThresholdINCHES;

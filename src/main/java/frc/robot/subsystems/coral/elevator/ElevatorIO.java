@@ -27,6 +27,10 @@ public interface ElevatorIO {
 
   public default void setPosition(double requestedPosition) {}
 
+  public default void recoverElevator() {}
+
+  public default void clearElevatorError() {}
+
   public default double getHeightInMeters() {
     return 0.0;
   }

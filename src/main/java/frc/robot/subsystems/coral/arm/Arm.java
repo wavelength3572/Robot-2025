@@ -51,6 +51,10 @@ public class Arm {
     setAngleDEG(preset.getArmAngle());
   }
 
+  public void recoverArm() {
+    io.recoverArm();
+  }
+
   public void setAngleDEG(Double requestedPosition) {
     if (requestedPosition >= ArmConstants.armMinAngle
         && requestedPosition <= ArmConstants.armMaxAngle) io.setTargetAngleDEG(requestedPosition);
@@ -71,5 +75,9 @@ public class Arm {
 
   public boolean isArmInError() {
     return io.isArmInError();
+  }
+
+  public void clearArmError() {
+    io.clearArmError();
   }
 }

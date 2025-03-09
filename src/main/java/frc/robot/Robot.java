@@ -200,7 +200,7 @@ public class Robot extends LoggedRobot {
 
     // Set drive mode based on the boolean value
     if (robotContainer.getDrive().isDriveModeSmart()
-        && (DriverStation.isFMSAttached() || Constants.isCompetition)) {
+        && (DriverStation.isFMSAttached())) {
       robotContainer.SmartDriving();
     } else robotContainer.NormalDriving();
   }
