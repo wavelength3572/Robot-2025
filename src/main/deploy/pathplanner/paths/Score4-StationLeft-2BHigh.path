@@ -33,10 +33,34 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "L4",
-      "waypointRelativePos": 0.17506631299734798,
+      "name": "L4Sequence",
+      "waypointRelativePos": 0.1,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "PREL4"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "WaitForPreset"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "L4"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "globalConstraints": {

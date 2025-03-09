@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.000192246987792,
-        "y": 5.99735182233307
+        "x": 5.975954082299586,
+        "y": 5.612876378036828
       },
       "isLocked": false,
       "linkedName": "Cage2"
     },
     {
       "anchor": {
-        "x": 5.22886908089227,
-        "y": 5.165482636993822
+        "x": 5.1758937538477845,
+        "y": 5.133856336782568
       },
       "prevControl": {
-        "x": 5.35386908089227,
-        "y": 5.381988987939932
+        "x": 5.4038976201702065,
+        "y": 5.236395290073632
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "3B"
+      "linkedName": "Score4-3B"
     }
   ],
   "rotationTargets": [
@@ -45,8 +45,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 2.5,
+    "maxVelocity": 2.25,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
