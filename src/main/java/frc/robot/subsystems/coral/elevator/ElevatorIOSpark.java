@@ -58,7 +58,7 @@ public class ElevatorIOSpark implements ElevatorIO {
       }
       elevatorCurrentTarget = inputs.positionRotations;
     }
-    
+
     elevatorClosedLoopController.setReference(
         elevatorCurrentTarget,
         ControlType.kMAXMotionPositionControl,
