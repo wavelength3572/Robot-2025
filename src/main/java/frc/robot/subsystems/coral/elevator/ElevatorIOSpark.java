@@ -11,6 +11,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.util.RobotStatus;
 
 public class ElevatorIOSpark implements ElevatorIO {
 
@@ -29,6 +30,8 @@ public class ElevatorIOSpark implements ElevatorIO {
   private double elevatorCurrentTarget = 0.0;
   private double elevatorCurrentArbFF = 0.0;
 
+  private boolean firstTimeArmInError = true;
+
   public ElevatorIOSpark() {
     leaderMotor.configure(
         ElevatorConfigs.ElevatorSubsystem.leaderConfig,
@@ -45,6 +48,17 @@ public class ElevatorIOSpark implements ElevatorIO {
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
+    inputs.positionRotations = leaderEncoder.getPosition();
+
+    // If the arm is in error then don't move the elevator
+    if (RobotStatus.isArmInError()) {
+      if (firstTimeArmInError = true) {
+        leaderMotor.set(0);
+        firstTimeArmInError = false;
+      }
+      elevatorCurrentTarget = inputs.positionRotations;
+    }
+    
     elevatorClosedLoopController.setReference(
         elevatorCurrentTarget,
         ControlType.kMAXMotionPositionControl,

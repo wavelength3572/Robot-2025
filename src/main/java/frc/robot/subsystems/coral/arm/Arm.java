@@ -68,4 +68,8 @@ public class Arm {
     return Math.abs(getCurrentAngleDEG() - getTargetAngleDEG())
         < ArmConstants.kSetpointThresholdDEG;
   }
+
+  public boolean isArmInError() {
+    return io.isArmInError();
+  }
 }

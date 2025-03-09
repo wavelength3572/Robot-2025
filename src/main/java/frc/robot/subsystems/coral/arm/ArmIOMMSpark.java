@@ -4,6 +4,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
+
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
@@ -11,6 +12,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.util.RobotStatus;
+import lombok.Getter;
+
 import org.littletonrobotics.junction.Logger;
 
 public class ArmIOMMSpark implements ArmIO {
@@ -23,10 +26,11 @@ public class ArmIOMMSpark implements ArmIO {
   private RelativeEncoder armEncoder = armMotor.getEncoder();
 
   private double armTargetDEG = ArmConstants.armStartAngle;
-  private double armTargetEncoderRotations =
-      ArmConstants.armStartAngle * ArmConstants.kArmGearing / 360.0;
+  private double armTargetEncoderRotations = ArmConstants.armStartAngle * ArmConstants.kArmGearing / 360.0;
 
   private boolean TBE_Valid = true;
+  private boolean ARM_STUCK_ERROR = false;
+  private double ARM_STUCK_ERROR_COUNT = 0;
 
   private double armArbFF = ArmConstants.kArmKfNoCoral;
 
@@ -40,43 +44,46 @@ public class ArmIOMMSpark implements ArmIO {
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
+    inputs.currentAmps = armMotor.getOutputCurrent();
+    if (inputs.currentAmps > 48.0) {
+      ARM_STUCK_ERROR_COUNT++;
+      if (ARM_STUCK_ERROR_COUNT >= 13) { // Approx .25 seconds
+        ARM_STUCK_ERROR = true;
+        // turn off motor immediatly;
+        armMotor.set(0.0);
+      }
+    } else {
+      ARM_STUCK_ERROR_COUNT = 0;
+    }
     inputs.currentAngleDEG = armEncoder.getPosition() * 360.0 / ArmConstants.kArmGearing;
     if (RobotStatus.haveCoral()) {
       armArbFF = ArmConstants.kArmKfCoral;
     } else {
       armArbFF = ArmConstants.kArmKfNoCoral;
     }
+
+    inputs.encoderRotations = armEncoder.getPosition();
+
+    if (ARM_STUCK_ERROR) {
+      armTargetEncoderRotations = inputs.encoderRotations;
+    }
+
     armClosedLoopController.setReference(
         armTargetEncoderRotations,
         ControlType.kMAXMotionPositionControl,
         ClosedLoopSlot.kSlot0,
         armArbFF * Math.cos(Math.toRadians(inputs.currentAngleDEG)));
+
     inputs.targetAngleDEG = armTargetDEG;
     inputs.targetEncoderRotations = this.armTargetEncoderRotations;
     inputs.encoderRotations = armEncoder.getPosition();
     inputs.armArbFF = armArbFF;
+    inputs.ARM_STUCK_ERROR = this.ARM_STUCK_ERROR;
     inputs.TBE_Valid = this.TBE_Valid;
     inputs.armArbFF_COS = armArbFF * Math.cos(Math.toRadians(inputs.currentAngleDEG));
     inputs.velocityRPM = armEncoder.getVelocity();
     inputs.appliedVolts = armMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.currentAmps = armMotor.getOutputCurrent();
-
-    Logger.recordOutput(
-        "Arm/FaultInfo/FaultPeriodMs", armMotor.configAccessor.signals.getFaultsPeriodMs());
-    Logger.recordOutput(
-        "Arm/FaultInfo/WarningPeriodMs", armMotor.configAccessor.signals.getWarningsPeriodMs());
-    Logger.recordOutput(
-        "Arm/FaultInfo/FaultsAlwaysOn", armMotor.configAccessor.signals.getFaultsAlwaysOn());
-    Logger.recordOutput("Arm/FaultInfo/HasActiveFault", armMotor.hasActiveFault());
-    Logger.recordOutput("Arm/FaultInfo/HasStickFault", armMotor.hasStickyFault());
-    Logger.recordOutput("Arm/FaultInfo/HasActiveWarning", armMotor.hasActiveWarning());
-    Logger.recordOutput("Arm/FaultInfo/HasStickyWarning", armMotor.hasStickyWarning());
-
-    // armMotor.setPeriodicFrameTimeout(50);
-
-    if (armMotor.hasStickyFault()) {
-      // armMotor.clearFaults();
-    }
   }
 
   @Override
@@ -94,7 +101,8 @@ public class ArmIOMMSpark implements ArmIO {
 
   @Override
   public void setArbFFConstant(double volts) {
-    if (volts >= -0.4 && volts <= 0.4) armArbFF = volts;
+    if (volts >= -0.4 && volts <= 0.4)
+      armArbFF = volts;
   }
 
   @Override
@@ -118,14 +126,17 @@ public class ArmIOMMSpark implements ArmIO {
   @Override
   public void setPIDValues(double kP, double kD, double VelocityMax, double AccelerationMax) {
     final SparkFlexConfig config = new SparkFlexConfig();
-    config
-        .closedLoop
-        .pidf(kP, 0.0, kD, 0.0)
-        .maxMotion
+    config.closedLoop
+        .pidf(kP, 0.0, kD, 0.0).maxMotion
         // Set MAXMotion parameters for position control
         .maxVelocity(VelocityMax)
         .maxAcceleration(AccelerationMax)
         .allowedClosedLoopError(0.1);
     armMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+  }
+
+  @Override
+  public boolean isArmInError() {
+    return ARM_STUCK_ERROR;
   }
 }

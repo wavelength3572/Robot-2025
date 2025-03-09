@@ -276,8 +276,6 @@ public class CoralSystem extends SubsystemBase {
   public void scoreCoral() {
     if (targetCoralPreset != CLIMB) {
       intake.pushCoral();
-      // set state to running coral
-      // start a timer
     }
   }
 
@@ -342,5 +340,9 @@ public class CoralSystem extends SubsystemBase {
     if (targetCoralPreset != CLIMB) {
       setTargetPreset(CLIMB);
     }
+  }
+
+  public boolean isArmInError() {
+    return arm.isArmInError();
   }
 }
