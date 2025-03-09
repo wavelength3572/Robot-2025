@@ -20,6 +20,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.Vision;
 import java.util.ArrayList;
 import java.util.List;
+import org.littletonrobotics.junction.Logger;
 
 public class PathPlannerCommands {
   public static void Setup(CoralSystem coralSystem, Drive drive, Vision vision) {
@@ -46,6 +47,15 @@ public class PathPlannerCommands {
                         CoralSystemPresets.FINAL_DISLODGE_LEVEL_1))));
 
     NamedCommands.registerCommand(
+        "DislodgeHigh",
+        new ParallelCommandGroup(
+            new InstantCommand(coralSystem.getIntake()::pushCoral),
+            new InstantCommand(
+                () ->
+                    coralSystem.setSimultaneousTargetPreset(
+                        CoralSystemPresets.FINAL_DISLODGE_LEVEL_2))));
+
+    NamedCommands.registerCommand(
         "PrepareLowDislodge",
         new SequentialCommandGroup(
             new InstantCommand(
@@ -56,6 +66,19 @@ public class PathPlannerCommands {
                 () ->
                     coralSystem.setSimultaneousTargetPreset(
                         CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1)),
+            new WaitUntilCommand(coralSystem::isAtGoal)));
+
+    NamedCommands.registerCommand(
+        "PrepareHighDislodge",
+        new SequentialCommandGroup(
+            new InstantCommand(
+                () ->
+                    coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2)),
+            new WaitUntilCommand(coralSystem::isAtGoal),
+            new InstantCommand(
+                () ->
+                    coralSystem.setSimultaneousTargetPreset(
+                        CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2)),
             new WaitUntilCommand(coralSystem::isAtGoal)));
 
     new EventTrigger("Pickup")
@@ -91,16 +114,16 @@ public class PathPlannerCommands {
 
       autoPathConditionals.add(
           new AutoPathConditional(
-              "StationRight-6BHigh-OR-1ALow",
+              "StationRight-6BHigh-OR-1BLow",
               PathPlannerPath.fromPathFile("StationRight-6BHigh"),
-              PathPlannerPath.fromPathFile("StationRight-1ALow"),
+              PathPlannerPath.fromPathFile("StationRight-1BLow"),
               coralSystem));
 
       autoPathConditionals.add(
           new AutoPathConditional(
-              "Score3-StationRight-6BHigh-OR-1ALow",
+              "Score3-StationRight-6BHigh-OR-1BLow",
               PathPlannerPath.fromPathFile("Score3-StationRight-6BHigh"),
-              PathPlannerPath.fromPathFile("Score3-StationRight-1ALow"),
+              PathPlannerPath.fromPathFile("Score3-StationRight-1BLow"),
               coralSystem));
 
       autoPathConditionals.add( // this is part of our Score2 for LakeCity
@@ -121,6 +144,9 @@ public class PathPlannerCommands {
       for (AutoPathConditional conditional : autoPathConditionals) {
         NamedCommands.registerCommand(
             conditional.getConditionalCommandName(), conditional.getCommand());
+        Logger.recordOutput(
+            "ConditionalCommands/" + conditional.getConditionalCommandName(),
+            conditional.getCommand().getName());
       }
     } catch (Exception e) {
       DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());

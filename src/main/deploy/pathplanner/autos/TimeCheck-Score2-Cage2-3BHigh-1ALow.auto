@@ -13,7 +13,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.5
           }
         },
         {
@@ -33,11 +33,29 @@
           "data": {
             "name": "WaitForCoral"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "StationLeft-1ALow"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForPreset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Cage2",
+  "folder": "TimeCheck",
   "choreoAuto": false
 }

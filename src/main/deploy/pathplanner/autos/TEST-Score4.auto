@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-Cage2-3B-High"
+            "pathName": "Score4-Cage2-3B-Low"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-3B-StationLeft"
+            "pathName": "Score4-3B-StationLeft"
           }
         },
         {
@@ -37,7 +37,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-StationLeft-2AHigh"
+            "pathName": "Score4-StationLeft-2BHigh"
           }
         },
         {
@@ -55,7 +55,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-2A-StationLeft"
+            "pathName": "Score4-2B-StationLeft"
           }
         },
         {
@@ -67,7 +67,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-StationLeft-2BHigh"
+            "pathName": "Score4-StationLeft-1ALow"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForPreset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score4-1A-StationLeft"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score4-StationLeft-1BLow"
           }
         },
         {
@@ -86,6 +116,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Tests",
   "choreoAuto": false
 }

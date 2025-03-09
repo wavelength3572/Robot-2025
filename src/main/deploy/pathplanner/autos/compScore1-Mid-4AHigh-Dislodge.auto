@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "AlignDislodge4"
+            "pathName": "4A-AlignDislodge4"
           }
         },
         {
@@ -47,7 +47,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Dislodge4"
+                  "pathName": "Algae4Dislodge"
                 }
               },
               {
@@ -63,6 +63,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "LakeCityAutos",
+  "folder": "CompetitionAutos",
   "choreoAuto": false
 }

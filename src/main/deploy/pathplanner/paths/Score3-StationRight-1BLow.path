@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7894039735099336,
-        "y": 1.6060637417218537
+        "x": 2.1093906452998876,
+        "y": 2.4347838666255193
       },
       "isLocked": false,
       "linkedName": "StationRight"
     },
     {
       "anchor": {
-        "x": 3.175076565233334,
-        "y": 4.360437983236584
+        "x": 3.172172797575634,
+        "y": 4.066806730925226
       },
       "prevControl": {
-        "x": 2.175076565233334,
-        "y": 4.360437983236584
+        "x": 3.03616097194384,
+        "y": 3.856978191493683
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "1A"
+      "linkedName": "1B"
     }
   ],
   "rotationTargets": [],
@@ -48,7 +48,7 @@
   "eventMarkers": [
     {
       "name": "L2",
-      "waypointRelativePos": 0.4180257510729618,
+      "waypointRelativePos": 0.4787798408488015,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -71,5 +71,5 @@
     "velocity": 0,
     "rotation": 54.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

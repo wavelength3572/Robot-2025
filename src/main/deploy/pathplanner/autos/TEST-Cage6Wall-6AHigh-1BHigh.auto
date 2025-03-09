@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-Cage5-5A-High"
+            "pathName": "Cage6Wall-6A-High"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
           }
         },
         {
@@ -19,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-5A-StationRight"
+            "pathName": "6A-StationRight"
           }
         },
         {
@@ -31,7 +37,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-StationRight-6AHigh"
+            "pathName": "StationRight-1BHigh"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
           }
         },
         {
@@ -41,27 +53,15 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Score3-6A-StationRight"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "WaitForCoral"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score3-StationRight-6BHigh-OR-1ALow"
+            "name": "Stow"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "LakeCityAutos",
+  "folder": "Tests",
   "choreoAuto": false
 }

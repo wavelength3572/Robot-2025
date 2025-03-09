@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Cage5-5AHigh"
+            "pathName": "Cage1Wall-2B-High"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "5A-StationRight"
+            "pathName": "2B-StationLeft"
           }
         },
         {
@@ -35,15 +35,33 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "StationLeft-1AHigh"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "StationRight-6BHigh-OR-1ALow"
+            "name": "Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stow"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "LakeCityAutos",
+  "folder": "Tests",
   "choreoAuto": false
 }
