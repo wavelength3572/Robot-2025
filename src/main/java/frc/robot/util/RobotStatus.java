@@ -104,6 +104,7 @@ public class RobotStatus {
   }
 
   public static boolean isArmInError() {
-    return coralSystem.isArmInError();
+    if (coralSystem != null) return coralSystem.isArmInError();
+    else return false;
   }
 }

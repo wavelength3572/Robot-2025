@@ -11,6 +11,7 @@ public interface ArmIO {
     public double encoderRotations = 0.0;
     public boolean TBE_Valid = false;
     public boolean ARM_STUCK_ERROR = false;
+    public boolean inArmRecoveryMode = false;
     public double armArbFF = 0.0;
     public double armArbFF_COS = 0.0;
     public double velocityRPM = 0.0;
@@ -25,6 +26,8 @@ public interface ArmIO {
   public default void setArbFFConstant(double volts) {}
 
   public default void setTargetAngleDEG(double requestedPositionDEG) {}
+
+  public default void recoverArm() {}
 
   public default double getTargetAngleDEG() {
     return 0.0;
@@ -42,4 +45,6 @@ public interface ArmIO {
   public default boolean isArmInError() {
     return false;
   }
+
+  public default void clearArmError() {}
 }

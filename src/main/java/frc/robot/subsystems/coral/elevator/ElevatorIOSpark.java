@@ -31,6 +31,7 @@ public class ElevatorIOSpark implements ElevatorIO {
   private double elevatorCurrentArbFF = 0.0;
 
   private boolean firstTimeArmInError = true;
+  private boolean inElevatorRecoveryMode = false;
 
   public ElevatorIOSpark() {
     leaderMotor.configure(
@@ -52,11 +53,13 @@ public class ElevatorIOSpark implements ElevatorIO {
 
     // If the arm is in error then don't move the elevator
     if (RobotStatus.isArmInError()) {
-      if (firstTimeArmInError = true) {
+      if (firstTimeArmInError == true) {
         leaderMotor.set(0);
         firstTimeArmInError = false;
       }
-      elevatorCurrentTarget = inputs.positionRotations;
+      if (inElevatorRecoveryMode == false) {
+        elevatorCurrentTarget = inputs.positionRotations;
+      }
     }
 
     elevatorClosedLoopController.setReference(
@@ -66,7 +69,6 @@ public class ElevatorIOSpark implements ElevatorIO {
         elevatorCurrentArbFF);
 
     inputs.setpoint = this.elevatorCurrentTarget;
-    inputs.positionRotations = leaderEncoder.getPosition();
     inputs.velocityRPM = leaderEncoder.getVelocity();
     inputs.elevatorHeightCalc =
         Units.metersToInches(
@@ -82,12 +84,27 @@ public class ElevatorIOSpark implements ElevatorIO {
 
   @Override
   public void setPosition(double requestedPosition) {
-    if (requestedPosition <= .01) {
-      this.elevatorCurrentArbFF = 0.0;
-    } else {
-      this.elevatorCurrentArbFF = ElevatorConstants.kElevatorKf;
+    if (RobotStatus.isArmInError() == false) {
+      if (requestedPosition <= .01) {
+        this.elevatorCurrentArbFF = 0.0;
+      } else {
+        this.elevatorCurrentArbFF = ElevatorConstants.kElevatorKf;
+      }
+      this.elevatorCurrentTarget = requestedPosition;
     }
-    this.elevatorCurrentTarget = requestedPosition;
+  }
+
+  @Override
+  public void recoverElevator() {
+    inElevatorRecoveryMode = true;
+    this.elevatorCurrentArbFF = 0.0;
+    this.elevatorCurrentTarget = 0.0;
+  }
+
+  @Override
+  public void clearElevatorError() {
+    firstTimeArmInError = true;
+    inElevatorRecoveryMode = false;
   }
 
   @Override

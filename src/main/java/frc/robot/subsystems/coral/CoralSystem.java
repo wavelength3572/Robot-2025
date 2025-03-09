@@ -15,6 +15,7 @@ import frc.robot.subsystems.coral.intake.Intake;
 import frc.robot.util.BranchAlignmentUtils;
 import frc.robot.util.BranchAlignmentUtils.BranchAlignmentStatus;
 import frc.robot.util.CoralRPStatusLogger;
+import frc.robot.util.Elastic;
 import frc.robot.util.ReefScoringLogger;
 import frc.robot.util.RobotStatus;
 import lombok.Getter;
@@ -28,7 +29,9 @@ public class CoralSystem extends SubsystemBase {
     SAFE_ARM,
     MOVE_ELEVATOR,
     MOVE_ARM_FINAL,
-    MOVE_SIMULTANEOUS
+    MOVE_SIMULTANEOUS,
+    ARM_RECOVERY,
+    ELEVATOR_RECOVERY
   }
 
   // Enum representing the states for coral pickup
@@ -171,6 +174,24 @@ public class CoralSystem extends SubsystemBase {
           coralSystemState = CoralSystemMovementState.STABLE;
         }
         break;
+      case ARM_RECOVERY:
+        this.arm.recoverArm(); // go to L1 Angle
+        if (arm.isAtGoal()) {
+          coralSystemState = CoralSystemMovementState.ELEVATOR_RECOVERY;
+        }
+        break;
+      case ELEVATOR_RECOVERY:
+        this.elevator.recoverElevator();
+        if (elevator.isAtGoal()) {
+          elevator.clearElevatorError();
+          arm.clearArmError();
+          this.targetCoralPreset = CoralSystemPresets.L1;
+          this.currentCoralPreset = CoralSystemPresets.L1;
+          coralSystemState = CoralSystemMovementState.STABLE;
+          Elastic.selectTab("Teleoperated");
+          intake.stopIntake();
+        }
+        break;
       default:
         // do nothing
         break;
@@ -281,6 +302,10 @@ public class CoralSystem extends SubsystemBase {
     if (targetCoralPreset != CLIMB) {
       intake.pushCoral();
     }
+  }
+
+  public void recoverArmAndElevator() {
+    if (arm.isArmInError()) coralSystemState = CoralSystemMovementState.ARM_RECOVERY;
   }
 
   public void updateCoralPickupState() {
