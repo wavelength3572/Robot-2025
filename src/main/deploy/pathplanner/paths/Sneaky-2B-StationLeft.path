@@ -1,0 +1,106 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.175076565233334,
+        "y": 4.360437983236584
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.8481048387096766,
+        "y": 4.375564516129032
+      },
+      "isLocked": false,
+      "linkedName": "1A"
+    },
+    {
+      "anchor": {
+        "x": 0.679556451611603,
+        "y": 5.894677419355571
+      },
+      "prevControl": {
+        "x": 0.5951612903212804,
+        "y": 5.037741935484603
+      },
+      "nextControl": {
+        "x": 0.7352044985476277,
+        "y": 6.459719126705976
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.679556451613632,
+        "y": 6.667217741938135
+      },
+      "prevControl": {
+        "x": 0.6406048387104062,
+        "y": 6.22576612903491
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "StationLeft-Sneaky"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.860128617363345,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 1.0819935691318308,
+      "rotationDegrees": -90.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.8206008583690998,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 1.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Pickup",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "CaptureAlgae",
+      "waypointRelativePos": 0.8515021459227474,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 0.5,
+    "maxAcceleration": 1.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -54.0
+  },
+  "reversed": false,
+  "folder": "Sneaky-Cage1",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": false
+}

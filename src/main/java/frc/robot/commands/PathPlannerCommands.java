@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.NamedCommands.PickupCoralCommand;
 import frc.robot.commands.NamedCommands.RunPresetCommand;
 import frc.robot.commands.NamedCommands.ScoreCoralInAutoCommand;
+import frc.robot.subsystems.algae.Algae;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
@@ -23,11 +24,12 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class PathPlannerCommands {
-  public static void Setup(CoralSystem coralSystem, Drive drive, Vision vision) {
+  public static void Setup(CoralSystem coralSystem, Drive drive, Vision vision, Algae algae) {
     NamedCommands.registerCommand(
         "WaitForCoral", new TimedWaitUntilCommand("WaitForCoral", coralSystem::isHaveCoral));
     NamedCommands.registerCommand(
         "WaitForPreset", new TimedWaitUntilCommand("WaitForPreset", coralSystem::isAtGoal));
+    NamedCommands.registerCommand("CaptureAlgae", Commands.runOnce(algae::pullAlgae));
 
     NamedCommands.registerCommand("TurnVisionOff", new InstantCommand(vision::setVisionOff));
 
