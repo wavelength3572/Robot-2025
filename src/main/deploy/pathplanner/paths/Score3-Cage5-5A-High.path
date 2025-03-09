@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.953193759236297,
-        "y": 1.9100000000000001
+        "x": 5.998897977156866,
+        "y": 2.257524640205345
       },
       "isLocked": false,
       "linkedName": "Cage5"
@@ -20,8 +20,8 @@
         "y": 2.714
       },
       "prevControl": {
-        "x": 4.986,
-        "y": 2.4974936490538906
+        "x": 5.104959888116773,
+        "y": 2.622067914900114
       },
       "nextControl": null,
       "isLocked": false,
@@ -40,7 +40,7 @@
       "minWaypointRelativePos": 0,
       "maxWaypointRelativePos": 0.8,
       "constraints": {
-        "maxVelocity": 2.75,
+        "maxVelocity": 2.0,
         "maxAcceleration": 2.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -59,8 +59,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 1.25,
-    "maxAcceleration": 1.75,
+    "maxVelocity": 0.5,
+    "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

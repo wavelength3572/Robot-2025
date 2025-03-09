@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.5061051324503314,
-        "y": 2.5286009933774833
+        "x": 1.555363268013464,
+        "y": 1.299958630179994
       },
       "isLocked": false,
       "linkedName": "StationRight"
@@ -20,8 +20,8 @@
         "y": 2.8946849994911212
       },
       "prevControl": {
-        "x": 3.3850579470198676,
-        "y": 2.5867135761589397
+        "x": 3.5112343252911025,
+        "y": 2.5068718094572273
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0.0,
-      "maxWaypointRelativePos": 0.9,
+      "maxWaypointRelativePos": 0.8,
       "constraints": {
         "maxVelocity": 2.0,
         "maxAcceleration": 2.5,
@@ -47,8 +47,14 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
+      "name": "PREL4",
+      "waypointRelativePos": 0.1,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
       "name": "L4",
-      "waypointRelativePos": 0.40686695278969925,
+      "waypointRelativePos": 0.65,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -71,5 +77,5 @@
     "velocity": 0,
     "rotation": 54.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

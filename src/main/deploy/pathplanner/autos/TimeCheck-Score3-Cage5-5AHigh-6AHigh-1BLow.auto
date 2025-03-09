@@ -65,15 +65,33 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "Score3-StationRight-1BLow"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "Score3-StationRight-6BHigh-OR-1BLow"
+            "name": "WaitForPreset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L1"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "CompetitionAutos",
+  "folder": "TimeCheck",
   "choreoAuto": false
 }

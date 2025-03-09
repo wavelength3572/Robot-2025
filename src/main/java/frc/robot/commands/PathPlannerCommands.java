@@ -117,6 +117,7 @@ public class PathPlannerCommands {
               "StationRight-6BHigh-OR-1BLow",
               PathPlannerPath.fromPathFile("StationRight-6BHigh"),
               PathPlannerPath.fromPathFile("StationRight-1BLow"),
+              PathPlannerPath.fromPathFile("StationRight-Safe"),
               coralSystem));
 
       autoPathConditionals.add(
@@ -124,6 +125,7 @@ public class PathPlannerCommands {
               "Score3-StationRight-6BHigh-OR-1BLow",
               PathPlannerPath.fromPathFile("Score3-StationRight-6BHigh"),
               PathPlannerPath.fromPathFile("Score3-StationRight-1BLow"),
+              PathPlannerPath.fromPathFile("StationRight-Safe"),
               coralSystem));
 
       autoPathConditionals.add( // this is part of our Score2 for LakeCity
@@ -131,6 +133,7 @@ public class PathPlannerCommands {
               "StationLeft-2BHigh-OR-1ALow",
               PathPlannerPath.fromPathFile("StationLeft-2BHigh"),
               PathPlannerPath.fromPathFile("StationLeft-1ALow"),
+              PathPlannerPath.fromPathFile("StationLeft-Safe"),
               coralSystem));
 
       autoPathConditionals.add( // SCORE 3
@@ -138,6 +141,7 @@ public class PathPlannerCommands {
               "Score3-StationLeft-2BHigh-OR-1ALow",
               PathPlannerPath.fromPathFile("Score3-StationLeft-2BHigh"),
               PathPlannerPath.fromPathFile("Score3-StationLeft-1ALow"),
+              PathPlannerPath.fromPathFile("StationLeft-Safe"),
               coralSystem));
 
       // Register each combination as a NamedCommand

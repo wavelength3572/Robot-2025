@@ -81,6 +81,12 @@
           "data": {
             "name": "Score"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L1"
+          }
         }
       ]
     }

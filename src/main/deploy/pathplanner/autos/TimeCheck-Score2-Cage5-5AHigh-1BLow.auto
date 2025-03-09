@@ -39,6 +39,24 @@
           "data": {
             "pathName": "StationRight-1BLow"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForPreset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L1"
+          }
         }
       ]
     }

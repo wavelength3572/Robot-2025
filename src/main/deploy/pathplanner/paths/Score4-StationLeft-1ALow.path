@@ -8,7 +8,7 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.8191039560911515,
+        "x": 1.8191039560911513,
         "y": 6.279577436728071
       },
       "isLocked": false,
@@ -57,7 +57,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Score4",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -54.0

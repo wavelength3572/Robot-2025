@@ -17,16 +17,15 @@ import frc.robot.subsystems.drive.DriveConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class AutoPathConditional {
-  // TODO determine these empirically
   private static final double HIGH_SCORE_EXTRA_TIME_TO_BE_SAFE =
       ScoreCoralInAutoCommand.getExpectedDuration()
           + RunPresetCommand.getExpectedDurationToStowFromL4();
-
   private static final double LOW_SCORE_EXTRA_TIME_TO_BE_SAFE = 0.0;
 
   private final String conditionalCommandName;
   private final PathPlannerPath highScorePath;
   private final PathPlannerPath lowScorePath;
+  private final PathPlannerPath safePath;
   private final CoralSystem coralSystem;
   private RobotConfig config;
 
@@ -34,10 +33,15 @@ public class AutoPathConditional {
   private double lowScoreThresholdTime;
 
   public AutoPathConditional(
-      String name, PathPlannerPath highPath, PathPlannerPath lowPath, CoralSystem coralSystem) {
+      String name,
+      PathPlannerPath highPath,
+      PathPlannerPath lowPath,
+      PathPlannerPath safePath,
+      CoralSystem coralSystem) {
     this.conditionalCommandName = name;
     this.highScorePath = highPath;
     this.lowScorePath = lowPath;
+    this.safePath = safePath;
     this.coralSystem = coralSystem;
   }
 
@@ -47,22 +51,11 @@ public class AutoPathConditional {
    * command.
    */
   public ConditionalCommand getCommand() {
-    // Load the configuration once.
-    try {
-      config = DriveConstants.ppConfig;
-      Logger.recordOutput("AutoPathConditional/RobotConfig", config.toString());
-    } catch (Exception e) {
-      DriverStation.reportError(
-          "Failed to load RobotConfig from GUI settings: " + e.getMessage(), e.getStackTrace());
-      Logger.recordOutput(
-          "AutoPathConditional/Error", "Failed to load RobotConfig: " + e.getMessage());
-      // Returning a fallback if config can't be loaded.
-      return new ConditionalCommand(Commands.none(), Commands.none(), () -> false);
-    }
+    config = DriveConstants.ppConfig;
 
     Command highScoreCommand = createHighScoreCommand();
     Command lowScoreCommand = createLowScoreCommand();
-    Command fallbackCommand = Commands.none();
+    Command fallbackCommand = createSafeCommand();
 
     highScoreThresholdTime = calcualteHighScoreTimeThreshold();
     lowScoreThresholdTime = calcualteLowScoreTimeThreshold();
@@ -103,6 +96,13 @@ public class AutoPathConditional {
             new ScoreCoralInAutoCommand(coralSystem.getIntake()),
             new RunPresetCommand(coralSystem, CoralSystemPresets.L1));
     return lowScoreCommand;
+  }
+
+  private Command createSafeCommand() {
+    if (safePath != null) {
+      Command safeCommand = AutoBuilder.followPath(safePath);
+      return safeCommand;
+    } else return Commands.none();
   }
 
   private double calcualteHighScoreTimeThreshold() {

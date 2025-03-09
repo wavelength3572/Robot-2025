@@ -337,8 +337,8 @@ public final class FieldConstants {
         ReefBranchesRed.BRANCH_D_ID_8_FACE_6_POLE_B),
     FACE_9(
         9,
-        ReefBranchesRed.BRANCH_F_ID_9_FACE_5_POLE_B,
-        ReefBranchesRed.BRANCH_E_ID_9_FACE_5_POLE_A),
+        ReefBranchesRed.BRANCH_E_ID_9_FACE_5_POLE_A,
+        ReefBranchesRed.BRANCH_F_ID_9_FACE_5_POLE_B),
     FACE_10(
         10,
         ReefBranchesRed.BRANCH_G_ID_10_FACE_4_POLE_A,
