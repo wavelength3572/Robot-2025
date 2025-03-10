@@ -146,6 +146,14 @@ public class PathPlannerCommands {
               PathPlannerPath.fromPathFile("StationLeft-Safe"),
               coralSystem));
 
+      autoPathConditionals.add( // SCORE 3
+          new AutoPathConditional(
+              "Score3-SequentialEvent-StationLeft-2BHigh-OR-1ALow",
+              PathPlannerPath.fromPathFile("Score3-SequentialEvent-StationLeft-2BHigh"),
+              PathPlannerPath.fromPathFile("Score3-StationLeft-1ALow"),
+              PathPlannerPath.fromPathFile("StationLeft-Safe"),
+              coralSystem));
+
       // Register each combination as a NamedCommand
       for (AutoPathConditional conditional : autoPathConditionals) {
         NamedCommands.registerCommand(

@@ -211,7 +211,10 @@ public class ButtonsAndDashboardBindings {
                 FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
                 coralSystem::isHaveCoral));
 
-    // Give Driver ability to toggle Smart Drive
+    oi.getRightJoyDownButton().onTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
+
+    oi.getRightJoyUpButton().onTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
+
     oi.getButtonI()
         .onTrue(
             DriveCommands.toggleSmartDriveCmd(

@@ -34,11 +34,15 @@ public final class BranchAlignmentUtils {
   // Offsets for scoring positions relative to the AprilTag pose.
   // One for the left pole and one for the right pole.
 
-  //x is distance from the face to center of robot, y is the lateral distance from the face.
+  // x is distance from the face to center of robot, y is the lateral distance from the face.
   private static final Transform2d RIGHT_POLE_OFFSET =
-      new Transform2d(new Translation2d(Units.inchesToMeters(17.51), Units.inchesToMeters(-0.787)), new Rotation2d(0));
+      new Transform2d(
+          new Translation2d(Units.inchesToMeters(17.51), Units.inchesToMeters(-0.787)),
+          new Rotation2d(0));
   private static final Transform2d LEFT_POLE_OFFSET =
-      new Transform2d(new Translation2d(Units.inchesToMeters(17.51), Units.inchesToMeters(-13.582)), new Rotation2d(0));
+      new Transform2d(
+          new Translation2d(Units.inchesToMeters(17.51), Units.inchesToMeters(-13.582)),
+          new Rotation2d(0));
 
   @Getter
   public static BranchAlignmentStatus currentBranchAlignmentStatus = BranchAlignmentStatus.NONE;

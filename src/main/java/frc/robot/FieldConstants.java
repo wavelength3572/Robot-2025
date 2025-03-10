@@ -29,11 +29,11 @@ import java.util.Set;
  */
 public final class FieldConstants {
 
-  public static final double THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE = 3.0; // meters
+  public static final double THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE = 2.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF = 2.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_STATION = 2.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_CAGE_ASSIST = 1.0; // meters
-  public static final double THRESHOLD_DISTANCE_FOR_DISLODGE = 3.0; // meters
+  public static final double THRESHOLD_DISTANCE_FOR_DISLODGE = 2.0; // meters
 
   public static Translation2d selectedCageTranslation = new Translation2d();
 
