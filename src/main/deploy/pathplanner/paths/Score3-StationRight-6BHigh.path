@@ -47,14 +47,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "PREL4",
+      "name": "PREL4SEQ",
       "waypointRelativePos": 0.1,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "L4",
-      "waypointRelativePos": 0.65,
       "endWaypointRelativePos": null,
       "command": null
     }
