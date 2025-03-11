@@ -84,7 +84,7 @@ public class AutoPathConditional {
             AutoBuilder.followPath(highScorePath),
             new TimedWaitUntilCommand("High Score Conditional", coralSystem::isAtGoal),
             new ScoreCoralInAutoCommand(coralSystem.getIntake()),
-            new RunPresetCommand(coralSystem, CoralSystemPresets.L1));
+            new RunPresetCommand(coralSystem, CoralSystemPresets.AUTO_SCORE_3_END));
     return highScoreCommand;
   }
 

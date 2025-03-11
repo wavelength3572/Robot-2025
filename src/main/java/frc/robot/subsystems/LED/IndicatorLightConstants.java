@@ -39,7 +39,8 @@ public class IndicatorLightConstants {
     ELEVATOR_SELECTION_CHANGED,
     ELEVATOR_TARGET_CHANGED,
     ELEVATOR_CURRENT_CHANGED,
-    DYNAMIC_BLINK
+    DYNAMIC_BLINK,
+    ARM_IN_ERROR
   }
 
   // Define an array with 20 chosen colors (as RGB values)
