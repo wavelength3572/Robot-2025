@@ -41,8 +41,8 @@ public class CoralSystem extends SubsystemBase {
     HAVE_CORAL_NEAR_STATION,
   }
 
-  private static final double TIME_OF_FLIGHT_THRESHOLD = .4; // meters
-  private double SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE = .4; // meters
+  private static final double TIME_OF_FLIGHT_THRESHOLD = .7; // meters
+  private double SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE = .7; // meters
 
   private CANrange canRange = new CANrange(31);
 
@@ -329,6 +329,7 @@ public class CoralSystem extends SubsystemBase {
           coralPickupState = CoralPickupState.HAVE_CORAL_SAFE_DISTANCE_FROM_STATION;
           justPickedUpCoral = false;
         }
+
         if (justExpelledCoral()) {
           justPickedUpCoral = false;
           tofFilter.reset();
@@ -357,7 +358,7 @@ public class CoralSystem extends SubsystemBase {
   }
 
   private boolean checkIfSafeDistanceFromCoralStation(double currentTOFAvg, boolean nearStation) {
-    if (!nearStation && currentTOFAvg>TIME_OF_FLIGHT_THRESHOLD) {
+    if (!nearStation || currentTOFAvg > TIME_OF_FLIGHT_THRESHOLD) {
       return true;
     } else return false;
   }
