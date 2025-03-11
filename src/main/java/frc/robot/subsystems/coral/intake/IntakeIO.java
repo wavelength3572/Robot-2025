@@ -9,6 +9,7 @@ public interface IntakeIO {
     public double velocityRPM = 0.0;
     public double appliedVolts = 0.0;
     public double motorPosition = 0.0;
+    public boolean limitSwitch = false;
     public boolean haveCoral = false;
     public double currentAmps = 0.0;
     public double Arm_TBE = 0.0;
