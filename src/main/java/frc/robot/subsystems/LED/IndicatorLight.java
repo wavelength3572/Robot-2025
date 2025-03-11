@@ -3,10 +3,11 @@ package frc.robot.subsystems.LED;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.LED.IndicatorLightConstants.LED_EFFECTS;
 import frc.robot.subsystems.coral.CoralSystemPresets;
@@ -105,7 +106,7 @@ public class IndicatorLight extends SubsystemBase {
     wlOrangeLEDBuffer =
         new AddressableLEDBuffer(IndicatorLightConstants.ADDRESSABLE_LED_BUFFER_LENGTH);
     for (var i = 0; i < wlOrangeLEDBuffer.getLength(); i++) {
-      wlOrangeLEDBuffer.setHSV(i, IndicatorLightConstants.ORANGE_HUE, 255, 128);
+      wlOrangeLEDBuffer.setLED(i, new Color8Bit(255, 27, 0));
     }
 
     wlPurpleLEDBuffer =
@@ -183,13 +184,14 @@ public class IndicatorLight extends SubsystemBase {
       case BLUE -> setActiveBuffer(wlBlueLEDBuffer);
       case BLACK -> setActiveBuffer(wlBlackLEDBuffer);
       case WHITE -> setActiveBuffer(wlWhiteLEDBuffer);
+      case ARM_IN_ERROR -> doBlinkRed();
       case RAINBOW -> doRainbow();
       case BLUEOMBRE -> doBlueOmbre();
       case BLINK -> doBlink();
       case BLINK_RED -> doBlinkRed();
       case BLINK_PURPLE -> blinkPurple();
       case PARTY -> party();
-      case RSL -> rsl();
+      case RSL -> doRsl();
       case SEGMENTPARTY -> doSegmentParty();
       case EXPLOSION -> doExplosionEffect();
       case POLKADOT -> doPokadot();
@@ -459,7 +461,9 @@ public class IndicatorLight extends SubsystemBase {
   }
 
   public void doBlinkRed() {
+    LED_State = LED_EFFECTS.BLINK_RED;
     double timeStamp = Timer.getFPGATimestamp();
+
     if (timeStamp - lastTime > 0.1) {
       on = !on;
       lastTime = timeStamp;
@@ -759,11 +763,15 @@ public class IndicatorLight extends SubsystemBase {
 
   private LED_EFFECTS updateLightingGoal() {
 
-    if (RobotController.getRSLState()) {
-      return LED_EFFECTS.RSL;
+    if (RobotStatus.isArmInError()) {
+      return LED_EFFECTS.ARM_IN_ERROR;
     }
 
     if (RobotStatus.isClimbingFinished()) return LED_EFFECTS.SEGMENTPARTY;
+
+    if (DriverStation.isDisabled()) {
+      return LED_EFFECTS.RSL;
+    }
 
     if (RobotStatus.justPickedUpCoral() && !pickupBlinkTriggered) {
       pickupBlinkTriggered = true;
@@ -787,7 +795,7 @@ public class IndicatorLight extends SubsystemBase {
     return LED_EFFECTS.BLUEOMBRE;
   }
 
-  private void rsl() {
-    currentColor_GOAL = LED_EFFECTS.ORANGE;
+  private void doRsl() {
+    setActiveBuffer(wlOrangeLEDBuffer);
   }
 }
