@@ -39,7 +39,7 @@ public class IntakeIOSpark implements IntakeIO {
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    // haveCoral = intakeMotor.getForwardLimitSwitch().isPressed();
+    inputs.limitSwitch = intakeMotor.getForwardLimitSwitch().isPressed();
     if (currentIntakeState == intakeState.PULL) {
       if (intakeMotor.getOutputCurrent() >= 25.0) {
         haveCoral = true;
