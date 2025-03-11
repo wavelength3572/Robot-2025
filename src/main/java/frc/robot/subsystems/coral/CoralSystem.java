@@ -41,8 +41,8 @@ public class CoralSystem extends SubsystemBase {
     HAVE_CORAL_NEAR_STATION,
   }
 
-  private static final double TIME_OF_FLIGHT_THRESHOLD = 1250; // adjust this constant as needed
-  private double SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE = 1.5;
+  private static final double TIME_OF_FLIGHT_THRESHOLD = .4; // meters
+  private double SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE = .4; // meters
 
   private CANrange canRange = new CANrange(31);
 
@@ -357,9 +357,7 @@ public class CoralSystem extends SubsystemBase {
   }
 
   private boolean checkIfSafeDistanceFromCoralStation(double currentTOFAvg, boolean nearStation) {
-    // add additional TOF check once working: currentTOFAvg >
-    // TIME_OF_FLIGHT_THRESHOLD
-    if (!nearStation) {
+    if (!nearStation && currentTOFAvg>TIME_OF_FLIGHT_THRESHOLD) {
       return true;
     } else return false;
   }
