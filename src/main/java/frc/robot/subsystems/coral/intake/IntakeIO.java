@@ -19,9 +19,6 @@ public interface IntakeIO {
   /** Update the set of loggable inputs. */
   public default void updateInputs(IntakeIOInputs inputs) {}
 
-  /** Run open loop at the specified speed. */
-  public default void setSpeed(double requestedSpeed) {}
-
   public default void pullCoral() {}
 
   public default void pushCoral() {}

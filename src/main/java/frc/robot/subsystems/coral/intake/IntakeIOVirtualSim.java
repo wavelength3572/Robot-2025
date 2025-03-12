@@ -80,7 +80,7 @@ public class IntakeIOVirtualSim implements IntakeIO {
   @Override
   public void pullCoral() {
     currentIntakeState = IntakeState.PULL;
-    setSpeed(0.5); // Allow the intake to turn on immediately
+    requestedSpeed = 0.5;
   }
 
   @Override
@@ -88,23 +88,18 @@ public class IntakeIOVirtualSim implements IntakeIO {
     currentIntakeState = IntakeState.PUSH;
     pushTimer.reset();
     pushTimer.start();
-    setSpeed(-0.75);
+    requestedSpeed = -0.75;
   }
 
   @Override
   public void stopIntake() {
     currentIntakeState = IntakeState.OFF;
-    setSpeed(0.0);
+    requestedSpeed = 0.0;
   }
 
   @Override
   public boolean haveCoral() {
     return haveCoral;
-  }
-
-  @Override
-  public void setSpeed(double speed) {
-    this.requestedSpeed = speed;
   }
 
   @Override

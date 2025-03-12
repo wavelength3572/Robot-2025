@@ -3,6 +3,7 @@ package frc.robot.subsystems.climber;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.FieldConstants.CageTarget;
+import frc.robot.util.Elastic;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -27,6 +28,7 @@ public class Climber extends SubsystemBase {
   }
 
   public void deployClimber() {
+    Elastic.selectTab("Climb");
     io.deployClimber();
   }
 
