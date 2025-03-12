@@ -6,14 +6,15 @@ public class AlgaeConstants {
   public static final int algaeDeployCurrentLimit = 40;
   public static final int algaeCaptureCurrentLimit = 30;
 
-  public static final double captureIntakeVolts = 8.0;
+  public static final double captureIntakeVolts = 10.0;
   public static final double capturePushVolts = -8.0;
 
-  public static final double deployBurstVolts = 1.2;  // Inital burst to deploy arm
+  public static final double deployBurstVolts = 1.2; // Inital burst to deploy arm
   public static final double deployHoldOutVolts = 0.5; // Holding out arm waiting for algae capture
   public static final double deployPushAlgaeVolts = 0.6; // Pushing algae out of the arm
   public static final double deployPullBackVolts = -1.2; // Initial burst to stow arm
-  public static final double deployHoldVolts = -0.4; // Voltage to hold arm back to robot during stow
+  public static final double deployHoldVolts =
+      -0.4; // Voltage to hold arm back to robot during stow
   public static final double deployPullBackFF = 1.8; // 1.788545;
 
   public static final double kAlgaeCaptureKp = 0.1;

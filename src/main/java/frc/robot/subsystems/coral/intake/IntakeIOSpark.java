@@ -61,7 +61,6 @@ public class IntakeIOSpark implements IntakeIO {
       } else {
         stopIntake();
       }
-
     }
 
     inputs.requestedSpeed = this.requestedSpeed;

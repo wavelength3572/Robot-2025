@@ -44,18 +44,14 @@ public class PathPlannerCommands {
         new ParallelCommandGroup(
             new InstantCommand(coralSystem.getIntake()::pushCoral),
             new InstantCommand(
-                () ->
-                    coralSystem.setTargetPreset(
-                        CoralSystemPresets.FINAL_DISLODGE_LEVEL_1))));
+                () -> coralSystem.setTargetPreset(CoralSystemPresets.FINAL_DISLODGE_LEVEL_1))));
 
     NamedCommands.registerCommand(
         "DislodgeHigh",
         new ParallelCommandGroup(
             new InstantCommand(coralSystem.getIntake()::pushCoral),
             new InstantCommand(
-                () ->
-                    coralSystem.setTargetPreset(
-                        CoralSystemPresets.FINAL_DISLODGE_LEVEL_2))));
+                () -> coralSystem.setTargetPreset(CoralSystemPresets.FINAL_DISLODGE_LEVEL_2))));
 
     NamedCommands.registerCommand(
         "PrepareLowDislodge",
@@ -66,8 +62,7 @@ public class PathPlannerCommands {
             new WaitUntilCommand(coralSystem::isAtGoal),
             new InstantCommand(
                 () ->
-                    coralSystem.setTargetPreset(
-                        CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1)),
+                    coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1)),
             new WaitUntilCommand(coralSystem::isAtGoal)));
 
     NamedCommands.registerCommand(
@@ -79,8 +74,7 @@ public class PathPlannerCommands {
             new WaitUntilCommand(coralSystem::isAtGoal),
             new InstantCommand(
                 () ->
-                    coralSystem.setTargetPreset(
-                        CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2)),
+                    coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2)),
             new WaitUntilCommand(coralSystem::isAtGoal)));
 
     new EventTrigger("Pickup")

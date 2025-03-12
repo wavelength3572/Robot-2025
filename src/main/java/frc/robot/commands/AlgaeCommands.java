@@ -67,12 +67,10 @@ public class AlgaeCommands {
         () -> {
           if (coralSystem.getCurrentCoralPreset()
               == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1) {
-            coralSystem.setTargetPreset(
-                CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1);
+            coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1);
           } else if (coralSystem.getCurrentCoralPreset()
               == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2) {
-            coralSystem.setTargetPreset(
-                CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
+            coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
           }
         },
         coralSystem);

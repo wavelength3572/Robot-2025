@@ -313,9 +313,7 @@ public class ButtonsAndDashboardBindings {
             coralSystem),
         new WaitUntilCommand(coralSystem::isAtGoal),
         new InstantCommand(
-            () ->
-                coralSystem.setTargetPreset(
-                    CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2),
+            () -> coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2),
             coralSystem));
   }
 
@@ -326,9 +324,7 @@ public class ButtonsAndDashboardBindings {
             coralSystem),
         new WaitUntilCommand(coralSystem::isAtGoal),
         new InstantCommand(
-            () ->
-                coralSystem.setTargetPreset(
-                    CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1),
+            () -> coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1),
             coralSystem));
   }
 }
