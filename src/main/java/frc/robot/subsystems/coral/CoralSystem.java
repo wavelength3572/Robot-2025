@@ -152,8 +152,6 @@ public class CoralSystem extends SubsystemBase {
           deployClimberTriggered();
         break;
       case SAFE_ARM:
-        // Move Arm to Safe
-        this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
         if (arm.getCurrentAngleDEG() >= CoralSystemPresets.ARMSAFE.getArmAngle() - 1.0) { // Put in a 1 degree fudge
           // factor
           coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
@@ -224,13 +222,6 @@ public class CoralSystem extends SubsystemBase {
             && (currentCoralPreset == CoralSystemPresets.L4)) {
           moveArmSafely = false;
         }
-        // if (currentCoralPreset == CoralSystemPresets.PICKUP
-        // && haveCoral
-        // && (this.targetCoralPreset == CoralSystemPresets.L1
-        // || this.targetCoralPreset == CoralSystemPresets.L2
-        // || this.targetCoralPreset == CoralSystemPresets.L3)) {
-        // moveArmSafely = false;
-        // }
 
         // changes for autonomous only
         if (currentCoralPreset == CoralSystemPresets.PICKUP
@@ -244,37 +235,39 @@ public class CoralSystem extends SubsystemBase {
           moveArmSafely = false;
         }
 
+        if (currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2 &&
+            targetCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
+          moveArmSafely = false;
+        }
+
+        if (currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1 &&
+            targetCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1) {
+          moveArmSafely = false;
+        }
+
         if (moveArmSafely) {
-          // Start Moving Arm to Safe
-          this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
-          // Change state
-          coralSystemState = CoralSystemMovementState.SAFE_ARM;
+          // VERY SPEICAL CODE FOR AUTO INITAL PATH
+          // changes for autonomous only
+          if (currentCoralPreset == CoralSystemPresets.STARTUP
+              && this.targetCoralPreset == CoralSystemPresets.L4) {
+            // Start Moving Arm to First Path Arm Angle
+            this.arm.setTargetPreset(CoralSystemPresets.AUTO_START_L4);
+            this.elevator.setTargetPreset(CoralSystemPresets.AUTO_START_L4);
+            coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
+          } else {
+            // Start Moving Arm to Safe
+            if (this.targetCoralPreset == CoralSystemPresets.PICKUP) {
+              this.arm.setTargetPreset(CoralSystemPresets.PRE_PICKUP);
+            } else {
+              this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
+            }
+            // Change state
+            coralSystemState = CoralSystemMovementState.SAFE_ARM;
+          }
         } else {
           coralSystemState = CoralSystemMovementState.MOVE_ARM_FINAL;
         }
-
-        // VERY SPEICAL CODE FOR AUTO INITAL PATH
-        // changes for autonomous only
-        if (currentCoralPreset == CoralSystemPresets.STARTUP
-            && this.targetCoralPreset == CoralSystemPresets.L4) {
-          // Start Moving Arm to First Path Arm Angle
-          this.arm.setTargetPreset(CoralSystemPresets.AUTO_START_L4);
-          this.elevator.setTargetPreset(CoralSystemPresets.AUTO_START_L4);
-          coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
-        }
       }
-    }
-  }
-
-  public void setSimultaneousTargetPreset(CoralSystemPresets requestedPreset) {
-    // We are trying to go to a different location AND
-    // We ARE NOT Climbing AND
-    // We are not currently traveling to a location
-    if (requestedPreset != this.currentCoralPreset
-        && targetCoralPreset != CLIMB
-        && coralSystemState == CoralSystemMovementState.STABLE) {
-      this.targetCoralPreset = requestedPreset;
-      coralSystemState = CoralSystemMovementState.MOVE_ARM_FINAL;
     }
   }
 
