@@ -56,7 +56,12 @@ public class IntakeIOSpark implements IntakeIO {
       }
     } else {
       // Arm is in an emergency
-      stopIntake();
+      if (currentIntakeState == intakeState.PUSH) {
+        intakeMotor.set(requestedSpeed);
+      } else {
+        stopIntake();
+      }
+
     }
 
     inputs.requestedSpeed = this.requestedSpeed;
@@ -70,11 +75,6 @@ public class IntakeIOSpark implements IntakeIO {
   }
 
   @Override
-  public void setSpeed(double speed) {
-    this.requestedSpeed = speed;
-  }
-
-  @Override
   public boolean haveCoral() {
     return haveCoral;
   }
@@ -82,20 +82,19 @@ public class IntakeIOSpark implements IntakeIO {
   @Override
   public void pullCoral() {
     currentIntakeState = intakeState.PULL;
-    setSpeed(IntakeConstants.intakeInSpeed);
+    this.requestedSpeed = IntakeConstants.intakeInSpeed;
   }
 
   @Override
   public void pushCoral() {
     currentIntakeState = intakeState.PUSH;
-    setSpeed(IntakeConstants.intakeOutSpeed);
+    this.requestedSpeed = IntakeConstants.intakeOutSpeed;
   }
 
   @Override
   public void stopIntake() {
     currentIntakeState = intakeState.OFF;
     requestedSpeed = 0.0;
-    setSpeed(0.0);
   }
 
   @Override

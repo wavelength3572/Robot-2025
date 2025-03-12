@@ -79,17 +79,19 @@ public class AlgaeIOSpark implements AlgaeIO {
       case BURST:
         algaeCaptureMotor.setVoltage(AlgaeConstants.captureIntakeVolts);
         algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
-        detectionCount++;
-        if (detectionCount > 50) {
-          currentAlgIntakeState = algaeIntakeState.PULL;
-          detectionCount = 0;
-          previousArmAngle = inputs.currentAngle;
-        }
+        detectionCount = 0;
+        previousArmAngle = inputs.currentAngle;
+        currentAlgIntakeState = algaeIntakeState.PULL;
         break;
       case PULL:
+        detectionCount++;
+        if (detectionCount <= 50) {
+          algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
+        } else {
+          algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldOutVolts);
+        }
         // Pull until we see the angle decrease, the arm is moving upward
         algaeCaptureMotor.setVoltage(AlgaeConstants.captureIntakeVolts);
-        algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldOutVolts);
         if (previousArmAngle - inputs.currentAngle > 0.0) {
           // Checking to see if the arm is rising
           detectionCount++;
@@ -97,6 +99,7 @@ public class AlgaeIOSpark implements AlgaeIO {
             // We have detected 3 consecutive samples of the arm rising
             currentAlgIntakeState = algaeIntakeState.DETECT;
             detectionCount = 0;
+            algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldOutVolts);
           }
         } else {
           detectionCount = 0;

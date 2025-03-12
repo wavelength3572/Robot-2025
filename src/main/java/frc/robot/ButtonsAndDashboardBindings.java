@@ -306,30 +306,28 @@ public class ButtonsAndDashboardBindings {
         });
   }
 
-  // TODO The UNLESS modifer needs to be in this command
   private static Command createPrepL2DislodgeCommand() {
     return new SequentialCommandGroup(
         new InstantCommand(
             () -> coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2),
             coralSystem),
-        new WaitUntilCommand(coralSystem::isAtGoal),
+        new WaitUntilCommand(coralSystem::preppedForDislodge),
         new InstantCommand(
             () ->
-                coralSystem.setSimultaneousTargetPreset(
+                coralSystem.setTargetPreset(
                     CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2),
             coralSystem));
   }
 
-  // TODO The UNLESS modifer needs to be in this command
   private static Command createPrepL1DislodgeCommand() {
     return new SequentialCommandGroup(
         new InstantCommand(
             () -> coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1),
             coralSystem),
-        new WaitUntilCommand(coralSystem::isAtGoal),
+        new WaitUntilCommand(coralSystem::preppedForDislodge),
         new InstantCommand(
             () ->
-                coralSystem.setSimultaneousTargetPreset(
+                coralSystem.setTargetPreset(
                     CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1),
             coralSystem));
   }

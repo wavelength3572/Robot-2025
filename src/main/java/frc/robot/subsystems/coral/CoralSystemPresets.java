@@ -7,6 +7,7 @@ public enum CoralSystemPresets {
   STOW(22, 105),
   ARMSAFE(22, 85),
   PICKUP(39.0, 233),
+  PRE_PICKUP(39.0,115),
   PICKUPFAR(37.0, 233), // TOF > 300
   L1(0.0, 92),
   L2(16.0, 77),
