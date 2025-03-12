@@ -45,7 +45,7 @@ public class PathPlannerCommands {
             new InstantCommand(coralSystem.getIntake()::pushCoral),
             new InstantCommand(
                 () ->
-                    coralSystem.setSimultaneousTargetPreset(
+                    coralSystem.setTargetPreset(
                         CoralSystemPresets.FINAL_DISLODGE_LEVEL_1))));
 
     NamedCommands.registerCommand(
@@ -54,7 +54,7 @@ public class PathPlannerCommands {
             new InstantCommand(coralSystem.getIntake()::pushCoral),
             new InstantCommand(
                 () ->
-                    coralSystem.setSimultaneousTargetPreset(
+                    coralSystem.setTargetPreset(
                         CoralSystemPresets.FINAL_DISLODGE_LEVEL_2))));
 
     NamedCommands.registerCommand(
@@ -66,7 +66,7 @@ public class PathPlannerCommands {
             new WaitUntilCommand(coralSystem::isAtGoal),
             new InstantCommand(
                 () ->
-                    coralSystem.setSimultaneousTargetPreset(
+                    coralSystem.setTargetPreset(
                         CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1)),
             new WaitUntilCommand(coralSystem::isAtGoal)));
 
@@ -79,7 +79,7 @@ public class PathPlannerCommands {
             new WaitUntilCommand(coralSystem::isAtGoal),
             new InstantCommand(
                 () ->
-                    coralSystem.setSimultaneousTargetPreset(
+                    coralSystem.setTargetPreset(
                         CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2)),
             new WaitUntilCommand(coralSystem::isAtGoal)));
 

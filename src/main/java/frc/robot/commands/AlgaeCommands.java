@@ -67,11 +67,11 @@ public class AlgaeCommands {
         () -> {
           if (coralSystem.getCurrentCoralPreset()
               == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1) {
-            coralSystem.setSimultaneousTargetPreset(
+            coralSystem.setTargetPreset(
                 CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1);
           } else if (coralSystem.getCurrentCoralPreset()
               == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2) {
-            coralSystem.setSimultaneousTargetPreset(
+            coralSystem.setTargetPreset(
                 CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
           }
         },
@@ -106,7 +106,7 @@ public class AlgaeCommands {
                         "[AlgaeCommands] Dislodge sequence canceled: Not in a valid prepare preset.");
                     return;
                   }
-                  coralSystem.setSimultaneousTargetPreset(finalPreset);
+                  coralSystem.setTargetPreset(finalPreset);
                 },
                 coralSystem),
 
@@ -175,7 +175,7 @@ public class AlgaeCommands {
                         "[AlgaeCommands] Dislodge sequence canceled: Not in a valid prepare preset.");
                     return;
                   }
-                  coralSystem.setSimultaneousTargetPreset(finalPreset);
+                  coralSystem.setTargetPreset(finalPreset);
                 },
                 coralSystem),
 
