@@ -37,7 +37,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-SequentialEvent-StationLeft-2AHigh"
+            "pathName": "Score3-StationLeft-2AHigh"
           }
         },
         {
@@ -67,7 +67,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Score3-SequentialEvent-StationLeft-2BHigh-OR-1ALow"
+            "name": "Score3-StationLeft-2BHigh-OR-1ALow"
           }
         }
       ]
