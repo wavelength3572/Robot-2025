@@ -41,6 +41,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
 
+import com.pathplanner.lib.commands.FollowPathCommand;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to
@@ -154,6 +156,8 @@ public class Robot extends LoggedRobot {
 
     UsbCamera lifeCam = CameraServer.startAutomaticCapture("Climber Cam", 0);
     lifeCam.setResolution(416, 240);
+
+    FollowPathCommand.warmupCommand().schedule();
   }
 
   /** This function is called periodically during all modes. */
