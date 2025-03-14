@@ -181,7 +181,9 @@ public class Robot extends LoggedRobot {
     }
 
     // Change to Climb Elastic Tab with 20 seconds left.
-    if (DriverStation.getMatchType() != MatchType.None && DriverStation.isTeleop()) {
+    if (DriverStation.getMatchType() != MatchType.None
+        && DriverStation.isTeleop()
+        && DriverStation.isEnabled()) {
       if (DriverStation.getMatchTime() <= 20) {
         Elastic.selectTab("Climb");
       }
