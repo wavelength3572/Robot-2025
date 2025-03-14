@@ -167,6 +167,10 @@ public class CoralSystem extends SubsystemBase {
       case MOVE_ARM_FINAL:
         this.arm.setTargetPreset(targetCoralPreset);
         this.elevator.setTargetPreset(targetCoralPreset);
+        // Make sure the intake is running as we're going to pickup.
+        if (targetCoralPreset == CoralSystemPresets.PICKUP || targetCoralPreset == CoralSystemPresets.PICKUPFAR) {
+          intake.pullCoral();
+        }
         if (arm.isAtGoal() && elevator.isAtGoal()) {
           currentCoralPreset = targetCoralPreset;
           coralSystemState = CoralSystemMovementState.STABLE;
@@ -206,7 +210,7 @@ public class CoralSystem extends SubsystemBase {
       // We ARE NOT Climbing AND
       // We are not currently traveling to a location
       if (requestedPreset != this.currentCoralPreset
-          && targetCoralPreset != CLIMB
+          && targetCoralPreset != CoralSystemPresets.CLIMB
           && coralSystemState == CoralSystemMovementState.STABLE) {
         // We are allowed to move
         // Lets just hard code situations where we can just move the
