@@ -34,8 +34,8 @@ public class DriveToCommands {
       DoubleSupplier xJoystickSupplier,
       DoubleSupplier yJoystickSupplier,
       DoubleSupplier rotationJoystickSupplier) {
-    return new DriveToPose(
-        drive, poseSupplier, xJoystickSupplier, yJoystickSupplier, rotationJoystickSupplier);
+    return new DriveToPoseHolonomic(
+        drive, poseSupplier, xJoystickSupplier, yJoystickSupplier, rotationJoystickSupplier, .8);
   }
 
   /**
