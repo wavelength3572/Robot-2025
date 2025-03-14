@@ -505,23 +505,24 @@ public final class FieldConstants {
     // The mapping is: blue id 17 -> red id 6, 18 -> 7, 19 -> 8, 20 -> 9, 21 -> 10,
     // 22 -> 11.
     Map<Integer, Pose2d> redPoses = new HashMap<>();
-    for (Map.Entry<Integer, Pose2d> entry : REEF_FACE_POSES_BLUE.entrySet()) {
-      int blueFaceId = entry.getKey();
+    for (ReefFacesRed face : ReefFacesRed.values()) {
       // Compute the red face ID by subtracting 11.
-      int redFaceId = blueFaceId - 11; // e.g., 17-11 = 6, 18-11 = 7, etc.
+      int redFaceId = face.getFaceId(); // e.g., 17-11 = 6, 18-11 = 7, etc.
 
-      Translation2d blueTranslation = entry.getValue().getTranslation();
-      // Reflect the blue translation to get the red translation.
-      Translation2d redTranslation = reflectBlueToRed(blueTranslation);
+      Translation2d left = face.getLeftPole().getBranchTranslation();
+      Translation2d right = face.getRightPole().getBranchTranslation();
+      double midX = (left.getX() + right.getX()) / 2.0;
+      double midY = (left.getY() + right.getY()) / 2.0;
+      Translation2d midpoint = new Translation2d(midX, midY);
 
-      // Get the red orientation for this face id.
-      Rotation2d[] possibleRedOrients = REEF_FACE_ORIENTATION_RED.get(redFaceId);
-      Rotation2d redRotation =
-          (possibleRedOrients != null && possibleRedOrients.length > 0)
-              ? possibleRedOrients[0]
-              : entry.getValue().getRotation(); // Fallback: use the blue rotation if none defined.
+      // Retrieve the blue orientation(s) for this face id.
+      Rotation2d[] possibleOrients = REEF_FACE_ORIENTATION_RED.get(redFaceId);
+      Rotation2d chosenRotation =
+          (possibleOrients != null && possibleOrients.length > 0)
+              ? possibleOrients[0] // Default to the first orientation.
+              : new Rotation2d(); // Fallback to 0 radians.
 
-      redPoses.put(redFaceId, new Pose2d(redTranslation, redRotation));
+      redPoses.put(redFaceId, new Pose2d(midpoint, chosenRotation));
     }
     REEF_FACE_POSES_RED = Collections.unmodifiableMap(redPoses);
   }

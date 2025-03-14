@@ -168,7 +168,8 @@ public class CoralSystem extends SubsystemBase {
         this.arm.setTargetPreset(targetCoralPreset);
         this.elevator.setTargetPreset(targetCoralPreset);
         // Make sure the intake is running as we're going to pickup.
-        if (targetCoralPreset == CoralSystemPresets.PICKUP || targetCoralPreset == CoralSystemPresets.PICKUPFAR) {
+        if (targetCoralPreset == CoralSystemPresets.PICKUP
+            || targetCoralPreset == CoralSystemPresets.PICKUPFAR) {
           intake.pullCoral();
         }
         if (arm.isAtGoal() && elevator.isAtGoal()) {

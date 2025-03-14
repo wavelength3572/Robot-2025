@@ -430,10 +430,12 @@ public class AlignmentUtils {
 
     if (DriverStation.getAlliance().isPresent()
         && DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+
       targetPose = FieldConstants.REEF_FACE_POSES_BLUE.get(faceId);
     } else {
       targetPose = FieldConstants.REEF_FACE_POSES_RED.get(faceId);
     }
+    Logger.recordOutput("Alignment/TargetAlgaePose", targetPose);
 
     // Optionally refine the orientation using the current heading.
     FieldConstants.ReefChosenOrientation chosen = pickClosestOrientationForReef(robotPose, faceId);
