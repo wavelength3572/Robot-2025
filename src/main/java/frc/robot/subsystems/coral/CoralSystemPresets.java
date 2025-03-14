@@ -21,7 +21,7 @@ public enum CoralSystemPresets {
   FINAL_DISLODGE_LEVEL_1(27, 110),
   PREPARE_DISLODGE_PART1_LEVEL_2(30, 45),
   PREPARE_DISLODGE_PART2_LEVEL_2(35, 45),
-  FINAL_DISLODGE_LEVEL_2(37, 110),
+  FINAL_DISLODGE_LEVEL_2(42, 110), // change to 42
   CLIMB(0, 160);
 
   @Getter private final double elevatorHeight;
