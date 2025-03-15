@@ -102,9 +102,18 @@ public class DriveToPose extends Command {
   @Override
   public void initialize() {
     currentPose = drivetrain.getPose();
-    driveControllerX.reset(currentPose.getX());
-    driveControllerY.reset(currentPose.getY());
-    thetaController.reset(currentPose.getRotation().getRadians());
+    ChassisSpeeds currentSpeeds = drivetrain.getChassisSpeeds();
+
+    Logger.recordOutput("DriveToPose/initVxMetersPerSecond", currentSpeeds.vxMetersPerSecond);
+    Logger.recordOutput("DriveToPose/initVyMetersPerSecond", currentSpeeds.vyMetersPerSecond);
+    Logger.recordOutput(
+        "DriveToPose/initOmegaDegreesPerSecond",
+        Units.radiansToDegrees(currentSpeeds.omegaRadiansPerSecond));
+
+    driveControllerX.reset(currentPose.getX(), currentSpeeds.vxMetersPerSecond);
+    driveControllerY.reset(currentPose.getY(), currentSpeeds.vyMetersPerSecond);
+    thetaController.reset(
+        currentPose.getRotation().getRadians(), currentSpeeds.omegaRadiansPerSecond);
 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
     timeoutTimer.reset();
