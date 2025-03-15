@@ -362,7 +362,7 @@ public class CoralSystem extends SubsystemBase {
   }
 
   private boolean checkIfSafeDistanceFromCoralStation(double currentTOFAvg, boolean nearStation) {
-    if (!nearStation || currentTOFAvg > TIME_OF_FLIGHT_THRESHOLD) {
+    if (currentTOFAvg > TIME_OF_FLIGHT_THRESHOLD) {
       return true;
     } else return false;
   }
