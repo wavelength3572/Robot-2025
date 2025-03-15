@@ -43,14 +43,14 @@ public class DriveToPose extends Command {
           driveXKp,
           0.0,
           0.0,
-          new TrapezoidProfile.Constraints(2, 2)); // upped accelleration from .5
+          new TrapezoidProfile.Constraints(2, 2.5)); // upped accelleration from .5
 
   private final ProfiledPIDController driveControllerY =
       new ProfiledPIDController(
           driveYKp,
           0.0,
           0.0,
-          new TrapezoidProfile.Constraints(2, 2)); // upped accelleration from .5
+          new TrapezoidProfile.Constraints(2, 2.5)); // upped accelleration from .5
 
   private final ProfiledPIDController thetaController =
       new ProfiledPIDController(
@@ -112,8 +112,7 @@ public class DriveToPose extends Command {
 
     driveControllerX.reset(currentPose.getX(), currentSpeeds.vxMetersPerSecond);
     driveControllerY.reset(currentPose.getY(), currentSpeeds.vyMetersPerSecond);
-    thetaController.reset(
-        currentPose.getRotation().getRadians(), currentSpeeds.omegaRadiansPerSecond);
+    thetaController.reset(currentPose.getRotation().getRadians(), currentSpeeds.omegaRadiansPerSecond);
 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
     timeoutTimer.reset();

@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveToPoseHolonomic extends Command {
-  private static final double TIMEOUT_TIME = 8.0;
+  private static final double TIMEOUT_TIME = 5.0;
   private static final double POSITION_TOLERANCE = 0.02; // ~3 inches tolerance
 
   private final Drive drivetrain;
@@ -110,7 +110,6 @@ public class DriveToPoseHolonomic extends Command {
 
   @Override
   public boolean isFinished() {
-    boolean atGoal = xController.atGoal() && yController.atGoal() && thetaController.atGoal();
 
     if (atGoal()) {
       Logger.recordOutput("DriveToPoseHolonomic/AtGoal", true);
