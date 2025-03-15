@@ -40,8 +40,9 @@ public class IntakeIOSpark implements IntakeIO {
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
     inputs.limitSwitch = intakeMotor.getForwardLimitSwitch().isPressed();
+    inputs.appliedVolts = intakeMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     if (currentIntakeState == intakeState.PULL) {
-      if (intakeMotor.getOutputCurrent() >= 25.0) {
+      if (intakeMotor.getOutputCurrent() >= 25.0 && inputs.appliedVolts > 0.0) {
         haveCoral = true;
       }
     } else {
