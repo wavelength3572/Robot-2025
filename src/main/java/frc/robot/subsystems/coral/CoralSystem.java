@@ -8,6 +8,8 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 import frc.robot.commands.*;
 import frc.robot.subsystems.coral.arm.Arm;
 import frc.robot.subsystems.coral.elevator.Elevator;
@@ -24,6 +26,16 @@ import org.littletonrobotics.junction.Logger;
 
 public class CoralSystem extends SubsystemBase {
 
+  private static final double TOF_SAFE_FROM_CORAL_STATION_THRESHOLD =
+      0.7; // safe distance from coral station in meters
+  private static final double TOF_DERIVATIVE_THRESHOLD =
+      0.02; // minimum positive change to indicate moving away
+
+// Define thresholds (you can tune these values)
+private static final double TOF_APPROACHING_THRESHOLD = 1.5; // in meters, when robot is considered "approaching"
+private static final double TOF_AT_CORAL_STATION_THRESHOLD = 0.7; // when robot is at the station
+
+
   public static enum CoralSystemMovementState {
     STABLE,
     SAFE_ARM,
@@ -36,13 +48,12 @@ public class CoralSystem extends SubsystemBase {
 
   // Enum representing the states for coral pickup
   private enum CoralPickupState {
-    WAITING_FOR_CORAL,
-    HAVE_CORAL_SAFE_DISTANCE_FROM_STATION,
+    APPROACHING_CORAL_STATION,  // actively tracking while approaching: elevator at PICKUPFAR
+    AT_CORAL_STATION,  // very close: elevator at PICKUP
     HAVE_CORAL_NEAR_STATION,
+    HAVE_CORAL_SAFE_DISTANCE_FROM_STATION,
+    READY_FOR_PICKUP   // default state after scoring or when not actively tracking the station
   }
-
-  private static final double TIME_OF_FLIGHT_THRESHOLD = .7; // meters
-  private double SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE = .7; // meters
 
   private CANrange canRange = new CANrange(31);
 
@@ -82,7 +93,21 @@ public class CoralSystem extends SubsystemBase {
   // Current state of the pickup state machine
   @AutoLogOutput(key = "CoralSystem/coralPickupState")
   @Getter
-  private CoralPickupState coralPickupState = CoralPickupState.WAITING_FOR_CORAL;
+  private CoralPickupState coralPickupState = CoralPickupState.READY_FOR_PICKUP;
+
+  @AutoLogOutput(key = "CoralSystem/TOF/currentTOF (filtered)")
+  @Getter
+  private double currentTOFAvg = 0.0;
+
+  private double previousTOFAvg = 0.0;
+
+  @AutoLogOutput(key = "CoralSystem/TOF/deltaTOF (filtered)")
+  @Getter
+  double filteredDeltaTOF = 0.0;
+
+  @AutoLogOutput(key = "CoralSystem/TOF/deltaTOF")
+  @Getter
+  double rawDeltaTOF = 0.0; // Raw change in TOF
 
   // Field to track the previous coral state
   private boolean previousHaveCoral = false;
@@ -92,6 +117,7 @@ public class CoralSystem extends SubsystemBase {
 
   // For calculating a moving average of the TOF sensor readings
   private final LinearFilter tofFilter = LinearFilter.movingAverage(10);
+  private final LinearFilter derivativeFilter = LinearFilter.movingAverage(5);
 
   @AutoLogOutput(key = "CoralSystem/coralSystemState")
   @Getter
@@ -276,6 +302,7 @@ public class CoralSystem extends SubsystemBase {
   public void autoSetHaveCoral(Boolean coral) {
     this.haveCoral = coral;
     this.intake.autoSetHaveCoral(coral);
+    coralPickupState = CoralPickupState.HAVE_CORAL_SAFE_DISTANCE_FROM_STATION;
   }
 
   public boolean isAtGoal() {
@@ -297,9 +324,15 @@ public class CoralSystem extends SubsystemBase {
             || currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
   }
 
-  @AutoLogOutput(key = "CoralSystem/Rear TOF")
+  @AutoLogOutput(key = "CoralSystem/TOF/Rear TOF")
   public double getTimeOfFlightRange() {
-    return canRange.getDistance().getValueAsDouble();
+    if (Constants.currentMode == Mode.REAL) {
+      return canRange.getDistance().getValueAsDouble(); // use TOF for real robot
+    } else {
+      return RobotStatus.getCoralStationSelection()
+          .getAcceptedDistance(); // use odometry distance to coral station in SIM because we dont
+      // have a simulated TOF
+    }
   }
 
   public void scoreCoral() {
@@ -313,12 +346,13 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public void updateCoralPickupState() {
-    double currentTOFAvg = tofFilter.calculate(getTimeOfFlightRange());
-    double distanceFromStation = RobotStatus.getCoralStationSelection().getAcceptedDistance();
-    boolean nearStation = (distanceFromStation < SAFE_DISTANCE_FROM_STATION_AFTER_INTAKE);
+    currentTOFAvg = tofFilter.calculate(getTimeOfFlightRange());    
+    rawDeltaTOF = currentTOFAvg - previousTOFAvg;    
+    filteredDeltaTOF = derivativeFilter.calculate(rawDeltaTOF);
+    previousTOFAvg = currentTOFAvg;
 
     switch (coralPickupState) {
-      case WAITING_FOR_CORAL:
+      case READY_FOR_PICKUP:
         if (!previousHaveCoral && haveCoral) {
           justPickedUpCoral = true;
           justMissedCoralScore = false;
@@ -328,16 +362,19 @@ public class CoralSystem extends SubsystemBase {
         break;
 
       case HAVE_CORAL_NEAR_STATION:
-      case HAVE_CORAL_SAFE_DISTANCE_FROM_STATION:
-        if (checkIfSafeDistanceFromCoralStation(currentTOFAvg, nearStation)) {
+        if (currentTOFAvg
+                > TOF_SAFE_FROM_CORAL_STATION_THRESHOLD // safe distance from coral station
+            && filteredDeltaTOF > TOF_DERIVATIVE_THRESHOLD) { // moving away from coral station
           coralPickupState = CoralPickupState.HAVE_CORAL_SAFE_DISTANCE_FROM_STATION;
           justPickedUpCoral = false;
+          setTargetPreset(PRE_SCORE); // get arm ready to score
         }
+        break;
 
+      case HAVE_CORAL_SAFE_DISTANCE_FROM_STATION:
         if (justExpelledCoral()) {
           justPickedUpCoral = false;
-          tofFilter.reset();
-          coralPickupState = CoralPickupState.WAITING_FOR_CORAL;
+          coralPickupState = CoralPickupState.READY_FOR_PICKUP;
         }
 
         // Update the previous coral state for the next cycle.
@@ -357,12 +394,6 @@ public class CoralSystem extends SubsystemBase {
         justMissedCoralScore = true;
         justScoredCoral = false;
       }
-      return true;
-    } else return false;
-  }
-
-  private boolean checkIfSafeDistanceFromCoralStation(double currentTOFAvg, boolean nearStation) {
-    if (currentTOFAvg > TIME_OF_FLIGHT_THRESHOLD) {
       return true;
     } else return false;
   }
