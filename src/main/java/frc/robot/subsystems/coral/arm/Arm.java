@@ -32,9 +32,9 @@ public class Arm {
     //     || ArmAcc.hasChanged(hashCode())) {
     //   io.setPIDValues(ArmkP.get(), ArmkD.get(), ArmVel.get(), ArmAcc.get());
     // }
-    // if (ArmPosDegrees.hasChanged(hashCode())) {
-    //   setAngleDEG(ArmPosDegrees.get());
-    // }
+    if (ArmPosDegrees.hasChanged(hashCode())) {
+      setAngleDEG(ArmPosDegrees.get());
+    }
     // if (ArmkF.hasChanged(hashCode())) {
     //   io.setArbFFConstant(ArmkF.get());
     // }

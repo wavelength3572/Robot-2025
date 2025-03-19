@@ -50,7 +50,7 @@ public class ArmIOMMSpark implements ArmIO {
 
     if (inputs.currentAmps > 48.0) {
       ARM_STUCK_ERROR_COUNT++;
-      if (ARM_STUCK_ERROR == false && ARM_STUCK_ERROR_COUNT >= 13) { // Approx .25 seconds
+      if (ARM_STUCK_ERROR == false && ARM_STUCK_ERROR_COUNT >= 25) { // Approx .25 seconds
         ARM_STUCK_ERROR = true;
         // turn off motor immediatly;
         armMotor.set(0.0);
