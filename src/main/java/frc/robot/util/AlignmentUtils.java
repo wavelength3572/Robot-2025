@@ -68,39 +68,29 @@ public class AlignmentUtils {
   }
 
   public static ReefFaceSelection findClosestReefFaceAndRejectOthers(Pose2d robotPose) {
-    // 1. Pick the correct AprilTag map based on alliance
     Optional<Alliance> alliance = DriverStation.getAlliance();
-
     Map<Integer, Translation2d> aprilTagMap;
+
     if (alliance.get() == Alliance.Blue) {
       aprilTagMap = FieldConstants.BLUE_REEF_APRIL_TAGS;
     } else if (alliance.get() == Alliance.Red) {
       aprilTagMap = FieldConstants.RED_REEF_APRIL_TAGS;
     } else {
-      // e.g. Alliance.Invalid or something else
-      // Return a neutral "none found" result or handle as an error
       return new ReefFaceSelection(null, null, Double.NaN, new Translation2d[0]);
     }
 
-    // 2. Edge case: If no faces exist for that alliance
     if (aprilTagMap.isEmpty()) {
       return new ReefFaceSelection(null, null, Double.NaN, new Translation2d[0]);
     }
 
-    // 3. Compute distances: faceId -> distance from robotPose
     Map<Integer, Double> distanceMap = new HashMap<>();
     for (Map.Entry<Integer, Translation2d> entry : aprilTagMap.entrySet()) {
       int faceId = entry.getKey();
       Translation2d faceTranslation = entry.getValue();
-
-      double dx = faceTranslation.getX() - robotPose.getX();
-      double dy = faceTranslation.getY() - robotPose.getY();
-      double distance = Math.hypot(dx, dy);
-
+      double distance = robotPose.getTranslation().getDistance(faceTranslation);
       distanceMap.put(faceId, distance);
     }
 
-    // 4. Find the minimum-distance entry (accepted face)
     Map.Entry<Integer, Double> minEntry = null;
     for (Map.Entry<Integer, Double> entry : distanceMap.entrySet()) {
       if (minEntry == null || entry.getValue() < minEntry.getValue()) {
@@ -108,27 +98,32 @@ public class AlignmentUtils {
       }
     }
 
-    // 5. Sanity check
     if (minEntry == null) {
       return new ReefFaceSelection(null, null, Double.NaN, new Translation2d[0]);
     }
 
     int acceptedFaceId = minEntry.getKey();
-    double acceptedDistance = minEntry.getValue();
     Translation2d acceptedFace = aprilTagMap.get(acceptedFaceId);
 
-    // 6. Build array of "rejected" faces
-    distanceMap.remove(acceptedFaceId); // remove accepted face
+    // Get the Reef face orientation
+    Rotation2d faceOrientation = FieldConstants.REEF_FACE_ORIENTATION_BLUE.get(acceptedFaceId)[0];
+
+    // Compute perpendicular distance using shared helper
+    double perpendicularDistance =
+        getPerpendicularDistance(robotPose.getTranslation(), acceptedFace, faceOrientation);
+
+    distanceMap.remove(acceptedFaceId);
     Translation2d[] rejectedFaces =
         distanceMap.keySet().stream().map(aprilTagMap::get).toArray(Translation2d[]::new);
 
-    Logger.recordOutput("Alignment/Reef/ClosestDistance", acceptedDistance);
+    Logger.recordOutput("Alignment/Reef/ClosestDistance", minEntry.getValue());
+    Logger.recordOutput("Alignment/Reef/PerpendicularDistance", perpendicularDistance);
     Logger.recordOutput("Alignment/Reef/AcceptedFace", acceptedFace);
     Logger.recordOutput("Alignment/Reef/RejectedFaces", rejectedFaces);
     Logger.recordOutput("Alignment/Reef/AcceptedFaceID", acceptedFaceId);
 
-    // 7. Return the result
-    return new ReefFaceSelection(acceptedFaceId, acceptedFace, acceptedDistance, rejectedFaces);
+    return new ReefFaceSelection(
+        acceptedFaceId, acceptedFace, perpendicularDistance, rejectedFaces);
   }
 
   public static ReefChosenOrientation pickClosestOrientationForReef(Pose2d robotPose, int faceId) {
@@ -213,34 +208,29 @@ public class AlignmentUtils {
   }
 
   public static CoralStationSelection findClosestCoralStation(Pose2d robotPose) {
-    // 1. Pick the correct AprilTag map based on alliance
     Optional<Alliance> alliance = DriverStation.getAlliance();
-
     Map<Integer, Translation2d> aprilTagMap;
+
     if (alliance.get() == Alliance.Blue) {
       aprilTagMap = FieldConstants.BLUE_CORALSTATION_APRIL_TAGS;
     } else if (alliance.get() == Alliance.Red) {
       aprilTagMap = FieldConstants.RED_CORALSTATION_APRIL_TAGS;
     } else {
-      // e.g. Alliance.Invalid or something else
-      // Return a neutral "none found" result or handle as an error
       return new CoralStationSelection(null, null, Double.NaN, new Translation2d[0]);
     }
 
-    // 2. Compute distances: faceId -> distance from robotPose
+    if (aprilTagMap.isEmpty()) {
+      return new CoralStationSelection(null, null, Double.NaN, new Translation2d[0]);
+    }
+
     Map<Integer, Double> distanceMap = new HashMap<>();
     for (Map.Entry<Integer, Translation2d> entry : aprilTagMap.entrySet()) {
       int faceId = entry.getKey();
       Translation2d faceTranslation = entry.getValue();
-
-      double dx = faceTranslation.getX() - robotPose.getX();
-      double dy = faceTranslation.getY() - robotPose.getY();
-      double distance = Math.hypot(dx, dy);
-
+      double distance = robotPose.getTranslation().getDistance(faceTranslation);
       distanceMap.put(faceId, distance);
     }
 
-    // 3. Find the minimum-distance entry (accepted face)
     Map.Entry<Integer, Double> minEntry = null;
     for (Map.Entry<Integer, Double> entry : distanceMap.entrySet()) {
       if (minEntry == null || entry.getValue() < minEntry.getValue()) {
@@ -248,22 +238,33 @@ public class AlignmentUtils {
       }
     }
 
+    if (minEntry == null) {
+      return new CoralStationSelection(null, null, Double.NaN, new Translation2d[0]);
+    }
+
     int acceptedStationId = minEntry.getKey();
-    double acceptedDistance = minEntry.getValue();
     Translation2d acceptedStation = aprilTagMap.get(acceptedStationId);
 
-    // 4. Build array of "rejected" faces
-    distanceMap.remove(acceptedStationId); // remove accepted face
-    Translation2d[] rejectedStation =
+    // Get the Coral Station face orientation
+    Rotation2d stationOrientation =
+        FieldConstants.CORAL_STATION_ORIENTATION_BLUE.get(acceptedStationId)[0];
+
+    // Compute perpendicular distance using shared helper
+    double perpendicularDistance =
+        getPerpendicularDistance(robotPose.getTranslation(), acceptedStation, stationOrientation);
+
+    distanceMap.remove(acceptedStationId);
+    Translation2d[] rejectedStations =
         distanceMap.keySet().stream().map(aprilTagMap::get).toArray(Translation2d[]::new);
 
-    Logger.recordOutput("Alignment/CoralStation/ClosestDistance", acceptedDistance);
+    Logger.recordOutput("Alignment/CoralStation/ClosestDistance", minEntry.getValue());
+    Logger.recordOutput("Alignment/CoralStation/PerpendicularDistance", perpendicularDistance);
     Logger.recordOutput("Alignment/CoralStation/AcceptedStation", acceptedStation);
-    Logger.recordOutput("Alignment/CoralStation/RejectedStation", rejectedStation);
-    Logger.recordOutput("Alignment/CoralStation/AcceptedStationID", acceptedStation);
-    // 7. Return the result
+    Logger.recordOutput("Alignment/CoralStation/RejectedStations", rejectedStations);
+    Logger.recordOutput("Alignment/CoralStation/AcceptedStationID", acceptedStationId);
+
     return new CoralStationSelection(
-        acceptedStationId, acceptedStation, acceptedDistance, rejectedStation);
+        acceptedStationId, acceptedStation, perpendicularDistance, rejectedStations);
   }
 
   public static StationChosenOrientation pickClosestOrientationForStation(
@@ -478,5 +479,24 @@ public class AlignmentUtils {
     double distRight = robotPose.getTranslation().getDistance(rightPoleTrans);
 
     return (distLeft <= distRight) ? PolePosition.A_LEFT : PolePosition.B_RIGHT;
+  }
+
+  public static double getPerpendicularDistance(
+      Translation2d robotPosition,
+      Translation2d referencePosition,
+      Rotation2d referenceOrientation) {
+    // Convert Rotation2d to a unit normal vector (direction the face is pointing)
+    Translation2d normalVector =
+        new Translation2d(
+            Math.cos(referenceOrientation.getRadians()),
+            Math.sin(referenceOrientation.getRadians()));
+
+    // Compute the vector from the reference position (reef/station) to the robot
+    Translation2d referenceToRobotVector = robotPosition.minus(referencePosition);
+
+    // Project the reference-to-robot vector onto the normal vector
+    return Math.abs(
+        referenceToRobotVector.getX() * normalVector.getX()
+            + referenceToRobotVector.getY() * normalVector.getY());
   }
 }
