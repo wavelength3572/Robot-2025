@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.subsystems.coral.arm.ArmConstants;
+import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.RobotStatus;
 
 public class IntakeIOSpark implements IntakeIO {
@@ -20,6 +21,7 @@ public class IntakeIOSpark implements IntakeIO {
   private AbsoluteEncoder armEncoder = intakeMotor.getAbsoluteEncoder();
   private Double requestedSpeed = 0.0;
   private boolean haveCoral = false;
+  private double intakePushPower = IntakeConstants.intakeOutSpeed;
 
   private enum intakeState {
     OFF,
@@ -37,11 +39,18 @@ public class IntakeIOSpark implements IntakeIO {
     intakeMotor.set(requestedSpeed);
   }
 
+  private static final LoggedTunableNumber PushPower =
+      new LoggedTunableNumber("Intake/PushPower", IntakeConstants.intakeOutSpeed);
+
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
+    if (PushPower.hasChanged(hashCode())) {
+      intakePushPower = PushPower.get();
+    }
     inputs.limitSwitch = intakeMotor.getForwardLimitSwitch().isPressed();
+    inputs.appliedVolts = intakeMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     if (currentIntakeState == intakeState.PULL) {
-      if (intakeMotor.getOutputCurrent() >= 25.0) {
+      if (intakeMotor.getOutputCurrent() >= 25.0 && inputs.appliedVolts > 0.0) {
         haveCoral = true;
       }
     } else {
@@ -87,7 +96,7 @@ public class IntakeIOSpark implements IntakeIO {
   @Override
   public void pushCoral() {
     currentIntakeState = intakeState.PUSH;
-    this.requestedSpeed = IntakeConstants.intakeOutSpeed;
+    this.requestedSpeed = intakePushPower;
   }
 
   @Override
