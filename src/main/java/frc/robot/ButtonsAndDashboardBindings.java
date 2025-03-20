@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.FieldConstants.CageTarget;
 import frc.robot.commands.AlgaeCommands;
+import frc.robot.commands.AlignAndScore;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
 import frc.robot.commands.ScoreCoralInTeleopCommand;
@@ -189,27 +190,30 @@ public class ButtonsAndDashboardBindings {
                 .alongWith(Commands.runOnce(() -> climber.setSelectedCageTarget(CageTarget.RIGHT)))
                 .ignoringDisable(true));
 
-    oi.getRightJoyLeftButton()
-        .onTrue(
-            DriveToCommands.driveToPole(
-                drive,
-                true,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                oi::getRotate,
-                FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-                coralSystem::isHaveCoral));
+    oi.getRightJoyLeftButton().onTrue(AlignAndScore.create(drive, coralSystem, true));
+
+    // .onTrue(
+    //     DriveToCommands.driveToPole(
+    //         drive,
+    //         true,
+    //         oi::getTranslateX,
+    //         oi::getTranslateY,
+    //         oi::getRotate,
+    //         FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
+    //         coralSystem::isHaveCoral));
 
     oi.getRightJoyRightButton()
-        .onTrue(
-            DriveToCommands.driveToPole(
-                drive,
-                false,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                oi::getRotate,
-                FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-                coralSystem::isHaveCoral));
+        // .onTrue(
+        //     DriveToCommands.driveToPole(
+        //         drive,
+        //         false,
+        //         oi::getTranslateX,
+        //         oi::getTranslateY,
+        //         oi::getRotate,
+        //         FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
+        //         coralSystem::isHaveCoral));
+
+        .onTrue(AlignAndScore.create(drive, coralSystem, false));
 
     oi.getRightJoyDownButton().onTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
 

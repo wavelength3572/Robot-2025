@@ -44,6 +44,14 @@ public class RobotStatus {
     return coralSystem.getCurrentCoralPreset();
   }
 
+  // Globally accessible method to get the robot's pose
+  public static CoralSystemPresets getTargetPreset() {
+    if (coralSystem == null) {
+      throw new IllegalStateException("RobotStatus has not been initialized!");
+    }
+    return coralSystem.getTargetCoralPreset();
+  }
+
   // Globally accessible method to get the reefFaceSelection
   public static ReefFaceSelection getReefFaceSelection() {
     if (driveSystem == null) {
