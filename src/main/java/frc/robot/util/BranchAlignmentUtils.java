@@ -75,7 +75,7 @@ public final class BranchAlignmentUtils {
     // If we don't have a reef face or if we aren't in a scoring preset, then don't do this work.
     if (!reefFacePose3d.isPresent()
         || (!RobotStatus.haveCoral())
-        || (RobotStatus.getCurrentPreset() != CoralSystemPresets.L1
+        || (RobotStatus.getCurrentPreset() != CoralSystemPresets.L1_SCORE
             && RobotStatus.getCurrentPreset() != CoralSystemPresets.L2
             && RobotStatus.getCurrentPreset() != CoralSystemPresets.L3
             && RobotStatus.getCurrentPreset() != CoralSystemPresets.L4)) {

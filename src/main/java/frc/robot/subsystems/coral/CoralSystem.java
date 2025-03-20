@@ -211,7 +211,7 @@ public class CoralSystem extends SubsystemBase {
         // Just reset the counters until we are withing TOF range
         coralStationNearCounter = 0;
         coralStationFarCounter = 0;
-        // If we out side the detection threshold then
+        // If we are outside the detection threshold then
         // make sure we are in the normal PICKUP state
         setTargetPreset(CoralSystemPresets.PICKUP);
       }
@@ -226,6 +226,18 @@ public class CoralSystem extends SubsystemBase {
         if (climbASAP) deployClimberTriggered();
         break;
       case SAFE_ARM:
+        // Start Moving Arm to Safe
+        if (this.targetCoralPreset == CoralSystemPresets.PICKUP
+            || this.targetCoralPreset == CoralSystemPresets.PICKUPFAR
+            || this.targetCoralPreset == CoralSystemPresets.L1_SCORE) {
+          if (arm.getCurrentAngleDEG() < CoralSystemPresets.PRE_PICKUP.getArmAngle()) {
+            this.arm.setTargetPreset(CoralSystemPresets.PRE_PICKUP);
+          } else {
+            this.arm.setTargetPreset(this.targetCoralPreset);
+          }
+        } else {
+          this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
+        }
         if (arm.getCurrentAngleDEG()
             >= CoralSystemPresets.ARMSAFE.getArmAngle() - 1.0) { // Put in a 1 degree fudge
           // factor
@@ -246,8 +258,9 @@ public class CoralSystem extends SubsystemBase {
         this.arm.setTargetPreset(targetCoralPreset);
         this.elevator.setTargetPreset(targetCoralPreset);
         // Make sure the intake is running as we're going to pickup.
-        if (targetCoralPreset == CoralSystemPresets.PICKUP
-            || targetCoralPreset == CoralSystemPresets.PICKUPFAR) {
+        if ((targetCoralPreset == CoralSystemPresets.PICKUP
+                || targetCoralPreset == CoralSystemPresets.PICKUPFAR)
+            && !haveCoral) {
           intake.pullCoral();
         }
         if (arm.isAtGoal() && elevator.isAtGoal()) {
@@ -266,8 +279,8 @@ public class CoralSystem extends SubsystemBase {
         if (elevator.isAtGoal()) {
           elevator.clearElevatorError();
           arm.clearArmError();
-          this.targetCoralPreset = CoralSystemPresets.L1;
-          this.currentCoralPreset = CoralSystemPresets.L1;
+          this.targetCoralPreset = CoralSystemPresets.L1_SCORE;
+          this.currentCoralPreset = CoralSystemPresets.L1_SCORE;
           coralSystemState = CoralSystemMovementState.STABLE;
           Elastic.selectTab("Teleoperated");
           intake.stopIntake();
@@ -335,12 +348,6 @@ public class CoralSystem extends SubsystemBase {
             this.elevator.setTargetPreset(CoralSystemPresets.AUTO_START_L4);
             coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
           } else {
-            // Start Moving Arm to Safe
-            if (this.targetCoralPreset == CoralSystemPresets.PICKUP) {
-              this.arm.setTargetPreset(CoralSystemPresets.PRE_PICKUP);
-            } else {
-              this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
-            }
             // Change state
             coralSystemState = CoralSystemMovementState.SAFE_ARM;
           }

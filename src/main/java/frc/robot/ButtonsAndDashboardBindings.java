@@ -72,7 +72,8 @@ public class ButtonsAndDashboardBindings {
 
     // Dashboard Buttons to Mimic the Button Box
     SmartDashboard.putData(
-        "Shelf - L1", Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L1)));
+        "Shelf - L1",
+        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L1_SCORE)));
     SmartDashboard.putData(
         "Low - L2",
         Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L2))); // L2
@@ -251,7 +252,14 @@ public class ButtonsAndDashboardBindings {
   private static void configureOperatorButtonBindings() {
 
     oi.getButtonBox1YAxisPositive()
-        .onTrue(Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L1))); // L1
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  if (coralSystem.haveCoral)
+                    coralSystem.setTargetPreset(CoralSystemPresets.L1_SCORE);
+                  else coralSystem.setTargetPreset(CoralSystemPresets.L1_STOW);
+                })); // L1
+
     oi.getButtonBox1YAxisNegative()
         .onTrue(Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L2))); // L2
     oi.getButtonBox1XAxisNegative()
@@ -277,6 +285,8 @@ public class ButtonsAndDashboardBindings {
 
     oi.getButtonBox1Button6() // Deploy Collector & Capture Algae
         .onTrue(Commands.runOnce(algae::pullAlgae));
+        //if we dont have a coral and PICKUP, dont move arm
+        //otherwise move to L1_STOW
 
     oi.getButtonBox1Button7() // Deploy Climber - the big switch
         .onTrue(Commands.runOnce(climber::deployClimber))

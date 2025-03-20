@@ -122,7 +122,7 @@ public class ArmIOMMSpark implements ArmIO {
   public void recoverArm() {
     if (TBE_Valid) {
       inArmRecoveryMode = true;
-      this.armTargetDEG = CoralSystemPresets.L1.getArmAngle();
+      this.armTargetDEG = CoralSystemPresets.L1_SCORE.getArmAngle();
       this.armTargetEncoderRotations = angleToRotations(this.armTargetDEG);
     }
   }
