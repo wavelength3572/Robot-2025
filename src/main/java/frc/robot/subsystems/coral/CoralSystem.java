@@ -195,10 +195,13 @@ public class CoralSystem extends SubsystemBase {
         break;
       case SAFE_ARM:
         // Start Moving Arm to Safe
-        if ((this.targetCoralPreset == CoralSystemPresets.PICKUP
-            || this.targetCoralPreset == CoralSystemPresets.PICKUPFAR)
-            && arm.getCurrentAngleDEG() < CoralSystemPresets.PRE_PICKUP.getArmAngle()) {
-          this.arm.setTargetPreset(CoralSystemPresets.PRE_PICKUP);
+        if (this.targetCoralPreset == CoralSystemPresets.PICKUP
+            || this.targetCoralPreset == CoralSystemPresets.PICKUPFAR) {
+              if (arm.getCurrentAngleDEG() < CoralSystemPresets.PRE_PICKUP.getArmAngle()) {
+                this.arm.setTargetPreset(CoralSystemPresets.PRE_PICKUP);
+              } else {
+                this.arm.setTargetPreset(this.targetCoralPreset);
+              }
         } else {
           this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
         }
