@@ -85,6 +85,11 @@ public class ArmIOVirtualSim implements ArmIO {
 
   @Override
   public void setInitialAngle(double initialDegree) {
+
+    // in SIM we don't have the advantage of starting with a real known encoder position
+    // so we need to set the encoder position to the initial angle
+    initialDegree = 110;
+
     // Set both the virtual encoder and target to the initial angle.
     this.armVirtualEncoder = initialDegree * ArmConstants.kArmGearing / 360.0;
     this.armTargetDEG = initialDegree;

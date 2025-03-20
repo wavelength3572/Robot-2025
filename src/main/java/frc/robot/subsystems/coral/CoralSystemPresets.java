@@ -13,6 +13,7 @@ public enum CoralSystemPresets {
   L2(16.0, 77),
   L3(33, 77),
   L4(65, 45),
+  PRE_SCORE(39.0, 85),
   PREL4(39.0, 105),
   AUTO_START_L4(65, 65),
   AUTO_SCORE_3_END(45, 85),
