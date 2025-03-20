@@ -15,7 +15,7 @@ public class CoralSystemPresetChooser {
     chooser.setDefaultOption("Stow", CoralSystemPresets.STOW);
     chooser.addOption("Startup", CoralSystemPresets.STARTUP);
     chooser.addOption("Pickup", CoralSystemPresets.PICKUP);
-    chooser.addOption("Shelf-L1", CoralSystemPresets.L1);
+    chooser.addOption("Shelf-L1", CoralSystemPresets.L1_SCORE);
     chooser.addOption("Low-L2", CoralSystemPresets.L2);
     chooser.addOption("Mid-L3", CoralSystemPresets.L3);
     chooser.addOption("High-L4", CoralSystemPresets.L4);

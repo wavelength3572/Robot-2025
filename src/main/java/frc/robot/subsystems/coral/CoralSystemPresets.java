@@ -9,7 +9,9 @@ public enum CoralSystemPresets {
   PICKUP(39.0, 233),
   PRE_PICKUP(39.0, 115),
   PICKUPFAR(37.0, 233),
-  L1(0.0, 92),
+  L1_STOW(0.0, 92),
+  L1_SCORE(22.0, 240),
+
   L2(16.0, 77),
   L3(33, 77),
   L4(65, 45),

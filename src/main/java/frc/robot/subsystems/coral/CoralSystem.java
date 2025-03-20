@@ -46,17 +46,12 @@ public class CoralSystem extends SubsystemBase {
 
   private CANrange canRange = new CANrange(31);
 
-  @Getter
-  private Elevator elevator;
-  @Getter
-  public final CoralSystemPresetChooser coralSystemPresetChooser;
-  @Getter
-  private Arm arm;
-  @Getter
-  private Intake intake;
+  @Getter private Elevator elevator;
+  @Getter public final CoralSystemPresetChooser coralSystemPresetChooser;
+  @Getter private Arm arm;
+  @Getter private Intake intake;
 
-  @Getter
-  public boolean haveCoral;
+  @Getter public boolean haveCoral;
 
   @AutoLogOutput(key = "CoralSystem/climbASAP")
   @Getter
@@ -76,11 +71,13 @@ public class CoralSystem extends SubsystemBase {
 
   @AutoLogOutput(key = "CoralSystem/targetCoralPreset")
   @Getter
-  public CoralSystemPresets targetCoralPreset = CoralSystemPresets.STARTUP; // Default startup position
+  public CoralSystemPresets targetCoralPreset =
+      CoralSystemPresets.STARTUP; // Default startup position
 
   @AutoLogOutput(key = "CoralSystem/currentCoralPreset")
   @Getter
-  public CoralSystemPresets currentCoralPreset = CoralSystemPresets.STARTUP; // Tracks last reached preset
+  public CoralSystemPresets currentCoralPreset =
+      CoralSystemPresets.STARTUP; // Tracks last reached preset
 
   // Current state of the pickup state machine
   @AutoLogOutput(key = "CoralSystem/coralPickupState")
@@ -152,7 +149,7 @@ public class CoralSystem extends SubsystemBase {
     }
 
     if ((targetCoralPreset == CoralSystemPresets.PICKUP
-        || targetCoralPreset == CoralSystemPresets.PICKUPFAR)
+            || targetCoralPreset == CoralSystemPresets.PICKUPFAR)
         && (!haveCoral)) {
       if (getTimeOfFlightRange() < 0.48) {
         if (getTimeOfFlightRange() > 0.33) {
@@ -190,19 +187,19 @@ public class CoralSystem extends SubsystemBase {
 
     switch (coralSystemState) {
       case STABLE:
-        if (climbASAP)
-          deployClimberTriggered();
+        if (climbASAP) deployClimberTriggered();
         break;
       case SAFE_ARM:
         // Start Moving Arm to Safe
         if ((this.targetCoralPreset == CoralSystemPresets.PICKUP
-            || this.targetCoralPreset == CoralSystemPresets.PICKUPFAR)
-            && arm.getCurrentAngleDEG() < CoralSystemPresets.PRE_PICKUP.getArmAngle()) {
+                || this.targetCoralPreset == CoralSystemPresets.PICKUPFAR)
+            && arm.getCurrentAngleDEG() > CoralSystemPresets.PRE_PICKUP.getArmAngle()) {
           this.arm.setTargetPreset(CoralSystemPresets.PRE_PICKUP);
         } else {
           this.arm.setTargetPreset(CoralSystemPresets.ARMSAFE);
         }
-        if (arm.getCurrentAngleDEG() >= CoralSystemPresets.ARMSAFE.getArmAngle() - 1.0) { // Put in a 1 degree fudge
+        if (arm.getCurrentAngleDEG()
+            >= CoralSystemPresets.ARMSAFE.getArmAngle() - 1.0) { // Put in a 1 degree fudge
           // factor
           coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
           // Start moving elevator
@@ -222,7 +219,8 @@ public class CoralSystem extends SubsystemBase {
         this.elevator.setTargetPreset(targetCoralPreset);
         // Make sure the intake is running as we're going to pickup.
         if ((targetCoralPreset == CoralSystemPresets.PICKUP
-            || targetCoralPreset == CoralSystemPresets.PICKUPFAR) && !haveCoral) {
+                || targetCoralPreset == CoralSystemPresets.PICKUPFAR)
+            && !haveCoral) {
           intake.pullCoral();
         }
         if (arm.isAtGoal() && elevator.isAtGoal()) {
@@ -241,8 +239,8 @@ public class CoralSystem extends SubsystemBase {
         if (elevator.isAtGoal()) {
           elevator.clearElevatorError();
           arm.clearArmError();
-          this.targetCoralPreset = CoralSystemPresets.L1;
-          this.currentCoralPreset = CoralSystemPresets.L1;
+          this.targetCoralPreset = CoralSystemPresets.L1_SCORE;
+          this.currentCoralPreset = CoralSystemPresets.L1_SCORE;
           coralSystemState = CoralSystemMovementState.STABLE;
           Elastic.selectTab("Teleoperated");
           intake.stopIntake();
@@ -326,12 +324,14 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public boolean isAtGoal() {
-    boolean atTargetState = coralSystemState == CoralSystemMovementState.STABLE
-        && currentCoralPreset == targetCoralPreset;
+    boolean atTargetState =
+        coralSystemState == CoralSystemMovementState.STABLE
+            && currentCoralPreset == targetCoralPreset;
 
-    boolean preppedForDislodge = ((currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
-        || currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2)
-        && coralSystemState == CoralSystemMovementState.STABLE);
+    boolean preppedForDislodge =
+        ((currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+                || currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2)
+            && coralSystemState == CoralSystemMovementState.STABLE);
 
     return atTargetState || preppedForDislodge;
   }
@@ -354,8 +354,7 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public void recoverArmAndElevator() {
-    if (arm.isArmInError())
-      coralSystemState = CoralSystemMovementState.ARM_RECOVERY;
+    if (arm.isArmInError()) coralSystemState = CoralSystemMovementState.ARM_RECOVERY;
   }
 
   public void updateCoralPickupState() {
@@ -404,15 +403,13 @@ public class CoralSystem extends SubsystemBase {
         justScoredCoral = false;
       }
       return true;
-    } else
-      return false;
+    } else return false;
   }
 
   private boolean checkIfSafeDistanceFromCoralStation(double currentTOFAvg, boolean nearStation) {
     if (currentTOFAvg > TIME_OF_FLIGHT_THRESHOLD) {
       return true;
-    } else
-      return false;
+    } else return false;
   }
 
   public void deployClimberTriggered() {

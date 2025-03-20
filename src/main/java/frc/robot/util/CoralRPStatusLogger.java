@@ -10,7 +10,7 @@ public class CoralRPStatusLogger {
 
   // Define the scoring presets in the desired order: High (L4), Mid (L3), Low (L2), Shelf (L1).
   private static final CoralSystemPresets[] SCORING_LEVELS = {
-    CoralSystemPresets.L4, CoralSystemPresets.L3, CoralSystemPresets.L2, CoralSystemPresets.L1
+    CoralSystemPresets.L4, CoralSystemPresets.L3, CoralSystemPresets.L2, CoralSystemPresets.L1_SCORE
   };
 
   // Define custom labels for each scoring level.
@@ -20,7 +20,7 @@ public class CoralRPStatusLogger {
     LEVEL_LABELS.put(CoralSystemPresets.L4, "High");
     LEVEL_LABELS.put(CoralSystemPresets.L3, "Mid");
     LEVEL_LABELS.put(CoralSystemPresets.L2, "Low");
-    LEVEL_LABELS.put(CoralSystemPresets.L1, "Shelf");
+    LEVEL_LABELS.put(CoralSystemPresets.L1_SCORE, "Shelf");
   }
 
   /**

@@ -36,7 +36,7 @@ public class PathPlannerCommands {
     NamedCommands.registerCommand("L4", new RunPresetCommand(coralSystem, L4));
     NamedCommands.registerCommand("L3", new RunPresetCommand(coralSystem, L3));
     NamedCommands.registerCommand("L2", new RunPresetCommand(coralSystem, L2));
-    NamedCommands.registerCommand("L1", new RunPresetCommand(coralSystem, L1));
+    NamedCommands.registerCommand("L1", new RunPresetCommand(coralSystem, L1_SCORE));
     NamedCommands.registerCommand("Stow", new RunPresetCommand(coralSystem, STOW));
     NamedCommands.registerCommand("Score", new ScoreCoralInAutoCommand(coralSystem.getIntake()));
     NamedCommands.registerCommand(
@@ -103,7 +103,7 @@ public class PathPlannerCommands {
             Commands.print("Running preset: L2").andThen(new RunPresetCommand(coralSystem, L2)));
     new EventTrigger("L1")
         .onTrue(
-            Commands.print("Running preset: L1").andThen(new RunPresetCommand(coralSystem, L1)));
+            Commands.print("Running preset: L1").andThen(new RunPresetCommand(coralSystem, L1_SCORE)));
     new EventTrigger("Stow")
         .onTrue(
             Commands.print("Running preset: Stow")

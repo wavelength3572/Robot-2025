@@ -631,7 +631,7 @@ public class IndicatorLight extends SubsystemBase {
         currentColor_GOAL = LED_EFFECTS.BLUEOMBRE;
         return;
       }
-      case L1 -> {
+      case L1_SCORE -> {
         brightStart = 0;
         brightCount = 5;
       }

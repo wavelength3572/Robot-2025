@@ -941,7 +941,7 @@ public final class FieldConstants {
             L1_BASE_ANGLE_DEG,
             L1_YAW_OFFSET_DEG);
     int[] redFaceIdsForL1 = {7, 8, 9, 10, 11, 6}; // example order for each face
-    populateCoralMappingForPreset(redL1, CoralSystemPresets.L1, redFaceIdsForL1);
+    populateCoralMappingForPreset(redL1, CoralSystemPresets.L1_SCORE, redFaceIdsForL1);
 
     Pose3d[] redL2 =
         generateScoredCoralPosesAngled(
@@ -986,18 +986,18 @@ public final class FieldConstants {
             L1_FIXED_PITCH_DEG,
             L1_BASE_ANGLE_DEG,
             L1_YAW_OFFSET_DEG);
-    coralMapping.put(new CoralKey(21, A_LEFT, L1), new CoralLocation(blueL1[0]));
-    coralMapping.put(new CoralKey(21, B_RIGHT, L1), new CoralLocation(blueL1[1]));
-    coralMapping.put(new CoralKey(22, A_LEFT, L1), new CoralLocation(blueL1[10]));
-    coralMapping.put(new CoralKey(22, B_RIGHT, L1), new CoralLocation(blueL1[11]));
-    coralMapping.put(new CoralKey(17, A_LEFT, L1), new CoralLocation(blueL1[8]));
-    coralMapping.put(new CoralKey(17, B_RIGHT, L1), new CoralLocation(blueL1[9]));
-    coralMapping.put(new CoralKey(18, A_LEFT, L1), new CoralLocation(blueL1[6]));
-    coralMapping.put(new CoralKey(18, B_RIGHT, L1), new CoralLocation(blueL1[7]));
-    coralMapping.put(new CoralKey(19, A_LEFT, L1), new CoralLocation(blueL1[4]));
-    coralMapping.put(new CoralKey(19, B_RIGHT, L1), new CoralLocation(blueL1[5]));
-    coralMapping.put(new CoralKey(20, A_LEFT, L1), new CoralLocation(blueL1[2]));
-    coralMapping.put(new CoralKey(20, B_RIGHT, L1), new CoralLocation(blueL1[3]));
+    coralMapping.put(new CoralKey(21, A_LEFT, L1_SCORE), new CoralLocation(blueL1[0]));
+    coralMapping.put(new CoralKey(21, B_RIGHT, L1_SCORE), new CoralLocation(blueL1[1]));
+    coralMapping.put(new CoralKey(22, A_LEFT, L1_SCORE), new CoralLocation(blueL1[10]));
+    coralMapping.put(new CoralKey(22, B_RIGHT, L1_SCORE), new CoralLocation(blueL1[11]));
+    coralMapping.put(new CoralKey(17, A_LEFT, L1_SCORE), new CoralLocation(blueL1[8]));
+    coralMapping.put(new CoralKey(17, B_RIGHT, L1_SCORE), new CoralLocation(blueL1[9]));
+    coralMapping.put(new CoralKey(18, A_LEFT, L1_SCORE), new CoralLocation(blueL1[6]));
+    coralMapping.put(new CoralKey(18, B_RIGHT, L1_SCORE), new CoralLocation(blueL1[7]));
+    coralMapping.put(new CoralKey(19, A_LEFT, L1_SCORE), new CoralLocation(blueL1[4]));
+    coralMapping.put(new CoralKey(19, B_RIGHT, L1_SCORE), new CoralLocation(blueL1[5]));
+    coralMapping.put(new CoralKey(20, A_LEFT, L1_SCORE), new CoralLocation(blueL1[2]));
+    coralMapping.put(new CoralKey(20, B_RIGHT, L1_SCORE), new CoralLocation(blueL1[3]));
 
     Pose3d[] blueL2 =
         generateScoredCoralPosesAngled(
