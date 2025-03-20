@@ -105,6 +105,10 @@ public class AlignmentUtils {
     int acceptedFaceId = minEntry.getKey();
     Translation2d acceptedFace = aprilTagMap.get(acceptedFaceId);
 
+    // ✅ Check if the Reef Face AprilTag has been seen within the last 8 seconds
+    boolean tagSeenRecently = RobotStatus.hasRecentlySeenAprilTag(acceptedFaceId, 1.5);
+    Logger.recordOutput("Alignment/Reef/TagSeenRecently", tagSeenRecently);
+
     // Get the Reef face orientation
     Rotation2d faceOrientation = FieldConstants.REEF_FACE_ORIENTATION_BLUE.get(acceptedFaceId)[0];
 

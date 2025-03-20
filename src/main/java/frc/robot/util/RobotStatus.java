@@ -115,4 +115,8 @@ public class RobotStatus {
     if (coralSystem != null) return coralSystem.isArmInError();
     else return false;
   }
+
+  public static boolean hasRecentlySeenAprilTag(int faceID, double seconds) {
+    return visionSystem.hasRecentlySeenAprilTag(faceID, seconds);
+  }
 }

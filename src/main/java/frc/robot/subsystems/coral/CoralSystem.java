@@ -405,7 +405,8 @@ public class CoralSystem extends SubsystemBase {
       case HAVE_CORAL_NEAR_STATION:
         if (currentTOFAvg
                 > TOF_SAFE_FROM_CORAL_STATION_THRESHOLD // safe distance from coral station
-            && filteredDeltaTOF > TOF_DERIVATIVE_THRESHOLD) { // moving away from coral station
+            && filteredDeltaTOF > TOF_DERIVATIVE_THRESHOLD
+            && currentCoralPreset == PICKUP) { // moving away from coral station
           coralPickupState = CoralPickupState.HAVE_CORAL_SAFE_DISTANCE_FROM_STATION;
           justPickedUpCoral = false;
           setTargetPreset(PRE_SCORE); // get arm ready to score

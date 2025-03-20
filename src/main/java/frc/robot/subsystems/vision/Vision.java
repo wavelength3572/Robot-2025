@@ -25,11 +25,13 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonPoseEstimator;
@@ -42,6 +44,8 @@ public class Vision extends SubsystemBase {
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
   private Boolean isVisionOn = true;
+
+  private final Map<Integer, Double> aprilTagTimestamps = new ConcurrentHashMap<>();
 
   // An array of PhotonPoseEstimators, one per camera
   private final PhotonPoseEstimator[] photonEstimators;
@@ -146,7 +150,6 @@ public class Vision extends SubsystemBase {
                 || observation.pose().getY() < 0.0
                 || observation.pose().getY() > aprilTagLayout.getFieldWidth()
                 || observation.averageTagDistance() > MAX_TAG_DISTANCE;
-        // || (observation.tagCount() > 1 && observation.ambiguity() > maxAmbiguity)
 
         // Track which tags contributed to this observation
         List<Pose3d> contributingTags = new LinkedList<>();
@@ -166,6 +169,10 @@ public class Vision extends SubsystemBase {
           robotPosesAccepted.add(observation.pose());
           tagPosesAccepted.addAll(contributingTags);
           contributingTagsForCamera.addAll(contributingTags); // Add to per-camera tracker
+          // ✅ Log AprilTag timestamps ONLY if the pose was ACCEPTED
+          for (int tagId : inputs[cameraIndex].tagIds) {
+            logAprilTagDetection(tagId);
+          }
         }
 
         // Skip if rejected
@@ -406,5 +413,21 @@ public class Vision extends SubsystemBase {
       }
     }
     return sum / estimatedRobotPose.targetsUsed.size();
+  }
+
+  /**
+   * Logs an AprilTag detection with the current timestamp (using FPGATimestamp for consistency).
+   */
+  public void logAprilTagDetection(int tagId) {
+    aprilTagTimestamps.put(tagId, Timer.getFPGATimestamp()); // Use FPGA time
+  }
+
+  /** Checks if the given tagId was seen within the last maxAgeSeconds. */
+  public boolean hasRecentlySeenAprilTag(int tagId, double maxAgeSeconds) {
+    Double lastSeenTime = aprilTagTimestamps.get(tagId);
+    if (lastSeenTime == null) {
+      return false;
+    }
+    return (Timer.getFPGATimestamp() - lastSeenTime) <= maxAgeSeconds;
   }
 }

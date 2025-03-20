@@ -50,11 +50,18 @@ public class AlignAndScore {
     return Commands.sequence(
         Commands.runOnce(() -> System.out.println("Starting drive to pole...")),
 
-        // Compute the target pose and conditionally proceed
-        Commands.waitUntil(() -> targetPoseSupplier.get() != null),
+        // Compute the target pose and either drive or skip alignment
+        Commands.either(
+                Commands.runOnce(
+                    () ->
+                        System.out.println(
+                            "Skipping alignment, no valid target.")), // Skip if no valid target
+                new DriveToPoseNoJoystick(drive, targetPoseSupplier), // Drive if pose is valid
+                () -> targetPoseSupplier.get() == null // Condition: if null, skip
+                )
 
-        // Drive to the computed pose
-        new DriveToPoseNoJoystick(drive, targetPoseSupplier),
+            // Stop execution if alignment wasn't successful
+            .unless(() -> targetPoseSupplier.get() == null),
 
         // Log when alignment is done
         Commands.runOnce(() -> System.out.println("Robot aligned, checking presets...")),
