@@ -9,21 +9,15 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-public class DriveToPose extends Command {
-  private static final double JOYSTICK_DEADBAND = 0.1; // Adjust as needed
-  private double TIMEOUT_TIME = 8.0;
+public class DriveToPoseNoJoystick extends Command {
+  private double TIMEOUT_TIME = 2.0;
 
   private final double speedScalar;
-
   private final Drive drivetrain;
   private final Supplier<Pose2d> poseSupplier;
-  private final DoubleSupplier xJoystickSupplier;
-  private final DoubleSupplier yJoystickSupplier;
-  private final DoubleSupplier rotationJoystickSupplier;
 
   private double targetX;
   private double targetY;
@@ -43,35 +37,27 @@ public class DriveToPose extends Command {
           driveXKp,
           0.0,
           0.0,
-          new TrapezoidProfile.Constraints(2, 2.5)); // upped accelleration from .5
+          new TrapezoidProfile.Constraints(2, 3.0)); // upped accelleration from .5
 
   private final ProfiledPIDController driveControllerY =
       new ProfiledPIDController(
           driveYKp,
           0.0,
           0.0,
-          new TrapezoidProfile.Constraints(2, 2.5)); // upped accelleration from .5
+          new TrapezoidProfile.Constraints(2, 3.0)); // upped accelleration from .5
 
   private final ProfiledPIDController thetaController =
       new ProfiledPIDController(
           thetaKp,
           0.0,
           0.0,
-          new TrapezoidProfile.Constraints(Math.toRadians(360), Math.toRadians(360)));
+          new TrapezoidProfile.Constraints(Math.toRadians(720), Math.toRadians(720)));
 
   /** Drives to the specified pose under full software control. */
-  public DriveToPose(
-      Drive drivetrain,
-      Supplier<Pose2d> poseSupplier,
-      DoubleSupplier xJoystickSupplier,
-      DoubleSupplier yJoystickSupplier,
-      DoubleSupplier rotationJoystickSupplier,
-      double speedScalar) {
+  public DriveToPoseNoJoystick(
+      Drive drivetrain, Supplier<Pose2d> poseSupplier, double speedScalar) {
     this.drivetrain = drivetrain;
     this.poseSupplier = poseSupplier;
-    this.xJoystickSupplier = xJoystickSupplier;
-    this.yJoystickSupplier = yJoystickSupplier;
-    this.rotationJoystickSupplier = rotationJoystickSupplier;
 
     // Clamp the speedScalar between 0 and 1 to prevent unsafe values.
     double clampedScalar = MathUtil.clamp(speedScalar, 0.0, 1.0);
@@ -84,19 +70,8 @@ public class DriveToPose extends Command {
     addRequirements(drivetrain);
   }
 
-  public DriveToPose(
-      Drive drivetrain,
-      Supplier<Pose2d> poseSupplier,
-      DoubleSupplier xJoystickSupplier,
-      DoubleSupplier yJoystickSupplier,
-      DoubleSupplier rotationJoystickSupplier) {
-    this(
-        drivetrain,
-        poseSupplier,
-        xJoystickSupplier,
-        yJoystickSupplier,
-        rotationJoystickSupplier,
-        1.0);
+  public DriveToPoseNoJoystick(Drive drivetrain, Supplier<Pose2d> poseSupplier) {
+    this(drivetrain, poseSupplier, 1.0);
   }
 
   @Override
@@ -167,13 +142,6 @@ public class DriveToPose extends Command {
 
   @Override
   public boolean isFinished() {
-    // Check if the driver moves either joystick or rotates the robot
-    if (Math.abs(xJoystickSupplier.getAsDouble()) > JOYSTICK_DEADBAND
-        || Math.abs(yJoystickSupplier.getAsDouble()) > JOYSTICK_DEADBAND
-        || Math.abs(rotationJoystickSupplier.getAsDouble()) > JOYSTICK_DEADBAND) {
-      Logger.recordOutput("DriveToPose/CanceledByJoystick", true);
-      return true;
-    }
 
     // Check if the robot has reached the goal
     if (atGoal()) {
