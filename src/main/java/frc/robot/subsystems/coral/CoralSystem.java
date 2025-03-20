@@ -379,7 +379,7 @@ public class CoralSystem extends SubsystemBase {
           if (currentTOFAvg > TOF_AT_CORAL_STATION_THRESHOLD
               && pickUpTimer.get() > THRESHOLD_TIME_TO_DETECT_CORAL_IN_WAY) {
             coralPickupState = CoralPickupState.CORAL_IN_THE_WAY;
-            setTargetPreset(PICKUPFAR);
+            // setTargetPreset(PICKUPFAR);
             pickUpTimer.restart();
           }
           if (currentTOFAvg < TOF_AT_CORAL_STATION_THRESHOLD
@@ -388,7 +388,7 @@ public class CoralSystem extends SubsystemBase {
             // if we are at PICKUP_FAR and now we are close to the station we should go to
             // PICKUP
             coralPickupState = CoralPickupState.CLOSE_TO_STATION_AFTER_CORAL_WAS_IN_THE_WAY;
-            setTargetPreset(PICKUP);
+            // setTargetPreset(PICKUP);
             pickUpTimer.restart();
           }
         }
@@ -409,7 +409,7 @@ public class CoralSystem extends SubsystemBase {
             && currentCoralPreset == PICKUP) { // moving away from coral station
           coralPickupState = CoralPickupState.HAVE_CORAL_SAFE_DISTANCE_FROM_STATION;
           justPickedUpCoral = false;
-          setTargetPreset(PRE_SCORE); // get arm ready to score
+          // setTargetPreset(PRE_SCORE); // get arm ready to score
         }
         break;
 
