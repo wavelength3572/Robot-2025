@@ -103,7 +103,8 @@ public class PathPlannerCommands {
             Commands.print("Running preset: L2").andThen(new RunPresetCommand(coralSystem, L2)));
     new EventTrigger("L1")
         .onTrue(
-            Commands.print("Running preset: L1").andThen(new RunPresetCommand(coralSystem, L1_SCORE)));
+            Commands.print("Running preset: L1")
+                .andThen(new RunPresetCommand(coralSystem, L1_SCORE)));
     new EventTrigger("Stow")
         .onTrue(
             Commands.print("Running preset: Stow")
