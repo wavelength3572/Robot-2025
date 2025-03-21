@@ -10,7 +10,6 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AlignmentUtils;
 import frc.robot.util.BranchAlignmentUtils;
 import frc.robot.util.BranchAlignmentUtils.BranchAlignmentStatus;
-
 import java.util.function.Supplier;
 
 public class AlignAndScore {
@@ -76,7 +75,8 @@ public class AlignAndScore {
             () ->
                 inScoringConfiguration(coralSystem)
                     && drive.getReefFaceSelection().getTagSeenRecently()
-                    && BranchAlignmentUtils.getCurrentBranchAlignmentStatus() == BranchAlignmentStatus.GREEN));
+                    && BranchAlignmentUtils.getCurrentBranchAlignmentStatus()
+                        == BranchAlignmentStatus.GREEN));
   }
 
   /** Calculates the target pose for pole alignment using correct alliance logic. */
@@ -84,7 +84,7 @@ public class AlignAndScore {
     return DriveToCommands.calculatePolePose(drive, faceId, isLeftPole);
   }
 
-  private static boolean inScoringConfiguration(CoralSystem coralSystem) {
+  public static boolean inScoringConfiguration(CoralSystem coralSystem) {
     return coralSystem.getCurrentCoralPreset() == coralSystem.getTargetCoralPreset()
         && (coralSystem.getTargetCoralPreset() == CoralSystemPresets.L2
             || coralSystem.getTargetCoralPreset() == CoralSystemPresets.L3

@@ -108,7 +108,6 @@ public class DriveToPoseNoJoystick extends Command {
     Logger.recordOutput("DriveToPose/targetPoseY", targetY);
     Logger.recordOutput("DriveToPose/targetPoseTheta", Units.radiansToDegrees(targetTheta));
     timeoutTimer.restart();
-
   }
 
   @Override

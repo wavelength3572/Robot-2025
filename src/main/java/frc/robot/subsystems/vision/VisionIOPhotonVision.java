@@ -67,10 +67,15 @@ public class VisionIOPhotonVision implements VisionIO {
         Transform3d fieldToRobot = fieldToCamera.plus(robotToCamera.inverse());
         Pose3d robotPose = new Pose3d(fieldToRobot.getTranslation(), fieldToRobot.getRotation());
 
-        // Calculate average tag distance
-        double totalTagDistance = 0.0;
+        double closestTagDistance = Double.MAX_VALUE;
         for (var target : result.targets) {
-          totalTagDistance += target.bestCameraToTarget.getTranslation().getNorm();
+          double tagDistance = target.bestCameraToTarget.getTranslation().getNorm();
+          if (tagDistance < closestTagDistance) {
+            closestTagDistance = tagDistance;
+          }
+        }
+        if (closestTagDistance == Double.MAX_VALUE) {
+          closestTagDistance = 9999.0; // Fallback for no tags detected
         }
 
         // Add tag IDs
@@ -84,8 +89,11 @@ public class VisionIOPhotonVision implements VisionIO {
                 robotPose.plus(robotToCamera),
                 multitagResult.estimatedPose.ambiguity, // Ambiguity
                 multitagResult.fiducialIDsUsed.size(), // Tag count
-                totalTagDistance / result.targets.size(), // Average tag distance
-                PoseObservationType.PHOTONVISION)); // Observation type
+                closestTagDistance, // closest tag distance
+                PoseObservationType.PHOTONVISION, // Observation type
+                multitagResult.fiducialIDsUsed.stream()
+                    .mapToInt(Short::intValue)
+                    .toArray())); // list of tagIDs used for this observation
 
       } else if (!result.targets.isEmpty()) { // Single tag result
         var target = result.targets.get(0);
@@ -112,7 +120,9 @@ public class VisionIOPhotonVision implements VisionIO {
                   target.poseAmbiguity, // Ambiguity
                   1, // Tag count
                   cameraToTarget.getTranslation().getNorm(), // Average tag distance
-                  PoseObservationType.PHOTONVISION)); // Observation type
+                  PoseObservationType.PHOTONVISION,
+                  new int[] {target.fiducialId} // ✅ Store single detected tag ID
+                  )); // Observation type
         }
       }
     }

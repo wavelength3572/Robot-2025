@@ -137,6 +137,7 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(frontLeftCam, robotToFrontLeftCam, drive::getPose),
                 new VisionIOPhotonVisionSim(
                     elevatorBackCam, robotToElevatorBackCam, drive::getPose));
+
         elevator = new Elevator(new ElevatorIOVirtualSim() {});
         arm = new Arm(new ArmIOVirtualSim() {});
         intake = new Intake(new IntakeIOVirtualSim() {});

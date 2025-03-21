@@ -11,7 +11,6 @@ public enum CoralSystemPresets {
   PICKUPFAR(37.0, 233),
   L1_STOW(0.0, 92),
   L1_SCORE(22.0, 240),
-
   L2(16.0, 77),
   L3(33, 77),
   L4(65, 45),

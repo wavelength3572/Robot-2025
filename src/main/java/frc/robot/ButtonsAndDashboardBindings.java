@@ -22,7 +22,10 @@ import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.AlignmentUtils;
+import frc.robot.util.BranchAlignmentUtils;
+import frc.robot.util.BranchAlignmentUtils.BranchAlignmentStatus;
 import frc.robot.util.RobotStatus;
+import org.littletonrobotics.junction.Logger;
 
 public class ButtonsAndDashboardBindings {
 
@@ -74,15 +77,21 @@ public class ButtonsAndDashboardBindings {
     SmartDashboard.putData(
         "Shelf - L1",
         Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L1_SCORE)));
+
     SmartDashboard.putData(
         "Low - L2",
-        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L2))); // L2
+        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L2))
+            .andThen(waitForScoringConditions(drive, coralSystem)));
+
     SmartDashboard.putData(
         "Mid - L3",
-        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L3))); // L3
+        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L3))
+            .andThen(waitForScoringConditions(drive, coralSystem)));
+
     SmartDashboard.putData(
         "High - L4",
-        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L4))); // L4
+        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L4))
+            .andThen(waitForScoringConditions(drive, coralSystem)));
 
     SmartDashboard.putData("Pickup Coral", createPickupCoralCommand());
     SmartDashboard.putData("Reef Action", createReefActionCommand()); // Score OR Dislodge
@@ -194,25 +203,25 @@ public class ButtonsAndDashboardBindings {
     oi.getRightJoyLeftButton().onTrue(AlignAndScore.create(drive, coralSystem, true));
 
     // .onTrue(
-    //     DriveToCommands.driveToPole(
-    //         drive,
-    //         true,
-    //         oi::getTranslateX,
-    //         oi::getTranslateY,
-    //         oi::getRotate,
-    //         FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-    //         coralSystem::isHaveCoral));
+    // DriveToCommands.driveToPole(
+    // drive,
+    // true,
+    // oi::getTranslateX,
+    // oi::getTranslateY,
+    // oi::getRotate,
+    // FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
+    // coralSystem::isHaveCoral));
 
     oi.getRightJoyRightButton()
         // .onTrue(
-        //     DriveToCommands.driveToPole(
-        //         drive,
-        //         false,
-        //         oi::getTranslateX,
-        //         oi::getTranslateY,
-        //         oi::getRotate,
-        //         FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-        //         coralSystem::isHaveCoral));
+        // DriveToCommands.driveToPole(
+        // drive,
+        // false,
+        // oi::getTranslateX,
+        // oi::getTranslateY,
+        // oi::getRotate,
+        // FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
+        // coralSystem::isHaveCoral));
 
         .onTrue(AlignAndScore.create(drive, coralSystem, false));
 
@@ -340,5 +349,66 @@ public class ButtonsAndDashboardBindings {
         new InstantCommand(
             () -> coralSystem.setTargetPreset(CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1),
             coralSystem));
+  }
+
+  private static Command waitForScoringConditions(Drive drive, CoralSystem coralSystem) {
+    return Commands.waitUntil(
+            () -> {
+              boolean inScoringConfig = AlignAndScore.inScoringConfiguration(coralSystem);
+              Logger.recordOutput("AutoScore/WaitingForScoringConfig", inScoringConfig);
+              return inScoringConfig;
+            }) // Always wait for scoring config
+        .andThen(
+            Commands.either(
+                Commands.runOnce(
+                    () -> {
+                      Logger.recordOutput(
+                          "AutoScore/Status",
+                          "TRIGGERED: Configuration correct, vision confirmed, alignment is GREEN.");
+                      new ScoreCoralInTeleopCommand(coralSystem.getIntake()).schedule();
+                    }),
+                Commands.runOnce(
+                    () -> {
+                      Logger.recordOutput(
+                          "AutoScore/Status", "ABANDONED: Operator must score manually.");
+                      debugAlignmentStatus(drive); // Log why alignment failed
+                    }),
+                () -> {
+                  var reefFaceSelection = drive.getReefFaceSelection();
+                  var branchStatus = BranchAlignmentUtils.getCurrentBranchAlignmentStatus();
+
+                  boolean hasReefFace = reefFaceSelection != null;
+                  boolean tagSeenRecently = hasReefFace && reefFaceSelection.getTagSeenRecently();
+                  boolean hasBranchStatus = branchStatus != null;
+                  boolean alignmentGreen =
+                      hasBranchStatus && branchStatus == BranchAlignmentStatus.GREEN;
+
+                  // Log conditions
+                  Logger.recordOutput("AutoScore/CheckingConditions", true);
+                  Logger.recordOutput("AutoScore/ReefFaceDetected", hasReefFace);
+                  Logger.recordOutput("AutoScore/TagSeenRecently", tagSeenRecently);
+                  Logger.recordOutput("AutoScore/BranchStatusAvailable", hasBranchStatus);
+                  Logger.recordOutput("AutoScore/AlignmentGreen", alignmentGreen);
+
+                  return tagSeenRecently && alignmentGreen;
+                }));
+  }
+
+  private static void debugAlignmentStatus(Drive drive) {
+    var reefFaceSelection = drive.getReefFaceSelection();
+    var branchStatus = BranchAlignmentUtils.getCurrentBranchAlignmentStatus();
+
+    boolean hasReefFace = reefFaceSelection != null;
+    boolean tagSeenRecently = hasReefFace && reefFaceSelection.getTagSeenRecently();
+    boolean hasBranchStatus = branchStatus != null;
+    boolean alignmentGreen = hasBranchStatus && branchStatus == BranchAlignmentStatus.GREEN;
+
+    Logger.recordOutput("AutoScore/FailureReason", "Auto-scoring failed because:");
+
+    if (!hasReefFace) Logger.recordOutput("AutoScore/Failure", "No reef face detected.");
+    if (!tagSeenRecently) Logger.recordOutput("AutoScore/Failure", "Tag was NOT seen recently.");
+    if (!hasBranchStatus)
+      Logger.recordOutput("AutoScore/Failure", "No branch alignment status available.");
+    if (!alignmentGreen) Logger.recordOutput("AutoScore/Failure", "Alignment status is NOT GREEN.");
   }
 }

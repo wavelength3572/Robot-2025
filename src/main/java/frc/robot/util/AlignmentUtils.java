@@ -123,7 +123,7 @@ public class AlignmentUtils {
     Translation2d acceptedFace = aprilTagMap.get(acceptedFaceId);
 
     // ✅ Check if the Reef Face AprilTag has been seen within the last 8 seconds
-    boolean tagSeenRecently = RobotStatus.hasRecentlySeenAprilTag(acceptedFaceId, 1.5);
+    boolean tagSeenRecently = RobotStatus.hasRecentlySeenAprilTag(acceptedFaceId, 3.0);
     Logger.recordOutput("Alignment/Reef/TagSeenRecently", tagSeenRecently);
 
     // Get the Reef face orientation

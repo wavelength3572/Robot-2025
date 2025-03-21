@@ -37,8 +37,10 @@ public interface VisionIO {
       Pose3d cameraPose,
       double ambiguity,
       int tagCount,
-      double averageTagDistance,
-      PoseObservationType type) {}
+      double closestTagDistance,
+      PoseObservationType type,
+      int[] tagIds // store tagIDS
+      ) {}
 
   public static enum PoseObservationType {
     PHOTONVISION

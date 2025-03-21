@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,6 +47,8 @@ public class Vision extends SubsystemBase {
   private Boolean isVisionOn = true;
 
   private final Map<Integer, Double> aprilTagTimestamps = new ConcurrentHashMap<>();
+  private static double lastLogTime = 0;
+  private static final double LOG_INTERVAL_SECONDS = 10.0; // Log every 10 seconds
 
   // An array of PhotonPoseEstimators, one per camera
   private final PhotonPoseEstimator[] photonEstimators;
@@ -141,15 +144,46 @@ public class Vision extends SubsystemBase {
 
       // Loop over pose observations
       for (var observation : inputs[cameraIndex].poseObservations) {
-        boolean rejectPose =
-            observation.tagCount() == 0
-                || (observation.tagCount() == 1 && observation.ambiguity() > maxAmbiguity)
-                || Math.abs(observation.pose().getZ()) > maxZError
-                || observation.pose().getX() < 0.0
-                || observation.pose().getX() > aprilTagLayout.getFieldLength()
-                || observation.pose().getY() < 0.0
-                || observation.pose().getY() > aprilTagLayout.getFieldWidth()
-                || observation.averageTagDistance() > MAX_TAG_DISTANCE;
+        boolean rejectPose = false;
+        String rejectReason = null;
+
+        // Rejection conditions
+        if (observation.tagCount() == 0) {
+          rejectReason = "No tags detected";
+        } else if (observation.tagCount() == 1 && observation.ambiguity() > maxAmbiguity) {
+          rejectReason = "Single tag with high ambiguity: " + observation.ambiguity();
+        } else if (Math.abs(observation.pose().getZ()) > maxZError) {
+          rejectReason = "Pose Z out of bounds: " + observation.pose().getZ();
+        } else if (observation.pose().getX() < 0.0) {
+          rejectReason = "Pose X is negative: " + observation.pose().getX();
+        } else if (observation.pose().getX() > aprilTagLayout.getFieldLength()) {
+          rejectReason = "Pose X exceeds field length: " + observation.pose().getX();
+        } else if (observation.pose().getY() < 0.0) {
+          rejectReason = "Pose Y is negative: " + observation.pose().getY();
+        } else if (observation.pose().getY() > aprilTagLayout.getFieldWidth()) {
+          rejectReason = "Pose Y exceeds field width: " + observation.pose().getY();
+        } else if (observation.closestTagDistance() > MAX_TAG_DISTANCE) {
+          rejectReason = "Closest tag distance too high: " + observation.closestTagDistance();
+        }
+
+        // Aggregate rejections per cycle
+        List<String> rejectionReasons = new ArrayList<>();
+
+        if (rejectReason != null) {
+          rejectionReasons.add(rejectReason);
+          rejectPose = true;
+        }
+
+        // Log summary once per cycle
+        // if (shouldLogSummary()) {
+        //   Logger.recordOutput(
+        //       "Vision/RejectSummary",
+        //       "Cycle Rejections: "
+        //           + rejectionReasons.size()
+        //           + " | Unique Reasons: "
+        //           + new HashSet<>(rejectionReasons));
+        //   rejectionReasons.clear();
+        // }
 
         // Track which tags contributed to this observation
         List<Pose3d> contributingTags = new LinkedList<>();
@@ -182,7 +216,7 @@ public class Vision extends SubsystemBase {
 
         // Calculate standard deviations
         double stdDevFactor =
-            Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
+            Math.pow(observation.closestTagDistance(), 2.0) / observation.tagCount();
         double linearStdDev = linearStdDevBaseline * stdDevFactor;
         double angularStdDev = angularStdDevBaseline * stdDevFactor;
         if (cameraIndex < cameraStdDevFactors.length) {
@@ -190,8 +224,8 @@ public class Vision extends SubsystemBase {
           angularStdDev *= cameraStdDevFactors[cameraIndex];
         }
 
-        Logger.recordOutput("Vision/LinearStdDev" + cameraIndex, linearStdDev);
-        Logger.recordOutput("Vision/AngularStdDev" + cameraIndex, angularStdDev);
+        Logger.recordOutput("Vision/StdDev/LinearStdDev" + cameraIndex, linearStdDev);
+        Logger.recordOutput("Vision/StdDev/AngularStdDev" + cameraIndex, angularStdDev);
 
         // Send vision observation
         consumer.accept(
@@ -291,7 +325,6 @@ public class Vision extends SubsystemBase {
                 || pose3d.getX() > aprilTagLayout.getFieldLength()
                 || pose3d.getY() < 0.0
                 || pose3d.getY() > aprilTagLayout.getFieldWidth();
-        // || averageTagDistance > MAX_TAG_DISTANCE;
 
         allPhotonRobotPoses.add(pose3d);
 
@@ -385,9 +418,7 @@ public class Vision extends SubsystemBase {
 
     PhotonPoseEstimator estimator =
         new PhotonPoseEstimator(
-            VisionConstants.aprilTagLayout,
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-            cameraTransform);
+            VisionConstants.aprilTagLayout, PoseStrategy.PNP_DISTANCE_TRIG_SOLVE, cameraTransform);
 
     return estimator;
   }
@@ -429,5 +460,14 @@ public class Vision extends SubsystemBase {
       return false;
     }
     return (Timer.getFPGATimestamp() - lastSeenTime) <= maxAgeSeconds;
+  }
+
+  private static boolean shouldLogSummary() {
+    double currentTime = Timer.getFPGATimestamp();
+    if (currentTime - lastLogTime >= LOG_INTERVAL_SECONDS) {
+      lastLogTime = currentTime;
+      return true;
+    }
+    return false;
   }
 }
