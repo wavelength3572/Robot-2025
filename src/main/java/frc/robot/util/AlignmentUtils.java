@@ -22,11 +22,14 @@ import java.util.Optional;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
-// Fix ending of Auto align and score
-// Only score if you have seen vision (xtime) has been seen and it thinks we are aligned.
-// optional auto score if the alignment was done first and confident we are in scoring position.
+// Auto Scoring
+// 1) if driver auto aligns - checks if we are inConfiguration, haveSeenTag recently, and aligned
+// 2) if operator goes to score config - scores if haveSeenReefTag recently and aligned
+
 // no L1 auto score
+
 // turn off smart drive or change procedure when scoring L1
+
 // investigate algae dislodge needs work
 // move arm when algae intake is out. L1_stow or stay in intake position
 // add TOF on front for coral on reef and correction?

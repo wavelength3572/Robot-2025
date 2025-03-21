@@ -39,7 +39,16 @@ public class AlignAndScore {
             return null;
           }
 
-          Pose2d targetPose = calculatePolePose(drive, selection.getAcceptedFaceId(), isLeftPole);
+          // Check if we are scoring at L1
+          boolean isScoringL1 = coralSystem.getTargetCoralPreset() == CoralSystemPresets.L1_SCORE;
+
+          Pose2d targetPose;
+          if (isScoringL1) {
+            targetPose = calculateL1Pose(drive, selection.getAcceptedFaceId());
+          } else {
+            targetPose = calculatePolePose(drive, selection.getAcceptedFaceId(), !isLeftPole);
+          }
+
           if (targetPose == null) {
             System.out.println("Failed to calculate valid target pose. Cancelling.");
             return null;
@@ -75,8 +84,10 @@ public class AlignAndScore {
             () ->
                 inScoringConfiguration(coralSystem)
                     && drive.getReefFaceSelection().getTagSeenRecently()
-                    && BranchAlignmentUtils.getCurrentBranchAlignmentStatus()
-                        == BranchAlignmentStatus.GREEN));
+                    && ((BranchAlignmentUtils.getCurrentBranchAlignmentStatus()
+                                == BranchAlignmentStatus.GREEN
+                            && coralSystem.getCurrentCoralPreset() != CoralSystemPresets.L1_SCORE)
+                        || (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L1_SCORE))));
   }
 
   /** Calculates the target pose for pole alignment using correct alliance logic. */
@@ -84,9 +95,14 @@ public class AlignAndScore {
     return DriveToCommands.calculatePolePose(drive, faceId, isLeftPole);
   }
 
+  private static Pose2d calculateL1Pose(Drive drive, int faceId) {
+    return DriveToCommands.calculateL1Pose(drive, faceId);
+  }
+
   public static boolean inScoringConfiguration(CoralSystem coralSystem) {
     return coralSystem.getCurrentCoralPreset() == coralSystem.getTargetCoralPreset()
-        && (coralSystem.getTargetCoralPreset() == CoralSystemPresets.L2
+        && (coralSystem.getTargetCoralPreset() == CoralSystemPresets.L1_SCORE
+            || coralSystem.getTargetCoralPreset() == CoralSystemPresets.L2
             || coralSystem.getTargetCoralPreset() == CoralSystemPresets.L3
             || coralSystem.getTargetCoralPreset() == CoralSystemPresets.L4);
   }

@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -161,6 +162,73 @@ public class DriveToCommands {
     }
   }
 
+  public static Pose2d calculateL1Pose(Drive drive, int faceId) {
+    Translation2d midpointTranslation;
+    Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+
+    if (!alliance.isPresent()) {
+      System.out.println("Unknown alliance. Cannot calculate L1 target pose.");
+      return null;
+    }
+
+    if (alliance.get() == DriverStation.Alliance.Blue) {
+      ReefFacesBlue blueFace = ReefFacesBlue.fromId(faceId);
+      if (blueFace == null) {
+        System.out.println("Invalid face ID for Blue alliance: " + faceId);
+        return null;
+      }
+
+      // Compute the midpoint between left and right poles
+      midpointTranslation =
+          blueFace
+              .getLeftPole()
+              .getBranchTranslation()
+              .plus(blueFace.getRightPole().getBranchTranslation())
+              .div(2.0); // Average the two translations to get the midpoint
+
+    } else if (alliance.get() == DriverStation.Alliance.Red) {
+      ReefFacesRed redFace = ReefFacesRed.fromId(faceId);
+      if (redFace == null) {
+        System.out.println("Invalid face ID for Red alliance: " + faceId);
+        return null;
+      }
+
+      // Compute the midpoint between left and right poles
+      midpointTranslation =
+          redFace
+              .getLeftPole()
+              .getBranchTranslation()
+              .plus(redFace.getRightPole().getBranchTranslation())
+              .div(2.0);
+
+    } else {
+      System.out.println("Unknown alliance. Cannot calculate L1 target pose.");
+      return null;
+    }
+
+    // Determine closest reef orientation and apply a 180-degree rotation
+    ReefChosenOrientation chosen =
+        AlignmentUtils.pickClosestOrientationForReef(drive.getPose(), faceId);
+    if (chosen == null) {
+      System.out.println("Failed to determine reef orientation for face ID: " + faceId);
+      return null;
+    }
+
+    Rotation2d flippedRotation = chosen.rotation2D().plus(Rotation2d.fromDegrees(180));
+
+    // Offset distance to move the robot *right* in the flipped orientation
+    double rightOffset = 0.38; // Adjust as needed based on actual misalignment
+
+    // Shift right in the robot's new coordinate frame (perpendicular to heading)
+    Translation2d adjustedMidpoint =
+        midpointTranslation.plus(
+            new Translation2d(0.0, rightOffset)
+                .rotateBy(flippedRotation) // Moves "right" relative to the flipped heading
+            );
+
+    // Return the final pose with adjusted translation and flipped rotation
+    return new Pose2d(adjustedMidpoint, flippedRotation);
+  }
   /**
    * Drive to the closest coral station face (based on which station AprilTag is closest).
    *

@@ -5,6 +5,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.coral.CoralSystemPresets;
+import frc.robot.util.RobotStatus;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -79,8 +81,14 @@ public class StrategyManager implements AlignmentStrategy {
         context.getCageSelection() != null
             && context.getCageSelection().getDistanceToCage() <= THRESHOLD_DISTANCE_TO_CAGE;
 
+    // If scoring at L1, we need to reverse the alignment.
+    boolean shouldFlipReefAlignment = RobotStatus.getTargetPreset() == CoralSystemPresets.L1_SCORE;
+
     if (nearReef && haveCoral && !climberDeployed) {
       currentActiveStrategy = reefStrategy;
+      if (shouldFlipReefAlignment) {
+        currentActiveStrategy = new FlippedReefAlignmentStrategy(sharedAngleController);
+      }
     } else if (nearCoralStation && !haveCoral && !climberDeployed) {
       currentActiveStrategy = coralStationStrategy;
     } else if (nearCage && climberDeployed) {
