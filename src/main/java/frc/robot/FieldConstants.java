@@ -1078,4 +1078,21 @@ public final class FieldConstants {
       coralMapping.put(new CoralKey(faceId, B_RIGHT, preset), new CoralLocation(rightPose));
     }
   }
+
+  public static final Map<Integer, Translation2d> BLUE_PROCESSOR_APRIL_TAG =
+      new HashMap<>(); // Blue
+  public static final Map<Integer, Translation2d> RED_PROCESSOR_APRIL_TAG = new HashMap<>(); // Red
+
+  static {
+    // ---------------- BLUE PROCESSOR TAG ----------------
+    BLUE_PROCESSOR_APRIL_TAG.put(16, new Translation2d(6.03, .46));
+    // ---------------- RED PROCESSOR TAG -----
+    RED_PROCESSOR_APRIL_TAG.put(3, new Translation2d(11.63, 7.61));
+  }
+
+  /** Orientation data for BLUE reef faces, keyed by faceId 12-13 */
+  public static final Rotation2d PROCESSOR_ORIENTATION_BLUE = new Rotation2d(Math.toRadians(180));
+
+  /** Orientation data for RED reef faces, keyed by faceId 1-2 */
+  public static final Rotation2d PROCESSOR_ORIENTATION_RED = new Rotation2d(Math.toRadians(0));
 }

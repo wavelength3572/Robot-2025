@@ -54,6 +54,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.AlignmentUtils;
 import frc.robot.util.AlignmentUtils.CageSelection;
 import frc.robot.util.AlignmentUtils.CoralStationSelection;
+import frc.robot.util.AlignmentUtils.ProcessorSelection;
 import frc.robot.util.AlignmentUtils.ReefFaceSelection;
 import frc.robot.util.BranchAlignmentUtils;
 import frc.robot.util.LocalADStarAK;
@@ -102,6 +103,7 @@ public class Drive extends SubsystemBase {
   @Getter private CoralStationSelection coralStationSelection;
   @Getter private Pose2d algaeTargetPose;
   @Getter private CageSelection cageSelection;
+  @Getter private ProcessorSelection processorSelection;
 
   @Getter private final StrategyManager strategyManager = new StrategyManager();
 
@@ -180,6 +182,8 @@ public class Drive extends SubsystemBase {
     if (DriverStation.getAlliance().isPresent()) {
       reefFaceSelection = AlignmentUtils.findClosestReefFaceAndRejectOthers(getPose());
       coralStationSelection = AlignmentUtils.findClosestCoralStation(getPose());
+      processorSelection = AlignmentUtils.findClosestProcessor(getPose());
+
       algaeTargetPose = AlignmentUtils.getAlgaeRemovalTargetPose(getPose(), reefFaceSelection);
 
       if (FieldConstants.selectedCageTranslation != null)

@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -75,11 +76,10 @@ public class ButtonsAndDashboardBindings {
     SmartDashboard.putData(
         "Shelf - L1",
         Commands.runOnce(
-                () -> {
-                  if (coralSystem.haveCoral)
-                    coralSystem.setTargetPreset(CoralSystemPresets.L1_SCORE);
-                  else coralSystem.setTargetPreset(CoralSystemPresets.L1_STOW);
-                })); // L1
+            () -> {
+              if (coralSystem.haveCoral) coralSystem.setTargetPreset(CoralSystemPresets.L1_SCORE);
+              else coralSystem.setTargetPreset(CoralSystemPresets.L1_STOW);
+            })); // L1
 
     SmartDashboard.putData(
         "Low - L2",
@@ -103,12 +103,8 @@ public class ButtonsAndDashboardBindings {
 
     SmartDashboard.putData("Recover E&A", Commands.runOnce(coralSystem::recoverArmAndElevator));
 
-    SmartDashboard.putData(
-        "Deploy & Capture Algae",
-        Commands.runOnce(algae::pullAlgae)); // Deploy Algae Collector & Capture Algae
+    SmartDashboard.putData("Deploy & Capture Algae", getDeployAndCaptureAlgaeCommand());
 
-    // This is one button on the Button Box, not sure how to simulate the same thing
-    // from dashbaord
     SmartDashboard.putData(
         "Deploy & Process Algae",
         Commands.runOnce(algae::pushAlgae)); // Depoloy Algae Collector & Process Algae
@@ -128,6 +124,7 @@ public class ButtonsAndDashboardBindings {
                 oi::getTranslateY,
                 oi::getRotate,
                 coralSystem::isHaveCoral,
+                algae::haveAlgae,
                 climber::isClimberDeployed,
                 coralSystem.getElevator()::getHeightInInches)
             .ignoringDisable(true));
@@ -197,6 +194,7 @@ public class ButtonsAndDashboardBindings {
                 oi::getTranslateY,
                 oi::getRotate,
                 coralSystem::isHaveCoral,
+                algae::haveAlgae,
                 climber::isClimberDeployed,
                 coralSystem.getElevator()::getHeightInInches));
   }
@@ -240,9 +238,7 @@ public class ButtonsAndDashboardBindings {
         .onFalse(Commands.runOnce(algae::stowAlgae));
 
     oi.getButtonBox1Button6() // Deploy Collector & Capture Algae
-        .onTrue(Commands.runOnce(algae::pullAlgae));
-    // if we dont have a coral and PICKUP, dont move arm
-    // otherwise move to L1_STOW
+        .onTrue(getDeployAndCaptureAlgaeCommand());
 
     oi.getButtonBox1Button7() // Deploy Climber - the big switch
         .onTrue(Commands.runOnce(climber::deployClimber))
@@ -357,5 +353,16 @@ public class ButtonsAndDashboardBindings {
     if (!hasBranchStatus)
       Logger.recordOutput("AutoScore/Failure", "No branch alignment status available.");
     if (!alignmentGreen) Logger.recordOutput("AutoScore/Failure", "Alignment status is NOT GREEN.");
+  }
+
+  public static Command getDeployAndCaptureAlgaeCommand() {
+    return Commands.sequence(
+        Commands.runOnce(algae::pullAlgae), // PULL algae
+        new ConditionalCommand(
+            Commands.none(), // If the arm is in pickup or L1_STOW, do nothing
+            Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L1_STOW)),
+            () ->
+                (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.PICKUP
+                    || (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L1_STOW))));
   }
 }

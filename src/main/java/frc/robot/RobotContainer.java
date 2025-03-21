@@ -277,6 +277,7 @@ public class RobotContainer {
             oi::getTranslateY,
             oi::getRotate,
             coralSystem::isHaveCoral,
+            algae::haveAlgae,
             climber::isClimberDeployed,
             coralSystem.getElevator()::getHeightInInches)
         .schedule();

@@ -284,6 +284,7 @@ public class DriveCommands {
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier,
       Supplier<Boolean> haveCoralSupplier,
+      Supplier<Boolean> haveAlgaeSupplier,
       Supplier<Boolean> climberDeployedSupplier,
       DoubleSupplier elevatorHeightInchesSupplier) {
     return new InstantCommand(
@@ -303,10 +304,12 @@ public class DriveCommands {
                     drive::getPose,
                     elevatorHeightInchesSupplier,
                     haveCoralSupplier,
+                    haveAlgaeSupplier,
                     climberDeployedSupplier,
                     drive::getReefFaceSelection,
                     drive::getCoralStationSelection,
-                    drive::getCageSelection));
+                    drive::getCageSelection,
+                    drive::getProcessorSelection));
           }
         },
         drive);
@@ -318,6 +321,7 @@ public class DriveCommands {
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier,
       Supplier<Boolean> haveCoralSupplier,
+      Supplier<Boolean> haveAlgaeSupplier,
       Supplier<Boolean> climberDeployedSupplier,
       DoubleSupplier elevatorHeightInchesSupplier) {
     return new InstantCommand(
@@ -332,10 +336,12 @@ public class DriveCommands {
                   drive::getPose,
                   elevatorHeightInchesSupplier,
                   haveCoralSupplier,
+                  haveAlgaeSupplier,
                   climberDeployedSupplier,
                   drive::getReefFaceSelection,
                   drive::getCoralStationSelection,
-                  drive::getCageSelection));
+                  drive::getCageSelection,
+                  drive::getProcessorSelection));
         },
         drive);
   }
@@ -363,10 +369,12 @@ public class DriveCommands {
       Supplier<Pose2d> robotPoseSupplier,
       DoubleSupplier elevatorHeightInchesSupplier,
       Supplier<Boolean> haveCoralSupplier,
+      Supplier<Boolean> haveAlgaeSupplier,
       Supplier<Boolean> climberDeployedSupplier,
       Supplier<AlignmentUtils.ReefFaceSelection> reefFaceSelectionSupplier,
       Supplier<AlignmentUtils.CoralStationSelection> coralStationSelectionSupplier,
-      Supplier<AlignmentUtils.CageSelection> cageSelectionSupplier) {
+      Supplier<AlignmentUtils.CageSelection> cageSelectionSupplier,
+      Supplier<AlignmentUtils.ProcessorSelection> processorSelectionSupplier) {
 
     // Step 2: Get the StrategyManager to dynamically select alignment strat
     StrategyManager strategyManager = drive.getStrategyManager();
@@ -380,11 +388,13 @@ public class DriveCommands {
                   new AlignmentContext(
                       robotPoseSupplier.get(),
                       haveCoralSupplier.get(),
+                      haveAlgaeSupplier.get(),
                       elevatorHeightInchesSupplier.getAsDouble(),
                       climberDeployedSupplier.get(),
                       reefFaceSelectionSupplier.get(),
                       coralStationSelectionSupplier.get(),
-                      cageSelectionSupplier.get());
+                      cageSelectionSupplier.get(),
+                      processorSelectionSupplier.get());
               strategyManager.initialControllerReset(initContext);
             },
             drive);
@@ -411,11 +421,13 @@ public class DriveCommands {
                   new AlignmentContext(
                       robotPoseSupplier.get(),
                       haveCoralSupplier.get(),
+                      haveAlgaeSupplier.get(),
                       elevatorHeightInchesSupplier.getAsDouble(),
                       climberDeployedSupplier.get(),
                       reefFaceSelectionSupplier.get(),
                       coralStationSelectionSupplier.get(),
-                      cageSelectionSupplier.get());
+                      cageSelectionSupplier.get(),
+                      processorSelectionSupplier.get());
 
               // Step 3: Update alignment strategy
               strategyManager.updateStrategyForCycle(context);

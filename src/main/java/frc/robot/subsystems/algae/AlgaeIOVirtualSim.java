@@ -60,4 +60,14 @@ public class AlgaeIOVirtualSim implements AlgaeIO {
   public double rotationsToAngle(double rotations) {
     return (rotations / AlgaeConstants.kAlgaeDeployGearing) * 360.0;
   }
+
+  @Override
+  public void pullAlgae() {
+    setHaveAlgae(true);
+  }
+
+  @Override
+  public void pushAlgae() {
+    setHaveAlgae(false);
+  }
 }

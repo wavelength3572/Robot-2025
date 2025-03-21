@@ -15,6 +15,7 @@ public class StrategyManager implements AlignmentStrategy {
   private static final double THRESHOLD_DISTANCE_TO_REEF = 2.0;
   private static final double THRESHOLD_DISTANCE_TO_CORAL_STATION = 2.0;
   private static final double THRESHOLD_DISTANCE_TO_CAGE = 3.0;
+  private static final double THRESHOLD_DISTANCE_TO_PROCESSOR = 2.0;
 
   private static final double TOLERANCE_IN_DEGREES = 1.0;
 
@@ -27,6 +28,7 @@ public class StrategyManager implements AlignmentStrategy {
   private final AlignmentStrategy coralStationStrategy;
   private final AlignmentStrategy cageStrategy;
   private final AlignmentStrategy cageFullAlignmentStrategy;
+  private final AlignmentStrategy processorStrategy;
   private final NoOpAlignmentStrategy noOpStrategy = new NoOpAlignmentStrategy();
 
   // Store the currently active strategy for consistency across a loop cycle
@@ -53,6 +55,7 @@ public class StrategyManager implements AlignmentStrategy {
     coralStationStrategy = new CoralStationAlignmentStrategy(sharedAngleController);
     cageStrategy = new CageAlignmentStrategy(sharedAngleController);
     cageFullAlignmentStrategy = new CageFullAlignmentStrategy(sharedAngleController);
+    processorStrategy = new ProcessorAlignmentStrategy(sharedAngleController);
   }
 
   public void toggleAutoCageAlignmentMode() {
@@ -66,6 +69,7 @@ public class StrategyManager implements AlignmentStrategy {
   public void updateStrategyForCycle(AlignmentContext context) {
 
     boolean haveCoral = context.isHaveCoral();
+    boolean haveAlgae = context.isHaveAlgae();
     boolean climberDeployed = context.isClimberDeployed();
 
     boolean nearReef =
@@ -81,6 +85,11 @@ public class StrategyManager implements AlignmentStrategy {
         context.getCageSelection() != null
             && context.getCageSelection().getDistanceToCage() <= THRESHOLD_DISTANCE_TO_CAGE;
 
+    boolean nearProcessor =
+        context.getProcessorSelection() != null
+            && context.getProcessorSelection().getDistanceToProcessor()
+                <= THRESHOLD_DISTANCE_TO_PROCESSOR;
+
     // If scoring at L1, we need to reverse the alignment.
     boolean shouldFlipReefAlignment = RobotStatus.getTargetPreset() == CoralSystemPresets.L1_SCORE;
 
@@ -91,6 +100,8 @@ public class StrategyManager implements AlignmentStrategy {
       }
     } else if (nearCoralStation && !haveCoral && !climberDeployed) {
       currentActiveStrategy = coralStationStrategy;
+    } else if (nearProcessor && haveAlgae && !climberDeployed) {
+      currentActiveStrategy = processorStrategy;
     } else if (nearCage && climberDeployed) {
       currentActiveStrategy = fullCageAlignment ? cageFullAlignmentStrategy : cageStrategy;
     } else {

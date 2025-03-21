@@ -21,17 +21,18 @@ import java.util.Optional;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
+// 3-20 and 3-21 changes:
 // Auto Scoring
 // 1) if driver auto aligns - checks if we are inConfiguration, haveSeenTag recently, and aligned
 // 2) if operator goes to score config - scores if haveSeenReefTag recently and aligned
 // L1 auto scoring only on driver button (easy to remove)
 // smart drive working for L1
-// cagealignment - no buttons for alignment (just cares about climber deployed and within 2.5 meters of mid cage)
+// cagealignment - no buttons for alignment (just cares about climber and dist to mid cage)
+// Arm goes safe position when capturing algae
 
-// move arm when algae intake is out. L1_stow or stay in intake position
 // pulls in coral for 1 second if it thinks it has coral already
-// algae process alignment?
 
+// algae process automatic alignment
 // add TOF on front for coral on reef and correction?
 // investigate algae dislodge (do we need to remove driver control?)
 
@@ -90,11 +91,14 @@ public class AlignmentUtils {
   public static ReefFaceSelection findClosestReefFaceAndRejectOthers(Pose2d robotPose) {
     Optional<Alliance> alliance = DriverStation.getAlliance();
     Map<Integer, Translation2d> aprilTagMap;
+    Map<Integer, Rotation2d[]> faceOrientationMap;
 
     if (alliance.get() == Alliance.Blue) {
       aprilTagMap = FieldConstants.BLUE_REEF_APRIL_TAGS;
+      faceOrientationMap = FieldConstants.REEF_FACE_ORIENTATION_BLUE;
     } else if (alliance.get() == Alliance.Red) {
       aprilTagMap = FieldConstants.RED_REEF_APRIL_TAGS;
+      faceOrientationMap = FieldConstants.REEF_FACE_ORIENTATION_RED;
     } else {
       return new ReefFaceSelection(null, null, Double.NaN, new Translation2d[0], false);
     }
@@ -129,8 +133,8 @@ public class AlignmentUtils {
     boolean tagSeenRecently = RobotStatus.hasRecentlySeenAprilTag(acceptedFaceId, 3.0);
     Logger.recordOutput("Alignment/Reef/TagSeenRecently", tagSeenRecently);
 
-    // Get the Reef face orientation
-    Rotation2d faceOrientation = FieldConstants.REEF_FACE_ORIENTATION_BLUE.get(acceptedFaceId)[0];
+    // Get the Reef face orientation based on alliance color
+    Rotation2d faceOrientation = faceOrientationMap.get(acceptedFaceId)[0];
 
     // Compute perpendicular distance using shared helper
     double perpendicularDistance =
@@ -234,11 +238,14 @@ public class AlignmentUtils {
   public static CoralStationSelection findClosestCoralStation(Pose2d robotPose) {
     Optional<Alliance> alliance = DriverStation.getAlliance();
     Map<Integer, Translation2d> aprilTagMap;
+    Map<Integer, Rotation2d[]> stationOrientationMap;
 
     if (alliance.get() == Alliance.Blue) {
       aprilTagMap = FieldConstants.BLUE_CORALSTATION_APRIL_TAGS;
+      stationOrientationMap = FieldConstants.CORAL_STATION_ORIENTATION_BLUE;
     } else if (alliance.get() == Alliance.Red) {
       aprilTagMap = FieldConstants.RED_CORALSTATION_APRIL_TAGS;
+      stationOrientationMap = FieldConstants.CORAL_STATION_ORIENTATION_RED;
     } else {
       return new CoralStationSelection(null, null, Double.NaN, new Translation2d[0]);
     }
@@ -249,10 +256,10 @@ public class AlignmentUtils {
 
     Map<Integer, Double> distanceMap = new HashMap<>();
     for (Map.Entry<Integer, Translation2d> entry : aprilTagMap.entrySet()) {
-      int faceId = entry.getKey();
-      Translation2d faceTranslation = entry.getValue();
-      double distance = robotPose.getTranslation().getDistance(faceTranslation);
-      distanceMap.put(faceId, distance);
+      int stationId = entry.getKey();
+      Translation2d stationTranslation = entry.getValue();
+      double distance = robotPose.getTranslation().getDistance(stationTranslation);
+      distanceMap.put(stationId, distance);
     }
 
     Map.Entry<Integer, Double> minEntry = null;
@@ -269,9 +276,8 @@ public class AlignmentUtils {
     int acceptedStationId = minEntry.getKey();
     Translation2d acceptedStation = aprilTagMap.get(acceptedStationId);
 
-    // Get the Coral Station face orientation
-    Rotation2d stationOrientation =
-        FieldConstants.CORAL_STATION_ORIENTATION_BLUE.get(acceptedStationId)[0];
+    // Get the Coral Station face orientation based on alliance color
+    Rotation2d stationOrientation = stationOrientationMap.get(acceptedStationId)[0];
 
     // Compute perpendicular distance using shared helper
     double perpendicularDistance =
@@ -510,5 +516,81 @@ public class AlignmentUtils {
     return Math.abs(
         referenceToRobotVector.getX() * normalVector.getX()
             + referenceToRobotVector.getY() * normalVector.getY());
+  }
+
+  public static class ProcessorSelection {
+    private final Translation2d processorSelectionTranslation;
+    private final double distanceToProcessor;
+    private final Rotation2d rotationToProcessor;
+
+    public ProcessorSelection(
+        Translation2d processorSelectionTranslation,
+        double distanceToProcessor,
+        Rotation2d rotationToProcessor) {
+      this.processorSelectionTranslation = processorSelectionTranslation;
+      this.distanceToProcessor = distanceToProcessor;
+      this.rotationToProcessor = rotationToProcessor;
+    }
+
+    public Translation2d getProcessorSelectionTranslation() {
+      return processorSelectionTranslation;
+    }
+
+    public double getDistanceToProcessor() {
+      return distanceToProcessor;
+    }
+
+    public Rotation2d getRotationToProcessor() {
+      return rotationToProcessor;
+    }
+  }
+
+  public static ProcessorSelection findClosestProcessor(Pose2d robotPose) {
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    Map<Integer, Translation2d> aprilTagMap;
+    Rotation2d processorOrientation;
+
+    if (alliance.isPresent() && alliance.get() == Alliance.Blue) {
+      aprilTagMap = FieldConstants.BLUE_PROCESSOR_APRIL_TAG;
+      processorOrientation = FieldConstants.PROCESSOR_ORIENTATION_BLUE;
+    } else if (alliance.isPresent() && alliance.get() == Alliance.Red) {
+      aprilTagMap = FieldConstants.RED_PROCESSOR_APRIL_TAG;
+      processorOrientation = FieldConstants.PROCESSOR_ORIENTATION_RED;
+    } else {
+      return new ProcessorSelection(null, Double.NaN, null);
+    }
+
+    if (aprilTagMap.isEmpty()) {
+      return new ProcessorSelection(null, Double.NaN, null);
+    }
+
+    Map<Integer, Double> distanceMap = new HashMap<>();
+    for (Map.Entry<Integer, Translation2d> entry : aprilTagMap.entrySet()) {
+      int processorId = entry.getKey();
+      Translation2d processorTranslation = entry.getValue();
+      double distance = robotPose.getTranslation().getDistance(processorTranslation);
+      distanceMap.put(processorId, distance);
+    }
+
+    Map.Entry<Integer, Double> minEntry = null;
+    for (Map.Entry<Integer, Double> entry : distanceMap.entrySet()) {
+      if (minEntry == null || entry.getValue() < minEntry.getValue()) {
+        minEntry = entry;
+      }
+    }
+
+    if (minEntry == null) {
+      return new ProcessorSelection(null, Double.NaN, null);
+    }
+
+    int acceptedProcessorId = minEntry.getKey();
+    Translation2d acceptedProcessor = aprilTagMap.get(acceptedProcessorId);
+
+    Logger.recordOutput("Alignment/Processor/ClosestDistance", minEntry.getValue());
+    Logger.recordOutput("Alignment/Processor/AcceptedProcessor", acceptedProcessor);
+    Logger.recordOutput("Alignment/Processor/AcceptedProcessorID", acceptedProcessorId);
+    Logger.recordOutput("Alignment/Processor/ProcessorOrientation", processorOrientation);
+
+    return new ProcessorSelection(acceptedProcessor, minEntry.getValue(), processorOrientation);
   }
 }
