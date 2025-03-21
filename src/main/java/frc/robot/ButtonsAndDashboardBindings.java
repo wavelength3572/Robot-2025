@@ -285,8 +285,8 @@ public class ButtonsAndDashboardBindings {
 
     oi.getButtonBox1Button6() // Deploy Collector & Capture Algae
         .onTrue(Commands.runOnce(algae::pullAlgae));
-        //if we dont have a coral and PICKUP, dont move arm
-        //otherwise move to L1_STOW
+    // if we dont have a coral and PICKUP, dont move arm
+    // otherwise move to L1_STOW
 
     oi.getButtonBox1Button7() // Deploy Climber - the big switch
         .onTrue(Commands.runOnce(climber::deployClimber))

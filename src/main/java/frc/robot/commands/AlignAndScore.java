@@ -8,6 +8,9 @@ import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AlignmentUtils;
+import frc.robot.util.BranchAlignmentUtils;
+import frc.robot.util.BranchAlignmentUtils.BranchAlignmentStatus;
+
 import java.util.function.Supplier;
 
 public class AlignAndScore {
@@ -71,15 +74,20 @@ public class AlignAndScore {
             new ScoreCoralInTeleopCommand(coralSystem.getIntake()), // Auto-score command
             Commands.none(), // No scoring if preset is not correct
             () ->
-                (coralSystem.getCurrentCoralPreset() == coralSystem.getTargetCoralPreset()
-                    && (coralSystem.getTargetCoralPreset() == CoralSystemPresets.L1
-                        || coralSystem.getTargetCoralPreset() == CoralSystemPresets.L2
-                        || coralSystem.getTargetCoralPreset() == CoralSystemPresets.L3
-                        || coralSystem.getTargetCoralPreset() == CoralSystemPresets.L4))));
+                inScoringConfiguration(coralSystem)
+                    && drive.getReefFaceSelection().getTagSeenRecently()
+                    && BranchAlignmentUtils.getCurrentBranchAlignmentStatus() == BranchAlignmentStatus.GREEN));
   }
 
   /** Calculates the target pose for pole alignment using correct alliance logic. */
   private static Pose2d calculatePolePose(Drive drive, int faceId, boolean isLeftPole) {
     return DriveToCommands.calculatePolePose(drive, faceId, isLeftPole);
+  }
+
+  private static boolean inScoringConfiguration(CoralSystem coralSystem) {
+    return coralSystem.getCurrentCoralPreset() == coralSystem.getTargetCoralPreset()
+        && (coralSystem.getTargetCoralPreset() == CoralSystemPresets.L2
+            || coralSystem.getTargetCoralPreset() == CoralSystemPresets.L3
+            || coralSystem.getTargetCoralPreset() == CoralSystemPresets.L4);
   }
 }

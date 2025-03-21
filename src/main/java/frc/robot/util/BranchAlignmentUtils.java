@@ -26,7 +26,7 @@ public final class BranchAlignmentUtils {
   private static final double FORWARD_THRESHOLD = 0.10;
 
   // Lateral thresholds for traffic-light style alignment.
-  public static final double LATERAL_THRESHOLD_RED = 0.150;
+  public static final double LATERAL_THRESHOLD_RED = 0.12;
   public static final double LATERAL_THRESHOLD_SOLID_GREEN =
       0.025; // this is only used to make the blinking solid
 

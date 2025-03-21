@@ -22,6 +22,16 @@ import java.util.Optional;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
+// Fix ending of Auto align and score
+// Only score if you have seen vision (xtime) has been seen and it thinks we are aligned.
+// optional auto score if the alignment was done first and confident we are in scoring position.
+// no L1 auto score
+// turn off smart drive or change procedure when scoring L1
+// investigate algae dislodge needs work
+// move arm when algae intake is out. L1_stow or stay in intake position
+// add TOF on front for coral on reef and correction?
+// pulls in coral for 1 second if it thinks it has coral already
+
 @AutoLog
 public class AlignmentUtils {
 
@@ -33,6 +43,7 @@ public class AlignmentUtils {
     private final Translation2d acceptedFace;
     private final double acceptedDistance;
     private final Translation2d[] rejectedFaces;
+    private final boolean tagSeenRecently;
 
     public enum PolePosition {
       A_LEFT,
@@ -43,11 +54,13 @@ public class AlignmentUtils {
         Integer acceptedFaceId,
         Translation2d acceptedFace,
         double acceptedDistance,
-        Translation2d[] rejectedFaces) {
+        Translation2d[] rejectedFaces,
+        boolean tagSeenRecently) {
       this.acceptedFaceId = acceptedFaceId;
       this.acceptedFace = acceptedFace;
       this.acceptedDistance = acceptedDistance;
       this.rejectedFaces = rejectedFaces;
+      this.tagSeenRecently = tagSeenRecently;
     }
 
     public Integer getAcceptedFaceId() {
@@ -65,6 +78,10 @@ public class AlignmentUtils {
     public Translation2d[] getRejectedFaces() {
       return rejectedFaces;
     }
+
+    public boolean getTagSeenRecently() {
+      return tagSeenRecently;
+    }
   }
 
   public static ReefFaceSelection findClosestReefFaceAndRejectOthers(Pose2d robotPose) {
@@ -76,11 +93,11 @@ public class AlignmentUtils {
     } else if (alliance.get() == Alliance.Red) {
       aprilTagMap = FieldConstants.RED_REEF_APRIL_TAGS;
     } else {
-      return new ReefFaceSelection(null, null, Double.NaN, new Translation2d[0]);
+      return new ReefFaceSelection(null, null, Double.NaN, new Translation2d[0], false);
     }
 
     if (aprilTagMap.isEmpty()) {
-      return new ReefFaceSelection(null, null, Double.NaN, new Translation2d[0]);
+      return new ReefFaceSelection(null, null, Double.NaN, new Translation2d[0], false);
     }
 
     Map<Integer, Double> distanceMap = new HashMap<>();
@@ -99,7 +116,7 @@ public class AlignmentUtils {
     }
 
     if (minEntry == null) {
-      return new ReefFaceSelection(null, null, Double.NaN, new Translation2d[0]);
+      return new ReefFaceSelection(null, null, Double.NaN, new Translation2d[0], false);
     }
 
     int acceptedFaceId = minEntry.getKey();
@@ -127,7 +144,7 @@ public class AlignmentUtils {
     Logger.recordOutput("Alignment/Reef/AcceptedFaceID", acceptedFaceId);
 
     return new ReefFaceSelection(
-        acceptedFaceId, acceptedFace, perpendicularDistance, rejectedFaces);
+        acceptedFaceId, acceptedFace, perpendicularDistance, rejectedFaces, tagSeenRecently);
   }
 
   public static ReefChosenOrientation pickClosestOrientationForReef(Pose2d robotPose, int faceId) {

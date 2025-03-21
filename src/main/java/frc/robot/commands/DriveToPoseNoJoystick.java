@@ -91,7 +91,6 @@ public class DriveToPoseNoJoystick extends Command {
         currentPose.getRotation().getRadians(), currentSpeeds.omegaRadiansPerSecond);
 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
-    timeoutTimer.reset();
 
     targetPose = poseSupplier.get();
     targetX = targetPose.getX();
@@ -108,6 +107,8 @@ public class DriveToPoseNoJoystick extends Command {
     Logger.recordOutput("DriveToPose/targetPoseX", targetX);
     Logger.recordOutput("DriveToPose/targetPoseY", targetY);
     Logger.recordOutput("DriveToPose/targetPoseTheta", Units.radiansToDegrees(targetTheta));
+    timeoutTimer.restart();
+
   }
 
   @Override
