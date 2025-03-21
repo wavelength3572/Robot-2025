@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.FieldConstants.CageTarget;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AlignAndScore;
 import frc.robot.commands.DriveCommands;
@@ -21,7 +20,6 @@ import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.util.AlignmentUtils;
 import frc.robot.util.BranchAlignmentUtils;
 import frc.robot.util.BranchAlignmentUtils.BranchAlignmentStatus;
 import frc.robot.util.RobotStatus;
@@ -76,7 +74,12 @@ public class ButtonsAndDashboardBindings {
     // Dashboard Buttons to Mimic the Button Box
     SmartDashboard.putData(
         "Shelf - L1",
-        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L1_SCORE)));
+        Commands.runOnce(
+                () -> {
+                  if (coralSystem.haveCoral)
+                    coralSystem.setTargetPreset(CoralSystemPresets.L1_SCORE);
+                  else coralSystem.setTargetPreset(CoralSystemPresets.L1_STOW);
+                })); // L1
 
     SmartDashboard.putData(
         "Low - L2",
@@ -179,51 +182,8 @@ public class ButtonsAndDashboardBindings {
     oi.getResetGyroButton()
         .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
 
-    setInitialCageSelectionToMatchSwitch();
-
-    oi.getButtonDPosition0()
-        .onTrue(
-            Commands.runOnce(AlignmentUtils::setLeftCage)
-                .ignoringDisable(true)
-                .alongWith(Commands.runOnce(() -> climber.setSelectedCageTarget(CageTarget.LEFT)))
-                .ignoringDisable(true));
-    oi.getButtonDPosition1()
-        .onTrue(
-            Commands.runOnce(AlignmentUtils::setMidCage)
-                .ignoringDisable(true)
-                .alongWith(Commands.runOnce(() -> climber.setSelectedCageTarget(CageTarget.MID)))
-                .ignoringDisable(true));
-    oi.getButtonDPosition2()
-        .onTrue(
-            Commands.runOnce(AlignmentUtils::setRightCage)
-                .ignoringDisable(true)
-                .alongWith(Commands.runOnce(() -> climber.setSelectedCageTarget(CageTarget.RIGHT)))
-                .ignoringDisable(true));
-
     oi.getRightJoyLeftButton().onTrue(AlignAndScore.create(drive, coralSystem, true));
-
-    // .onTrue(
-    // DriveToCommands.driveToPole(
-    // drive,
-    // true,
-    // oi::getTranslateX,
-    // oi::getTranslateY,
-    // oi::getRotate,
-    // FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-    // coralSystem::isHaveCoral));
-
-    oi.getRightJoyRightButton()
-        // .onTrue(
-        // DriveToCommands.driveToPole(
-        // drive,
-        // false,
-        // oi::getTranslateX,
-        // oi::getTranslateY,
-        // oi::getRotate,
-        // FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-        // coralSystem::isHaveCoral));
-
-        .onTrue(AlignAndScore.create(drive, coralSystem, false));
+    oi.getRightJoyRightButton().onTrue(AlignAndScore.create(drive, coralSystem, false));
 
     oi.getRightJoyDownButton().onTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
 
@@ -239,19 +199,6 @@ public class ButtonsAndDashboardBindings {
                 coralSystem::isHaveCoral,
                 climber::isClimberDeployed,
                 coralSystem.getElevator()::getHeightInInches));
-  }
-
-  private static void setInitialCageSelectionToMatchSwitch() {
-    if (oi.getButtonDPosition0().getAsBoolean()) {
-      AlignmentUtils.setLeftCage();
-      climber.setSelectedCageTarget(CageTarget.LEFT);
-    } else if (oi.getButtonDPosition1().getAsBoolean()) {
-      AlignmentUtils.setMidCage();
-      climber.setSelectedCageTarget(CageTarget.MID);
-    } else {
-      AlignmentUtils.setRightCage();
-      climber.setSelectedCageTarget(CageTarget.RIGHT);
-    }
   }
 
   /****************************** */

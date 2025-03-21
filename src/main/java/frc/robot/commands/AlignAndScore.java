@@ -46,7 +46,7 @@ public class AlignAndScore {
           if (isScoringL1) {
             targetPose = calculateL1Pose(drive, selection.getAcceptedFaceId());
           } else {
-            targetPose = calculatePolePose(drive, selection.getAcceptedFaceId(), !isLeftPole);
+            targetPose = calculatePolePose(drive, selection.getAcceptedFaceId(), isLeftPole);
           }
 
           if (targetPose == null) {

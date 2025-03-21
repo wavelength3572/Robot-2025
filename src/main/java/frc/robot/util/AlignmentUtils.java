@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.FieldConstants;
-import frc.robot.FieldConstants.CageTarget;
 import frc.robot.FieldConstants.ReefChosenOrientation;
 import frc.robot.FieldConstants.ReefFacesBlue;
 import frc.robot.FieldConstants.ReefFacesRed;
@@ -25,15 +24,16 @@ import org.littletonrobotics.junction.Logger;
 // Auto Scoring
 // 1) if driver auto aligns - checks if we are inConfiguration, haveSeenTag recently, and aligned
 // 2) if operator goes to score config - scores if haveSeenReefTag recently and aligned
+// L1 auto scoring only on driver button (easy to remove)
+// smart drive working for L1
+// cagealignment - no buttons for alignment (just cares about climber deployed and within 2.5 meters of mid cage)
 
-// no L1 auto score
-
-// turn off smart drive or change procedure when scoring L1
-
-// investigate algae dislodge needs work
 // move arm when algae intake is out. L1_stow or stay in intake position
-// add TOF on front for coral on reef and correction?
 // pulls in coral for 1 second if it thinks it has coral already
+// algae process alignment?
+
+// add TOF on front for coral on reef and correction?
+// investigate algae dislodge (do we need to remove driver control?)
 
 @AutoLog
 public class AlignmentUtils {
@@ -379,18 +379,6 @@ public class AlignmentUtils {
         "Alignment/CageAlignmentTarget/TargetAngleDeg", Math.toDegrees(targetAngleRadians));
 
     return target;
-  }
-
-  public static void setLeftCage() {
-    FieldConstants.selectedCageTranslation = FieldConstants.getCage(CageTarget.LEFT);
-  }
-
-  public static void setMidCage() {
-    FieldConstants.selectedCageTranslation = FieldConstants.getCage(CageTarget.MID);
-  }
-
-  public static void setRightCage() {
-    FieldConstants.selectedCageTranslation = FieldConstants.getCage(CageTarget.RIGHT);
   }
 
   public static class CageSelection {

@@ -14,7 +14,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 public class StrategyManager implements AlignmentStrategy {
   private static final double THRESHOLD_DISTANCE_TO_REEF = 2.0;
   private static final double THRESHOLD_DISTANCE_TO_CORAL_STATION = 2.0;
-  private static final double THRESHOLD_DISTANCE_TO_CAGE = 1.0;
+  private static final double THRESHOLD_DISTANCE_TO_CAGE = 3.0;
 
   private static final double TOLERANCE_IN_DEGREES = 1.0;
 
