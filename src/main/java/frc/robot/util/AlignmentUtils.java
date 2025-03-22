@@ -31,14 +31,16 @@ import org.littletonrobotics.junction.Logger;
 // Arm goes safe position when capturing algae
 // algae processing orientation for smart drive
 
-// pulls in coral for 1 second if it thinks it has coral already - this is tricky because of how intake is coded 
+// pulls in coral for 1 second if it thinks it has coral already - this is tricky because of how
+// intake is coded
 // add TOF on front for coral on reef and correction?
 // investigate algae dislodge (do we need to remove driver control?)
 
 @AutoLog
 public class AlignmentUtils {
 
-  public static Transform2d ALGAE_OFFSET = new Transform2d(new Translation2d(.025, 0), new Rotation2d(0));
+  public static Transform2d ALGAE_OFFSET =
+      new Transform2d(new Translation2d(.025, 0), new Rotation2d(0));
 
   public static class ReefFaceSelection {
     private final Integer acceptedFaceId;
@@ -135,10 +137,12 @@ public class AlignmentUtils {
     Rotation2d faceOrientation = faceOrientationMap.get(acceptedFaceId)[0];
 
     // Compute perpendicular distance using shared helper
-    double perpendicularDistance = getPerpendicularDistance(robotPose.getTranslation(), acceptedFace, faceOrientation);
+    double perpendicularDistance =
+        getPerpendicularDistance(robotPose.getTranslation(), acceptedFace, faceOrientation);
 
     distanceMap.remove(acceptedFaceId);
-    Translation2d[] rejectedFaces = distanceMap.keySet().stream().map(aprilTagMap::get).toArray(Translation2d[]::new);
+    Translation2d[] rejectedFaces =
+        distanceMap.keySet().stream().map(aprilTagMap::get).toArray(Translation2d[]::new);
 
     Logger.recordOutput("Alignment/Reef/ClosestDistance", minEntry.getValue());
     Logger.recordOutput("Alignment/Reef/PerpendicularDistance", perpendicularDistance);
@@ -276,12 +280,12 @@ public class AlignmentUtils {
     Rotation2d stationOrientation = stationOrientationMap.get(acceptedStationId)[0];
 
     // Compute perpendicular distance using shared helper
-    double perpendicularDistance = getPerpendicularDistance(robotPose.getTranslation(), acceptedStation,
-        stationOrientation);
+    double perpendicularDistance =
+        getPerpendicularDistance(robotPose.getTranslation(), acceptedStation, stationOrientation);
 
     distanceMap.remove(acceptedStationId);
-    Translation2d[] rejectedStations = distanceMap.keySet().stream().map(aprilTagMap::get)
-        .toArray(Translation2d[]::new);
+    Translation2d[] rejectedStations =
+        distanceMap.keySet().stream().map(aprilTagMap::get).toArray(Translation2d[]::new);
 
     Logger.recordOutput("Alignment/CoralStation/ClosestDistance", minEntry.getValue());
     Logger.recordOutput("Alignment/CoralStation/PerpendicularDistance", perpendicularDistance);
@@ -346,16 +350,11 @@ public class AlignmentUtils {
   /**
    * Returns a fixed cage alignment target.
    *
-   * <p>
-   * This method creates a CageSelection that represents the fixed target for
-   * aligning to the
-   * cage. The target rotation is locked based on the alliance: 0° for Blue and
-   * 180° for Red.
+   * <p>This method creates a CageSelection that represents the fixed target for aligning to the
+   * cage. The target rotation is locked based on the alliance: 0° for Blue and 180° for Red.
    *
-   * @param robotPose       The current robot Pose2d (used here only to compute
-   *                        the distance, if desired).
-   * @param cageTranslation The known field position (Translation2d) of the cage
-   *                        (or cage center).
+   * @param robotPose The current robot Pose2d (used here only to compute the distance, if desired).
+   * @param cageTranslation The known field position (Translation2d) of the cage (or cage center).
    * @return A CageSelection representing the fixed cage alignment target.
    */
   public static CageSelection getCageAlignmentTarget(
@@ -505,9 +504,10 @@ public class AlignmentUtils {
       Translation2d referencePosition,
       Rotation2d referenceOrientation) {
     // Convert Rotation2d to a unit normal vector (direction the face is pointing)
-    Translation2d normalVector = new Translation2d(
-        Math.cos(referenceOrientation.getRadians()),
-        Math.sin(referenceOrientation.getRadians()));
+    Translation2d normalVector =
+        new Translation2d(
+            Math.cos(referenceOrientation.getRadians()),
+            Math.sin(referenceOrientation.getRadians()));
 
     // Compute the vector from the reference position (reef/station) to the robot
     Translation2d referenceToRobotVector = robotPosition.minus(referencePosition);
