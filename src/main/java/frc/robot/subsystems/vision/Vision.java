@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.RobotStatus;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -278,6 +279,7 @@ public class Vision extends SubsystemBase {
   }
 
   private void updatePhotonVisionEstimates() {
+
     // Example logging structures
     List<Pose3d> allPhotonRobotPoses = new LinkedList<>();
     List<Pose3d> allPhotonRobotPosesAccepted = new LinkedList<>();
@@ -295,12 +297,15 @@ public class Vision extends SubsystemBase {
 
       // If we have a valid PhotonPoseEstimator
       PhotonPoseEstimator estimator = photonEstimators[cameraIndex];
+  
       if (estimator == null) {
         continue;
       }
 
       // Process each pipeline result
       for (var result : unreadResults) {
+        Rotation2d gyroAngle = RobotStatus.getRobotPose().getRotation();
+        estimator.addHeadingData(result.getTimestampSeconds(), gyroAngle);
         // Let PhotonPoseEstimator produce a pose estimate
         var maybeEstimatedRobotPose = estimator.update(result);
         if (maybeEstimatedRobotPose.isEmpty()) {

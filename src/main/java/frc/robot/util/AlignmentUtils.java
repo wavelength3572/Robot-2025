@@ -35,6 +35,7 @@ import org.littletonrobotics.junction.Logger;
 // intake is coded
 // add TOF on front for coral on reef and correction?
 // investigate algae dislodge (do we need to remove driver control?)
+// should we try something else?
 
 @AutoLog
 public class AlignmentUtils {
