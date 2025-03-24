@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Servo;
 import frc.robot.subsystems.climber.ClimberConstants.CLIMB_STATE;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.RobotStatus;
@@ -25,8 +26,13 @@ public class ClimberIOSpark implements ClimberIO {
 
   private double targetPosition = 0;
 
-  private static final LoggedTunableNumber ClimberkP =
-      new LoggedTunableNumber("Climber/kp", ClimberConstants.climberKp);
+  private static final LoggedTunableNumber ClimberkP = new LoggedTunableNumber("Climber/kp",
+      ClimberConstants.climberKp);
+
+  private static final LoggedTunableNumber climbManualPosition = new LoggedTunableNumber("Climber/target",
+      -1.0);
+
+  private Servo servo = new Servo(1);
 
   public ClimberIOSpark() {
     climberMotor.configure(
@@ -50,31 +56,36 @@ public class ClimberIOSpark implements ClimberIO {
     // config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     // }
 
+    if (climbManualPosition.hasChanged(hashCode())) {
+      manualClimbPosition(climbManualPosition.get());
+    }
+
     switch (currentClimberState) {
       case STOWED:
         climberMotor.set(0.0);
         break;
       case FAST_DEPLOY:
-        targetPosition = ClimberConstants.FAST_DEPLOY_POSITION;
+        targetPosition = drumToEncoder(ClimberConstants.FAST_DEPLOY_POSITION);
         if (RobotStatus.algaeArmIsSafeForClimbing()) {
           climberMotor.set(-1.0); // Deploy as fast as we can
-          if (climberEncoder.getPosition() < ClimberConstants.FAST_DEPLOY_POSITION) {
+          if (climberEncoder.getPosition() < targetPosition) {
             currentClimberState = CLIMB_STATE.DEPLOY;
           }
         }
         break;
       case DEPLOY:
-        targetPosition = ClimberConstants.DEPLOY_POSITION;
-        climberController.setReference(ClimberConstants.DEPLOY_POSITION, ControlType.kPosition);
+        targetPosition = drumToEncoder(ClimberConstants.DEPLOY_POSITION);
+        climberController.setReference(targetPosition, ControlType.kPosition);
         break;
       case CLIMB:
-        targetPosition = ClimberConstants.CLIMBED_POSITION;
-        climberController.setReference(ClimberConstants.CLIMBED_POSITION, ControlType.kPosition);
+        targetPosition = drumToEncoder(ClimberConstants.CLIMBED_POSITION);
+        climberController.setReference(targetPosition, ControlType.kPosition);
         setRelayState(Relay.Value.kReverse); // Foot longer
         break;
       case FINAL:
-        // Target position will come from stopClimber command
-        climberController.setReference(targetPosition, ControlType.kPosition);
+        if (RobotStatus.algaeArmIsSafeForClimbing()) {
+          climberController.setReference(targetPosition, ControlType.kPosition);
+        }
         break;
       default:
         break;
@@ -92,10 +103,10 @@ public class ClimberIOSpark implements ClimberIO {
     currentClimberState = CLIMB_STATE.FAST_DEPLOY;
   }
 
-  public void stopClimber() {
-    targetPosition = climberEncoder.getPosition();
-    currentClimberState = CLIMB_STATE.FINAL;
-  }
+  // public void stopClimber() {
+  // targetPosition = climberEncoder.getPosition();
+  // currentClimberState = CLIMB_STATE.FINAL;
+  // }
 
   public void climb() {
     if (currentClimberState == CLIMB_STATE.DEPLOY) {
@@ -112,12 +123,27 @@ public class ClimberIOSpark implements ClimberIO {
     return (this.currentClimberState != CLIMB_STATE.STOWED);
   }
 
+  public void manualClimbPosition(double encoderRotations) {
+    if (encoderRotations < -2) {
+      targetPosition = encoderRotations;
+      currentClimberState = CLIMB_STATE.FINAL;
+    }
+  }
+
+  public double drumToEncoder(double drumRotations) {
+    return drumRotations * ClimberConstants.kClimberGearing;
+  }
+
+  public double encoderToDrum(double encoderRotations) {
+    return encoderRotations / ClimberConstants.kClimberGearing;
+  }
+
   @Override
   public boolean isClimbingFinished() {
     if (currentClimberState == CLIMB_STATE.CLIMB) {
-      double difference =
-          Math.abs(ClimberConstants.CLIMBED_POSITION - climberEncoder.getPosition());
+      double difference = Math.abs(drumToEncoder(ClimberConstants.CLIMBED_POSITION) - climberEncoder.getPosition());
       return (difference < ClimberConstants.CLIMBING_TOLERANCE) ? true : false;
-    } else return false;
+    } else
+      return false;
   }
 }
