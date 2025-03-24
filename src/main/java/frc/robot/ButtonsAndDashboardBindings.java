@@ -299,6 +299,8 @@ public class ButtonsAndDashboardBindings {
           if (RobotStatus.haveCoral() == false) {
             coralSystem.setTargetPreset(CoralSystemPresets.PICKUP);
             coralSystem.getIntake().pullCoral();
+          } else {
+            coralSystem.getIntake().pullCoral();
           }
         });
   }
