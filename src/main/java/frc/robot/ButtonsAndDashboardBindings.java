@@ -84,18 +84,18 @@ public class ButtonsAndDashboardBindings {
 
     SmartDashboard.putData(
         "Low - L2",
-        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L2))
-            .andThen(waitForScoringConditions(drive, coralSystem)));
+        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L2)));
+            // .andThen(waitForScoringConditions(drive, coralSystem)));
 
     SmartDashboard.putData(
         "Mid - L3",
-        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L3))
-            .andThen(waitForScoringConditions(drive, coralSystem)));
+        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L3)));
+            // .andThen(waitForScoringConditions(drive, coralSystem)));
 
     SmartDashboard.putData(
         "High - L4",
-        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L4))
-            .andThen(waitForScoringConditions(drive, coralSystem)));
+        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L4)));
+            // .andThen(waitForScoringConditions(drive, coralSystem)));
 
     SmartDashboard.putData("Pickup Coral", createPickupCoralCommand());
     SmartDashboard.putData("Reef Action", createReefActionCommand()); // Score OR Dislodge

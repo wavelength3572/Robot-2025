@@ -76,6 +76,7 @@ public class AlignAndScore {
 
         // Log when alignment is done
         Commands.runOnce(() -> System.out.println("Robot aligned, checking presets...")),
+        new TimedWaitUntilCommand("inPresetConfiguration", coralSystem::isAtGoal),
 
         // Auto-score only if preset matches, otherwise do nothing
         Commands.either(
