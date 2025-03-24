@@ -36,7 +36,8 @@ public final class ClimberConstants {
   public static final double climberKp = 0.03;
   public static final double climberKd = 0.0;
 
-  public static final double CLIMBING_TOLERANCE = 20.0; // Encoder rotations, same as .333333 drum rotations
+  public static final double CLIMBING_TOLERANCE =
+      20.0; // Encoder rotations, same as .333333 drum rotations
 
   public static final double kClimberGearing = 60.0;
 

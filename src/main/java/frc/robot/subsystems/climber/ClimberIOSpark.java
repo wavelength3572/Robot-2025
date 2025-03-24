@@ -26,11 +26,11 @@ public class ClimberIOSpark implements ClimberIO {
 
   private double targetPosition = 0;
 
-  private static final LoggedTunableNumber ClimberkP = new LoggedTunableNumber("Climber/kp",
-      ClimberConstants.climberKp);
+  private static final LoggedTunableNumber ClimberkP =
+      new LoggedTunableNumber("Climber/kp", ClimberConstants.climberKp);
 
-  private static final LoggedTunableNumber climbManualPosition = new LoggedTunableNumber("Climber/target",
-      -1.0);
+  private static final LoggedTunableNumber climbManualPosition =
+      new LoggedTunableNumber("Climber/target", -1.0);
 
   private Servo servo = new Servo(1);
 
@@ -141,9 +141,9 @@ public class ClimberIOSpark implements ClimberIO {
   @Override
   public boolean isClimbingFinished() {
     if (currentClimberState == CLIMB_STATE.CLIMB) {
-      double difference = Math.abs(drumToEncoder(ClimberConstants.CLIMBED_POSITION) - climberEncoder.getPosition());
+      double difference =
+          Math.abs(drumToEncoder(ClimberConstants.CLIMBED_POSITION) - climberEncoder.getPosition());
       return (difference < ClimberConstants.CLIMBING_TOLERANCE) ? true : false;
-    } else
-      return false;
+    } else return false;
   }
 }
