@@ -83,19 +83,16 @@ public class ButtonsAndDashboardBindings {
             })); // L1
 
     SmartDashboard.putData(
-        "Low - L2",
-        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L2)));
-            // .andThen(waitForScoringConditions(drive, coralSystem)));
+        "Low - L2", Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L2)));
+    // .andThen(waitForScoringConditions(drive, coralSystem)));
 
     SmartDashboard.putData(
-        "Mid - L3",
-        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L3)));
-            // .andThen(waitForScoringConditions(drive, coralSystem)));
+        "Mid - L3", Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L3)));
+    // .andThen(waitForScoringConditions(drive, coralSystem)));
 
     SmartDashboard.putData(
-        "High - L4",
-        Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L4)));
-            // .andThen(waitForScoringConditions(drive, coralSystem)));
+        "High - L4", Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L4)));
+    // .andThen(waitForScoringConditions(drive, coralSystem)));
 
     SmartDashboard.putData("Pickup Coral", createPickupCoralCommand());
     SmartDashboard.putData("Reef Action", createReefActionCommand()); // Score OR Dislodge
@@ -186,9 +183,9 @@ public class ButtonsAndDashboardBindings {
     oi.getRightJoyLeftButton().toggleOnTrue(AlignAndScore.create(drive, coralSystem, true));
     oi.getRightJoyRightButton().toggleOnTrue(AlignAndScore.create(drive, coralSystem, false));
 
-    oi.getRightJoyDownButton().onTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
+    oi.getRightJoyDownButton().toggleOnTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
 
-    oi.getRightJoyUpButton().onTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
+    oi.getRightJoyUpButton().toggleOnTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
 
     oi.getButtonI()
         .onTrue(
