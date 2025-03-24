@@ -32,6 +32,13 @@ public final class AlgaeConfigs {
           .openLoopRampRate(.5)
           .closedLoopRampRate(0.0)
           .voltageCompensation(12);
+      algaeDeployConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          // Set PID values for position control
+          .p(AlgaeConstants.kAlgaeDeployKp)
+          .d(AlgaeConstants.kAlgaeDeployKd)
+          .outputRange(-1, 1);
     }
   }
 }

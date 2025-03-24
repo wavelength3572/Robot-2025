@@ -32,6 +32,9 @@ public class ClimberIOSpark implements ClimberIO {
   private static final LoggedTunableNumber climbManualPosition =
       new LoggedTunableNumber("Climber/target", -1.0);
 
+  private static final LoggedTunableNumber climbServoPosition =
+      new LoggedTunableNumber("Climber/servo", 0.0);
+
   private Servo servo = new Servo(1);
 
   public ClimberIOSpark() {
@@ -55,6 +58,10 @@ public class ClimberIOSpark implements ClimberIO {
     // climberMotor.configure(
     // config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     // }
+
+    if (climbServoPosition.hasChanged(hashCode())) {
+      servo.set(climbServoPosition.get());
+    }
 
     if (climbManualPosition.hasChanged(hashCode())) {
       manualClimbPosition(climbManualPosition.get());
