@@ -95,12 +95,6 @@ public class PathPlannerCommands {
                 new TimedWaitUntilCommand("WaitForPreset", coralSystem::isAtGoal),
                 new RunPresetCommand(coralSystem, L4)));
 
-    new EventTrigger("NEW_PREL4SEQ")
-        .onTrue(
-            new SequentialCommandGroup(
-                new TimedWaitUntilCommand("WaitForPreset", coralSystem::isAtGoal),
-                new RunPresetCommand(coralSystem, L4)));
-
     new EventTrigger("L3")
         .onTrue(
             Commands.print("Running preset: L3").andThen(new RunPresetCommand(coralSystem, L3)));
