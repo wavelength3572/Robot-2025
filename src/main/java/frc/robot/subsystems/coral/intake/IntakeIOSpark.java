@@ -31,7 +31,6 @@ public class IntakeIOSpark implements IntakeIO {
     PULL,
     HAVE_CORAL_PULL, // Holds position when coral is detected
     PULL_OVERRIDE // Operator forced pull (full power for 1 sec)
-
   }
 
   private intakeState currentIntakeState = intakeState.OFF;
@@ -44,8 +43,8 @@ public class IntakeIOSpark implements IntakeIO {
     intakeMotor.set(requestedSpeed);
   }
 
-  private static final LoggedTunableNumber PushPower = new LoggedTunableNumber("Intake/PushPower",
-      IntakeConstants.intakeOutSpeed);
+  private static final LoggedTunableNumber PushPower =
+      new LoggedTunableNumber("Intake/PushPower", IntakeConstants.intakeOutSpeed);
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
