@@ -1,6 +1,7 @@
 package frc.robot.subsystems.algae;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -10,6 +11,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.subsystems.algae.AlgaeConstants.algaeIntakeState;
+import frc.robot.util.LoggedTunableNumber;
 
 public class AlgaeIOSpark implements AlgaeIO {
 
@@ -21,6 +23,8 @@ public class AlgaeIOSpark implements AlgaeIO {
 
   private SparkMax algaeDeployMotor =
       new SparkMax(AlgaeConstants.algaeDeployCanId, MotorType.kBrushless);
+  private SparkClosedLoopController algaeDeployController =
+      algaeDeployMotor.getClosedLoopController();
   private RelativeEncoder algaeDeployEncoder = algaeDeployMotor.getEncoder();
 
   private double captureEncoderValue = 0.0;
@@ -31,6 +35,12 @@ public class AlgaeIOSpark implements AlgaeIO {
   private double detectionCount = 0;
 
   private boolean haveAlgae = false;
+
+  private static final LoggedTunableNumber deployAFF =
+      new LoggedTunableNumber("Algae/deployAFF", AlgaeConstants.deployPullBackFF);
+
+  private static final LoggedTunableNumber deploykP =
+      new LoggedTunableNumber("Algae/deploykP", AlgaeConstants.kAlgaeDeployKp);
 
   public AlgaeIOSpark() {
     algaeCaptureMotor.configure(
@@ -49,6 +59,14 @@ public class AlgaeIOSpark implements AlgaeIO {
 
   @Override
   public void updateInputs(AlgaeIOInputs inputs) {
+
+    if (deploykP.hasChanged(hashCode())) {
+      final SparkMaxConfig config = new SparkMaxConfig();
+      config.closedLoop.pidf(deploykP.get(), 0.0, 0.0, 0.0);
+      algaeDeployMotor.configure(
+          config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    }
+
     // Capture Motor Inputs
     inputs.captureVelocityRPM = algaeCaptureMotor.getEncoder().getVelocity();
     inputs.captureAppliedVolts =
@@ -60,8 +78,7 @@ public class AlgaeIOSpark implements AlgaeIO {
     inputs.deployEncRotations = algaeDeployEncoder.getPosition();
     inputs.currentAngle = rotationsToAngle(inputs.deployEncRotations);
 
-    inputs.armArbFF =
-        Math.cos(Math.toRadians(inputs.currentAngle + 21.5)) * AlgaeConstants.deployPullBackFF;
+    inputs.armArbFF = Math.cos(Math.toRadians(inputs.currentAngle + 21.5)) * deployAFF.get();
     inputs.deployAppliedVolts =
         algaeDeployMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.deployCurrentAmps = algaeDeployMotor.getOutputCurrent();
@@ -71,8 +88,14 @@ public class AlgaeIOSpark implements AlgaeIO {
 
     switch (currentAlgIntakeState) {
       case OFF:
+        haveAlgae = false;
+        algaeDeployController.setReference(
+            AlgaeConstants.algaeStowPosition,
+            ControlType.kPosition,
+            ClosedLoopSlot.kSlot0,
+            inputs.armArbFF);
         algaeCaptureMotor.setVoltage(0.0);
-        algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldVolts);
+        // algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldVolts);
         previousArmAngle = inputs.currentAngle;
         detectionCount = 0;
         break;
