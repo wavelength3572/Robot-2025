@@ -34,12 +34,13 @@ public final class BranchAlignmentUtils {
   // Offsets for scoring positions relative to the AprilTag pose.
   // One for the left pole and one for the right pole.
 
-  // x is distance from the face to center of robot, y is the lateral distance from the face.
-  private static final Transform2d RIGHT_POLE_OFFSET =
+  // x is distance from the face to center of robot, y is the lateral distance
+  // from the face.
+  public static final Transform2d RIGHT_POLE_OFFSET =
       new Transform2d(
           new Translation2d(Units.inchesToMeters(17.51), Units.inchesToMeters(-0.787)),
           new Rotation2d(0));
-  private static final Transform2d LEFT_POLE_OFFSET =
+  public static final Transform2d LEFT_POLE_OFFSET =
       new Transform2d(
           new Translation2d(Units.inchesToMeters(17.51), Units.inchesToMeters(-13.582)),
           new Rotation2d(0));
@@ -67,12 +68,14 @@ public final class BranchAlignmentUtils {
    * @return BranchAlignmentStatus indicating the alignment quality.
    */
 
-  // TODO: consider making the green blink frequency change depending on how close you are?
+  // TODO: consider making the green blink frequency change depending on how close
+  // you are?
   public static BranchAlignmentStatus getBranchAlignmentStatus(Pose2d robotPose, int faceId) {
     // Retrieve the reef face pose directly from the AprilTag layout.
     Optional<Pose3d> reefFacePose3d = VisionConstants.aprilTagLayout.getTagPose(faceId);
 
-    // If we don't have a reef face or if we aren't in a scoring preset, then don't do this work.
+    // If we don't have a reef face or if we aren't in a scoring preset, then don't
+    // do this work.
     if (!reefFacePose3d.isPresent()
         || (!RobotStatus.haveCoral())
         || (RobotStatus.getTargetPreset() != CoralSystemPresets.L1_SCORE

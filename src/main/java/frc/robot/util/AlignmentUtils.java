@@ -21,21 +21,18 @@ import java.util.Optional;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
-// 3-20 and 3-21 changes:
-// Auto Scoring
+// Auto Scoring (needs testing) - 2 flavors - right buttons do trapezoid pid, left buttons do PathPlannerHolomonicDrive
 // 1) if driver auto aligns - checks if we are inConfiguration, haveSeenTag recently, and aligned
 // 2) if operator goes to score config - scores if haveSeenReefTag recently and aligned
-// L1 auto scoring only on driver button (easy to remove)
-// smart drive working for L1
-// cagealignment - no buttons for alignment (just cares about climber and dist to mid cage)
-// Arm goes safe position when capturing algae
-// algae processing orientation for smart drive
+// L1 auto scoring only on driver button (not on operator button) (needs testing)
+// smart drive working for L1 (needs testing)
+// cagealignment - no buttons for alignment (just cares about climber and dist to mid cage) (needs testing)
+// Arm goes safe position when capturing algae (needs testing)
+// algae processing orientation for smart drive (needs testing with ID 16 and ID 3)
+// added more states to intake to handle override pull 
 
-// pulls in coral for 1 second if it thinks it has coral already - this is tricky because of how
-// intake is coded
 // add TOF on front for coral on reef and correction?
 // investigate algae dislodge (do we need to remove driver control?)
-// should we try something else?
 
 @AutoLog
 public class AlignmentUtils {

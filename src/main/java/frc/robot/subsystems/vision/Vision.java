@@ -297,7 +297,7 @@ public class Vision extends SubsystemBase {
 
       // If we have a valid PhotonPoseEstimator
       PhotonPoseEstimator estimator = photonEstimators[cameraIndex];
-  
+
       if (estimator == null) {
         continue;
       }

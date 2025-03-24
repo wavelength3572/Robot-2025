@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.coral.arm.ArmConstants;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.RobotStatus;
@@ -22,11 +23,15 @@ public class IntakeIOSpark implements IntakeIO {
   private Double requestedSpeed = 0.0;
   private boolean haveCoral = false;
   private double intakePushPower = IntakeConstants.intakeOutSpeed;
+  private Timer overrideTimer = new Timer();
 
   private enum intakeState {
     OFF,
     PUSH,
-    PULL
+    PULL,
+    HAVE_CORAL_PULL, // Holds position when coral is detected
+    PULL_OVERRIDE // Operator forced pull (full power for 1 sec)
+
   }
 
   private intakeState currentIntakeState = intakeState.OFF;
@@ -39,8 +44,8 @@ public class IntakeIOSpark implements IntakeIO {
     intakeMotor.set(requestedSpeed);
   }
 
-  private static final LoggedTunableNumber PushPower =
-      new LoggedTunableNumber("Intake/PushPower", IntakeConstants.intakeOutSpeed);
+  private static final LoggedTunableNumber PushPower = new LoggedTunableNumber("Intake/PushPower",
+      IntakeConstants.intakeOutSpeed);
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
@@ -49,11 +54,27 @@ public class IntakeIOSpark implements IntakeIO {
     }
     inputs.limitSwitch = intakeMotor.getForwardLimitSwitch().isPressed();
     inputs.appliedVolts = intakeMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
+
     if (currentIntakeState == intakeState.PULL) {
+      intakeMotor.set(requestedSpeed);
+
+      // Detect coral only in normal PULL mode
       if (intakeMotor.getOutputCurrent() >= 25.0 && inputs.appliedVolts > 0.0) {
         haveCoral = true;
+        currentIntakeState = intakeState.HAVE_CORAL_PULL;
+      }
+    } else if (currentIntakeState == intakeState.HAVE_CORAL_PULL) {
+      intakeMotor.set(0.03); // Hold coral gently
+    } else if (currentIntakeState == intakeState.PULL_OVERRIDE) {
+      intakeMotor.set(requestedSpeed);
+
+      // Allow override for  1 second, then return to HAVE_CORAL_PULL
+      if (overrideTimer.hasElapsed(1.0)) {
+        currentIntakeState = intakeState.HAVE_CORAL_PULL;
       }
     } else {
+      // When intake is OFF, reset haveCoral
+      intakeMotor.set(0.0);
       haveCoral = false;
     }
 
@@ -89,7 +110,13 @@ public class IntakeIOSpark implements IntakeIO {
 
   @Override
   public void pullCoral() {
-    currentIntakeState = intakeState.PULL;
+    if (currentIntakeState == intakeState.HAVE_CORAL_PULL) {
+      currentIntakeState = intakeState.PULL_OVERRIDE;
+      overrideTimer.reset();
+      overrideTimer.start();
+    } else {
+      currentIntakeState = intakeState.PULL;
+    }
     this.requestedSpeed = IntakeConstants.intakeInSpeed;
   }
 

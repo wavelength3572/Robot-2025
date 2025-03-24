@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.AlignAndScore;
+import frc.robot.commands.AlignAndScorePP;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveToCommands;
 import frc.robot.commands.ScoreCoralInTeleopCommand;
@@ -178,6 +179,9 @@ public class ButtonsAndDashboardBindings {
     // Gyro Reset
     oi.getResetGyroButton()
         .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
+
+    oi.getLeftJoyLeftButton().toggleOnTrue(AlignAndScorePP.create(drive, coralSystem, true));
+    oi.getLeftJoyRightButton().toggleOnTrue(AlignAndScorePP.create(drive, coralSystem, false));
 
     oi.getRightJoyLeftButton().toggleOnTrue(AlignAndScore.create(drive, coralSystem, true));
     oi.getRightJoyRightButton().toggleOnTrue(AlignAndScore.create(drive, coralSystem, false));
