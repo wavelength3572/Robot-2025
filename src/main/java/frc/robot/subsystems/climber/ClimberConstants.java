@@ -21,13 +21,14 @@ public final class ClimberConstants {
   // public static final double CLIMBED_POSITION = -58.33333333333;
 
   // 20:1 Encoder Positions
-  // public static final double DEPLOY_POSITION = -166.666666666;
-  // public static final double FAST_DEPLOY_POSITION = -133.333333333;
-  // public static final double CLIMBED_POSITION = -46.666666666;
+  public static final double DEPLOY_POSITION = -166.666666666;
+  public static final double FAST_DEPLOY_POSITION = -133.333333333;
+  public static final double CLIMBED_POSITION = -46.666666666;
+  public static final double CLIMBED_SERVO_RELEASE_POSITION = -100;
 
-  public static final double DEPLOY_POSITION = -8.33333333; // Drum Position
-  public static final double FAST_DEPLOY_POSITION = -6.6666666; // Drum Position
-  public static final double CLIMBED_POSITION = -2.33333333; // Drum Position
+  // public static final double DEPLOY_POSITION = -8.33333333; // Drum Position
+  // public static final double FAST_DEPLOY_POSITION = -6.6666666; // Drum Position
+  // public static final double CLIMBED_POSITION = -2.33333333; // Drum Position
 
   // Define the climber tip offset relative to the robot's center
   public static final double CLIMBER_TIP_OFFSET_X = 0.35;
@@ -40,6 +41,8 @@ public final class ClimberConstants {
       20.0; // Encoder rotations, same as .333333 drum rotations
 
   public static final double kClimberGearing = 60.0;
+
+  public static final double climberMaxDeploySpeed = -0.8;
 
   /**
    * Computes the climber tip pose based on the robot's current pose.
@@ -55,9 +58,10 @@ public final class ClimberConstants {
   }
 
   public static enum CLIMB_STATE {
+    STOWED,
+    SERVO,
     FAST_DEPLOY,
     DEPLOY,
-    STOWED,
     CLIMB,
     FINAL
   }
