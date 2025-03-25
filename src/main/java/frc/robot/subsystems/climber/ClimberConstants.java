@@ -23,8 +23,8 @@ public final class ClimberConstants {
   // 20:1 Encoder Positions
   public static final double DEPLOY_POSITION = -155.0;
   public static final double FAST_DEPLOY_POSITION = -133.333333333;
-  public static final double CLIMBED_POSITION = -50.595; // -46.666666666;
-  public static final double CLIMBED_SERVO_RELEASE_POSITION = -70; 
+  public static final double CLIMBED_POSITION = -52.4285; // -46.666666666;
+  public static final double CLIMBED_SERVO_RELEASE_POSITION = -80; 
 
   // public static final double DEPLOY_POSITION = -8.33333333; // Drum Position
   // public static final double FAST_DEPLOY_POSITION = -6.6666666; // Drum Position
@@ -34,7 +34,7 @@ public final class ClimberConstants {
   public static final double CLIMBER_TIP_OFFSET_X = 0.35;
   public static final double CLIMBER_TIP_OFFSET_Y = 0.06;
 
-  public static final double climberKp = 0.03;
+  public static final double climberKp = 0.04;
   public static final double climberKd = 0.0;
 
   public static final double CLIMBING_TOLERANCE = 4.0;

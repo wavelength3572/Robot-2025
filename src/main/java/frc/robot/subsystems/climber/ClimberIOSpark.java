@@ -99,18 +99,13 @@ public class ClimberIOSpark implements ClimberIO {
             targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0);
         break;
       case CLIMB:
+        setRelayState(Relay.Value.kReverse); // Foot longer
         targetPosition = ClimberConstants.CLIMBED_POSITION;
-        // climberController.setReference(
-        //     targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot1);
+        climberController.setReference(
+            targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot1);
         if (climberEncoder.getPosition() > ClimberConstants.CLIMBED_SERVO_RELEASE_POSITION) {
           servo.set(0.0); // Release the servo so climber locks
         }
-        if (climberEncoder.getPosition() >= ClimberConstants.CLIMBED_POSITION) {
-          climberMotor.set(0.0);
-        } else {
-          climberMotor.set(ClimberConstants.climberMaxClimbSpeed);
-        }
-        setRelayState(Relay.Value.kReverse); // Foot longer
         break;
       case FINAL:
         // Used for testing

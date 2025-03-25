@@ -15,16 +15,12 @@ import frc.robot.util.LoggedTunableNumber;
 
 public class AlgaeIOSpark implements AlgaeIO {
 
-  private SparkMax algaeCaptureMotor =
-      new SparkMax(AlgaeConstants.algaeCaptureCanId, MotorType.kBrushless);
-  private SparkClosedLoopController algaeCaptureController =
-      algaeCaptureMotor.getClosedLoopController();
+  private SparkMax algaeCaptureMotor = new SparkMax(AlgaeConstants.algaeCaptureCanId, MotorType.kBrushless);
+  private SparkClosedLoopController algaeCaptureController = algaeCaptureMotor.getClosedLoopController();
   private RelativeEncoder algaeCaptureEncoder = algaeCaptureMotor.getEncoder();
 
-  private SparkMax algaeDeployMotor =
-      new SparkMax(AlgaeConstants.algaeDeployCanId, MotorType.kBrushless);
-  private SparkClosedLoopController algaeDeployController =
-      algaeDeployMotor.getClosedLoopController();
+  private SparkMax algaeDeployMotor = new SparkMax(AlgaeConstants.algaeDeployCanId, MotorType.kBrushless);
+  private SparkClosedLoopController algaeDeployController = algaeDeployMotor.getClosedLoopController();
   private RelativeEncoder algaeDeployEncoder = algaeDeployMotor.getEncoder();
 
   private double captureEncoderValue = 0.0;
@@ -36,11 +32,11 @@ public class AlgaeIOSpark implements AlgaeIO {
 
   private boolean haveAlgae = false;
 
-  private static final LoggedTunableNumber deployAFF =
-      new LoggedTunableNumber("Algae/deployAFF", AlgaeConstants.deployPullBackFF);
+  private static final LoggedTunableNumber deployAFF = new LoggedTunableNumber("Algae/deployAFF",
+      AlgaeConstants.deployPullBackFF);
 
-  private static final LoggedTunableNumber deploykP =
-      new LoggedTunableNumber("Algae/deploykP", AlgaeConstants.kAlgaeDeployKp);
+  private static final LoggedTunableNumber deploykP = new LoggedTunableNumber("Algae/deploykP",
+      AlgaeConstants.kAlgaeDeployKp);
 
   public AlgaeIOSpark() {
     algaeCaptureMotor.configure(
@@ -69,8 +65,7 @@ public class AlgaeIOSpark implements AlgaeIO {
 
     // Capture Motor Inputs
     inputs.captureVelocityRPM = algaeCaptureMotor.getEncoder().getVelocity();
-    inputs.captureAppliedVolts =
-        algaeCaptureMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
+    inputs.captureAppliedVolts = algaeCaptureMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.captureCurrentAmps = algaeCaptureMotor.getOutputCurrent();
     inputs.captureEncRotations = algaeCaptureEncoder.getPosition();
 
@@ -79,8 +74,7 @@ public class AlgaeIOSpark implements AlgaeIO {
     inputs.currentAngle = rotationsToAngle(inputs.deployEncRotations);
 
     inputs.armArbFF = Math.cos(Math.toRadians(inputs.currentAngle + 21.5)) * deployAFF.get();
-    inputs.deployAppliedVolts =
-        algaeDeployMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
+    inputs.deployAppliedVolts = algaeDeployMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.deployCurrentAmps = algaeDeployMotor.getOutputCurrent();
     inputs.deployVelocityRPM = algaeDeployEncoder.getVelocity();
 
@@ -174,17 +168,26 @@ public class AlgaeIOSpark implements AlgaeIO {
       case MANUAL:
         break;
       case CLIMB:
-        detectionCount++;
-        if (detectionCount <= 50) { // About 1 second
-          algaeCaptureMotor.setVoltage(AlgaeConstants.capturePushVolts);
-          algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
-        } else {
-          // Purposly setting speed here because I got some twitches in algae arm duing
-          // testing.
-          algaeDeployMotor.set(0.0);
-          algaeCaptureMotor.set(0.0);
-        }
+        haveAlgae = false;
+        algaeDeployController.setReference(
+            AlgaeConstants.algaeStowPosition,
+            ControlType.kPosition,
+            ClosedLoopSlot.kSlot0,
+            inputs.armArbFF);
+        algaeCaptureMotor.setVoltage(0.0);
         break;
+      // case CLIMB:
+      // detectionCount++;
+      // if (detectionCount <= 50) { // About 1 second
+      // algaeCaptureMotor.setVoltage(AlgaeConstants.capturePushVolts);
+      // algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
+      // } else {
+      // // Purposly setting speed here because I got some twitches in algae arm duing
+      // // testing.
+      // algaeDeployMotor.set(0.0);
+      // algaeCaptureMotor.set(0.0);
+      // }
+      // break;
       default:
         break;
     }
