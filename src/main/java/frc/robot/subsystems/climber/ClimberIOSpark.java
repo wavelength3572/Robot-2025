@@ -77,7 +77,7 @@ public class ClimberIOSpark implements ClimberIO {
         break;
       case SERVO:
         servo.set(0.2);
-        if (servoDelay > 250) {
+        if (servoDelay > 25) {  // About .5 seconds
           currentClimberState = CLIMB_STATE.FAST_DEPLOY;
         } else {
           servoDelay++;
@@ -100,10 +100,15 @@ public class ClimberIOSpark implements ClimberIO {
         break;
       case CLIMB:
         targetPosition = ClimberConstants.CLIMBED_POSITION;
-        climberController.setReference(
-            targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot1);
+        // climberController.setReference(
+        //     targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot1);
         if (climberEncoder.getPosition() > ClimberConstants.CLIMBED_SERVO_RELEASE_POSITION) {
           servo.set(0.0); // Release the servo so climber locks
+        }
+        if (climberEncoder.getPosition() >= ClimberConstants.CLIMBED_POSITION) {
+          climberMotor.set(0.0);
+        } else {
+          climberMotor.set(ClimberConstants.climberMaxClimbSpeed);
         }
         setRelayState(Relay.Value.kReverse); // Foot longer
         break;
