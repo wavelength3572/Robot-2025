@@ -168,23 +168,16 @@ public class ButtonsAndDashboardBindings {
         .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
 
     SendableChooser<Function<Boolean, Command>> alignmentChooser = new SendableChooser<>();
-    alignmentChooser.addOption(
-        "AlignAndScore", (isLeftPole) -> AlignAndScore.create(drive, coralSystem, isLeftPole));
     alignmentChooser.setDefaultOption(
         "AlignAndScorePP", (isLeftPole) -> AlignAndScorePP.create(drive, coralSystem, isLeftPole));
+    alignmentChooser.addOption(
+        "AlignAndScore", (isLeftPole) -> AlignAndScore.create(drive, coralSystem, isLeftPole));
 
     SmartDashboard.putData("Alignment Strategy", alignmentChooser);
 
     // Operator buttons
-    oi.getRightJoyLeftButton()
-        .toggleOnTrue(
-            alignmentChooser.getSelected().apply(true) // true = left pole
-            );
-
-    oi.getRightJoyRightButton()
-        .toggleOnTrue(
-            alignmentChooser.getSelected().apply(false) // false = right pole
-            );
+    oi.getRightJoyLeftButton().toggleOnTrue(deferredAlignmentCommand(alignmentChooser, true));
+    oi.getRightJoyRightButton().toggleOnTrue(deferredAlignmentCommand(alignmentChooser, false));
 
     oi.getRightJoyDownButton().toggleOnTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
 
@@ -370,5 +363,10 @@ public class ButtonsAndDashboardBindings {
             () ->
                 (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.PICKUP
                     || (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L1_STOW))));
+  }
+
+  private static Command deferredAlignmentCommand(
+      SendableChooser<Function<Boolean, Command>> chooser, boolean isLeftPole) {
+    return new InstantCommand(() -> chooser.getSelected().apply(isLeftPole).schedule());
   }
 }
