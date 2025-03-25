@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.FieldConstants;
 import frc.robot.FieldConstants.ReefChosenOrientation;
 import frc.robot.FieldConstants.ReefFacesBlue;
@@ -69,50 +68,53 @@ public class DriveToCommands {
       DoubleSupplier rotationJoystickSupplier,
       double distanceThresholdMeters,
       BooleanSupplier haveCoralSupplier) {
-    return Commands.runOnce(
-        () -> {
-          if (!haveCoralSupplier.getAsBoolean()) {
-            System.out.println("No coral in the robot. Aborting drive to pole.");
-            return;
-          }
 
-          // Get the closest reef face selection
-          AlignmentUtils.ReefFaceSelection selection = drive.getReefFaceSelection();
+    Supplier<Pose2d> dynamicPoseSupplier =
+        createDynamicPolePoseSupplier(
+            drive, isLeftPole, distanceThresholdMeters, haveCoralSupplier);
 
-          // Check if a valid face is found
-          if (selection == null || selection.getAcceptedFaceId() == null) {
-            System.out.println("No valid reef face found. Cannot drive to pole.");
-            return;
-          }
+    return createDriveToPose(
+            drive,
+            dynamicPoseSupplier,
+            xJoystickSupplier,
+            yJoystickSupplier,
+            rotationJoystickSupplier)
+        .unless(() -> dynamicPoseSupplier.get() == null);
+  }
 
-          // Check if the accepted face is within the distance threshold
-          double closestDistance = selection.getAcceptedDistance();
-          if (closestDistance > distanceThresholdMeters) {
-            System.out.println(
-                "Closest reef face is too far: "
-                    + closestDistance
-                    + " meters (threshold: "
-                    + distanceThresholdMeters
-                    + " meters).");
-            return;
-          }
+  public static Supplier<Pose2d> createDynamicPolePoseSupplier(
+      Drive drive,
+      boolean isLeftPole,
+      double distanceThresholdMeters,
+      BooleanSupplier haveCoralSupplier) {
 
-          // Calculate the target pole pose
-          Pose2d targetPose = calculatePolePose(drive, selection.getAcceptedFaceId(), isLeftPole);
-          if (targetPose != null) {
-            System.out.println("Target pose calculated: " + targetPose);
-            createDriveToPose(
-                    drive,
-                    () -> targetPose,
-                    xJoystickSupplier,
-                    yJoystickSupplier,
-                    rotationJoystickSupplier)
-                .schedule();
-          } else {
-            System.out.println("Failed to calculate target pose for pole.");
-          }
-        },
-        drive);
+    return () -> {
+      if (!haveCoralSupplier.getAsBoolean()) {
+        System.out.println("No coral in the robot. Aborting drive to pole.");
+        return null;
+      }
+
+      AlignmentUtils.ReefFaceSelection selection = drive.getReefFaceSelection();
+      if (selection == null || selection.getAcceptedFaceId() == null) {
+        System.out.println("No valid reef face found.");
+        return null;
+      }
+
+      double closestDistance = selection.getAcceptedDistance();
+      if (closestDistance > distanceThresholdMeters) {
+        System.out.println("Reef face too far: " + closestDistance + " m");
+        return null;
+      }
+
+      Pose2d targetPose = calculatePolePose(drive, selection.getAcceptedFaceId(), isLeftPole);
+      if (targetPose == null) {
+        System.out.println("Failed to calculate target pose.");
+      } else {
+        System.out.println("Pose calculated at runtime: " + targetPose);
+      }
+
+      return targetPose;
+    };
   }
 
   public static Pose2d calculatePolePose(Drive drive, int faceId, boolean isLeftPole) {
@@ -229,15 +231,7 @@ public class DriveToCommands {
     // Return the final pose with adjusted translation and flipped rotation
     return new Pose2d(adjustedMidpoint, flippedRotation);
   }
-  /**
-   * Drive to the closest coral station face (based on which station AprilTag is closest).
-   *
-   * @param drive The drivetrain subsystem.
-   * @param xJoystickSupplier The forward/back joystick input.
-   * @param yJoystickSupplier The left/right joystick input.
-   * @param rotationJoystickSupplier The rotation joystick input.
-   * @param distanceThresholdMeters If the station is farther than this threshold, do nothing.
-   */
+
   public static Command driveToCoralStation(
       Drive drive,
       DoubleSupplier xJoystickSupplier,
@@ -245,47 +239,50 @@ public class DriveToCommands {
       DoubleSupplier rotationJoystickSupplier,
       double distanceThresholdMeters) {
 
-    return Commands.runOnce(
-        () -> {
-          // 1) Ask AlignmentUtils which station face is closest:
-          AlignmentUtils.CoralStationSelection selection =
-              AlignmentUtils.findClosestCoralStation(drive.getPose());
+    Supplier<Pose2d> dynamicPoseSupplier =
+        createDynamicCoralStationPoseSupplier(drive, distanceThresholdMeters);
 
-          if (selection == null || selection.getAcceptedStationId() == null) {
-            System.out.println("No valid coral station face found. Cannot drive to station.");
-            return;
-          }
+    return createDriveToPose(
+            drive,
+            dynamicPoseSupplier,
+            xJoystickSupplier,
+            yJoystickSupplier,
+            rotationJoystickSupplier)
+        .unless(() -> dynamicPoseSupplier.get() == null);
+  }
 
-          // 2) Check distance threshold
-          double closestDistance = selection.getAcceptedDistance();
-          if (closestDistance > distanceThresholdMeters) {
-            System.out.println(
-                "Closest coral station is too far: "
-                    + closestDistance
-                    + " meters (threshold: "
-                    + distanceThresholdMeters
-                    + ")");
-            return;
-          }
+  public static Supplier<Pose2d> createDynamicCoralStationPoseSupplier(
+      Drive drive, double distanceThresholdMeters) {
 
-          // 3) Calculate target pose
-          Pose2d targetPose = calculateCoralStationPose(drive, selection.getAcceptedStationId());
-          if (targetPose != null) {
-            System.out.println("Target coral station pose: " + targetPose);
+    return () -> {
+      AlignmentUtils.CoralStationSelection selection =
+          AlignmentUtils.findClosestCoralStation(drive.getPose());
 
-            // 4) Schedule the actual "drive to pose" command
-            createDriveToPose(
-                    drive,
-                    () -> targetPose,
-                    xJoystickSupplier,
-                    yJoystickSupplier,
-                    rotationJoystickSupplier)
-                .schedule();
-          } else {
-            System.out.println("Failed to calculate coral station pose.");
-          }
-        },
-        drive);
+      if (selection == null || selection.getAcceptedStationId() == null) {
+        System.out.println("No valid coral station face found.");
+        return null;
+      }
+
+      double closestDistance = selection.getAcceptedDistance();
+      if (closestDistance > distanceThresholdMeters) {
+        System.out.println(
+            "Coral station too far: "
+                + closestDistance
+                + " m (limit: "
+                + distanceThresholdMeters
+                + ")");
+        return null;
+      }
+
+      Pose2d pose = calculateCoralStationPose(drive, selection.getAcceptedStationId());
+      if (pose == null) {
+        System.out.println("Failed to calculate coral station pose.");
+      } else {
+        System.out.println("Coral station target pose: " + pose);
+      }
+
+      return pose;
+    };
   }
 
   /**
@@ -297,8 +294,8 @@ public class DriveToCommands {
     DriverStation.Alliance alliance = DriverStation.getAlliance().get();
 
     // 2) Based on alliance, get the translation for the station
-    //    (We've already done the "closest station" logic. This method just
-    //     converts station ID to a final "pose to aim for.")
+    // (We've already done the "closest station" logic. This method just
+    // converts station ID to a final "pose to aim for.")
     switch (alliance) {
       case Blue -> {
         Translation2d stationTranslation = new Translation2d(.94, 1.1);

@@ -37,7 +37,8 @@ public class ButtonsAndDashboardBindings {
   private static Algae algae;
   private static Vision vision;
 
-  public ButtonsAndDashboardBindings() {}
+  public ButtonsAndDashboardBindings() {
+  }
 
   public static void configureTestModeButtonBindings(
       OperatorInterface operatorInterface, Drive drive) {
@@ -78,8 +79,10 @@ public class ButtonsAndDashboardBindings {
         "Shelf - L1",
         Commands.runOnce(
             () -> {
-              if (coralSystem.haveCoral) coralSystem.setTargetPreset(CoralSystemPresets.L1_SCORE);
-              else coralSystem.setTargetPreset(CoralSystemPresets.L1_STOW);
+              if (coralSystem.haveCoral)
+                coralSystem.setTargetPreset(CoralSystemPresets.L1_SCORE);
+              else
+                coralSystem.setTargetPreset(CoralSystemPresets.L1_STOW);
             })); // L1
 
     SmartDashboard.putData(
@@ -117,14 +120,14 @@ public class ButtonsAndDashboardBindings {
     SmartDashboard.putData(
         "Toggle Smart Drive",
         DriveCommands.toggleSmartDriveCmd(
-                drive,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                oi::getRotate,
-                coralSystem::isHaveCoral,
-                algae::haveAlgae,
-                climber::isClimberDeployed,
-                coralSystem.getElevator()::getHeightInInches)
+            drive,
+            oi::getTranslateX,
+            oi::getTranslateY,
+            oi::getRotate,
+            coralSystem::isHaveCoral,
+            algae::haveAlgae,
+            climber::isClimberDeployed,
+            coralSystem.getElevator()::getHeightInInches)
             .ignoringDisable(true));
 
     SmartDashboard.putData(
@@ -177,11 +180,20 @@ public class ButtonsAndDashboardBindings {
     oi.getResetGyroButton()
         .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
 
-    oi.getLeftJoyLeftButton().toggleOnTrue(AlignAndScorePP.create(drive, coralSystem, true));
-    oi.getLeftJoyRightButton().toggleOnTrue(AlignAndScorePP.create(drive, coralSystem, false));
+    oi.getLeftJoyLeftButton().toggleOnTrue(
+        AlignAndScore.create(drive, coralSystem, true,
+            oi::getTranslateX,
+            oi::getTranslateY));
 
-    oi.getRightJoyLeftButton().toggleOnTrue(AlignAndScore.create(drive, coralSystem, true));
-    oi.getRightJoyRightButton().toggleOnTrue(AlignAndScore.create(drive, coralSystem, false));
+    oi.getLeftJoyRightButton().toggleOnTrue(
+        AlignAndScore.create(drive, coralSystem, false,
+            oi::getTranslateX,
+            oi::getTranslateY));
+
+    oi.getRightJoyLeftButton().toggleOnTrue(AlignAndScorePP.create(drive,
+        coralSystem, true));
+    oi.getRightJoyRightButton().toggleOnTrue(AlignAndScorePP.create(drive,
+        coralSystem, false));
 
     oi.getRightJoyDownButton().toggleOnTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
 
@@ -212,7 +224,8 @@ public class ButtonsAndDashboardBindings {
                 () -> {
                   if (coralSystem.haveCoral)
                     coralSystem.setTargetPreset(CoralSystemPresets.L1_SCORE);
-                  else coralSystem.setTargetPreset(CoralSystemPresets.L1_STOW);
+                  else
+                    coralSystem.setTargetPreset(CoralSystemPresets.L1_STOW);
                 })); // L1
 
     oi.getButtonBox1YAxisNegative()
@@ -266,8 +279,7 @@ public class ButtonsAndDashboardBindings {
     return Commands.runOnce(
         () -> {
           if (coralSystem.currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
-              || coralSystem.currentCoralPreset
-                  == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
+              || coralSystem.currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
             AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi).schedule();
           } else {
             new ScoreCoralInTeleopCommand(coralSystem.getIntake()).schedule();
@@ -299,11 +311,11 @@ public class ButtonsAndDashboardBindings {
 
   private static Command waitForScoringConditions(Drive drive, CoralSystem coralSystem) {
     return Commands.waitUntil(
-            () -> {
-              boolean inScoringConfig = AlignAndScore.inScoringConfiguration(coralSystem);
-              Logger.recordOutput("AutoScore/WaitingForScoringConfig", inScoringConfig);
-              return inScoringConfig;
-            }) // Always wait for scoring config
+        () -> {
+          boolean inScoringConfig = AlignAndScore.inScoringConfiguration(coralSystem);
+          Logger.recordOutput("AutoScore/WaitingForScoringConfig", inScoringConfig);
+          return inScoringConfig;
+        }) // Always wait for scoring config
         .andThen(
             Commands.either(
                 Commands.runOnce(
@@ -326,8 +338,7 @@ public class ButtonsAndDashboardBindings {
                   boolean hasReefFace = reefFaceSelection != null;
                   boolean tagSeenRecently = hasReefFace && reefFaceSelection.getTagSeenRecently();
                   boolean hasBranchStatus = branchStatus != null;
-                  boolean alignmentGreen =
-                      hasBranchStatus && branchStatus == BranchAlignmentStatus.GREEN;
+                  boolean alignmentGreen = hasBranchStatus && branchStatus == BranchAlignmentStatus.GREEN;
 
                   // Log conditions
                   Logger.recordOutput("AutoScore/CheckingConditions", true);
@@ -351,11 +362,14 @@ public class ButtonsAndDashboardBindings {
 
     Logger.recordOutput("AutoScore/FailureReason", "Auto-scoring failed because:");
 
-    if (!hasReefFace) Logger.recordOutput("AutoScore/Failure", "No reef face detected.");
-    if (!tagSeenRecently) Logger.recordOutput("AutoScore/Failure", "Tag was NOT seen recently.");
+    if (!hasReefFace)
+      Logger.recordOutput("AutoScore/Failure", "No reef face detected.");
+    if (!tagSeenRecently)
+      Logger.recordOutput("AutoScore/Failure", "Tag was NOT seen recently.");
     if (!hasBranchStatus)
       Logger.recordOutput("AutoScore/Failure", "No branch alignment status available.");
-    if (!alignmentGreen) Logger.recordOutput("AutoScore/Failure", "Alignment status is NOT GREEN.");
+    if (!alignmentGreen)
+      Logger.recordOutput("AutoScore/Failure", "Alignment status is NOT GREEN.");
   }
 
   public static Command getDeployAndCaptureAlgaeCommand() {
@@ -364,8 +378,7 @@ public class ButtonsAndDashboardBindings {
         new ConditionalCommand(
             Commands.none(), // If the arm is in pickup or L1_STOW, do nothing
             Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L1_STOW)),
-            () ->
-                (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.PICKUP
-                    || (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L1_STOW))));
+            () -> (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.PICKUP
+                || (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L1_STOW))));
   }
 }
