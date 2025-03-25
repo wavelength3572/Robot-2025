@@ -25,11 +25,11 @@ import org.littletonrobotics.junction.Logger;
 public class AlignToReefPP extends Command {
 
   private static final LoggedTunableNumber kPTranslation =
-      new LoggedTunableNumber("AlignToReef/kPTranslation", 2.0);
+      new LoggedTunableNumber("AlignToReef/kPTranslation", 0.9);
   private static final LoggedTunableNumber kDTranslation =
       new LoggedTunableNumber("AlignToReef/kDTranslation", 0.0);
   private static final LoggedTunableNumber kPRotation =
-      new LoggedTunableNumber("AlignToReef/kPRotation", 2.0);
+      new LoggedTunableNumber("AlignToReef/kPRotation", 0.9);
   private static final LoggedTunableNumber kDRotation =
       new LoggedTunableNumber("AlignToReef/kDRotation", 0.0);
 
@@ -40,9 +40,17 @@ public class AlignToReefPP extends Command {
   private static final LoggedTunableNumber rotationThreshold =
       new LoggedTunableNumber("AlignToReef/RotationThresholdDegrees", 0.5);
   private static final LoggedTunableNumber maxRuntimeSeconds =
-      new LoggedTunableNumber("AlignToReef/MaxRuntimeSeconds", 1.5);
+      new LoggedTunableNumber("AlignToReef/MaxRuntimeSeconds", 3);
   private static final LoggedTunableNumber requiredStableCycles =
       new LoggedTunableNumber("AlignToReef/RequiredStableCycles", 2);
+  private static final LoggedTunableNumber maxVelocity =
+      new LoggedTunableNumber("AlignToReef/MaxVelocity", 1.5);
+  private static final LoggedTunableNumber maxAcceleration =
+      new LoggedTunableNumber("AlignToReef/MaxAcceleration", 3);
+  private static final LoggedTunableNumber maxAngularVelocityDEG =
+      new LoggedTunableNumber("AlignToReef/MaxAngularVelocity", 180);
+  private static final LoggedTunableNumber maxAngularAccelerationDEG =
+      new LoggedTunableNumber("AlignToReef/MaxAngularAcceleration", 360);
 
   private int stableCycles = 0;
   private final Drive drivetrain;
@@ -82,7 +90,11 @@ public class AlignToReefPP extends Command {
     Logger.recordOutput("AlignToReef/Poses/TargetPose", targetPose);
 
     PathConstraints constraints =
-        new PathConstraints(2.0, 3.0, Math.toRadians(720), Math.toRadians(720));
+        new PathConstraints(
+            maxVelocity.get(),
+            maxAcceleration.get(),
+            Math.toRadians(maxAngularVelocityDEG.get()),
+            Math.toRadians(maxAngularAccelerationDEG.get()));
 
     PathPlannerPath path =
         new PathPlannerPath(

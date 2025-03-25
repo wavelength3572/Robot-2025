@@ -14,7 +14,8 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveToPose extends Command {
-  private static final double TIMEOUT_TIME = 1.5; // Timeout to prevent infinite execution
+  private static final LoggedTunableNumber timeout =
+      new LoggedTunableNumber("DriveToPose/timeout", 2.0);
 
   private static final LoggedTunableNumber scalarTunable =
       new LoggedTunableNumber("DriveToPose/SpeedScalar", 1.0);
@@ -66,7 +67,6 @@ public class DriveToPose extends Command {
     // Log initial state
     Logger.recordOutput("DriveToPose/Init/StartPose", currentPose);
     Logger.recordOutput("DriveToPose/Init/SpeedScalar", speedScalar);
-    Logger.recordOutput("DriveToPose/Init/TimeoutTime", TIMEOUT_TIME);
 
     driveControllerX.reset(currentPose.getX(), currentSpeeds.vxMetersPerSecond);
     driveControllerY.reset(currentPose.getY(), currentSpeeds.vyMetersPerSecond);
@@ -137,12 +137,12 @@ public class DriveToPose extends Command {
     Logger.recordOutput("DriveToPose/End/FinalPose", drivetrain.getPose());
     Logger.recordOutput("DriveToPose/End/TotalTime", timeoutTimer.get());
     Logger.recordOutput("DriveToPose/End/WasInterrupted", interrupted);
-    Logger.recordOutput("DriveToPose/End/TimedOut", timeoutTimer.hasElapsed(TIMEOUT_TIME));
+    Logger.recordOutput("DriveToPose/End/TimedOut", timeoutTimer.hasElapsed(timeout.get()));
   }
 
   @Override
   public boolean isFinished() {
-    boolean finished = atGoal() || timeoutTimer.hasElapsed(TIMEOUT_TIME);
+    boolean finished = atGoal() || timeoutTimer.hasElapsed(timeout.get());
 
     Logger.recordOutput("DriveToPose/IsFinished", finished);
     Logger.recordOutput("DriveToPose/CompletionReason", atGoal() ? "Reached Target" : "Timed Out");

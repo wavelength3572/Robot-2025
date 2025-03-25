@@ -168,9 +168,9 @@ public class ButtonsAndDashboardBindings {
         .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
 
     SendableChooser<Function<Boolean, Command>> alignmentChooser = new SendableChooser<>();
-    alignmentChooser.setDefaultOption(
-        "AlignAndScore", (isLeftPole) -> AlignAndScore.create(drive, coralSystem, isLeftPole));
     alignmentChooser.addOption(
+        "AlignAndScore", (isLeftPole) -> AlignAndScore.create(drive, coralSystem, isLeftPole));
+    alignmentChooser.setDefaultOption(
         "AlignAndScorePP", (isLeftPole) -> AlignAndScorePP.create(drive, coralSystem, isLeftPole));
 
     SmartDashboard.putData("Alignment Strategy", alignmentChooser);
