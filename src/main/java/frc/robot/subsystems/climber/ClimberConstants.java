@@ -34,8 +34,11 @@ public final class ClimberConstants {
   public static final double CLIMBER_TIP_OFFSET_X = 0.35;
   public static final double CLIMBER_TIP_OFFSET_Y = 0.06;
 
-  public static final double climberKp = 0.04;
-  public static final double climberKd = 0.0;
+  public static final double deployKp = 0.03;
+  public static final double deployKd = 0.0;
+
+  public static final double climbKp = 0.04;
+  public static final double climbKd = 0.0;
 
   public static final double CLIMBING_TOLERANCE = 4.0;
 

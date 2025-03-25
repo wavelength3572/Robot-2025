@@ -22,12 +22,12 @@ public final class ClimberConfigs {
           .closedLoop
           // Set PID values for position control
           // Slot 0 is for going out
-          .p(ClimberConstants.climberKp, ClosedLoopSlot.kSlot0)
-          .d(ClimberConstants.climberKd, ClosedLoopSlot.kSlot0)
+          .p(ClimberConstants.deployKp, ClosedLoopSlot.kSlot0)
+          .d(ClimberConstants.deployKd, ClosedLoopSlot.kSlot0)
           .outputRange(ClimberConstants.climberMaxDeploySpeed, 1.0, ClosedLoopSlot.kSlot0)
           // Slot 1 is for climbing
-          .p(ClimberConstants.climberKp, ClosedLoopSlot.kSlot1)
-          .d(ClimberConstants.climberKd, ClosedLoopSlot.kSlot1)
+          .p(ClimberConstants.climbKp, ClosedLoopSlot.kSlot1)
+          .d(ClimberConstants.climbKd, ClosedLoopSlot.kSlot1)
           .outputRange(0.0, 1.0, ClosedLoopSlot.kSlot1)
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
     }

@@ -28,7 +28,7 @@ public class ClimberIOSpark implements ClimberIO {
   private double targetPosition = 0;
 
   private static final LoggedTunableNumber ClimberkP =
-      new LoggedTunableNumber("Climber/kp", ClimberConstants.climberKp);
+      new LoggedTunableNumber("Climber/kp", ClimberConstants.climbKp);
 
   private static final LoggedTunableNumber climbManualPosition =
       new LoggedTunableNumber("Climber/target", -1.0);
