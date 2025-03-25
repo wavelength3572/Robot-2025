@@ -388,11 +388,14 @@ public class CoralSystem extends SubsystemBase {
     if (Constants.currentMode == Mode.REAL) {
       return canRange.getDistance().getValueAsDouble(); // use TOF for real robot
     } else {
-      // use odometry distance to coral station in SIM because we dont
-      // have a simulated TOF
-      double simulatedTOFDistance =
-          RobotStatus.getCoralStationSelection().getAcceptedDistance() - 0.4;
-      return simulatedTOFDistance;
+      // use odometry distance to coral station in SIM because we don't have a simulated TOF
+      var selection = RobotStatus.getCoralStationSelection();
+      if (selection == null) {
+        System.out.println("[TOF] Warning: No coral station selection available in sim.");
+        return Double.MAX_VALUE; // or some other safe fallback
+      }
+
+      return selection.getAcceptedDistance() - 0.4;
     }
   }
 

@@ -9,150 +9,119 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
-import java.util.function.DoubleSupplier;
+import frc.robot.util.LoggedTunableNumber;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveToPose extends Command {
-  private static final double JOYSTICK_DEADBAND = 0.1; // Adjust as needed
-  private double TIMEOUT_TIME = 8.0;
+  private static final double TIMEOUT_TIME = 1.5; // Timeout to prevent infinite execution
+
+  private static final LoggedTunableNumber scalarTunable =
+      new LoggedTunableNumber("DriveToPose/SpeedScalar", 1.0);
+
+  // PID Gains
+  private static final LoggedTunableNumber kPX = new LoggedTunableNumber("DriveToPose/kPX", .9);
+  private static final LoggedTunableNumber kPY = new LoggedTunableNumber("DriveToPose/kPY", .9);
+  private static final LoggedTunableNumber kPTheta =
+      new LoggedTunableNumber("DriveToPose/kPTheta", .9);
+
+  // Constraints
+  private static final LoggedTunableNumber maxVelXY =
+      new LoggedTunableNumber("DriveToPose/MaxVelXY", 1.5);
+  private static final LoggedTunableNumber maxAccelXY =
+      new LoggedTunableNumber("DriveToPose/MaxAccelXY", 2.5);
+  private static final LoggedTunableNumber maxVelTheta =
+      new LoggedTunableNumber("DriveToPose/MaxVelThetaDeg", 180.0);
+  private static final LoggedTunableNumber maxAccelTheta =
+      new LoggedTunableNumber("DriveToPose/MaxAccelThetaDeg", 360.0);
 
   private final double speedScalar;
-
   private final Drive drivetrain;
   private final Supplier<Pose2d> poseSupplier;
-  private final DoubleSupplier xJoystickSupplier;
-  private final DoubleSupplier yJoystickSupplier;
-  private final DoubleSupplier rotationJoystickSupplier;
-
-  private double targetX;
-  private double targetY;
-  private double targetTheta;
 
   private Pose2d targetPose;
   private Pose2d currentPose;
-
   private Timer timeoutTimer = new Timer();
 
-  private double driveXKp = .9; // changed from 1.1
-  private double driveYKp = .9; // changed from 1.1
-  private double thetaKp = 0.9;
-
-  private final ProfiledPIDController driveControllerX =
-      new ProfiledPIDController(
-          driveXKp,
-          0.0,
-          0.0,
-          new TrapezoidProfile.Constraints(2, 2.5)); // upped accelleration from .5
-
-  private final ProfiledPIDController driveControllerY =
-      new ProfiledPIDController(
-          driveYKp,
-          0.0,
-          0.0,
-          new TrapezoidProfile.Constraints(2, 2.5)); // upped accelleration from .5
-
-  private final ProfiledPIDController thetaController =
-      new ProfiledPIDController(
-          thetaKp,
-          0.0,
-          0.0,
-          new TrapezoidProfile.Constraints(Math.toRadians(360), Math.toRadians(360)));
+  private ProfiledPIDController driveControllerX, driveControllerY, thetaController;
 
   /** Drives to the specified pose under full software control. */
-  public DriveToPose(
-      Drive drivetrain,
-      Supplier<Pose2d> poseSupplier,
-      DoubleSupplier xJoystickSupplier,
-      DoubleSupplier yJoystickSupplier,
-      DoubleSupplier rotationJoystickSupplier,
-      double speedScalar) {
+  public DriveToPose(Drive drivetrain, Supplier<Pose2d> poseSupplier, double speedScalar) {
     this.drivetrain = drivetrain;
     this.poseSupplier = poseSupplier;
-    this.xJoystickSupplier = xJoystickSupplier;
-    this.yJoystickSupplier = yJoystickSupplier;
-    this.rotationJoystickSupplier = rotationJoystickSupplier;
-
-    // Clamp the speedScalar between 0 and 1 to prevent unsafe values.
-    double clampedScalar = MathUtil.clamp(speedScalar, 0.0, 1.0);
-    if (clampedScalar != speedScalar) {
-      Logger.recordOutput(
-          "DriveToPose/Warning",
-          "Speed scalar " + speedScalar + " out of bounds; clamped to " + clampedScalar);
-    }
-    this.speedScalar = clampedScalar;
+    this.speedScalar = MathUtil.clamp(scalarTunable.get(), 0.0, 1.0);
     addRequirements(drivetrain);
   }
 
-  public DriveToPose(
-      Drive drivetrain,
-      Supplier<Pose2d> poseSupplier,
-      DoubleSupplier xJoystickSupplier,
-      DoubleSupplier yJoystickSupplier,
-      DoubleSupplier rotationJoystickSupplier) {
-    this(
-        drivetrain,
-        poseSupplier,
-        xJoystickSupplier,
-        yJoystickSupplier,
-        rotationJoystickSupplier,
-        1.0);
+  public DriveToPose(Drive drivetrain, Supplier<Pose2d> poseSupplier) {
+    this(drivetrain, poseSupplier, 1.0);
   }
 
   @Override
   public void initialize() {
+    createControllers();
     currentPose = drivetrain.getPose();
     ChassisSpeeds currentSpeeds = drivetrain.getChassisSpeeds();
 
-    Logger.recordOutput("DriveToPose/initVxMetersPerSecond", currentSpeeds.vxMetersPerSecond);
-    Logger.recordOutput("DriveToPose/initVyMetersPerSecond", currentSpeeds.vyMetersPerSecond);
-    Logger.recordOutput(
-        "DriveToPose/initOmegaDegreesPerSecond",
-        Units.radiansToDegrees(currentSpeeds.omegaRadiansPerSecond));
+    // Log initial state
+    Logger.recordOutput("DriveToPose/Init/StartPose", currentPose);
+    Logger.recordOutput("DriveToPose/Init/SpeedScalar", speedScalar);
+    Logger.recordOutput("DriveToPose/Init/TimeoutTime", TIMEOUT_TIME);
 
     driveControllerX.reset(currentPose.getX(), currentSpeeds.vxMetersPerSecond);
     driveControllerY.reset(currentPose.getY(), currentSpeeds.vyMetersPerSecond);
     thetaController.reset(
         currentPose.getRotation().getRadians(), currentSpeeds.omegaRadiansPerSecond);
-
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
-    timeoutTimer.reset();
 
     targetPose = poseSupplier.get();
-    targetX = targetPose.getX();
-    targetY = targetPose.getY();
-    targetTheta = targetPose.getRotation().getRadians();
-    driveControllerX.setGoal(targetX);
-    driveControllerY.setGoal(targetY);
-    thetaController.setGoal(targetTheta);
+    driveControllerX.setGoal(targetPose.getX());
+    driveControllerY.setGoal(targetPose.getY());
+    thetaController.setGoal(targetPose.getRotation().getRadians());
 
-    driveControllerX.setTolerance(0.0762); // 3 inches tolerance, was much larger
-    driveControllerY.setTolerance(0.0762); // 3 inches tolerance, was much larger
-    thetaController.setTolerance(Units.degreesToRadians(.1));
+    // Log target pose
+    Logger.recordOutput("DriveToPose/Init/TargetPose", targetPose);
 
-    Logger.recordOutput("DriveToPose/targetPoseX", targetX);
-    Logger.recordOutput("DriveToPose/targetPoseY", targetY);
-    Logger.recordOutput("DriveToPose/targetPoseTheta", Units.radiansToDegrees(targetTheta));
+    driveControllerX.setTolerance(Units.inchesToMeters(.5));
+    driveControllerY.setTolerance(Units.inchesToMeters(.5));
+    thetaController.setTolerance(Units.degreesToRadians(0.1));
+
+    timeoutTimer.restart();
   }
 
   @Override
   public void execute() {
     currentPose = drivetrain.getPose();
 
-    double driveXVelocity = driveControllerX.calculate(currentPose.getX(), targetX);
-    double driveYVelocity = driveControllerY.calculate(currentPose.getY(), targetY);
+    // Calculate errors
+    double xError = targetPose.getX() - currentPose.getX();
+    double yError = targetPose.getY() - currentPose.getY();
+    double thetaError =
+        targetPose.getRotation().getRadians() - currentPose.getRotation().getRadians();
 
+    Logger.recordOutput("DriveToPose/Error/XErrorMeters", xError);
+    Logger.recordOutput("DriveToPose/Error/YErrorMeters", yError);
+    Logger.recordOutput("DriveToPose/Error/ThetaErrorDegrees", Units.radiansToDegrees(thetaError));
+
+    // Calculate velocities
+    double driveXVelocity = driveControllerX.calculate(currentPose.getX(), targetPose.getX());
+    double driveYVelocity = driveControllerY.calculate(currentPose.getY(), targetPose.getY());
+    double thetaVelocity =
+        thetaController.calculate(
+            currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+
+    // Scale velocities
     double effectiveMaxLinearSpeed = drivetrain.getMaxLinearSpeedMetersPerSec() * speedScalar;
-
     double scaledXVelocity = driveXVelocity * effectiveMaxLinearSpeed;
     double scaledYVelocity = driveYVelocity * effectiveMaxLinearSpeed;
-
-    double thetaVelocity =
-        thetaController.calculate(currentPose.getRotation().getRadians(), targetTheta);
-    double maxAngularSpeed = drivetrain.getMaxAngularSpeedRadPerSec();
-    double scaledThetaVelocity = thetaVelocity * maxAngularSpeed;
+    double scaledThetaVelocity = thetaVelocity * drivetrain.getMaxAngularSpeedRadPerSec();
 
     if (thetaController.atGoal()) scaledThetaVelocity = 0.0;
+
+    Logger.recordOutput("DriveToPose/VelocityCommands/X", scaledXVelocity);
+    Logger.recordOutput("DriveToPose/VelocityCommands/Y", scaledYVelocity);
+    Logger.recordOutput(
+        "DriveToPose/VelocityCommands/Theta", Units.radiansToDegrees(scaledThetaVelocity));
 
     drivetrain.runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -163,34 +132,51 @@ public class DriveToPose extends Command {
   public void end(boolean interrupted) {
     drivetrain.stop();
     timeoutTimer.stop();
+
+    // Log completion state
+    Logger.recordOutput("DriveToPose/End/FinalPose", drivetrain.getPose());
+    Logger.recordOutput("DriveToPose/End/TotalTime", timeoutTimer.get());
+    Logger.recordOutput("DriveToPose/End/WasInterrupted", interrupted);
+    Logger.recordOutput("DriveToPose/End/TimedOut", timeoutTimer.hasElapsed(TIMEOUT_TIME));
   }
 
   @Override
   public boolean isFinished() {
-    // Check if the driver moves either joystick or rotates the robot
-    if (Math.abs(xJoystickSupplier.getAsDouble()) > JOYSTICK_DEADBAND
-        || Math.abs(yJoystickSupplier.getAsDouble()) > JOYSTICK_DEADBAND
-        || Math.abs(rotationJoystickSupplier.getAsDouble()) > JOYSTICK_DEADBAND) {
-      Logger.recordOutput("DriveToPose/CanceledByJoystick", true);
-      return true;
-    }
+    boolean finished = atGoal() || timeoutTimer.hasElapsed(TIMEOUT_TIME);
 
-    // Check if the robot has reached the goal
-    if (atGoal()) {
-      return true;
-    }
+    Logger.recordOutput("DriveToPose/IsFinished", finished);
+    Logger.recordOutput("DriveToPose/CompletionReason", atGoal() ? "Reached Target" : "Timed Out");
 
-    // Check if the command has timed out
-    if (timeoutTimer.hasElapsed(TIMEOUT_TIME)) {
-      Logger.recordOutput("DriveToPose/Timeout", true);
-      return true;
-    }
-
-    return false;
+    return finished;
   }
 
   /** Checks if the robot is stopped at the final pose. */
   public boolean atGoal() {
     return driveControllerX.atGoal() && driveControllerY.atGoal() && thetaController.atGoal();
+  }
+
+  private void createControllers() {
+    driveControllerX =
+        new ProfiledPIDController(
+            kPX.get(),
+            0.0,
+            0.0,
+            new TrapezoidProfile.Constraints(maxVelXY.get(), maxAccelXY.get()));
+
+    driveControllerY =
+        new ProfiledPIDController(
+            kPY.get(),
+            0.0,
+            0.0,
+            new TrapezoidProfile.Constraints(maxVelXY.get(), maxAccelXY.get()));
+
+    thetaController =
+        new ProfiledPIDController(
+            kPTheta.get(),
+            0.0,
+            0.0,
+            new TrapezoidProfile.Constraints(
+                Math.toRadians(maxVelTheta.get()), Math.toRadians(maxAccelTheta.get())));
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
 }

@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -25,6 +26,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.BranchAlignmentUtils;
 import frc.robot.util.BranchAlignmentUtils.BranchAlignmentStatus;
 import frc.robot.util.RobotStatus;
+import java.util.function.Function;
 import org.littletonrobotics.junction.Logger;
 
 public class ButtonsAndDashboardBindings {
@@ -142,24 +144,12 @@ public class ButtonsAndDashboardBindings {
     SmartDashboard.putData(
         "Closest A Pole",
         DriveToCommands.driveToPole(
-            drive,
-            true,
-            oi::getTranslateX,
-            oi::getTranslateY,
-            oi::getRotate,
-            FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-            coralSystem::isHaveCoral));
+            drive, true, FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
     SmartDashboard.putData(
         "Closest B Pole",
         DriveToCommands.driveToPole(
-            drive,
-            false,
-            oi::getTranslateX,
-            oi::getTranslateY,
-            oi::getRotate,
-            FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE,
-            coralSystem::isHaveCoral));
+            drive, false, FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
     SmartDashboard.putData(
         "Closest Staged Algae", AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
@@ -177,11 +167,24 @@ public class ButtonsAndDashboardBindings {
     oi.getResetGyroButton()
         .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
 
-    oi.getLeftJoyLeftButton().toggleOnTrue(AlignAndScorePP.create(drive, coralSystem, true));
-    oi.getLeftJoyRightButton().toggleOnTrue(AlignAndScorePP.create(drive, coralSystem, false));
+    SendableChooser<Function<Boolean, Command>> alignmentChooser = new SendableChooser<>();
+    alignmentChooser.setDefaultOption(
+        "AlignAndScore", (isLeftPole) -> AlignAndScore.create(drive, coralSystem, isLeftPole));
+    alignmentChooser.addOption(
+        "AlignAndScorePP", (isLeftPole) -> AlignAndScorePP.create(drive, coralSystem, isLeftPole));
 
-    oi.getRightJoyLeftButton().toggleOnTrue(AlignAndScore.create(drive, coralSystem, true));
-    oi.getRightJoyRightButton().toggleOnTrue(AlignAndScore.create(drive, coralSystem, false));
+    SmartDashboard.putData("Alignment Strategy", alignmentChooser);
+
+    // Operator buttons
+    oi.getRightJoyLeftButton()
+        .toggleOnTrue(
+            alignmentChooser.getSelected().apply(true) // true = left pole
+            );
+
+    oi.getRightJoyRightButton()
+        .toggleOnTrue(
+            alignmentChooser.getSelected().apply(false) // false = right pole
+            );
 
     oi.getRightJoyDownButton().toggleOnTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
 

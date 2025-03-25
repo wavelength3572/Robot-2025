@@ -39,12 +39,7 @@ public class AlgaeCommands {
                 SetAppropriateDislodgePresetPart2Command(coralSystem),
                 new WaitUntilCommand(coralSystem::isAtGoal)),
             // Drive to the dislodge spot simultaneously
-            DriveToCommands.createDriveToPose(
-                drive,
-                drive::getAlgaeTargetPose,
-                oi::getTranslateX,
-                oi::getTranslateY,
-                oi::getRotate)),
+            new DriveToPose(drive, drive::getAlgaeTargetPose)),
         Commands.none(),
         // Condition: Only execute if:
         // - The accepted reef face is within the threshold distance,
@@ -109,7 +104,7 @@ public class AlgaeCommands {
                 coralSystem),
 
             // 3. Drive backward 10 inches relative to the current pose.
-            DriveToCommands.createDriveToPoseScaled(
+            new DriveToPose(
                 drive,
                 () -> {
                   Pose2d currentPose = drive.getPose();
@@ -119,18 +114,8 @@ public class AlgaeCommands {
                   Translation2d targetTranslation = currentPose.getTranslation().plus(offset);
                   return new Pose2d(targetTranslation, currentPose.getRotation());
                 },
-                oi::getTranslateX,
-                oi::getTranslateY,
-                oi::getRotate,
                 SPEED_SCALAR),
             new InstantCommand(coralSystem.getIntake()::stopIntake, coralSystem)),
-
-        // 4. Finally, move the coral system to PICKUP preset.
-        // new InstantCommand(
-        // () -> {
-        // coralSystem.setTargetPreset(CoralSystemPresets.PICKUP);
-        // },
-        // coralSystem)),
 
         // **False Branch**: Do nothing (command does not run)
         Commands.none(),
@@ -178,19 +163,16 @@ public class AlgaeCommands {
                 coralSystem),
 
             // 3. Drive backward 10 inches relative to the current pose.
-            DriveToCommands.createDriveToPoseScaled(
+            new DriveToPose(
                 drive,
                 () -> {
                   Pose2d currentPose = drive.getPose();
-                  double offsetMeters = -0.254 * 3.0; // Move backward by 30 inches
+                  double offsetMeters = -0.254 * 3.0; // Move backward by 10 inches
                   Translation2d offset =
                       new Translation2d(offsetMeters, 0).rotateBy(currentPose.getRotation());
                   Translation2d targetTranslation = currentPose.getTranslation().plus(offset);
                   return new Pose2d(targetTranslation, currentPose.getRotation());
                 },
-                () -> 0.0,
-                () -> 0.0,
-                () -> 0.0,
                 SPEED_SCALAR),
             new InstantCommand(coralSystem.getIntake()::stopIntake)),
         Commands.none(),

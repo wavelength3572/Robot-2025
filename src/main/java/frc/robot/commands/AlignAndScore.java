@@ -67,7 +67,7 @@ public class AlignAndScore {
                     () ->
                         System.out.println(
                             "Skipping alignment, no valid target.")), // Skip if no valid target
-                new DriveToPoseNoJoystick(drive, targetPoseSupplier), // Drive if pose is valid
+                new DriveToPose(drive, targetPoseSupplier), // Drive if pose is valid
                 () -> targetPoseSupplier.get() == null // Condition: if null, skip
                 )
 

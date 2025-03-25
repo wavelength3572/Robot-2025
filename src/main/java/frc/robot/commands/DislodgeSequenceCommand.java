@@ -45,14 +45,11 @@ public class DislodgeSequenceCommand extends SequentialCommandGroup {
 
         // 3. Drive backward 10 inches relative to the current pose.
         // Compute a target pose by offsetting the current pose backward by 10 inches.
-        DriveToCommands.createDriveToPose(
+        new DriveToPoseJoystickCancel(
             drive,
             () -> {
               Pose2d currentPose = drive.getPose();
-              // Convert 10 inches to meters (approximately 0.254 m).
-              double offsetMeters = -0.254; // negative means backward
-              // Create an offset translation in the robot's coordinate frame,
-              // then rotate it by the robot's current heading.
+              double offsetMeters = -0.254;
               Translation2d offset =
                   new Translation2d(offsetMeters, 0).rotateBy(currentPose.getRotation());
               Translation2d targetTranslation = currentPose.getTranslation().plus(offset);
