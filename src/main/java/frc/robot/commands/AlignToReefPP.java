@@ -17,17 +17,32 @@ import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.RobotStatus;
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
 public class AlignToReefPP extends Command {
 
-  private static final double FORWARD_THRESHOLD_METERS = Units.inchesToMeters(3);
-  private static final double LATERAL_THRESHOLD_METERS = Units.inchesToMeters(1);
-  private static final double ROTATION_THRESHOLD_DEGREES = 0.5;
-  private static final int REQUIRED_STABLE_CYCLES = 2;
-  private static final double MAX_RUNTIME_SECONDS = 1.5; // Timeout to prevent infinite execution
+  private static final LoggedTunableNumber kPTranslation =
+      new LoggedTunableNumber("AlignToReef/kPTranslation", 2.0);
+  private static final LoggedTunableNumber kDTranslation =
+      new LoggedTunableNumber("AlignToReef/kDTranslation", 0.0);
+  private static final LoggedTunableNumber kPRotation =
+      new LoggedTunableNumber("AlignToReef/kPRotation", 2.0);
+  private static final LoggedTunableNumber kDRotation =
+      new LoggedTunableNumber("AlignToReef/kDRotation", 0.0);
+
+  private static final LoggedTunableNumber forwardThreshold =
+      new LoggedTunableNumber("AlignToReef/ForwardThresholdInches", 3.0);
+  private static final LoggedTunableNumber lateralThreshold =
+      new LoggedTunableNumber("AlignToReef/LateralThresholdInches", 1.0);
+  private static final LoggedTunableNumber rotationThreshold =
+      new LoggedTunableNumber("AlignToReef/RotationThresholdDegrees", 0.5);
+  private static final LoggedTunableNumber maxRuntimeSeconds =
+      new LoggedTunableNumber("AlignToReef/MaxRuntimeSeconds", 1.5);
+  private static final LoggedTunableNumber requiredStableCycles =
+      new LoggedTunableNumber("AlignToReef/RequiredStableCycles", 2);
 
   private int stableCycles = 0;
   private final Drive drivetrain;
@@ -44,7 +59,8 @@ public class AlignToReefPP extends Command {
     this.drivetrain = drivetrain;
     this.holonomicController =
         new PPHolonomicDriveController(
-            new PIDConstants(2.0, 0.0, 0), new PIDConstants(2.0, 0.0, 0));
+            new PIDConstants(kPTranslation.get(), 0.0, kDTranslation.get()),
+            new PIDConstants(kPRotation.get(), 0.0, kDRotation.get()));
     this.isLeftPole = isLeftPole;
     addRequirements(drivetrain);
   }
@@ -110,7 +126,7 @@ public class AlignToReefPP extends Command {
     double elapsedTime = timer.get();
     Logger.recordOutput("AlignToReef/Summary/ElapsedTime", elapsedTime);
 
-    if (elapsedTime >= MAX_RUNTIME_SECONDS) {
+    if (elapsedTime >= maxRuntimeSeconds.get()) {
       timedOut = true;
       return;
     }
@@ -147,9 +163,11 @@ public class AlignToReefPP extends Command {
     Logger.recordOutput("AlignToReef/Summary/RotationErrorDegrees", rotationError);
 
     // Define separate tolerances
-    boolean withinForwardTolerance = Math.abs(forwardError) <= FORWARD_THRESHOLD_METERS;
-    boolean withinLateralTolerance = Math.abs(lateralError) <= LATERAL_THRESHOLD_METERS;
-    boolean withinRotationTolerance = rotationError <= ROTATION_THRESHOLD_DEGREES;
+    boolean withinForwardTolerance =
+        Math.abs(forwardError) <= Units.inchesToMeters(forwardThreshold.get());
+    boolean withinLateralTolerance =
+        Math.abs(lateralError) <= Units.inchesToMeters(lateralThreshold.get());
+    boolean withinRotationTolerance = rotationError <= rotationThreshold.get();
 
     if (!withinForwardTolerance || !withinLateralTolerance || !withinRotationTolerance) {
       Logger.recordOutput("AlignToReef/State", "Final Correction");
@@ -191,7 +209,8 @@ public class AlignToReefPP extends Command {
 
   @Override
   public boolean isFinished() {
-    boolean finished = !trajectoryGenerated || stableCycles >= REQUIRED_STABLE_CYCLES || timedOut;
+    boolean finished =
+        !trajectoryGenerated || stableCycles >= requiredStableCycles.get() || timedOut;
     Logger.recordOutput("AlignToReef/IsFinished", finished);
     return finished;
   }
