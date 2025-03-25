@@ -24,8 +24,8 @@ public class AlignAndScorePP {
 
         // Directly call AlignToReef instead of manually checking the pose
         new AlignToReefPP(drive, isLeftPole),
-        Commands.runOnce(() -> System.out.println("Robot aligned, checking presets...")),
-
+        Commands.runOnce(() -> System.out.println("Robot aligned, wait for preset to finish...")),
+        new TimedWaitUntilCommand("inPresetConfiguration", coralSystem::isAtGoal),
         // Auto-score only if preset matches
         Commands.either(
             new ScoreCoralInTeleopCommand(coralSystem.getIntake()),
