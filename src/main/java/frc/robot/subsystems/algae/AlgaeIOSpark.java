@@ -170,7 +170,7 @@ public class AlgaeIOSpark implements AlgaeIO {
       case CLIMB:
         haveAlgae = false;
         algaeDeployController.setReference(
-            AlgaeConstants.algaeStowPosition,
+            AlgaeConstants.algaeClimbPosition,
             ControlType.kPosition,
             ClosedLoopSlot.kSlot0,
             inputs.armArbFF);

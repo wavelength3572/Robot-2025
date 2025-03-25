@@ -88,7 +88,7 @@ public class RobotStatus {
   }
 
   public static boolean algaeArmIsSafeForClimbing() {
-    return (algaeSystem.getDeployPositionAngle() > 120.0);
+    return (algaeSystem.getDeployPositionAngle() > 79.0);
   }
 
   public static boolean justScoredCoral() {

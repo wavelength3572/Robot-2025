@@ -26,6 +26,7 @@ public class AlgaeConstants {
   public static final double kAlgaeDeployGearing = 7.5;
   public static final double kAlgaeDeployInitalAngle = 45.5; // Degrees
   public static final double algaeStowPosition = 1.638; // Encoder Rotations
+  public static final double algaeClimbPosition = 1.662; // Encoder Rotations
   public static final double MIN_ANGLE = 45.429;
   public static final double MAX_ANGLE = 135.0;
 
