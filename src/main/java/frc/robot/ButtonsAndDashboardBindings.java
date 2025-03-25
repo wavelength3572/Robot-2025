@@ -177,11 +177,11 @@ public class ButtonsAndDashboardBindings {
     oi.getResetGyroButton()
         .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
 
-    oi.getLeftJoyLeftButton().toggleOnTrue(AlignAndScorePP.create(drive, coralSystem, true));
-    oi.getLeftJoyRightButton().toggleOnTrue(AlignAndScorePP.create(drive, coralSystem, false));
+    oi.getLeftJoyLeftButton().toggleOnTrue(AlignAndScore.create(drive, coralSystem, true));
+    oi.getLeftJoyRightButton().toggleOnTrue(AlignAndScore.create(drive, coralSystem, false));
 
-    oi.getRightJoyLeftButton().toggleOnTrue(AlignAndScore.create(drive, coralSystem, true));
-    oi.getRightJoyRightButton().toggleOnTrue(AlignAndScore.create(drive, coralSystem, false));
+    oi.getRightJoyLeftButton().toggleOnTrue(AlignAndScorePP.create(drive, coralSystem, true));
+    oi.getRightJoyRightButton().toggleOnTrue(AlignAndScorePP.create(drive, coralSystem, false));
 
     oi.getRightJoyDownButton().toggleOnTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
 

@@ -43,8 +43,7 @@ public class AlignToReefPP extends Command {
   public AlignToReefPP(Drive drivetrain, boolean isLeftPole) {
     this.drivetrain = drivetrain;
     this.holonomicController =
-        new PPHolonomicDriveController(
-            new PIDConstants(2.0, 0.0, 0), new PIDConstants(2.0, 0.0, 0));
+        new PPHolonomicDriveController(new PIDConstants(.9, 0.0, 0), new PIDConstants(.9, 0.0, 0));
     this.isLeftPole = isLeftPole;
     addRequirements(drivetrain);
   }
@@ -66,7 +65,7 @@ public class AlignToReefPP extends Command {
     Logger.recordOutput("AlignToReef/Poses/TargetPose", targetPose);
 
     PathConstraints constraints =
-        new PathConstraints(2.0, 3.0, Math.toRadians(720), Math.toRadians(720));
+        new PathConstraints(1.5, 2.0, Math.toRadians(720), Math.toRadians(720));
 
     PathPlannerPath path =
         new PathPlannerPath(

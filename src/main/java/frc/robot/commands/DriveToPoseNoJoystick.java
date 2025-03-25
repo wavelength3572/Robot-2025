@@ -24,12 +24,12 @@ public class DriveToPoseNoJoystick extends Command {
   private Timer timeoutTimer = new Timer();
 
   private final ProfiledPIDController driveControllerX =
-      new ProfiledPIDController(3.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2.2, 4.0));
+      new ProfiledPIDController(.9, 0.0, 0.0, new TrapezoidProfile.Constraints(1.5, 2.0));
   private final ProfiledPIDController driveControllerY =
-      new ProfiledPIDController(3.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2.2, 4.0));
+      new ProfiledPIDController(.9, 0.0, 0.0, new TrapezoidProfile.Constraints(1.5, 2.0));
   private final ProfiledPIDController thetaController =
       new ProfiledPIDController(
-          1.2,
+          1.0,
           0.0,
           0.0,
           new TrapezoidProfile.Constraints(Math.toRadians(720), Math.toRadians(720)));
