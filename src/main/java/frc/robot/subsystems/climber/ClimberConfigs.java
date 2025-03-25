@@ -2,6 +2,7 @@ package frc.robot.subsystems.climber;
 
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public final class ClimberConfigs {
@@ -20,9 +21,12 @@ public final class ClimberConfigs {
       climberConfig
           .closedLoop
           // Set PID values for position control
-          .p(ClimberConstants.climberKp)
-          .d(ClimberConstants.climberKd)
-          .outputRange(-1.0, 1.0)
+          .p(ClimberConstants.climberKp,ClosedLoopSlot.kSlot0)
+          .d(ClimberConstants.climberKd,ClosedLoopSlot.kSlot0)
+          .outputRange(-1.0, 1.0,ClosedLoopSlot.kSlot0)
+          .p(ClimberConstants.climberKp,ClosedLoopSlot.kSlot1)
+          .d(ClimberConstants.climberKd,ClosedLoopSlot.kSlot1)
+          .outputRange(0.0, 1.0,ClosedLoopSlot.kSlot1)
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
     }
   }
