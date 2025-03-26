@@ -8,8 +8,6 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Servo;
@@ -29,9 +27,11 @@ public class ClimberIOSpark implements ClimberIO {
 
   private double targetPosition = 0;
 
-  private static final LoggedTunableNumber ClimberkP = new LoggedTunableNumber("Climber/ClimberKP", ClimberConstants.climbKp);
+  private static final LoggedTunableNumber ClimberkP =
+      new LoggedTunableNumber("Climber/ClimberKP", ClimberConstants.climbKp);
 
-  private static final LoggedTunableNumber climbServoPosition = new LoggedTunableNumber("Climber/servo", 0.0);
+  private static final LoggedTunableNumber climbServoPosition =
+      new LoggedTunableNumber("Climber/servo", 0.0);
 
   private Servo servo = new Servo(1);
   private double servoDelay = 0;
@@ -154,9 +154,9 @@ public class ClimberIOSpark implements ClimberIO {
   @Override
   public boolean isClimbingFinished() {
     if (currentClimberState == CLIMB_STATE.CLIMB) {
-      double difference = Math.abs(ClimberConstants.CLIMBED_POSITION - climberEncoder.getPosition());
+      double difference =
+          Math.abs(ClimberConstants.CLIMBED_POSITION - climberEncoder.getPosition());
       return (difference < ClimberConstants.CLIMBING_TOLERANCE) ? true : false;
-    } else
-      return false;
+    } else return false;
   }
 }

@@ -24,7 +24,7 @@ public final class ClimberConstants {
   public static final double DEPLOY_POSITION = -155.0;
   public static final double FAST_DEPLOY_POSITION = -133.333333333;
   public static final double CLIMBED_POSITION = -52.4285; // -46.666666666;
-  public static final double CLIMBED_SERVO_RELEASE_POSITION = -80; 
+  public static final double CLIMBED_SERVO_RELEASE_POSITION = -80;
 
   // public static final double DEPLOY_POSITION = -8.33333333; // Drum Position
   // public static final double FAST_DEPLOY_POSITION = -6.6666666; // Drum Position
@@ -37,7 +37,7 @@ public final class ClimberConstants {
   public static final double deployKp = 0.03;
   public static final double deployKd = 0.0;
 
-  public static final double climbKp = 0.04;
+  public static final double climbKp = 0.06;
   public static final double climbKd = 0.0;
 
   public static final double CLIMBING_TOLERANCE = 4.0;

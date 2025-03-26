@@ -15,7 +15,7 @@ public final class ClimberConfigs {
       climberConfig
           .idleMode(IdleMode.kBrake)
           .smartCurrentLimit(ClimberConstants.climberCurrentLimit)
-          .openLoopRampRate(.1)
+          .openLoopRampRate(0.0)
           .closedLoopRampRate(0.1)
           .voltageCompensation(12);
       climberConfig
