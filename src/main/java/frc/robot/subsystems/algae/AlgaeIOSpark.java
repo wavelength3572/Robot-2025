@@ -174,17 +174,26 @@ public class AlgaeIOSpark implements AlgaeIO {
       case MANUAL:
         break;
       case CLIMB:
-        detectionCount++;
-        if (detectionCount <= 50) { // About 1 second
-          algaeCaptureMotor.setVoltage(AlgaeConstants.capturePushVolts);
-          algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
-        } else {
-          // Purposly setting speed here because I got some twitches in algae arm duing
-          // testing.
-          algaeDeployMotor.set(0.0);
-          algaeCaptureMotor.set(0.0);
-        }
+        haveAlgae = false;
+        algaeDeployController.setReference(
+            AlgaeConstants.algaeClimbPosition,
+            ControlType.kPosition,
+            ClosedLoopSlot.kSlot0,
+            inputs.armArbFF);
+        algaeCaptureMotor.setVoltage(0.0);
         break;
+        // case CLIMB:
+        // detectionCount++;
+        // if (detectionCount <= 50) { // About 1 second
+        // algaeCaptureMotor.setVoltage(AlgaeConstants.capturePushVolts);
+        // algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
+        // } else {
+        // // Purposly setting speed here because I got some twitches in algae arm duing
+        // // testing.
+        // algaeDeployMotor.set(0.0);
+        // algaeCaptureMotor.set(0.0);
+        // }
+        // break;
       default:
         break;
     }
