@@ -33,6 +33,8 @@ public class PathPlannerCommands {
 
     NamedCommands.registerCommand("TurnVisionOff", new InstantCommand(vision::setVisionOff));
 
+    NamedCommands.registerCommand("SafeEnd", new RunPresetCommand(coralSystem, AUTO_SCORE_END));
+
     NamedCommands.registerCommand("L4", new RunPresetCommand(coralSystem, L4));
     NamedCommands.registerCommand("L3", new RunPresetCommand(coralSystem, L3));
     NamedCommands.registerCommand("L2", new RunPresetCommand(coralSystem, L2));

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.201672156988611,
-        "y": 5.18542060807068
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 4.98913832769999,
-        "y": 5.3745222163213615
-      },
-      "isLocked": false,
-      "linkedName": "Score4-3B"
-    },
-    {
-      "anchor": {
         "x": 1.6796474358943514,
         "y": 7.2308092948724605
       },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.45168719213972,
+        "y": 6.643577314977039
+      },
+      "isLocked": false,
+      "linkedName": "StationLeft-FarLeft"
+    },
+    {
+      "anchor": {
+        "x": 4.116815071214612,
+        "y": 5.391107954545454
+      },
       "prevControl": {
-        "x": 2.158182842714754,
-        "y": 6.909732203769975
+        "x": 3.74653817172841,
+        "y": 5.701951398605775
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "StationLeft-FarLeft"
+      "linkedName": "Score4-2A"
     }
   ],
   "rotationTargets": [],
@@ -33,15 +33,15 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Pickup",
-      "waypointRelativePos": 0.0,
+      "name": "PREL4SEQ",
+      "waypointRelativePos": 0.1,
       "endWaypointRelativePos": null,
       "command": null
     }
   ],
   "globalConstraints": {
     "maxVelocity": 3.25,
-    "maxAcceleration": 4.0,
+    "maxAcceleration": 3.75,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -49,13 +49,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -54.0
+    "rotation": -59.99999999999999
   },
   "reversed": false,
-  "folder": "Score4",
+  "folder": "Score4High",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": -54.0
   },
   "useDefaultConstraints": false
 }
