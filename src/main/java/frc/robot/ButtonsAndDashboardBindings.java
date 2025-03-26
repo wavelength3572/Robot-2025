@@ -158,6 +158,12 @@ public class ButtonsAndDashboardBindings {
 
     SmartDashboard.putData(
         "Shorten Foot", Commands.runOnce(() -> climber.setRelayState(Relay.Value.kForward)));
+
+    SmartDashboard.putData(
+        "Put Out Foot", Commands.runOnce(() -> climber.setRelayState(Relay.Value.kReverse)));
+
+    SmartDashboard.putData(
+        "Stop Foot", Commands.runOnce(() -> climber.setRelayState(Relay.Value.kOff)));
   }
 
   /****************************** */

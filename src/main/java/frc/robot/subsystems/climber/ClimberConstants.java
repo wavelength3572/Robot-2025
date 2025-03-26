@@ -47,6 +47,8 @@ public final class ClimberConstants {
   public static final double climberMaxDeploySpeed = -0.8;
   public static final double climberMaxClimbSpeed = 1.0;
 
+  public static final double footDeployDuration = 1.0; // Seconds
+
   /**
    * Computes the climber tip pose based on the robot's current pose.
    *

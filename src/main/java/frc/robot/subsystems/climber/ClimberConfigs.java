@@ -21,7 +21,7 @@ public final class ClimberConfigs {
       climberConfig
           .softLimit
           .forwardSoftLimit(ClimberConstants.CLIMBED_POSITION)
-          .forwardSoftLimitEnabled(false)
+          .forwardSoftLimitEnabled(true)
           .reverseSoftLimitEnabled(false);
       climberConfig
           .closedLoop
