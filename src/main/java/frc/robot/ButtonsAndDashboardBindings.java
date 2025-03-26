@@ -169,9 +169,9 @@ public class ButtonsAndDashboardBindings {
 
     SendableChooser<Function<Boolean, Command>> alignmentChooser = new SendableChooser<>();
     alignmentChooser.setDefaultOption(
-        "AlignAndScore", (isLeftPole) -> AlignAndScorePP.create(drive, coralSystem, isLeftPole));
+        "AlignAndScorePP", (isLeftPole) -> AlignAndScorePP.create(drive, coralSystem, isLeftPole));
     alignmentChooser.addOption(
-        "AlignAndScorePP", (isLeftPole) -> AlignAndScore.create(drive, coralSystem, isLeftPole));
+        "AlignAndScore", (isLeftPole) -> AlignAndScore.create(drive, coralSystem, isLeftPole));
 
     SmartDashboard.putData("Alignment Strategy", alignmentChooser);
 

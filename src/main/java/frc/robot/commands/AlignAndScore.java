@@ -10,78 +10,60 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AlignmentUtils;
 import frc.robot.util.BranchAlignmentUtils;
 import frc.robot.util.BranchAlignmentUtils.BranchAlignmentStatus;
-import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
+/** Command that aligns the robot to the pole and then scores if the preset is correct. */
 public class AlignAndScore {
 
   /**
-   * Command that aligns the robot to the pole and scores if the preset is correct.
-   *
-   * @param drive The drive subsystem.
-   * @param coralSystem The coral handling system.
-   * @param isLeftPole Whether the target pole is on the left side.
-   * @return The full command sequence.
+   * Create the full command sequence that attempts to align the robot to a pole (or L1 scoring
+   * position) and then score if the coral system is in a scoring preset.
    */
   public static Command create(Drive drive, CoralSystem coralSystem, boolean isLeftPole) {
-
-    // Supplier to dynamically compute the target pose
-    Supplier<Pose2d> targetPoseSupplier =
-        () -> {
-          AlignmentUtils.ReefFaceSelection selection = drive.getReefFaceSelection();
-          if (selection == null || selection.getAcceptedFaceId() == null) {
-            System.out.println("No valid reef face found. Cancelling alignment.");
-            return null;
-          }
-
-          double closestDistance = selection.getAcceptedDistance();
-          if (closestDistance > FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE) {
-            System.out.println("Reef face too far: " + closestDistance);
-            return null;
-          }
-
-          // Check if we are scoring at L1
-          boolean isScoringL1 = coralSystem.getTargetCoralPreset() == CoralSystemPresets.L1_SCORE;
-
-          Pose2d targetPose;
-          if (isScoringL1) {
-            targetPose = calculateL1Pose(drive, selection.getAcceptedFaceId());
-          } else {
-            targetPose = calculatePolePose(drive, selection.getAcceptedFaceId(), isLeftPole);
-          }
-
-          if (targetPose == null) {
-            System.out.println("Failed to calculate valid target pose. Cancelling.");
-            return null;
-          }
-
-          System.out.println("Driving to target pose: " + targetPose);
-          return targetPose;
-        };
+    // Compute the target pose ONCE at the start
+    Pose2d targetPose = computeTargetPoseOrNull(drive, coralSystem, isLeftPole);
 
     return Commands.sequence(
-        Commands.runOnce(() -> System.out.println("Starting drive to pole...")),
+        // 1) Mark that we initialized
+        Commands.runOnce(() -> Logger.recordOutput("AlignAndScore/Stage", "INIT")),
 
-        // Compute the target pose and either drive or skip alignment
+        // 2) If targetPose == null, skip alignment. Otherwise, run DriveToPose.
         Commands.either(
+                // --- Skip alignment ---
                 Commands.runOnce(
-                    () ->
-                        System.out.println(
-                            "Skipping alignment, no valid target.")), // Skip if no valid target
-                new DriveToPose(drive, targetPoseSupplier), // Drive if pose is valid
-                () -> targetPoseSupplier.get() == null // Condition: if null, skip
-                )
+                    () -> {
+                      Logger.recordOutput("AlignAndScore/Stage", "SKIP_ALIGNMENT");
+                    }),
 
-            // Stop execution if alignment wasn't successful
-            .unless(() -> targetPoseSupplier.get() == null),
+                // --- Drive to the target pose ---
+                new DriveToPose(drive, () -> targetPose)
+                    .beforeStarting(
+                        () -> {
+                          Logger.recordOutput("AlignAndScore/Stage", "DRIVE_TO_POSE");
+                          Logger.recordOutput("AlignAndScore/DesiredPose", targetPose);
+                        }),
 
-        // Log when alignment is done
-        Commands.runOnce(() -> System.out.println("Robot aligned, checking presets...")),
+                // Condition: skip if the pose is null
+                () -> targetPose == null)
+            // Also skip the Drive command if targetPose was null
+            .unless(() -> targetPose == null),
+
+        // 3) Mark that we're done driving
+        Commands.runOnce(() -> Logger.recordOutput("AlignAndScore/Stage", "POST_DRIVE")),
+
+        // 4) Wait until the coral system is at its goal
         new TimedWaitUntilCommand("inPresetConfiguration", coralSystem::isAtGoal),
 
-        // Auto-score only if preset matches, otherwise do nothing
+        // 5) Auto-score if conditions match, otherwise skip
         Commands.either(
-            new ScoreCoralInTeleopCommand(coralSystem.getIntake()), // Auto-score command
-            Commands.none(), // No scoring if preset is not correct
+            // --- Scoring branch ---
+            Commands.sequence(
+                Commands.runOnce(() -> Logger.recordOutput("AlignAndScore/Stage", "SCORING")),
+                new ScoreCoralInTeleopCommand(coralSystem.getIntake()),
+                Commands.runOnce(() -> Logger.recordOutput("AlignAndScore/Stage", "SCORING_DONE"))),
+            // --- No scoring branch ---
+            Commands.runOnce(() -> Logger.recordOutput("AlignAndScore/Stage", "NO_SCORING")),
+            // Condition: can we score?
             () ->
                 inScoringConfiguration(coralSystem)
                     && drive.getReefFaceSelection().getTagSeenRecently()
@@ -89,6 +71,53 @@ public class AlignAndScore {
                                 == BranchAlignmentStatus.GREEN
                             && coralSystem.getCurrentCoralPreset() != CoralSystemPresets.L1_SCORE)
                         || (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L1_SCORE))));
+  }
+
+  /**
+   * Determines the target Pose2d to drive to. Returns null if no valid face or if the face is too
+   * far. Only called once.
+   */
+  private static Pose2d computeTargetPoseOrNull(
+      Drive drive, CoralSystem coralSystem, boolean isLeftPole) {
+
+    Logger.recordOutput("AlignAndScore/Stage", "COMPUTE_POSE");
+
+    AlignmentUtils.ReefFaceSelection selection = drive.getReefFaceSelection();
+    if (selection == null || selection.getAcceptedFaceId() == null) {
+      Logger.recordOutput("AlignAndScore/ComputePose/Status", "NO_FACE");
+      return null;
+    }
+
+    double closestDistance = selection.getAcceptedDistance();
+    Logger.recordOutput("AlignAndScore/ComputePose/FaceID", selection.getAcceptedFaceId());
+    Logger.recordOutput("AlignAndScore/ComputePose/Distance", closestDistance);
+
+    // Check distance threshold
+    if (closestDistance > FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE) {
+      Logger.recordOutput("AlignAndScore/ComputePose/Status", "FACE_TOO_FAR");
+      return null;
+    }
+
+    // Check if we are scoring at L1
+    boolean isScoringL1 = (coralSystem.getTargetCoralPreset() == CoralSystemPresets.L1_SCORE);
+    Logger.recordOutput("AlignAndScore/ComputePose/IsScoringL1", isScoringL1);
+
+    // Compute the desired pose (pole vs. L1)
+    Pose2d targetPose =
+        isScoringL1
+            ? calculateL1Pose(drive, selection.getAcceptedFaceId())
+            : calculatePolePose(drive, selection.getAcceptedFaceId(), isLeftPole);
+
+    if (targetPose == null) {
+      Logger.recordOutput("AlignAndScore/ComputePose/Status", "CALC_FAILED");
+      return null;
+    }
+
+    // Log the pose
+    Logger.recordOutput("AlignAndScore/ComputePose/Status", "POSE_VALID");
+    Logger.recordOutput("AlignAndScore/ComputePose/TargetPose", targetPose);
+
+    return targetPose;
   }
 
   /** Calculates the target pose for pole alignment using correct alliance logic. */
@@ -100,6 +129,9 @@ public class AlignAndScore {
     return DriveToCommands.calculateL1Pose(drive, faceId);
   }
 
+  /**
+   * Returns true if the coral system is in a "scoring" configuration (e.g. L1_SCORE, L2, L3, L4).
+   */
   public static boolean inScoringConfiguration(CoralSystem coralSystem) {
     return coralSystem.getCurrentCoralPreset() == coralSystem.getTargetCoralPreset()
         && (coralSystem.getTargetCoralPreset() == CoralSystemPresets.L1_SCORE

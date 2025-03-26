@@ -150,9 +150,7 @@ public class Robot extends LoggedRobot {
     System.out.println(String.format("wheelRadiusMeters: %.5f", DriveConstants.wheelRadiusMeters));
 
     UsbCamera lifeCam = CameraServer.startAutomaticCapture("Climber Cam", 0);
-    System.out.println(lifeCam.enumerateVideoModes());
-
-    // lifeCam.setResolution(416, 240);
+    lifeCam.setResolution(416, 240);
 
     FollowPathCommand.warmupCommand().schedule();
   }

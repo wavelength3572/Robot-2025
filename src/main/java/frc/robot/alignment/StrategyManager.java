@@ -42,11 +42,11 @@ public class StrategyManager implements AlignmentStrategy {
     // Initialize shared PID controller
     this.sharedAngleController =
         new ProfiledPIDController(
-            0.5, // ANGLE_KP
+            0.9, // ANGLE_KP
             0.0,
             0.0, // ANGLE_KD
             new TrapezoidProfile.Constraints(
-                Units.degreesToRadians(360.0), Units.degreesToRadians(360.0)));
+                Units.degreesToRadians(360.0), Units.degreesToRadians(520.0)));
     this.sharedAngleController.enableContinuousInput(-Math.PI, Math.PI);
     this.sharedAngleController.setTolerance(Math.toRadians(TOLERANCE_IN_DEGREES));
 

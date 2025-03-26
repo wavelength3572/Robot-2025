@@ -17,9 +17,6 @@ public class DriveToPose extends Command {
   private static final LoggedTunableNumber timeout =
       new LoggedTunableNumber("DriveToPose/timeout", 2.0);
 
-  private static final LoggedTunableNumber scalarTunable =
-      new LoggedTunableNumber("DriveToPose/SpeedScalar", 1.0);
-
   // PID Gains
   private static final LoggedTunableNumber kPX = new LoggedTunableNumber("DriveToPose/kPX", .9);
   private static final LoggedTunableNumber kPY = new LoggedTunableNumber("DriveToPose/kPY", .9);
@@ -50,7 +47,7 @@ public class DriveToPose extends Command {
   public DriveToPose(Drive drivetrain, Supplier<Pose2d> poseSupplier, double speedScalar) {
     this.drivetrain = drivetrain;
     this.poseSupplier = poseSupplier;
-    this.speedScalar = MathUtil.clamp(scalarTunable.get(), 0.0, 1.0);
+    this.speedScalar = MathUtil.clamp(speedScalar, 0.0, 1.0);
     addRequirements(drivetrain);
   }
 
@@ -62,16 +59,14 @@ public class DriveToPose extends Command {
   public void initialize() {
     createControllers();
     currentPose = drivetrain.getPose();
-    ChassisSpeeds currentSpeeds = drivetrain.getChassisSpeeds();
 
     // Log initial state
     Logger.recordOutput("DriveToPose/Init/StartPose", currentPose);
     Logger.recordOutput("DriveToPose/Init/SpeedScalar", speedScalar);
 
-    driveControllerX.reset(currentPose.getX(), currentSpeeds.vxMetersPerSecond);
-    driveControllerY.reset(currentPose.getY(), currentSpeeds.vyMetersPerSecond);
-    thetaController.reset(
-        currentPose.getRotation().getRadians(), currentSpeeds.omegaRadiansPerSecond);
+    driveControllerX.reset(currentPose.getX(), 0);
+    driveControllerY.reset(currentPose.getY(), 0);
+    thetaController.reset(currentPose.getRotation().getRadians(), 0);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
     targetPose = poseSupplier.get();

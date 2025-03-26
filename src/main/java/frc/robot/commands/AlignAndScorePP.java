@@ -7,30 +7,46 @@ import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.BranchAlignmentUtils;
 import frc.robot.util.BranchAlignmentUtils.BranchAlignmentStatus;
+import org.littletonrobotics.junction.Logger;
 
+/** Command that aligns the robot to the pole and scores if the preset is correct. */
 public class AlignAndScorePP {
 
   /**
-   * Command that aligns the robot to the pole and scores if the preset is correct.
+   * Creates the full command sequence to align the robot to a pole (via AlignToReefPP) and then
+   * score if the coral system is in a scoring preset.
    *
    * @param drive The drive subsystem.
-   * @param coralSystem The coral handling system.
+   * @param coralSystem The coral system handling the coral manipulator.
    * @param isLeftPole Whether the target pole is on the left side.
    * @return The full command sequence.
    */
   public static Command create(Drive drive, CoralSystem coralSystem, boolean isLeftPole) {
     return Commands.sequence(
-        Commands.runOnce(() -> System.out.println("Starting drive to pole...")),
+        // Stage: INIT
+        Commands.runOnce(() -> Logger.recordOutput("AlignAndScorePP/Stage", "INIT")),
 
-        // Directly call AlignToReef instead of manually checking the pose
-        new AlignToReefPP(drive, isLeftPole),
-        Commands.runOnce(() -> System.out.println("Robot aligned, checking presets...")),
+        // Run the path-planned alignment
+        new AlignToReefPP(drive, isLeftPole)
+            .beforeStarting(() -> Logger.recordOutput("AlignAndScorePP/Stage", "ALIGNING")),
+
+        // Post-alignment log
+        Commands.runOnce(() -> Logger.recordOutput("AlignAndScorePP/Stage", "CHECK_PRESETS")),
+
+        // Wait until the coral system is at its goal
         new TimedWaitUntilCommand("inPresetConfiguration", coralSystem::isAtGoal),
 
-        // Auto-score only if preset matches
+        // Either auto-score if conditions match or do nothing
         Commands.either(
-            new ScoreCoralInTeleopCommand(coralSystem.getIntake()),
-            Commands.none(),
+            // SCORING branch
+            Commands.sequence(
+                Commands.runOnce(() -> Logger.recordOutput("AlignAndScorePP/Stage", "SCORING")),
+                new ScoreCoralInTeleopCommand(coralSystem.getIntake()),
+                Commands.runOnce(
+                    () -> Logger.recordOutput("AlignAndScorePP/Stage", "SCORING_DONE"))),
+            // NO SCORING branch
+            Commands.runOnce(() -> Logger.recordOutput("AlignAndScorePP/Stage", "NO_SCORING")),
+            // Condition for scoring
             () ->
                 inScoringConfiguration(coralSystem)
                     && drive.getReefFaceSelection().getTagSeenRecently()
@@ -40,6 +56,7 @@ public class AlignAndScorePP {
                         || (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L1_SCORE))));
   }
 
+  /** Helper method that checks if the coral system is in one of the valid "scoring" presets. */
   public static boolean inScoringConfiguration(CoralSystem coralSystem) {
     return coralSystem.getCurrentCoralPreset() == coralSystem.getTargetCoralPreset()
         && (coralSystem.getTargetCoralPreset() == CoralSystemPresets.L1_SCORE
