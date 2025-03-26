@@ -19,6 +19,11 @@ public final class ClimberConfigs {
           .closedLoopRampRate(0.1)
           .voltageCompensation(12);
       climberConfig
+          .softLimit
+          .forwardSoftLimit(ClimberConstants.CLIMBED_POSITION)
+          .forwardSoftLimitEnabled(false)
+          .reverseSoftLimitEnabled(false);
+      climberConfig
           .closedLoop
           // Set PID values for position control
           // Slot 0 is for going out
