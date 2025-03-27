@@ -305,70 +305,6 @@ public class ButtonsAndDashboardBindings {
                         coralSystem));
     }
 
-    private static Command waitForScoringConditions(Drive drive, CoralSystem coralSystem) {
-        return Commands.waitUntil(
-                () -> {
-                    boolean inScoringConfig = AlignAndScore.inScoringConfiguration(coralSystem);
-                    Logger.recordOutput("AutoScore/WaitingForScoringConfig", inScoringConfig);
-                    return inScoringConfig;
-                }) // Always wait for scoring config
-                .andThen(
-                        Commands.either(
-                                Commands.runOnce(
-                                        () -> {
-                                            Logger.recordOutput(
-                                                    "AutoScore/Status",
-                                                    "TRIGGERED: Configuration correct, vision confirmed, alignment is GREEN.");
-                                            new ScoreCoralInTeleopCommand(coralSystem.getIntake()).schedule();
-                                        }),
-                                Commands.runOnce(
-                                        () -> {
-                                            Logger.recordOutput(
-                                                    "AutoScore/Status", "ABANDONED: Operator must score manually.");
-                                            debugAlignmentStatus(drive); // Log why alignment failed
-                                        }),
-                                () -> {
-                                    var reefFaceSelection = drive.getReefFaceSelection();
-                                    var branchStatus = BranchAlignmentUtils.getCurrentBranchAlignmentStatus();
-
-                                    boolean hasReefFace = reefFaceSelection != null;
-                                    boolean tagSeenRecently = hasReefFace && reefFaceSelection.getTagSeenRecently();
-                                    boolean hasBranchStatus = branchStatus != null;
-                                    boolean alignmentGreen = hasBranchStatus
-                                            && branchStatus == BranchAlignmentStatus.GREEN;
-
-                                    // Log conditions
-                                    Logger.recordOutput("AutoScore/CheckingConditions", true);
-                                    Logger.recordOutput("AutoScore/ReefFaceDetected", hasReefFace);
-                                    Logger.recordOutput("AutoScore/TagSeenRecently", tagSeenRecently);
-                                    Logger.recordOutput("AutoScore/BranchStatusAvailable", hasBranchStatus);
-                                    Logger.recordOutput("AutoScore/AlignmentGreen", alignmentGreen);
-
-                                    return tagSeenRecently && alignmentGreen;
-                                }));
-    }
-
-    private static void debugAlignmentStatus(Drive drive) {
-        var reefFaceSelection = drive.getReefFaceSelection();
-        var branchStatus = BranchAlignmentUtils.getCurrentBranchAlignmentStatus();
-
-        boolean hasReefFace = reefFaceSelection != null;
-        boolean tagSeenRecently = hasReefFace && reefFaceSelection.getTagSeenRecently();
-        boolean hasBranchStatus = branchStatus != null;
-        boolean alignmentGreen = hasBranchStatus && branchStatus == BranchAlignmentStatus.GREEN;
-
-        Logger.recordOutput("AutoScore/FailureReason", "Auto-scoring failed because:");
-
-        if (!hasReefFace)
-            Logger.recordOutput("AutoScore/Failure", "No reef face detected.");
-        if (!tagSeenRecently)
-            Logger.recordOutput("AutoScore/Failure", "Tag was NOT seen recently.");
-        if (!hasBranchStatus)
-            Logger.recordOutput("AutoScore/Failure", "No branch alignment status available.");
-        if (!alignmentGreen)
-            Logger.recordOutput("AutoScore/Failure", "Alignment status is NOT GREEN.");
-    }
-
     public static Command getDeployAndCaptureAlgaeCommand() {
         return Commands.sequence(
                 Commands.runOnce(algae::pullAlgae), // PULL algae
@@ -379,8 +315,4 @@ public class ButtonsAndDashboardBindings {
                                 || (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L1_STOW))));
     }
 
-    private static Command deferredAlignmentCommand(
-            SendableChooser<Function<Boolean, Command>> chooser, boolean isLeftPole) {
-        return new InstantCommand(() -> chooser.getSelected().apply(isLeftPole).schedule());
-    }
 }
