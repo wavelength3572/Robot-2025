@@ -182,11 +182,13 @@ public class ButtonsAndDashboardBindings {
     SmartDashboard.putData("Alignment Strategy", alignmentChooser);
 
     // Operator buttons
-    oi.getRightJoyLeftButton().toggleOnTrue(deferredAlignmentCommand(alignmentChooser, true));
-    oi.getRightJoyRightButton().toggleOnTrue(deferredAlignmentCommand(alignmentChooser, false));
+    // oi.getRightJoyLeftButton().toggleOnTrue(deferredAlignmentCommand(alignmentChooser, true));
+    // oi.getRightJoyRightButton().toggleOnTrue(deferredAlignmentCommand(alignmentChooser, false));
+
+    oi.getRightJoyLeftButton().toggleOnTrue(AlignAndScorePP.create(drive, coralSystem, true));
+    oi.getRightJoyRightButton().toggleOnTrue(AlignAndScorePP.create(drive, coralSystem, false));
 
     oi.getRightJoyDownButton().toggleOnTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
-
     oi.getRightJoyUpButton().toggleOnTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
 
     oi.getButtonI()

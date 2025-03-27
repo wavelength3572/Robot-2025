@@ -23,10 +23,10 @@ public final class BranchAlignmentUtils {
   // ----------------- TUNE THESE DISTANCES (meters) -----------------
   // Threshold for forward alignment—if the robot isn’t within this distance,
   // we consider it not aligned regardless of lateral offset.
-  private static final double FORWARD_THRESHOLD = 0.10;
+  private static final double FORWARD_THRESHOLD = 0.30;
 
   // Lateral thresholds for traffic-light style alignment.
-  public static final double LATERAL_THRESHOLD_RED = 0.12;
+  public static final double LATERAL_THRESHOLD_RED = 0.05;
   public static final double LATERAL_THRESHOLD_SOLID_GREEN =
       0.025; // this is only used to make the blinking solid
 

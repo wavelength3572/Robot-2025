@@ -25,28 +25,28 @@ import org.littletonrobotics.junction.Logger;
 public class AlignToReefPP extends Command {
 
   private static final LoggedTunableNumber kPTranslation =
-      new LoggedTunableNumber("AlignToReef/kPTranslation", 0.9);
+      new LoggedTunableNumber("AlignToReef/kPTranslation", 6.0);
   private static final LoggedTunableNumber kDTranslation =
       new LoggedTunableNumber("AlignToReef/kDTranslation", 0.0);
   private static final LoggedTunableNumber kPRotation =
-      new LoggedTunableNumber("AlignToReef/kPRotation", 0.9);
+      new LoggedTunableNumber("AlignToReef/kPRotation", 0.8);
   private static final LoggedTunableNumber kDRotation =
       new LoggedTunableNumber("AlignToReef/kDRotation", 0.0);
 
   private static final LoggedTunableNumber forwardThreshold =
-      new LoggedTunableNumber("AlignToReef/ForwardThresholdInches", 3.0);
+      new LoggedTunableNumber("AlignToReef/ForwardThresholdInches", 2.0);
   private static final LoggedTunableNumber lateralThreshold =
-      new LoggedTunableNumber("AlignToReef/LateralThresholdInches", 1.0);
+      new LoggedTunableNumber("AlignToReef/LateralThresholdInches", 2.0);
   private static final LoggedTunableNumber rotationThreshold =
-      new LoggedTunableNumber("AlignToReef/RotationThresholdDegrees", 0.5);
+      new LoggedTunableNumber("AlignToReef/RotationThresholdDegrees", 2);
   private static final LoggedTunableNumber maxRuntimeSeconds =
       new LoggedTunableNumber("AlignToReef/MaxRuntimeSeconds", 3);
   private static final LoggedTunableNumber requiredStableCycles =
-      new LoggedTunableNumber("AlignToReef/RequiredStableCycles", 2);
+      new LoggedTunableNumber("AlignToReef/RequiredStableCycles", 1);
   private static final LoggedTunableNumber maxVelocity =
-      new LoggedTunableNumber("AlignToReef/MaxVelocity", 1.5);
+      new LoggedTunableNumber("AlignToReef/MaxVelocity", 1.0);
   private static final LoggedTunableNumber maxAcceleration =
-      new LoggedTunableNumber("AlignToReef/MaxAcceleration", 3);
+      new LoggedTunableNumber("AlignToReef/MaxAcceleration", 2);
   private static final LoggedTunableNumber maxAngularVelocityDEG =
       new LoggedTunableNumber("AlignToReef/MaxAngularVelocity", 180);
   private static final LoggedTunableNumber maxAngularAccelerationDEG =
@@ -153,11 +153,11 @@ public class AlignToReefPP extends Command {
       return;
     }
 
-    if (!finalCorrectionStarted) {
-      finalCorrectionTimer.reset();
-      finalCorrectionTimer.start();
-      finalCorrectionStarted = true;
-    }
+    // if (!finalCorrectionStarted) {
+    //   finalCorrectionTimer.reset();
+    //   finalCorrectionTimer.start();
+    //   finalCorrectionStarted = true;
+    // }
 
     Pose2d currentPose = drivetrain.getPose();
     PathPlannerTrajectoryState finalState = trajectory.getEndState();
@@ -181,18 +181,18 @@ public class AlignToReefPP extends Command {
         Math.abs(lateralError) <= Units.inchesToMeters(lateralThreshold.get());
     boolean withinRotationTolerance = rotationError <= rotationThreshold.get();
 
-    if (!withinForwardTolerance || !withinLateralTolerance || !withinRotationTolerance) {
-      Logger.recordOutput("AlignToReef/State", "Final Correction");
-      ChassisSpeeds correctionSpeeds =
-          holonomicController.calculateRobotRelativeSpeeds(currentPose, finalState);
-      drivetrain.runVelocity(correctionSpeeds);
-      stableCycles = 0;
-    } else {
-      stableCycles++;
-      Logger.recordOutput("AlignToReef/State", "Stable");
-      Logger.recordOutput("AlignToReef/StableCycles", stableCycles);
-      drivetrain.stop();
-    }
+    // if (!withinForwardTolerance || !withinLateralTolerance || !withinRotationTolerance) {
+    //   Logger.recordOutput("AlignToReef/State", "Final Correction");
+    //   ChassisSpeeds correctionSpeeds =
+    //       holonomicController.calculateRobotRelativeSpeeds(currentPose, finalState);
+    //   drivetrain.runVelocity(correctionSpeeds);
+    //   stableCycles = 0;
+    // } else {
+    stableCycles++;
+    // Logger.recordOutput("AlignToReef/State", "Stable");
+    // Logger.recordOutput("AlignToReef/StableCycles", stableCycles);
+    drivetrain.stop();
+    // }
   }
 
   @Override
