@@ -1,10 +1,8 @@
 package frc.robot.commands;
-import java.util.function.Function;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.coral.CoralSystem;
+import java.util.function.Function;
 
 public class ChooserAlignmentCommand extends Command {
   private final SendableChooser<Function<Boolean, Command>> chooser;

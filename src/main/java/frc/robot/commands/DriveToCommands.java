@@ -243,4 +243,14 @@ public class DriveToCommands {
       }
     }
   }
+
+  /** Calculate standoff pose N meters away from the reef pose */
+  public static Pose2d calculateStandoffPose(Pose2d targetPose, double standoffDistanceMeters) {
+    Translation2d offset =
+        new Translation2d(-standoffDistanceMeters, 0.0).rotateBy(targetPose.getRotation());
+    return new Pose2d(
+        targetPose.getX() + offset.getX(),
+        targetPose.getY() + offset.getY(),
+        targetPose.getRotation());
+  }
 }
