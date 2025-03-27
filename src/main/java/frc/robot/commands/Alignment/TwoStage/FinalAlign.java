@@ -1,70 +1,111 @@
 package frc.robot.commands.Alignment.TwoStage;
 
-import edu.wpi.first.math.controller.HolonomicDriveController;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.util.LoggedTunableNumber;
+import org.littletonrobotics.junction.Logger;
 
 public class FinalAlign extends Command {
   private final Drive drive;
   private final Pose2d targetPose;
-  private final HolonomicDriveController controller;
+  private final PPHolonomicDriveController controller;
   private int stableCycles = 0;
+  private final Timer runtimeTimer = new Timer();
+
+  // Tunable PID and tolerance values
+  private static final LoggedTunableNumber kPTranslation =
+      new LoggedTunableNumber("FinalAlign/kPTranslation", 3.0);
+  private static final LoggedTunableNumber kDTranslation =
+      new LoggedTunableNumber("FinalAlign/kDTranslation", 0.2);
+  private static final LoggedTunableNumber kPRotation =
+      new LoggedTunableNumber("FinalAlign/kPRotation", 2.0);
+  private static final LoggedTunableNumber kDRotation =
+      new LoggedTunableNumber("FinalAlign/kDRotation", 0.1);
+  private static final LoggedTunableNumber rotationToleranceDeg =
+      new LoggedTunableNumber("FinalAlign/RotationToleranceDeg", 1.5);
+  private static final LoggedTunableNumber positionToleranceMeters =
+      new LoggedTunableNumber("FinalAlign/PositionToleranceMeters", 0.01);
+  private static final LoggedTunableNumber requiredStableCycles =
+      new LoggedTunableNumber("FinalAlign/StableCycles", 3);
 
   public FinalAlign(Drive drive, Pose2d targetPose) {
     this.drive = drive;
     this.targetPose = targetPose;
 
-    PIDController xPID = new PIDController(3.0, 0.0, 0.2);
-    PIDController yPID = new PIDController(3.0, 0.0, 0.2);
-    ProfiledPIDController thetaPID =
-        new ProfiledPIDController(
-            2.0,
-            0.0,
-            0.1,
-            new TrapezoidProfile.Constraints(Math.toRadians(90), Math.toRadians(180)));
-
-    xPID.setTolerance(0.01);
-    yPID.setTolerance(0.01);
-    thetaPID.setTolerance(Math.toRadians(1.5));
-
-    controller = new HolonomicDriveController(xPID, yPID, thetaPID);
-
+    this.controller =
+        new PPHolonomicDriveController(
+            new PIDConstants(kPTranslation.get(), 0.0, kDTranslation.get()),
+            new PIDConstants(kPRotation.get(), 0.0, kDRotation.get()));
     addRequirements(drive);
+  }
+
+  @Override
+  public void initialize() {
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/TargetPose", targetPose);
+    controller.reset(drive.getPose(), drive.getChassisSpeeds());
+    stableCycles = 0;
+    runtimeTimer.reset();
+    runtimeTimer.start();
   }
 
   @Override
   public void execute() {
     Pose2d current = drive.getPose();
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/CurrentPose", current);
 
-    Trajectory.State dummyState = new Trajectory.State();
-    dummyState.poseMeters = targetPose;
-    dummyState.velocityMetersPerSecond = 0.0;
-    dummyState.accelerationMetersPerSecondSq = 0.0;
+    // Create a dummy PathPlannerTrajectoryState
+    PathPlannerTrajectoryState goal = new PathPlannerTrajectoryState();
+    goal.pose = targetPose;
+    goal.linearVelocity = 0.0;
 
-    ChassisSpeeds speeds = controller.calculate(current, dummyState, targetPose.getRotation());
+    ChassisSpeeds speeds = controller.calculateRobotRelativeSpeeds(drive.getPose(), goal);
+    drive.runVelocity(speeds);
 
-    drive.runVelocity(speeds); // or field-relative version if needed
+    // Log details
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/CommandedSpeeds", speeds);
 
-    if (controller.atReference()) {
+    Pose2d error = targetPose.relativeTo(current);
+    double posError = error.getTranslation().getNorm();
+    double rotError = Math.abs(targetPose.getRotation().minus(current.getRotation()).getDegrees());
+
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/Error/X", error.getX());
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/Error/Y", error.getY());
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/Error/RotationDeg", rotError);
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/PositionErrorMeters", posError);
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/RotationErrorDeg", rotError);
+
+    boolean posOk = posError <= positionToleranceMeters.get();
+    boolean rotOk = rotError <= rotationToleranceDeg.get();
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/WithinTolerance", posOk && rotOk);
+
+    if (posOk && rotOk) {
       stableCycles++;
     } else {
       stableCycles = 0;
     }
+
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/StableCycles", stableCycles);
   }
 
   @Override
   public boolean isFinished() {
-    return stableCycles > 3;
+    boolean done = stableCycles >= requiredStableCycles.get();
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/IsFinished", done);
+    return done;
   }
 
   @Override
   public void end(boolean interrupted) {
     drive.stop();
+    runtimeTimer.stop();
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/DurationSeconds", runtimeTimer.get());
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/Interrupted", interrupted);
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/Completed", !interrupted);
   }
 }
