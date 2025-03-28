@@ -50,8 +50,7 @@ public class IntakeIOSpark implements IntakeIO {
     inputs.limitSwitch = intakeMotor.getForwardLimitSwitch().isPressed();
     inputs.appliedVolts = intakeMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     if (currentIntakeState == intakeState.PULL) {
-      if ((intakeMotor.getOutputCurrent() >= 25.0 && inputs.appliedVolts > 0.0)
-          || inputs.limitSwitch == true) {
+      if ((intakeMotor.getOutputCurrent() >= 25.0 && inputs.appliedVolts > 0.0)) {
         haveCoral = true;
       }
     } else {

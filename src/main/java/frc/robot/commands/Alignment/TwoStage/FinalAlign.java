@@ -20,7 +20,7 @@ public class FinalAlign extends Command {
 
   // Tunable PID and tolerance values
   private static final LoggedTunableNumber kPTranslation =
-      new LoggedTunableNumber("FinalAlign/kPTranslation", 3.0);
+      new LoggedTunableNumber("FinalAlign/kPTranslation", 6.0);
   private static final LoggedTunableNumber kDTranslation =
       new LoggedTunableNumber("FinalAlign/kDTranslation", 0.2);
   private static final LoggedTunableNumber kPRotation =
