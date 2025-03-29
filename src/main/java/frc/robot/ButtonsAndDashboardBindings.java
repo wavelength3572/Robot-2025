@@ -193,11 +193,11 @@ public class ButtonsAndDashboardBindings {
   private static void SetupAlignmentButtons() {
     SendableChooser<Function<Boolean, Command>> alignmentChooser = new SendableChooser<>();
     alignmentChooser.setDefaultOption(
+        "Two Stage", (isLeftPole) -> AlignAndScoreTwoStage.create(drive, coralSystem, isLeftPole));
+    alignmentChooser.addOption(
         "AlignAndScorePP", (isLeftPole) -> AlignAndScorePP.create(drive, coralSystem, isLeftPole));
     alignmentChooser.addOption(
         "AlignAndScore", (isLeftPole) -> AlignAndScore.create(drive, coralSystem, isLeftPole));
-    alignmentChooser.addOption(
-        "Two Stage", (isLeftPole) -> AlignAndScoreTwoStage.create(drive, coralSystem, isLeftPole));
 
     SmartDashboard.putData("Alignment Strategy", alignmentChooser);
     ChooserAlignmentCommand alignLeftCommand = new ChooserAlignmentCommand(alignmentChooser, true);

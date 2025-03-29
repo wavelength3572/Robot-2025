@@ -9,12 +9,14 @@ import frc.robot.FieldConstants;
 import frc.robot.FieldConstants.ReefChosenOrientation;
 import frc.robot.FieldConstants.ReefFacesBlue;
 import frc.robot.FieldConstants.ReefFacesRed;
+import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AlignmentUtils;
 import frc.robot.util.RobotStatus;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveToCommands {
   private DriveToCommands() {
@@ -103,42 +105,52 @@ public class DriveToCommands {
     Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
 
     if (!alliance.isPresent()) {
-      System.out.println("Unknown alliance. Cannot calculate L1 target pose.");
+      Logger.recordOutput(
+          "Alignment/calculateL1Pose", "Unknown alliance. Cannot calculate L1 target pose.");
       return null;
     }
+
+    Logger.recordOutput("Alignment/calculateL1Pose/Alliance", alliance.get().toString());
 
     if (alliance.get() == DriverStation.Alliance.Blue) {
       ReefFacesBlue blueFace = ReefFacesBlue.fromId(faceId);
       if (blueFace == null) {
-        System.out.println("Invalid face ID for Blue alliance: " + faceId);
+        Logger.recordOutput(
+            "Alignment/calculateL1Pose", "Invalid face ID for Blue alliance: " + faceId);
         return null;
       }
+      Logger.recordOutput("Alignment/calculateL1Pose/BlueFace", blueFace.toString());
 
       // Compute the midpoint between left and right poles
-      midpointTranslation =
-          blueFace
-              .getLeftPole()
-              .getBranchTranslation()
-              .plus(blueFace.getRightPole().getBranchTranslation())
-              .div(2.0); // Average the two translations to get the midpoint
+      Translation2d leftTranslation = blueFace.getLeftPole().getBranchTranslation();
+      Translation2d rightTranslation = blueFace.getRightPole().getBranchTranslation();
+      Logger.recordOutput("Alignment/calculateL1Pose/LeftTranslation", leftTranslation);
+      Logger.recordOutput("Alignment/calculateL1Pose/RightTranslation", rightTranslation);
+
+      midpointTranslation = leftTranslation.plus(rightTranslation).div(2.0);
+      Logger.recordOutput("Alignment/calculateL1Pose/MidpointTranslation", midpointTranslation);
 
     } else if (alliance.get() == DriverStation.Alliance.Red) {
       ReefFacesRed redFace = ReefFacesRed.fromId(faceId);
       if (redFace == null) {
-        System.out.println("Invalid face ID for Red alliance: " + faceId);
+        Logger.recordOutput(
+            "Alignment/calculateL1Pose", "Invalid face ID for Red alliance: " + faceId);
         return null;
       }
+      Logger.recordOutput("Alignment/calculateL1Pose/RedFace", redFace.toString());
 
       // Compute the midpoint between left and right poles
-      midpointTranslation =
-          redFace
-              .getLeftPole()
-              .getBranchTranslation()
-              .plus(redFace.getRightPole().getBranchTranslation())
-              .div(2.0);
+      Translation2d leftTranslation = redFace.getLeftPole().getBranchTranslation();
+      Translation2d rightTranslation = redFace.getRightPole().getBranchTranslation();
+      Logger.recordOutput("Alignment/calculateL1Pose/LeftTranslation", leftTranslation);
+      Logger.recordOutput("Alignment/calculateL1Pose/RightTranslation", rightTranslation);
+
+      midpointTranslation = leftTranslation.plus(rightTranslation).div(2.0);
+      Logger.recordOutput("Alignment/calculateL1Pose/MidpointTranslation", midpointTranslation);
 
     } else {
-      System.out.println("Unknown alliance. Cannot calculate L1 target pose.");
+      Logger.recordOutput(
+          "Alignment/calculateL1Pose", "Unknown alliance. Cannot calculate L1 target pose.");
       return null;
     }
 
@@ -146,24 +158,32 @@ public class DriveToCommands {
     ReefChosenOrientation chosen =
         AlignmentUtils.pickClosestOrientationForReef(drive.getPose(), faceId);
     if (chosen == null) {
-      System.out.println("Failed to determine reef orientation for face ID: " + faceId);
+      Logger.recordOutput(
+          "Alignment/calculateL1Pose",
+          "Failed to determine reef orientation for face ID: " + faceId);
       return null;
     }
+    Logger.recordOutput("Alignment/calculateL1Pose/ChosenOrientation", chosen.toString());
 
     Rotation2d flippedRotation = chosen.rotation2D().plus(Rotation2d.fromDegrees(180));
+    Logger.recordOutput("Alignment/calculateL1Pose/FlippedRotation", flippedRotation);
 
     // Offset distance to move the robot *right* in the flipped orientation
     double rightOffset = 0.38; // Adjust as needed based on actual misalignment
+    Logger.recordOutput("Alignment/calculateL1Pose/RightOffset", rightOffset);
 
     // Shift right in the robot's new coordinate frame (perpendicular to heading)
-    Translation2d adjustedMidpoint =
-        midpointTranslation.plus(
-            new Translation2d(0.0, rightOffset)
-                .rotateBy(flippedRotation) // Moves "right" relative to the flipped heading
-            );
+    Translation2d rightShift = new Translation2d(0.0, rightOffset).rotateBy(flippedRotation);
+    Logger.recordOutput("Alignment/calculateL1Pose/RightShift", rightShift);
+
+    Translation2d adjustedMidpoint = midpointTranslation.plus(rightShift);
+    Logger.recordOutput("Alignment/calculateL1Pose/AdjustedMidpoint", adjustedMidpoint);
 
     // Return the final pose with adjusted translation and flipped rotation
-    return new Pose2d(adjustedMidpoint, flippedRotation);
+    Pose2d finalPose = new Pose2d(adjustedMidpoint, flippedRotation);
+    Logger.recordOutput("Alignment/calculateL1Pose/FinalPose", finalPose);
+
+    return finalPose;
   }
 
   public static Command driveToCoralStation(
@@ -246,6 +266,17 @@ public class DriveToCommands {
 
   /** Calculate standoff pose N meters away from the reef pose */
   public static Pose2d calculateStandoffPose(Pose2d targetPose, double standoffDistanceMeters) {
+
+    // If we are in L1 scoring we have to return a different standoff.
+    if (RobotStatus.getTargetPreset() == CoralSystemPresets.L1_SCORE) {
+      Translation2d offset =
+          new Translation2d(standoffDistanceMeters, 0.0).rotateBy(targetPose.getRotation());
+      return new Pose2d(
+          targetPose.getX() + offset.getX(),
+          targetPose.getY() + offset.getY(),
+          targetPose.getRotation());
+    }
+
     Translation2d offset =
         new Translation2d(-standoffDistanceMeters, 0.0).rotateBy(targetPose.getRotation());
     return new Pose2d(
