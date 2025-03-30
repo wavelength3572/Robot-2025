@@ -109,7 +109,7 @@ public class AlignAndScore {
     // Compute the desired pose (pole vs. L1)
     Pose2d targetPose =
         isScoringL1
-            ? calculateL1Pose(drive, selection.getAcceptedFaceId())
+            ? calculateL1Pose(drive, selection.getAcceptedFaceId(), isLeftPole)
             : calculatePolePose(drive, selection.getAcceptedFaceId(), isLeftPole);
 
     if (targetPose == null) {
@@ -129,8 +129,8 @@ public class AlignAndScore {
     return DriveToCommands.calculatePolePose(drive, faceId, isLeftPole);
   }
 
-  private static Pose2d calculateL1Pose(Drive drive, int faceId) {
-    return DriveToCommands.calculateL1Pose(drive, faceId);
+  private static Pose2d calculateL1Pose(Drive drive, int faceId, boolean isLeft) {
+    return DriveToCommands.calculateL1Pose(drive, faceId, isLeft);
   }
 
   /**

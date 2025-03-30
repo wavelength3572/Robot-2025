@@ -228,7 +228,7 @@ public class AlignToReefPP extends Command {
     return finished;
   }
 
-  private Pose2d getOffsetTargetPose(Drive drive, int reefFaceId, boolean isLeftBranch) {
+  private Pose2d getOffsetTargetPose(Drive drive, int reefFaceId, boolean isLeft) {
     Optional<Pose3d> reefFacePose3d = VisionConstants.aprilTagLayout.getTagPose(reefFaceId);
     if (reefFacePose3d.isEmpty()) {
       Logger.recordOutput("AlignToReef/Error", "No valid reef face tag found.");
@@ -238,7 +238,7 @@ public class AlignToReefPP extends Command {
     boolean isScoringL1 = RobotStatus.getTargetPreset() == CoralSystemPresets.L1_SCORE;
 
     return isScoringL1
-        ? DriveToCommands.calculateL1Pose(drive, reefFaceId)
-        : DriveToCommands.calculatePolePose(drive, reefFaceId, isLeftBranch);
+        ? DriveToCommands.calculateL1Pose(drive, reefFaceId, isLeft)
+        : DriveToCommands.calculatePolePose(drive, reefFaceId, isLeft);
   }
 }

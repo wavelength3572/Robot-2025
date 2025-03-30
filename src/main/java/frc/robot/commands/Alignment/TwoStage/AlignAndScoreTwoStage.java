@@ -2,6 +2,7 @@ package frc.robot.commands.Alignment.TwoStage;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.FieldConstants;
 import frc.robot.commands.ScoreCoralInTeleopCommand;
 import frc.robot.commands.TimedWaitUntilCommand;
 import frc.robot.subsystems.coral.CoralSystem;
@@ -14,18 +15,29 @@ import org.littletonrobotics.junction.Logger;
 public class AlignAndScoreTwoStage {
 
   public static Command create(Drive drive, CoralSystem coralSystem, boolean isLeftPole) {
+    // Retrieve the accepted distance once.
+    double acceptedDistance = drive.getReefFaceSelection().getAcceptedDistance();
+
+    // Check if the face is too far to align.
+    if (acceptedDistance > FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE) {
+      Logger.recordOutput(
+          "AlignAndScoreTwoStage/Status", "FACE_TOO_FAR, skipping alignment and scoring.");
+      return Commands.none();
+    }
+
+    // If within threshold, build the full alignment and scoring sequence.
     return Commands.sequence(
         // INIT stage
         Commands.runOnce(() -> Logger.recordOutput("AlignAndScoreTwoStage/Stage", "INIT")),
 
-        // Log reef face, preset, and left/right
+        // Log reef face, preset, and left/right information.
         Commands.runOnce(
             () -> {
               Logger.recordOutput(
                   "AlignAndScoreTwoStage/ReefFaceId",
                   drive.getReefFaceSelection().getAcceptedFaceId());
               Logger.recordOutput(
-                  "AlignAndScoreTwoStage/CoralPreset", coralSystem.getCurrentCoralPreset().name());
+                  "AlignAndScoreTwoStage/CoralPreset", coralSystem.getCurrentCoralPreset());
               Logger.recordOutput("AlignAndScoreTwoStage/IsLeftPole", isLeftPole);
             }),
 
@@ -51,7 +63,6 @@ public class AlignAndScoreTwoStage {
                                   == BranchAlignmentStatus.GREEN
                               && coralSystem.getCurrentCoralPreset() != CoralSystemPresets.L1_SCORE)
                           || (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L1_SCORE));
-
               Logger.recordOutput("AlignAndScoreTwoStage/WillScore", willScore);
             }),
 
@@ -67,7 +78,7 @@ public class AlignAndScoreTwoStage {
             // NO SCORING branch
             Commands.runOnce(
                 () -> Logger.recordOutput("AlignAndScoreTwoStage/Stage", "NO_SCORING")),
-            // Condition
+            // Condition: should we score?
             () ->
                 inScoringConfiguration(coralSystem)
                     && drive.getReefFaceSelection().getTagSeenRecently()

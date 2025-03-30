@@ -100,7 +100,7 @@ public class DriveToCommands {
     }
   }
 
-  public static Pose2d calculateL1Pose(Drive drive, int faceId) {
+  public static Pose2d calculateL1Pose(Drive drive, int faceId, boolean isLeft) {
     Translation2d midpointTranslation;
     Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
 
@@ -173,14 +173,29 @@ public class DriveToCommands {
     Logger.recordOutput("Alignment/calculateL1Pose/RightOffset", rightOffset);
 
     // Shift right in the robot's new coordinate frame (perpendicular to heading)
+    // this is just to account for the robot being flipped 180
     Translation2d rightShift = new Translation2d(0.0, rightOffset).rotateBy(flippedRotation);
     Logger.recordOutput("Alignment/calculateL1Pose/RightShift", rightShift);
 
     Translation2d adjustedMidpoint = midpointTranslation.plus(rightShift);
     Logger.recordOutput("Alignment/calculateL1Pose/AdjustedMidpoint", adjustedMidpoint);
 
+    // Offset from center left/right depending on button pushed
+    double offsetDistance = 0.08;
+
+    // If isLeft is true, use a negative offset (to shift left); otherwise, use positive (to shift
+    // right)
+    double offset = isLeft ? -offsetDistance : offsetDistance;
+
+    // Shift in the robot's new coordinate frame (perpendicular to heading)
+    Translation2d offsetShift = new Translation2d(0.0, offset).rotateBy(flippedRotation);
+    Logger.recordOutput("Alignment/calculateL1Pose/OffsetShift", offsetShift);
+
+    Translation2d reAdjustedMidpoint = adjustedMidpoint.plus(offsetShift);
+    Logger.recordOutput("Alignment/calculateL1Pose/ReAdjustedMidpoint", reAdjustedMidpoint);
+
     // Return the final pose with adjusted translation and flipped rotation
-    Pose2d finalPose = new Pose2d(adjustedMidpoint, flippedRotation);
+    Pose2d finalPose = new Pose2d(reAdjustedMidpoint, flippedRotation);
     Logger.recordOutput("Alignment/calculateL1Pose/FinalPose", finalPose);
 
     return finalPose;
