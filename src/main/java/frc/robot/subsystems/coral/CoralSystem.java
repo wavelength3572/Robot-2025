@@ -65,7 +65,8 @@ public class CoralSystem extends SubsystemBase {
     HAVE_CORAL_SAFE_DISTANCE_FROM_STATION, // have coral, further than .7m from station
   }
 
-  private CANrange canRange = new CANrange(31);
+  private CANrange canRangeCoralStation = new CANrange(31);
+  private CANrange canRangeReef = new CANrange(32);
 
   @Getter private Elevator elevator;
   @Getter public final CoralSystemPresetChooser coralSystemPresetChooser;
@@ -148,10 +149,12 @@ public class CoralSystem extends SubsystemBase {
     this.intake = intake;
 
     // Configure the CANrange for basic use
-    CANrangeConfiguration configs = new CANrangeConfiguration();
+    CANrangeConfiguration configsCoralStation = new CANrangeConfiguration();
+    CANrangeConfiguration configsReef = new CANrangeConfiguration();
 
     // Write these configs to the CANrange
-    canRange.getConfigurator().apply(configs);
+    canRangeCoralStation.getConfigurator().apply(configsCoralStation);
+    canRangeReef.getConfigurator().apply(configsReef);
 
     // Puts the button/command on the dashboard to go to the choosed preset
     SmartDashboard.putData("Set Coral Config", CoralSystemCommands.runPreset(this)); //
@@ -187,8 +190,8 @@ public class CoralSystem extends SubsystemBase {
     if ((targetCoralPreset == CoralSystemPresets.PICKUP
             || targetCoralPreset == CoralSystemPresets.PICKUPFAR)
         && (!haveCoral)) {
-      if (getTimeOfFlightRange() < 0.48) {
-        if (getTimeOfFlightRange() > 0.33) {
+      if (getTimeOfFlightRangeCoralStation() < 0.48) {
+        if (getTimeOfFlightRangeCoralStation() > 0.33) {
           // We are in the far zone
           coralStationNearCounter = 0;
           coralStationFarCounter++;
@@ -383,15 +386,31 @@ public class CoralSystem extends SubsystemBase {
             || currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
   }
 
-  @AutoLogOutput(key = "CoralSystem/TOF/Rear TOF")
-  public double getTimeOfFlightRange() {
+  @AutoLogOutput(key = "CoralSystem/TOF/CoralStation Rear TOF")
+  public double getTimeOfFlightRangeCoralStation() {
     if (Constants.currentMode == Mode.REAL) {
-      return canRange.getDistance().getValueAsDouble(); // use TOF for real robot
+      return canRangeCoralStation.getDistance().getValueAsDouble(); // use TOF for real robot
     } else {
       // use odometry distance to coral station in SIM because we don't have a simulated TOF
       var selection = RobotStatus.getCoralStationSelection();
       if (selection == null) {
         System.out.println("[TOF] Warning: No coral station selection available in sim.");
+        return Double.MAX_VALUE; // or some other safe fallback
+      }
+
+      return selection.getAcceptedDistance() - 0.4;
+    }
+  }
+
+  @AutoLogOutput(key = "CoralSystem/TOF/Reef Front TOF")
+  public double getTimeOfFlightRangeReef() {
+    if (Constants.currentMode == Mode.REAL) {
+      return canRangeReef.getDistance().getValueAsDouble(); // use TOF for real robot
+    } else {
+      // use odometry distance to coral station in SIM because we don't have a simulated TOF
+      var selection = RobotStatus.getReefFaceSelection();
+      if (selection == null) {
+        System.out.println("[TOF] Warning: No reef selection available in sim.");
         return Double.MAX_VALUE; // or some other safe fallback
       }
 
@@ -410,7 +429,7 @@ public class CoralSystem extends SubsystemBase {
   }
 
   public void updateCoralPickupState() {
-    currentTOFAvg = tofFilter.calculate(getTimeOfFlightRange());
+    currentTOFAvg = tofFilter.calculate(getTimeOfFlightRangeCoralStation());
     rawDeltaTOF = currentTOFAvg - previousTOFAvg;
     filteredDeltaTOF = derivativeFilter.calculate(rawDeltaTOF);
     previousTOFAvg = currentTOFAvg;
@@ -467,7 +486,7 @@ public class CoralSystem extends SubsystemBase {
 
       case HAVE_CORAL_SAFE_DISTANCE_FROM_STATION:
         if (justExpelledCoral()) {
-          justPickedUpCoral = false;
+          justPickedUpCoral = false; 
           coralPickupState = CoralPickupState.READY_FOR_PICKUP;
         }
 
