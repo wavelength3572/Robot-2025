@@ -77,6 +77,13 @@ public class AlignToReefTwoStage extends SequentialCommandGroup {
     if (RobotStatus.getTargetPreset() == CoralSystemPresets.L1_SCORE) {
       drivingBackwards = true;
       return DriveToCommands.calculateL1Pose(drive, reefFaceId, isLeftBranch);
+    } else if (RobotStatus.getTargetPreset() == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1
+        || RobotStatus.getTargetPreset() == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+        || RobotStatus.getTargetPreset() == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2
+        || RobotStatus.getTargetPreset() == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
+      // For L2 scoring, we need to drive backwards to align with the pole.
+      drivingBackwards = false;
+      return drive.getAlgaeTargetPose();
     } else {
       drivingBackwards = false;
       return DriveToCommands.calculatePolePose(drive, reefFaceId, isLeftBranch);

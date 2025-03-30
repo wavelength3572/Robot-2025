@@ -10,11 +10,13 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.FieldConstants;
+import frc.robot.commands.Alignment.TwoStage.AlignToReefTwoStage;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AlignmentUtils;
+import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 
 public class AlgaeCommands {
@@ -30,6 +32,22 @@ public class AlgaeCommands {
    * met.
    */
   public static Command AlgaeAlignment(Drive drive, CoralSystem coralSystem, OperatorInterface oi) {
+
+    Command alignmentCommand =
+        Commands.defer(
+            () -> {
+              Integer faceId =
+                  (drive.getReefFaceSelection() != null)
+                      ? drive.getReefFaceSelection().getAcceptedFaceId()
+                      : null;
+              if (faceId != null) {
+                return new AlignToReefTwoStage(drive, faceId, false);
+              } else {
+                return Commands.none();
+              }
+            },
+            Set.of(drive));
+
     return new ConditionalCommand(
         new ParallelCommandGroup(
             // Get the Elevator and Arm prepped for dislodge
@@ -39,7 +57,7 @@ public class AlgaeCommands {
                 SetAppropriateDislodgePresetPart2Command(coralSystem),
                 new WaitUntilCommand(coralSystem::isAtGoal)),
             // Drive to the dislodge spot simultaneously
-            new DriveToPose(drive, drive::getAlgaeTargetPose)),
+            alignmentCommand),
         Commands.none(),
         // Condition: Only execute if:
         // - The accepted reef face is within the threshold distance,
