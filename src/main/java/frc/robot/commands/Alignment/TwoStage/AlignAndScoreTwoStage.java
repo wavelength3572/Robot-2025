@@ -61,7 +61,9 @@ public class AlignAndScoreTwoStage {
                       && drive.getReefFaceSelection().getTagSeenRecently()
                       && ((BranchAlignmentUtils.getCurrentBranchAlignmentStatus()
                                   == BranchAlignmentStatus.GREEN
-                              && coralSystem.getCurrentCoralPreset() != CoralSystemPresets.L1_SCORE)
+                              && coralSystem.getCurrentCoralPreset() != CoralSystemPresets.L1_SCORE
+                              && coralSystem.getTimeOfFlightRangeReef()
+                                  < CoralSystem.inRangeThreshold.get())
                           || (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L1_SCORE));
               Logger.recordOutput("AlignAndScoreTwoStage/WillScore", willScore);
             }),
@@ -84,7 +86,9 @@ public class AlignAndScoreTwoStage {
                     && drive.getReefFaceSelection().getTagSeenRecently()
                     && ((BranchAlignmentUtils.getCurrentBranchAlignmentStatus()
                                 == BranchAlignmentStatus.GREEN
-                            && coralSystem.getCurrentCoralPreset() != CoralSystemPresets.L1_SCORE)
+                            && coralSystem.getCurrentCoralPreset() != CoralSystemPresets.L1_SCORE
+                            && coralSystem.getTimeOfFlightRangeReef()
+                                < CoralSystem.inRangeThreshold.get())
                         || (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L1_SCORE))));
   }
 

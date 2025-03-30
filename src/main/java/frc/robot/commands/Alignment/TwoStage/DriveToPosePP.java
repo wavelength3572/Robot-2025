@@ -33,7 +33,7 @@ public class DriveToPosePP extends Command {
 
   // Tunable PID and motion profile constants
   private static final LoggedTunableNumber kPTranslation =
-      new LoggedTunableNumber("DriveToPosePP/kPTranslation", 6.0);
+      new LoggedTunableNumber("DriveToPosePP/kPTranslation", 5.0);
   private static final LoggedTunableNumber kDTranslation =
       new LoggedTunableNumber("DriveToPosePP/kDTranslation", 0.2);
   private static final LoggedTunableNumber kPRotation =
@@ -42,9 +42,9 @@ public class DriveToPosePP extends Command {
       new LoggedTunableNumber("DriveToPosePP/kDRotation", 0.0);
 
   private static final LoggedTunableNumber maxVelocity =
-      new LoggedTunableNumber("DriveToPosePP/MaxVelocity", 1.5);
+      new LoggedTunableNumber("DriveToPosePP/MaxVelocity", 1.0);
   private static final LoggedTunableNumber maxAcceleration =
-      new LoggedTunableNumber("DriveToPosePP/MaxAcceleration", 2.0);
+      new LoggedTunableNumber("DriveToPosePP/MaxAcceleration", 1.5);
   private static final LoggedTunableNumber maxAngularVelocityDeg =
       new LoggedTunableNumber("DriveToPosePP/MaxAngularVelocityDeg", 180.0);
   private static final LoggedTunableNumber maxAngularAccelerationDeg =
@@ -200,7 +200,7 @@ public class DriveToPosePP extends Command {
 
     // --- Define the Goal End State ---
     // Assume a target velocity of 0 at the endpoint.
-    GoalEndState goalEndState = new GoalEndState(.6, targetPose.getRotation());
+    GoalEndState goalEndState = new GoalEndState(0, targetPose.getRotation());
 
     // --- Create the Custom Path ---
     PathPlannerPath customPath = new PathPlannerPath(waypoints, constraints, null, goalEndState);

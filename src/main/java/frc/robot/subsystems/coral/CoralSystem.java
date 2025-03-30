@@ -28,10 +28,10 @@ import org.littletonrobotics.junction.Logger;
 
 public class CoralSystem extends SubsystemBase {
 
-  private static final LoggedTunableNumber outOfRangeThreshold =
+  public static final LoggedTunableNumber outOfRangeThreshold =
       new LoggedTunableNumber("TOF/Out of Range Threashold", 0.48);
-  private static final LoggedTunableNumber inRangeThreshold =
-      new LoggedTunableNumber("TOF/In Range Threashold", 0.33);
+  public static final LoggedTunableNumber inRangeThreshold =
+      new LoggedTunableNumber("TOF/In Range Threashold", 0.20);
 
   private static final double TOF_SAFE_FROM_CORAL_STATION_THRESHOLD =
       0.7; // safe distance from coral station in meters
@@ -334,7 +334,7 @@ public class CoralSystem extends SubsystemBase {
           // Far from reef: we want to raise the elevator by using the FAR preset.
           reefNearCounter = 0;
           reefFarCounter++;
-          if (reefFarCounter > 25) { // roughly 0.5 seconds of consistent readings
+          if (reefFarCounter > 50) { // roughly 0.5 seconds of consistent readings
             switch (targetCoralPreset) {
               case L2:
                 setTargetPreset(L2_FAR);
@@ -353,7 +353,7 @@ public class CoralSystem extends SubsystemBase {
           // Close to reef: lower the elevator to the normal scoring preset.
           reefFarCounter = 0;
           reefNearCounter++;
-          if (reefNearCounter > 25) { // roughly 0.5 seconds of consistent readings
+          if (reefNearCounter > 50) { // roughly 0.5 seconds of consistent readings
             switch (targetCoralPreset) {
               case L2_FAR:
                 setTargetPreset(L2);
