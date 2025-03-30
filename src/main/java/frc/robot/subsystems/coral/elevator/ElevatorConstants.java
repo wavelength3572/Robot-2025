@@ -18,7 +18,7 @@ public class ElevatorConstants {
 
   public static final double kElevatorKp = .3;
   public static final double kElevatorKi = 0;
-  public static final double kElevatorKd = 0.05;
+  public static final double kElevatorKd = 0.08;
   public static final double kElevatorKf = 0.37;
   // public static final double kElevatorVel = 3250; // Fast = 4500
   // public static final double kElevatorAcc = 6500; // Fast = 13500
@@ -29,6 +29,7 @@ public class ElevatorConstants {
   public static final double kElevatorkG = 0.762; // volts (V)
   public static final double kElevatorkV = 0.762; // volt per velocity (V/(m/s))
   public static final double kElevatorkA = 0.0; // volt per acceleration (V/(m/s²))
+  public static final double errorP = 0.04; // Leader Follower Encoder Error correction
 
   public static final double kSetpointThresholdINCHES = 0.5;
 

@@ -1,28 +1,33 @@
 package frc.robot.subsystems.coral.elevator;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.RobotStatus;
 
-public class ElevatorIOPPC implements ElevatorIO {
+public class ElevatorIOMaxMotion implements ElevatorIO {
 
   // Initialize elevator SPARK. We will use MAXMotion position control for the
   // elevator, so we also
   // need to initialize the closed loop controller and encoder.
   private SparkMax leaderMotor = new SparkMax(ElevatorConstants.leaderCanId, MotorType.kBrushless);
+  private SparkClosedLoopController leaderClosedLoopController =
+      leaderMotor.getClosedLoopController();
   private RelativeEncoder leaderEncoder = leaderMotor.getEncoder();
 
   private SparkMax followerMotor =
       new SparkMax(ElevatorConstants.followerCanId, MotorType.kBrushless);
+  private SparkClosedLoopController followerClosedLoopController =
+      followerMotor.getClosedLoopController();
   private RelativeEncoder followerEncoder = followerMotor.getEncoder();
 
   private double elevatorCurrentTarget = 0.0;
@@ -31,7 +36,13 @@ public class ElevatorIOPPC implements ElevatorIO {
   private boolean firstTimeArmInError = true;
   private boolean inElevatorRecoveryMode = false;
 
-  public ElevatorIOPPC() {
+  private double followerError = 0;
+
+  private static final LoggedTunableNumber ElevatorKg = new LoggedTunableNumber("Elevator/Kg", 0.0);
+  private static final LoggedTunableNumber ElevatorErrorP =
+      new LoggedTunableNumber("Elevator/ErrorP", ElevatorConstants.errorP);
+
+  public ElevatorIOMaxMotion() {
     leaderMotor.configure(
         ElevatorConfigs.ElevatorSubsystem.leaderConfig,
         ResetMode.kResetSafeParameters,
@@ -39,29 +50,11 @@ public class ElevatorIOPPC implements ElevatorIO {
     leaderEncoder.setPosition(0);
 
     followerMotor.configure(
-        ElevatorConfigs.ElevatorSubsystem.followerConfig,
+        ElevatorConfigs.ElevatorSubsystem.newFollowerConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     followerEncoder.setPosition(0);
   }
-
-  private static double kDt = 0.02;
-  private static double kMaxVelocity = 0.0;
-  private static double kMaxAcceleration = 0.0;
-  private static double kP = 0.0;
-  private static double kI = 0.0;
-  private static double kD = 0.0;
-  private static double kS = 0.369305;
-  private static double kG = 0.535;
-  private static double kV = 0.002915;
-
-  // Create a PID controller whose setpoint's change is subject to maximum
-  // velocity and acceleration constraints.
-  private final TrapezoidProfile.Constraints m_constraints =
-      new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
-  private final ProfiledPIDController m_controller =
-      new ProfiledPIDController(kP, kI, kD, m_constraints, kDt);
-  private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(kS, kG, kV);
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
@@ -79,6 +72,28 @@ public class ElevatorIOPPC implements ElevatorIO {
       }
     }
 
+    if (ElevatorKg.hasChanged(hashCode())) {
+      runCharacterization(ElevatorKg.get());
+    }
+
+    // Comment out when running characterization
+    leaderClosedLoopController.setReference(
+        elevatorCurrentTarget,
+        ControlType.kMAXMotionPositionControl,
+        ClosedLoopSlot.kSlot0,
+        elevatorCurrentArbFF);
+
+    followerError = (inputs.leaderPositionRotations - inputs.followerPositionRotations);
+    inputs.followerError = followerError;
+    followerError =
+        ElevatorErrorP.get() * (inputs.leaderPositionRotations - inputs.followerPositionRotations);
+
+    followerClosedLoopController.setReference(
+        elevatorCurrentTarget,
+        ControlType.kMAXMotionPositionControl,
+        ClosedLoopSlot.kSlot0,
+        elevatorCurrentArbFF + followerError);
+
     inputs.setpoint = this.elevatorCurrentTarget;
     inputs.leaderVelocityRPM = leaderEncoder.getVelocity();
     inputs.followerVelocityRPM = followerEncoder.getVelocity();
@@ -93,13 +108,6 @@ public class ElevatorIOPPC implements ElevatorIO {
     inputs.leaderCurrentAmps = leaderMotor.getOutputCurrent();
     inputs.followerCurrentAmps = followerMotor.getOutputCurrent();
     inputs.feedforwardOutput = elevatorCurrentArbFF;
-
-    m_controller.setGoal(elevatorCurrentTarget);
-
-    // Run controller and update motor output
-    leaderMotor.setVoltage(
-        m_controller.calculate(inputs.leaderPositionRotations)
-            + m_feedforward.calculate(m_controller.getSetpoint().velocity));
   }
 
   @Override
@@ -162,6 +170,8 @@ public class ElevatorIOPPC implements ElevatorIO {
         .maxAcceleration(AccelerationMax)
         .allowedClosedLoopError(0.1);
     leaderMotor.configure(
+        config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    followerMotor.configure(
         config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 }

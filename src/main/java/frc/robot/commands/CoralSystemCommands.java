@@ -1,22 +1,20 @@
 package frc.robot.commands;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.LinkedList;
-import java.util.List;
-
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.LinkedList;
+import java.util.List;
 
 public class CoralSystemCommands {
 
   private static final double FF_RAMP_RATE = 0.05; // Volts/Sec
 
-  private CoralSystemCommands() {
-  }
+  private CoralSystemCommands() {}
 
   public static Command runPreset(CoralSystem coralSystem) {
     return Commands.runOnce(
@@ -32,8 +30,7 @@ public class CoralSystemCommands {
   /**
    * Measures the velocity feedforward constants for the drive motors.
    *
-   * <p>
-   * This command should only be used in voltage control mode.
+   * <p>This command should only be used in voltage control mode.
    */
   public static Command feedforwardCharacterization(CoralSystem coralSystem) {
     List<Double> velocitySamples = new LinkedList<>();
@@ -53,13 +50,13 @@ public class CoralSystemCommands {
 
         // Accelerate and gather data
         Commands.run(
-            () -> {
-              double voltage = timer.get() * FF_RAMP_RATE;
-              coralSystem.getElevator().runCharacterization(voltage);
-              velocitySamples.add(coralSystem.getElevator().getFFCharacterizationVelocity());
-              voltageSamples.add(voltage);
-            },
-            coralSystem)
+                () -> {
+                  double voltage = timer.get() * FF_RAMP_RATE;
+                  coralSystem.getElevator().runCharacterization(voltage);
+                  velocitySamples.add(coralSystem.getElevator().getFFCharacterizationVelocity());
+                  voltageSamples.add(voltage);
+                },
+                coralSystem)
 
             // When cancelled, calculate and print results
             .finallyDo(

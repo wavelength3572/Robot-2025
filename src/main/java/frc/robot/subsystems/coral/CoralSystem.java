@@ -230,6 +230,8 @@ public class CoralSystem extends SubsystemBase {
         if (this.targetCoralPreset == CoralSystemPresets.PICKUP
             || this.targetCoralPreset == CoralSystemPresets.PICKUPFAR
             || this.targetCoralPreset == CoralSystemPresets.L1_SCORE) {
+          // This is the code to not move the arm when we are within TOF of
+          // the coral station
           if (arm.getCurrentAngleDEG() < CoralSystemPresets.PRE_PICKUP.getArmAngle()) {
             this.arm.setTargetPreset(CoralSystemPresets.PRE_PICKUP);
           } else {
@@ -388,7 +390,8 @@ public class CoralSystem extends SubsystemBase {
     if (Constants.currentMode == Mode.REAL) {
       return canRange.getDistance().getValueAsDouble(); // use TOF for real robot
     } else {
-      // use odometry distance to coral station in SIM because we don't have a simulated TOF
+      // use odometry distance to coral station in SIM because we don't have a
+      // simulated TOF
       var selection = RobotStatus.getCoralStationSelection();
       if (selection == null) {
         System.out.println("[TOF] Warning: No coral station selection available in sim.");

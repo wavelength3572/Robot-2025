@@ -18,6 +18,7 @@ public interface ElevatorIO {
     public double followerVelocityRPM = 0.0;
     public double followerAppliedVolts = 0.0;
     public double followerCurrentAmps = 0.0;
+    public double followerError = 0.0;
   }
 
   /** Update the set of loggable inputs. */

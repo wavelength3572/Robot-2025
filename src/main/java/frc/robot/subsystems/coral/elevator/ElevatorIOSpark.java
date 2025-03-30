@@ -11,6 +11,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.RobotStatus;
 
 public class ElevatorIOSpark implements ElevatorIO {
@@ -33,6 +34,8 @@ public class ElevatorIOSpark implements ElevatorIO {
   private boolean firstTimeArmInError = true;
   private boolean inElevatorRecoveryMode = false;
 
+  private static final LoggedTunableNumber ElevatorKg = new LoggedTunableNumber("Elevator/Kg", 0.0);
+
   public ElevatorIOSpark() {
     leaderMotor.configure(
         ElevatorConfigs.ElevatorSubsystem.leaderConfig,
@@ -51,6 +54,7 @@ public class ElevatorIOSpark implements ElevatorIO {
   public void updateInputs(ElevatorIOInputs inputs) {
     inputs.leaderPositionRotations = leaderEncoder.getPosition();
     inputs.followerPositionRotations = followerEncoder.getPosition();
+    inputs.followerError = inputs.leaderPositionRotations - inputs.followerPositionRotations;
 
     // If the arm is in error then don't move the elevator
     if (RobotStatus.isArmInError()) {
@@ -61,6 +65,10 @@ public class ElevatorIOSpark implements ElevatorIO {
       if (inElevatorRecoveryMode == false) {
         elevatorCurrentTarget = inputs.leaderPositionRotations;
       }
+    }
+
+    if (ElevatorKg.hasChanged(hashCode())) {
+      runCharacterization(ElevatorKg.get());
     }
 
     // Comment out when running characterization
@@ -77,8 +85,10 @@ public class ElevatorIOSpark implements ElevatorIO {
         Units.metersToInches(
             (leaderEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
                 * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI));
-    inputs.leaderAppliedVolts = leaderMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
-    inputs.followerAppliedVolts = followerMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
+    inputs.leaderAppliedVolts =
+        leaderMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
+    inputs.followerAppliedVolts =
+        followerMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.leaderCurrentAmps = leaderMotor.getOutputCurrent();
     inputs.followerCurrentAmps = followerMotor.getOutputCurrent();
     inputs.feedforwardOutput = elevatorCurrentArbFF;
