@@ -18,7 +18,7 @@ public class ElevatorIOVirtualSim implements ElevatorIO {
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     inputs.setpoint = this.elevatorCurrentTarget;
-    inputs.positionRotations = elevatorVirtualEncoder;
+    inputs.leaderPositionRotations = elevatorVirtualEncoder;
     inputs.elevatorHeightCalc =
         Units.metersToInches(
             (elevatorVirtualEncoder / ElevatorConstants.kElevatorGearing)

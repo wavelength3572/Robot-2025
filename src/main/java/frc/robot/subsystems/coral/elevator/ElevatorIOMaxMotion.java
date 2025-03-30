@@ -14,18 +14,20 @@ import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.RobotStatus;
 
-public class ElevatorIOSpark implements ElevatorIO {
+public class ElevatorIOMaxMotion implements ElevatorIO {
 
   // Initialize elevator SPARK. We will use MAXMotion position control for the
   // elevator, so we also
   // need to initialize the closed loop controller and encoder.
   private SparkMax leaderMotor = new SparkMax(ElevatorConstants.leaderCanId, MotorType.kBrushless);
-  private SparkClosedLoopController elevatorClosedLoopController =
+  private SparkClosedLoopController leaderClosedLoopController =
       leaderMotor.getClosedLoopController();
   private RelativeEncoder leaderEncoder = leaderMotor.getEncoder();
 
   private SparkMax followerMotor =
       new SparkMax(ElevatorConstants.followerCanId, MotorType.kBrushless);
+  private SparkClosedLoopController followerClosedLoopController =
+      followerMotor.getClosedLoopController();
   private RelativeEncoder followerEncoder = followerMotor.getEncoder();
 
   private double elevatorCurrentTarget = 0.0;
@@ -34,9 +36,13 @@ public class ElevatorIOSpark implements ElevatorIO {
   private boolean firstTimeArmInError = true;
   private boolean inElevatorRecoveryMode = false;
 
-  private static final LoggedTunableNumber ElevatorKg = new LoggedTunableNumber("Elevator/Kg", 0.0);
+  private double followerError = 0;
 
-  public ElevatorIOSpark() {
+  private static final LoggedTunableNumber ElevatorKg = new LoggedTunableNumber("Elevator/Kg", 0.0);
+  private static final LoggedTunableNumber ElevatorErrorP =
+      new LoggedTunableNumber("Elevator/ErrorP", ElevatorConstants.errorP);
+
+  public ElevatorIOMaxMotion() {
     leaderMotor.configure(
         ElevatorConfigs.ElevatorSubsystem.leaderConfig,
         ResetMode.kResetSafeParameters,
@@ -44,7 +50,7 @@ public class ElevatorIOSpark implements ElevatorIO {
     leaderEncoder.setPosition(0);
 
     followerMotor.configure(
-        ElevatorConfigs.ElevatorSubsystem.followerConfig,
+        ElevatorConfigs.ElevatorSubsystem.newFollowerConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     followerEncoder.setPosition(0);
@@ -54,7 +60,6 @@ public class ElevatorIOSpark implements ElevatorIO {
   public void updateInputs(ElevatorIOInputs inputs) {
     inputs.leaderPositionRotations = leaderEncoder.getPosition();
     inputs.followerPositionRotations = followerEncoder.getPosition();
-    inputs.followerError = inputs.leaderPositionRotations - inputs.followerPositionRotations;
 
     // If the arm is in error then don't move the elevator
     if (RobotStatus.isArmInError()) {
@@ -72,11 +77,22 @@ public class ElevatorIOSpark implements ElevatorIO {
     }
 
     // Comment out when running characterization
-    elevatorClosedLoopController.setReference(
+    leaderClosedLoopController.setReference(
         elevatorCurrentTarget,
         ControlType.kMAXMotionPositionControl,
         ClosedLoopSlot.kSlot0,
         elevatorCurrentArbFF);
+
+    followerError = (inputs.leaderPositionRotations - inputs.followerPositionRotations);
+    inputs.followerError = followerError;
+    followerError =
+        ElevatorErrorP.get() * (inputs.leaderPositionRotations - inputs.followerPositionRotations);
+
+    followerClosedLoopController.setReference(
+        elevatorCurrentTarget,
+        ControlType.kMAXMotionPositionControl,
+        ClosedLoopSlot.kSlot0,
+        elevatorCurrentArbFF + followerError);
 
     inputs.setpoint = this.elevatorCurrentTarget;
     inputs.leaderVelocityRPM = leaderEncoder.getVelocity();
@@ -154,6 +170,8 @@ public class ElevatorIOSpark implements ElevatorIO {
         .maxAcceleration(AccelerationMax)
         .allowedClosedLoopError(0.1);
     leaderMotor.configure(
+        config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    followerMotor.configure(
         config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 }

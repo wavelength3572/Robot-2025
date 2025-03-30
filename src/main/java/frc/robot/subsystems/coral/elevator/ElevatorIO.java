@@ -8,15 +8,17 @@ public interface ElevatorIO {
     public double setpoint = 0.0;
     public double elevatorHeight = 0.0;
     public double elevatorHeightCalc = 0.0;
-    public double positionRotations = 0.0;
-    public double velocityRPM = 0.0;
-    public double appliedVolts = 0.0;
-    public double currentAmps = 0.0;
-    public double pidOutput = 0.0;
+    public double leaderPositionRotations = 0.0;
+    public double leaderVelocityRPM = 0.0;
+    public double leaderAppliedVolts = 0.0;
+    public double leaderCurrentAmps = 0.0;
     public double feedforwardOutput = 0.0;
 
     public double followerPositionRotations = 0.0;
     public double followerVelocityRPM = 0.0;
+    public double followerAppliedVolts = 0.0;
+    public double followerCurrentAmps = 0.0;
+    public double followerError = 0.0;
   }
 
   /** Update the set of loggable inputs. */
@@ -36,6 +38,12 @@ public interface ElevatorIO {
   }
 
   public default double getSetpointInMeters() {
+    return 0.0;
+  }
+
+  public default void runCharacterization(double output) {}
+
+  public default double getFFCharacterizationVelocity() {
     return 0.0;
   }
 

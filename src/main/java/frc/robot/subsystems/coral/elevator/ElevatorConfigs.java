@@ -12,6 +12,7 @@ public final class ElevatorConfigs {
   public static final class ElevatorSubsystem {
     public static final SparkMaxConfig leaderConfig = new SparkMaxConfig();
     public static final SparkMaxConfig followerConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig newFollowerConfig = new SparkMaxConfig();
 
     static {
       // Configure basic settings of the elevator motor
@@ -42,6 +43,29 @@ public final class ElevatorConfigs {
           .smartCurrentLimit(ElevatorConstants.elevatorCurrentLimit)
           .voltageCompensation(12)
           .follow(leaderCanId, true);
+
+      // Configure basic settings of the elevator motor
+      newFollowerConfig
+          .idleMode(IdleMode.kBrake)
+          .smartCurrentLimit(ElevatorConstants.elevatorCurrentLimit)
+          .voltageCompensation(12)
+          .inverted(true);
+      /*
+       * Configure the closed loop controller. We want to make sure we set the
+       * feedback sensor as the primary encoder.
+       */
+      newFollowerConfig
+          .closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          // Set PID values for position control
+          .p(ElevatorConstants.kElevatorKp)
+          .d(ElevatorConstants.kElevatorKd)
+          .outputRange(-1, 1)
+          .maxMotion
+          // Set MAXMotion parameters for position control
+          .maxVelocity(ElevatorConstants.kElevatorVel)
+          .maxAcceleration(ElevatorConstants.kElevatorAcc)
+          .allowedClosedLoopError(ArmConstants.kAllowableError);
     }
   }
 }

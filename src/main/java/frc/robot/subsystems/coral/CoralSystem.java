@@ -247,6 +247,8 @@ public class CoralSystem extends SubsystemBase {
         if (this.targetCoralPreset == CoralSystemPresets.PICKUP
             || this.targetCoralPreset == CoralSystemPresets.PICKUPFAR
             || this.targetCoralPreset == CoralSystemPresets.L1_SCORE) {
+          // This is the code to not move the arm when we are within TOF of
+          // the coral station
           if (arm.getCurrentAngleDEG() < CoralSystemPresets.PRE_PICKUP.getArmAngle()) {
             this.arm.setTargetPreset(CoralSystemPresets.PRE_PICKUP);
           } else {

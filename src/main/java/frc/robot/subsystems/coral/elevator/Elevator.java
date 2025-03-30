@@ -15,8 +15,9 @@ public class Elevator {
       new LoggedTunableNumber("Elevator/kEp", ElevatorConstants.kElevatorKp);
   private static final LoggedTunableNumber ElevatorkD =
       new LoggedTunableNumber("Elevator/kEd", ElevatorConstants.kElevatorKd);
-  // private static final LoggedTunableNumber ElevatorkF = new LoggedTunableNumber("Elevator/kEf",
-  //     ElevatorConstants.kElevatorKf);
+  // private static final LoggedTunableNumber ElevatorkF = new
+  // LoggedTunableNumber("Elevator/kEf",
+  // ElevatorConstants.kElevatorKf);
   private static final LoggedTunableNumber ElevatorVel =
       new LoggedTunableNumber("Elevator/kEVel", ElevatorConstants.kElevatorVel);
   private static final LoggedTunableNumber ElevatorAcc =
@@ -34,8 +35,8 @@ public class Elevator {
       io.setPIDValues(ElevatorkP.get(), ElevatorkD.get(), ElevatorVel.get(), ElevatorAcc.get());
     }
     // if (ElevatorPosInches.hasChanged(hashCode()) ||
-    //     ElevatorkF.hasChanged(hashCode())) {
-    //   setPosition(ElevatorPosInches.get(), ElevatorkF.get());
+    // ElevatorkF.hasChanged(hashCode())) {
+    // setPosition(ElevatorPosInches.get(), ElevatorkF.get());
     // }
     if (ElevatorPosInches.hasChanged(hashCode())) {
       setPositionInches(ElevatorPosInches.get());
@@ -93,6 +94,14 @@ public class Elevator {
 
   public void clearElevatorError() {
     io.clearElevatorError();
+  }
+
+  public void runCharacterization(double output) {
+    io.runCharacterization(output);
+  }
+
+  public double getFFCharacterizationVelocity() {
+    return io.getFFCharacterizationVelocity();
   }
 
   public boolean isAtGoal() {

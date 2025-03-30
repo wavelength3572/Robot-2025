@@ -71,13 +71,14 @@ public class ElevatorIOSim implements ElevatorIO {
         0.02);
 
     inputs.setpoint = this.elevatorCurrentTarget;
-    inputs.positionRotations = elevatorEncoder.getPosition();
+    inputs.leaderPositionRotations = elevatorEncoder.getPosition();
     inputs.elevatorHeight = m_elevatorSim.getPositionMeters();
     inputs.elevatorHeightCalc =
         (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
             * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI);
-    inputs.appliedVolts = elevatorMotorSim.getAppliedOutput() * RobotController.getBatteryVoltage();
-    inputs.currentAmps = elevatorMotorSim.getMotorCurrent();
+    inputs.leaderAppliedVolts =
+        elevatorMotorSim.getAppliedOutput() * RobotController.getBatteryVoltage();
+    inputs.leaderCurrentAmps = elevatorMotorSim.getMotorCurrent();
   }
 
   @Override
