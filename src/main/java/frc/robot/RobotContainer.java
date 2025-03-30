@@ -20,6 +20,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.CoralSystemCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.PathPlannerCommands;
 import frc.robot.operator_interface.OISelector;
@@ -61,55 +62,70 @@ import lombok.Getter;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
   // Subsystems
-  @Getter private final Vision vision;
-  @Getter private final Drive drive;
+  @Getter
+  private final Vision vision;
+  @Getter
+  private final Drive drive;
   private final Elevator elevator;
   private final Arm arm;
   private final Intake intake;
-  @Getter private Climber climber;
-  @Getter private final CoralSystem coralSystem;
-  @Getter private final Algae algae;
-  @Getter private Visualizer visualizer;
+  @Getter
+  private Climber climber;
+  @Getter
+  private final CoralSystem coralSystem;
+  @Getter
+  private final Algae algae;
+  @Getter
+  private Visualizer visualizer;
   private final IndicatorLight indicatorLight;
-  private OperatorInterface oi = new OperatorInterface() {};
+  private OperatorInterface oi = new OperatorInterface() {
+  };
   private LoggedDashboardChooser<Command> autoChooser;
 
-  @Getter private final OdometryHealthMonitor odometryHealthMonitor;
+  @Getter
+  private final OdometryHealthMonitor odometryHealthMonitor;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
 
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        intake = new Intake(new IntakeIOSpark() {});
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOSpark(0),
-                new ModuleIOSpark(1),
-                new ModuleIOSpark(2),
-                new ModuleIOSpark(3));
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                drive::addVisionMeasurementForLogging,
-                new VisionIOPhotonVision(frontRightCam, robotToFrontRightCam),
-                new VisionIOPhotonVision(backRightCam, robotToBackRightCam),
-                new VisionIOPhotonVision(frontLeftCam, robotToFrontLeftCam),
-                new VisionIOPhotonVision(elevatorBackCam, robotToElevatorBackCam));
+        intake = new Intake(new IntakeIOSpark() {
+        });
+        drive = new Drive(
+            new GyroIOPigeon2(),
+            new ModuleIOSpark(0),
+            new ModuleIOSpark(1),
+            new ModuleIOSpark(2),
+            new ModuleIOSpark(3));
+        vision = new Vision(
+            drive::addVisionMeasurement,
+            drive::addVisionMeasurementForLogging,
+            new VisionIOPhotonVision(frontRightCam, robotToFrontRightCam),
+            new VisionIOPhotonVision(backRightCam, robotToBackRightCam),
+            new VisionIOPhotonVision(frontLeftCam, robotToFrontLeftCam),
+            new VisionIOPhotonVision(elevatorBackCam, robotToElevatorBackCam));
 
-        elevator = new Elevator(new ElevatorIOSpark() {});
+        elevator = new Elevator(new ElevatorIOSpark() {
+        });
         algae = new Algae(new AlgaeIOSpark());
-        climber = new Climber(new ClimberIOSpark() {});
-        arm = new Arm(new ArmIOMMSpark() {});
+        climber = new Climber(new ClimberIOSpark() {
+        });
+        arm = new Arm(new ArmIOMMSpark() {
+        });
         coralSystem = new CoralSystem(elevator, arm, intake);
         indicatorLight = new IndicatorLight();
         indicatorLight.setupLightingSuppliers(
@@ -121,29 +137,32 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim());
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                drive::addVisionMeasurementForLogging,
-                new VisionIOPhotonVisionSim(frontRightCam, robotToFrontRightCam, drive::getPose),
-                new VisionIOPhotonVisionSim(backRightCam, robotToBackRightCam, drive::getPose),
-                new VisionIOPhotonVisionSim(frontLeftCam, robotToFrontLeftCam, drive::getPose),
-                new VisionIOPhotonVisionSim(
-                    elevatorBackCam, robotToElevatorBackCam, drive::getPose));
+        drive = new Drive(
+            new GyroIO() {
+            },
+            new ModuleIOSim(),
+            new ModuleIOSim(),
+            new ModuleIOSim(),
+            new ModuleIOSim());
+        vision = new Vision(
+            drive::addVisionMeasurement,
+            drive::addVisionMeasurementForLogging,
+            new VisionIOPhotonVisionSim(frontRightCam, robotToFrontRightCam, drive::getPose),
+            new VisionIOPhotonVisionSim(backRightCam, robotToBackRightCam, drive::getPose),
+            new VisionIOPhotonVisionSim(frontLeftCam, robotToFrontLeftCam, drive::getPose),
+            new VisionIOPhotonVisionSim(
+                elevatorBackCam, robotToElevatorBackCam, drive::getPose));
 
-        elevator = new Elevator(new ElevatorIOVirtualSim() {});
-        arm = new Arm(new ArmIOVirtualSim() {});
-        intake = new Intake(new IntakeIOVirtualSim() {});
+        elevator = new Elevator(new ElevatorIOVirtualSim() {
+        });
+        arm = new Arm(new ArmIOVirtualSim() {
+        });
+        intake = new Intake(new IntakeIOVirtualSim() {
+        });
         coralSystem = new CoralSystem(elevator, arm, intake);
         algae = new Algae(new AlgaeIOVirtualSim());
-        climber = new Climber(new ClimberIOVirtualSim() {});
+        climber = new Climber(new ClimberIOVirtualSim() {
+        });
         indicatorLight = new IndicatorLight();
         indicatorLight.setupLightingSuppliers(
             coralSystem::getCurrentCoralPreset,
@@ -156,27 +175,39 @@ public class RobotContainer {
       default:
         // Replayed robot, disable IO implementations
         // (Use same number of dummy implementations as the real robot)
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                drive::addVisionMeasurementForLogging,
-                new VisionIO() {},
-                new VisionIO() {},
-                new VisionIO() {},
-                new VisionIO() {});
-        elevator = new Elevator(new ElevatorIO() {});
-        arm = new Arm(new ArmIO() {});
-        intake = new Intake(new IntakeIO() {});
+        drive = new Drive(
+            new GyroIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            });
+        vision = new Vision(
+            drive::addVisionMeasurement,
+            drive::addVisionMeasurementForLogging,
+            new VisionIO() {
+            },
+            new VisionIO() {
+            },
+            new VisionIO() {
+            },
+            new VisionIO() {
+            });
+        elevator = new Elevator(new ElevatorIO() {
+        });
+        arm = new Arm(new ArmIO() {
+        });
+        intake = new Intake(new IntakeIO() {
+        });
         coralSystem = new CoralSystem(elevator, arm, intake);
-        algae = new Algae(new AlgaeIO() {});
-        climber = new Climber(new ClimberIO() {});
+        algae = new Algae(new AlgaeIO() {
+        });
+        climber = new Climber(new ClimberIO() {
+        });
         indicatorLight = new IndicatorLight();
         indicatorLight.setupLightingSuppliers(
             coralSystem::getCurrentCoralPreset,
@@ -186,14 +217,13 @@ public class RobotContainer {
         break;
     }
 
-    visualizer =
-        new Visualizer(
-            drive::getPose,
-            elevator::getHeightInMeters,
-            arm::getCurrentAngleDEG,
-            coralSystem::isHaveCoral,
-            algae::haveAlgae,
-            algae::getDeployPositionAngle);
+    visualizer = new Visualizer(
+        drive::getPose,
+        elevator::getHeightInMeters,
+        arm::getCurrentAngleDEG,
+        coralSystem::isHaveCoral,
+        algae::haveAlgae,
+        algae::getDeployPositionAngle);
 
     odometryHealthMonitor = new OdometryHealthMonitor(drive, vision);
 
@@ -214,7 +244,8 @@ public class RobotContainer {
   }
 
   /**
-   * This method scans for any changes to the connected joystick. If anything changed, it creates
+   * This method scans for any changes to the connected joystick. If anything
+   * changed, it creates
    * new OI objects and binds all of the buttons to commands.
    */
   public void updateOI() {
@@ -237,18 +268,16 @@ public class RobotContainer {
 
   public void SetupAutoChooser() {
 
-    autoChooser =
-        new LoggedDashboardChooser<>(
-            "Auto Chooser",
-            AutoBuilder.buildAutoChooserWithOptionsModifier(
-                "compDefaultMoveOnly",
-                stream -> {
-                  Stream<PathPlannerAuto> modified =
-                      Constants.isCompetition
-                          ? stream.filter(auto -> auto.getName().startsWith("comp"))
-                          : stream;
-                  return modified.sorted(Comparator.comparing(PathPlannerAuto::getName));
-                }));
+    autoChooser = new LoggedDashboardChooser<>(
+        "Auto Chooser",
+        AutoBuilder.buildAutoChooserWithOptionsModifier(
+            "compDefaultMoveOnly",
+            stream -> {
+              Stream<PathPlannerAuto> modified = Constants.isCompetition
+                  ? stream.filter(auto -> auto.getName().startsWith("comp"))
+                  : stream;
+              return modified.sorted(Comparator.comparing(PathPlannerAuto::getName));
+            }));
 
     // add these if we aren't at competition
     if (!Constants.isCompetition) {
@@ -257,6 +286,8 @@ public class RobotContainer {
           "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
       autoChooser.addOption(
           "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+      autoChooser.addOption(
+          "Elevator Simple FF Characterization", CoralSystemCommands.feedforwardCharacterization(coralSystem));
       autoChooser.addOption(
           "Drive SysId (Quasistatic Forward)",
           drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -272,14 +303,14 @@ public class RobotContainer {
 
   public void SmartDriving() {
     DriveCommands.setSmartDriveCmd(
-            drive,
-            oi::getTranslateX,
-            oi::getTranslateY,
-            oi::getRotate,
-            coralSystem::isHaveCoral,
-            algae::haveAlgae,
-            climber::isClimberDeployed,
-            coralSystem.getElevator()::getHeightInInches)
+        drive,
+        oi::getTranslateX,
+        oi::getTranslateY,
+        oi::getRotate,
+        coralSystem::isHaveCoral,
+        algae::haveAlgae,
+        climber::isClimberDeployed,
+        coralSystem.getElevator()::getHeightInInches)
         .schedule();
   }
 
