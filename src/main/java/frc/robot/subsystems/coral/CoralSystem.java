@@ -447,7 +447,9 @@ public class CoralSystem extends SubsystemBase {
             coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
           } else {
             // Change state
-            if (currentCoralPreset == L2 && targetCoralPreset == L2_FAR           //Override Safe Arm in going to or in a Far Score Position
+            if (currentCoralPreset == L2
+                    && targetCoralPreset
+                        == L2_FAR // Override Safe Arm in going to or in a Far Score Position
                 || currentCoralPreset == L3 && targetCoralPreset == L3_FAR
                 || currentCoralPreset == L4 && targetCoralPreset == L4_FAR
                 || currentCoralPreset == L2_FAR && targetCoralPreset == L2

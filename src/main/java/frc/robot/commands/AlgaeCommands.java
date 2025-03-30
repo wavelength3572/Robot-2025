@@ -16,6 +16,7 @@ import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AlignmentUtils;
+import frc.robot.util.RobotStatus;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 
@@ -71,7 +72,16 @@ public class AlgaeCommands {
           }
           boolean noCoral = !coralSystem.isHaveCoral();
 
-          return withinThreshold && noCoral;
+          boolean alreadyPreppedForDislodge =
+              (RobotStatus.getTargetPreset() == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1
+                  || RobotStatus.getTargetPreset()
+                      == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2
+                  || RobotStatus.getTargetPreset()
+                      == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+                  || RobotStatus.getTargetPreset()
+                      == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
+
+          return withinThreshold && noCoral && !alreadyPreppedForDislodge;
         });
   }
 
@@ -96,60 +106,62 @@ public class AlgaeCommands {
   public static Command createDislodgeSequence(
       Drive drive, CoralSystem coralSystem, OperatorInterface oi) {
     return new ConditionalCommand(
-        // ✅ **True Branch**: Execute the dislodge sequence
-        new SequentialCommandGroup(
-            new InstantCommand(coralSystem.getIntake()::pushCoral, coralSystem),
-            // 1. Determine and set the final dislodge preset based on the current prepare
-            // preset.
-            new InstantCommand(
-                () -> {
-                  CoralSystemPresets currentPreset = coralSystem.getCurrentCoralPreset();
-                  CoralSystemPresets finalPreset;
-                  if (currentPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1) {
-                    finalPreset = CoralSystemPresets.FINAL_DISLODGE_LEVEL_1;
-                  } else if (currentPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
-                    finalPreset = CoralSystemPresets.FINAL_DISLODGE_LEVEL_2;
-                  } else {
-                    // This branch should never happen because of our outer condition.
-                    // If it does, log the problem and return early without setting any final
-                    // preset.
-                    System.out.println(
-                        "[AlgaeCommands] Dislodge sequence canceled: Not in a valid prepare preset.");
-                    return;
-                  }
-                  coralSystem.setTargetPreset(finalPreset);
-                },
-                coralSystem),
+            // ✅ **True Branch**: Execute the dislodge sequence
+            new SequentialCommandGroup(
+                new InstantCommand(coralSystem.getIntake()::pushCoral, coralSystem),
+                // 1. Determine and set the final dislodge preset based on the current prepare
+                // preset.
+                new InstantCommand(
+                    () -> {
+                      CoralSystemPresets currentPreset = coralSystem.getCurrentCoralPreset();
+                      CoralSystemPresets finalPreset;
+                      if (currentPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1) {
+                        finalPreset = CoralSystemPresets.FINAL_DISLODGE_LEVEL_1;
+                      } else if (currentPreset
+                          == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
+                        finalPreset = CoralSystemPresets.FINAL_DISLODGE_LEVEL_2;
+                      } else {
+                        // This branch should never happen because of our outer condition.
+                        // If it does, log the problem and return early without setting any final
+                        // preset.
+                        System.out.println(
+                            "[AlgaeCommands] Dislodge sequence canceled: Not in a valid prepare preset.");
+                        return;
+                      }
+                      coralSystem.setTargetPreset(finalPreset);
+                    },
+                    coralSystem),
 
-            // 3. Drive backward 10 inches relative to the current pose.
-            new DriveToPose(
-                drive,
-                () -> {
-                  Pose2d currentPose = drive.getPose();
-                  double offsetMeters = -0.254 * 3.0; // Move backward by 10 inches
-                  Translation2d offset =
-                      new Translation2d(offsetMeters, 0).rotateBy(currentPose.getRotation());
-                  Translation2d targetTranslation = currentPose.getTranslation().plus(offset);
-                  return new Pose2d(targetTranslation, currentPose.getRotation());
-                },
-                SPEED_SCALAR),
-            new InstantCommand(coralSystem.getIntake()::stopIntake, coralSystem)),
+                // 3. Drive backward 10 inches relative to the current pose.
+                new DriveToPose(
+                    drive,
+                    () -> {
+                      Pose2d currentPose = drive.getPose();
+                      double offsetMeters = -0.254 * 3.0; // Move backward by 10 inches
+                      Translation2d offset =
+                          new Translation2d(offsetMeters, 0).rotateBy(currentPose.getRotation());
+                      Translation2d targetTranslation = currentPose.getTranslation().plus(offset);
+                      return new Pose2d(targetTranslation, currentPose.getRotation());
+                    },
+                    SPEED_SCALAR),
+                new InstantCommand(coralSystem.getIntake()::stopIntake, coralSystem)),
 
-        // **False Branch**: Do nothing (command does not run)
-        Commands.none(),
+            // **False Branch**: Do nothing (command does not run)
+            Commands.none(),
 
-        // **Condition Check**: Execute only if:
-        () -> {
-          boolean isInDislodgePreset =
-              coralSystem.isAtGoal()
-                  && (coralSystem.getCurrentCoralPreset()
-                          == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
-                      || coralSystem.getCurrentCoralPreset()
-                          == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
+            // **Condition Check**: Execute only if:
+            () -> {
+              boolean isInDislodgePreset =
+                  coralSystem.isAtGoal()
+                      && (coralSystem.getCurrentCoralPreset()
+                              == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+                          || coralSystem.getCurrentCoralPreset()
+                              == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
 
-          boolean noCoral = !coralSystem.isHaveCoral();
-          return isInDislodgePreset && noCoral;
-        });
+              boolean noCoral = !coralSystem.isHaveCoral();
+              return isInDislodgePreset && noCoral;
+            })
+        .withTimeout(2.5);
   }
 
   /**
