@@ -19,6 +19,7 @@ import frc.robot.util.BranchAlignmentUtils;
 import frc.robot.util.BranchAlignmentUtils.BranchAlignmentStatus;
 import frc.robot.util.CoralRPStatusLogger;
 import frc.robot.util.Elastic;
+import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.ReefScoringLogger;
 import frc.robot.util.RobotStatus;
 import lombok.Getter;
@@ -26,6 +27,11 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class CoralSystem extends SubsystemBase {
+
+  private static final LoggedTunableNumber outOfRangeThreshold =
+      new LoggedTunableNumber("TOF/Out of Range Threashold", 0.48);
+  private static final LoggedTunableNumber inRangeThreshold =
+      new LoggedTunableNumber("TOF/In Range Threashold", 0.33);
 
   private static final double TOF_SAFE_FROM_CORAL_STATION_THRESHOLD =
       0.7; // safe distance from coral station in meters
@@ -136,11 +142,17 @@ public class CoralSystem extends SubsystemBase {
 
   private double setArmIntialAngleTries = 0;
 
-  @AutoLogOutput(key = "CoralSystem/coralStationNearCounter")
+  @AutoLogOutput(key = "CoralSystem/StationTOF/coralStationNearCounter")
   private double coralStationNearCounter = 0;
 
-  @AutoLogOutput(key = "CoralSystem/coralStationFarCounter")
+  @AutoLogOutput(key = "CoralSystem/StationTOF/coralStationFarCounter")
   private double coralStationFarCounter = 0;
+
+  @AutoLogOutput(key = "CoralSystem/reefTOF/ReefNearCounter")
+  private double reefNearCounter = 0;
+
+  @AutoLogOutput(key = "CoralSystem/reefTOF/ReefFarCounter")
+  private double reefFarCounter = 0;
 
   public CoralSystem(Elevator elevator, Arm arm, Intake intake) {
     coralSystemPresetChooser = new CoralSystemPresetChooser();
@@ -224,6 +236,8 @@ public class CoralSystem extends SubsystemBase {
       coralStationFarCounter = 0;
     }
 
+    proximityTriggeredScoringAdjustment();
+
     switch (coralSystemState) {
       case STABLE:
         if (climbASAP) deployClimberTriggered();
@@ -298,6 +312,87 @@ public class CoralSystem extends SubsystemBase {
     // threshold
   }
 
+  private void proximityTriggeredScoringAdjustment() {
+
+    // This code runs when the robot is in scoring mode and does not currently have
+    // a game piece.
+    if ((targetCoralPreset == CoralSystemPresets.L2
+            || targetCoralPreset == CoralSystemPresets.L2_FAR
+            || targetCoralPreset == CoralSystemPresets.L3
+            || targetCoralPreset == CoralSystemPresets.L3_FAR
+            || targetCoralPreset == CoralSystemPresets.L4
+            || targetCoralPreset == CoralSystemPresets.L4_FAR)
+        && (haveCoral)
+        && coralSystemState == CoralSystemMovementState.STABLE) {
+
+      double reefDistance = getTimeOfFlightRangeReef();
+
+      if (reefDistance < outOfRangeThreshold.get()) {
+        if (reefDistance > inRangeThreshold.get()) {
+          // Far from reef: we want to raise the elevator by using the FAR preset.
+          reefNearCounter = 0;
+          reefFarCounter++;
+          if (reefFarCounter > 25) { // roughly 0.5 seconds of consistent readings
+            switch (targetCoralPreset) {
+              case L2:
+                setTargetPreset(L2_FAR);
+                break;
+              case L3:
+                setTargetPreset(L3_FAR);
+                break;
+              case L4:
+                setTargetPreset(L4_FAR);
+                break;
+              default:
+                break;
+            }
+          }
+        } else {
+          // Close to reef: lower the elevator to the normal scoring preset.
+          reefFarCounter = 0;
+          reefNearCounter++;
+          if (reefNearCounter > 25) { // roughly 0.5 seconds of consistent readings
+            switch (targetCoralPreset) {
+              case L2_FAR:
+                setTargetPreset(L2);
+                break;
+              case L3_FAR:
+                setTargetPreset(L3);
+                break;
+              case L4_FAR:
+                setTargetPreset(L4);
+                break;
+              default:
+                break;
+            }
+          }
+        }
+      } else {
+        // If the sensor is out of range, reset counters and default to the normal
+        // scoring preset.
+        reefNearCounter = 0;
+        reefFarCounter = 0;
+        switch (targetCoralPreset) {
+          case L2_FAR:
+            setTargetPreset(L2);
+            break;
+          case L3_FAR:
+            setTargetPreset(L3);
+            break;
+          case L4_FAR:
+            setTargetPreset(L4);
+            break;
+          default:
+            break;
+        }
+      }
+    } else {
+      // Not in scoring mode; always reset the counters.
+      reefNearCounter = 0;
+      reefFarCounter = 0;
+    }
+  }
+
   public void setTargetPreset(CoralSystemPresets requestedPreset) {
     // If the ARM isn't Stuck then allow new presets
     if (arm.isArmInError() == false) {
@@ -352,7 +447,14 @@ public class CoralSystem extends SubsystemBase {
             coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
           } else {
             // Change state
-            coralSystemState = CoralSystemMovementState.SAFE_ARM;
+            if (currentCoralPreset == L2 && targetCoralPreset == L2_FAR           //Override Safe Arm in going to or in a Far Score Position
+                || currentCoralPreset == L3 && targetCoralPreset == L3_FAR
+                || currentCoralPreset == L4 && targetCoralPreset == L4_FAR
+                || currentCoralPreset == L2_FAR && targetCoralPreset == L2
+                || currentCoralPreset == L3_FAR && targetCoralPreset == L3
+                || currentCoralPreset == L4_FAR && targetCoralPreset == L4) {
+              coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
+            } else coralSystemState = CoralSystemMovementState.SAFE_ARM;
           }
         } else {
           coralSystemState = CoralSystemMovementState.MOVE_ARM_FINAL;
@@ -391,7 +493,8 @@ public class CoralSystem extends SubsystemBase {
     if (Constants.currentMode == Mode.REAL) {
       return canRangeCoralStation.getDistance().getValueAsDouble(); // use TOF for real robot
     } else {
-      // use odometry distance to coral station in SIM because we don't have a simulated TOF
+      // use odometry distance to coral station in SIM because we don't have a
+      // simulated TOF
       var selection = RobotStatus.getCoralStationSelection();
       if (selection == null) {
         System.out.println("[TOF] Warning: No coral station selection available in sim.");
@@ -407,7 +510,8 @@ public class CoralSystem extends SubsystemBase {
     if (Constants.currentMode == Mode.REAL) {
       return canRangeReef.getDistance().getValueAsDouble(); // use TOF for real robot
     } else {
-      // use odometry distance to coral station in SIM because we don't have a simulated TOF
+      // use odometry distance to coral station in SIM because we don't have a
+      // simulated TOF
       var selection = RobotStatus.getReefFaceSelection();
       if (selection == null) {
         System.out.println("[TOF] Warning: No reef selection available in sim.");
@@ -486,7 +590,7 @@ public class CoralSystem extends SubsystemBase {
 
       case HAVE_CORAL_SAFE_DISTANCE_FROM_STATION:
         if (justExpelledCoral()) {
-          justPickedUpCoral = false; 
+          justPickedUpCoral = false;
           coralPickupState = CoralPickupState.READY_FOR_PICKUP;
         }
 

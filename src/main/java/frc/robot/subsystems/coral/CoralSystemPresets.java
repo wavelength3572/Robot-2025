@@ -14,6 +14,9 @@ public enum CoralSystemPresets {
   L2(16.0, 77),
   L3(33, 77),
   L4(65, 45),
+  L2_FAR(16.0 + 2, 77), // moved up 2inches
+  L3_FAR(33.0 + 2, 77), // moved up 2inches
+  L4_FAR(65, 45), // not changed
   PRE_SCORE(39.0, 85),
   PREL4(39.0, 105),
   AUTO_START_L4(65, 65),
