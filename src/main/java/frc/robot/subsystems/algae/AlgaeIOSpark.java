@@ -163,13 +163,15 @@ public class AlgaeIOSpark implements AlgaeIO {
       case STOW:
         haveAlgae = false;
         algaeCaptureMotor.setVoltage(0.0);
-        algaeDeployMotor.setVoltage(AlgaeConstants.deployPullBackVolts);
-        detectionCount++;
-        if (detectionCount > 25) { // about .5 seconds
-          currentAlgIntakeState = algaeIntakeState.OFF;
-          algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldVolts);
-          detectionCount = 0;
-        }
+        currentAlgIntakeState = algaeIntakeState.OFF;
+        // algaeDeployMotor.setVoltage(AlgaeConstants.deployPullBackVolts);
+
+        // detectionCount++;
+        // if (detectionCount > 25) { // about .5 seconds
+        //   currentAlgIntakeState = algaeIntakeState.OFF;
+        //   algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldVolts);
+        //   detectionCount = 0;
+        // }
         break;
       case MANUAL:
         break;
