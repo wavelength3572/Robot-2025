@@ -42,7 +42,8 @@ public class AlignAndScoreTwoStage {
             }),
 
         // ALIGNING stage
-        new AlignToReefTwoStage(drive, drive.getReefFaceSelection().getAcceptedFaceId(), isLeftPole)
+        new AlignToReefTwoStage(
+                drive, coralSystem, drive.getReefFaceSelection().getAcceptedFaceId(), isLeftPole)
             .beforeStarting(() -> Logger.recordOutput("AlignAndScoreTwoStage/Stage", "ALIGNING")),
 
         // CHECK_PRESETS stage

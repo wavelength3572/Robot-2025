@@ -12,6 +12,7 @@ public enum CoralSystemPresets {
   L1_STOW(0.0, 92),
   L1_SCORE(22.0, 240),
   L2(16.0, 77),
+  STAGED_FOR_SCORING(16.0, 77),
   L3(33, 77),
   L4(64.5, 48),
   L2_FAR(16.0 + 3.5, 77), // moved up 2inches

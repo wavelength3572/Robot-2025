@@ -29,9 +29,9 @@ import org.littletonrobotics.junction.Logger;
 public class CoralSystem extends SubsystemBase {
 
   public static final LoggedTunableNumber outOfRangeThreshold =
-      new LoggedTunableNumber("TOF/Out of Range Threashold", 0.48);
+      new LoggedTunableNumber("TOF/Out of Range Threshold", 0.48);
   public static final LoggedTunableNumber inRangeThreshold =
-      new LoggedTunableNumber("TOF/In Range Threashold", 0.20);
+      new LoggedTunableNumber("TOF/In Range Threshold", 0.20);
 
   private static final double TOF_SAFE_FROM_CORAL_STATION_THRESHOLD =
       0.7; // safe distance from coral station in meters
@@ -48,6 +48,16 @@ public class CoralSystem extends SubsystemBase {
   private static final double THRESHOLD_TIME_TO_DETECT_AT_CORAL_STATION =
       0.4; // time to wait before detecting coral in
   // the way
+
+  @AutoLogOutput(key = "CoralSystem/StagedPreScoringOn")
+  @Getter
+  public boolean StagedPreScoringOn = false;
+
+  @Getter private CoralSystemPresets queuedFinalPreset = L2;
+
+  public void setQueuedFinalPreset(CoralSystemPresets preset) {
+    queuedFinalPreset = preset;
+  }
 
   private Timer pickUpTimer = new Timer();
 
@@ -522,7 +532,7 @@ public class CoralSystem extends SubsystemBase {
         return Double.MAX_VALUE; // or some other safe fallback
       }
 
-      return selection.getAcceptedDistance() - 0.4;
+      return selection.getAcceptedDistance() - 0.35;
     }
   }
 
@@ -628,5 +638,9 @@ public class CoralSystem extends SubsystemBase {
 
   public boolean isArmInError() {
     return arm.isArmInError();
+  }
+
+  public void toggleStagedPrescoring() {
+    StagedPreScoringOn = !StagedPreScoringOn; // Toggle the boolean value
   }
 }

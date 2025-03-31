@@ -42,7 +42,7 @@ public class AlgaeCommands {
                       ? drive.getReefFaceSelection().getAcceptedFaceId()
                       : null;
               if (faceId != null) {
-                return new AlignToReefTwoStage(drive, faceId, false);
+                return new AlignToReefTwoStage(drive, coralSystem, faceId, false);
               } else {
                 return Commands.none();
               }

@@ -84,16 +84,40 @@ public class ButtonsAndDashboardBindings {
             })); // L1
 
     SmartDashboard.putData(
-        "Low - L2", Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L2)));
-    // .andThen(waitForScoringConditions(drive, coralSystem)));
+        "Low - L2",
+        Commands.runOnce(
+            () -> {
+              if (coralSystem.isStagedPreScoringOn()) {
+                coralSystem.setTargetPreset(CoralSystemPresets.STAGED_FOR_SCORING);
+                coralSystem.setQueuedFinalPreset(CoralSystemPresets.L2);
+              } else {
+                coralSystem.setTargetPreset(CoralSystemPresets.L2);
+              }
+            }));
 
     SmartDashboard.putData(
-        "Mid - L3", Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L3)));
-    // .andThen(waitForScoringConditions(drive, coralSystem)));
+        "Mid - L3",
+        Commands.runOnce(
+            () -> {
+              if (coralSystem.isStagedPreScoringOn()) {
+                coralSystem.setTargetPreset(CoralSystemPresets.STAGED_FOR_SCORING);
+                coralSystem.setQueuedFinalPreset(CoralSystemPresets.L3);
+              } else {
+                coralSystem.setTargetPreset(CoralSystemPresets.L3);
+              }
+            }));
 
     SmartDashboard.putData(
-        "High - L4", Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L4)));
-    // .andThen(waitForScoringConditions(drive, coralSystem)));
+        "High - L4",
+        Commands.runOnce(
+            () -> {
+              if (coralSystem.isStagedPreScoringOn()) {
+                coralSystem.setTargetPreset(CoralSystemPresets.STAGED_FOR_SCORING);
+                coralSystem.setQueuedFinalPreset(CoralSystemPresets.L4);
+              } else {
+                coralSystem.setTargetPreset(CoralSystemPresets.L4);
+              }
+            }));
 
     SmartDashboard.putData("Pickup Coral", createPickupCoralCommand());
     SmartDashboard.putData("Reef Action", createReefActionCommand()); // Score OR Dislodge
@@ -138,6 +162,11 @@ public class ButtonsAndDashboardBindings {
 
     SmartDashboard.putData(
         "Toggle Elevator Limits Speed", Commands.runOnce(drive::toggleElevatorHeightLimitsSpeed));
+
+    SmartDashboard.putData(
+        "Toggle Staged Pre-scoring",
+        Commands.runOnce(coralSystem::toggleStagedPrescoring)
+            .ignoringDisable(true)); // This will toggle the staged algae mode for the coral system.
 
     // SmartDashboard Alignment Buttons
     SmartDashboard.putData(

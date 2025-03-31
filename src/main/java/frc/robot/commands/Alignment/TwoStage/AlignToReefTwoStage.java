@@ -5,8 +5,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DriveToCommands;
+import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.RobotStatus;
@@ -18,7 +20,8 @@ public class AlignToReefTwoStage extends SequentialCommandGroup {
   private final Timer runtimeTimer = new Timer();
   private boolean drivingBackwards = false;
 
-  public AlignToReefTwoStage(Drive drive, int reefFaceId, boolean isLeftPole) {
+  public AlignToReefTwoStage(
+      Drive drive, CoralSystem coralSystem, int reefFaceId, boolean isLeftPole) {
     Pose2d reefPose = getTargetPose(drive, reefFaceId, isLeftPole);
     if (reefPose == null) {
       Logger.recordOutput(
@@ -45,7 +48,7 @@ public class AlignToReefTwoStage extends SequentialCommandGroup {
                 }),
             new DriveToPosePP(drive, standoffPose, drivingBackwards, flipStartTangent)
                 .withTimeout(3),
-            new FinalAlign(drive, reefPose).withTimeout(0.7),
+            new FinalAlignWithPresetTransition(drive, reefPose, coralSystem).withTimeout(.7),
             Commands.runOnce(
                 () ->
                     Logger.recordOutput(
@@ -90,7 +93,23 @@ public class AlignToReefTwoStage extends SequentialCommandGroup {
     }
   }
 
-  public static Command alignToReefTwoStage(Drive drive, int reefFaceId, boolean isLeftPole) {
-    return new AlignToReefTwoStage(drive, reefFaceId, isLeftPole);
+  public class FinalAlignWithPresetTransition extends ParallelCommandGroup {
+    public FinalAlignWithPresetTransition(Drive drive, Pose2d reefPose, CoralSystem coralSystem) {
+      super();
+
+      Command finalAlign = new FinalAlign(drive, reefPose).withTimeout(0.7);
+
+      Command maybeTransition =
+          Commands.runOnce(
+              () -> {
+                if (coralSystem.isStagedPreScoringOn()
+                    && coralSystem.getCurrentCoralPreset() == CoralSystemPresets.STAGED_FOR_SCORING
+                    && coralSystem.getQueuedFinalPreset() != null) {
+                  coralSystem.setTargetPreset(coralSystem.getQueuedFinalPreset());
+                }
+              });
+
+      addCommands(finalAlign, maybeTransition);
+    }
   }
 }
