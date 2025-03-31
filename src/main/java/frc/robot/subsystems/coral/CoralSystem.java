@@ -53,7 +53,7 @@ public class CoralSystem extends SubsystemBase {
   @Getter
   public boolean StagedPreScoringOn = false;
 
-  @Getter private CoralSystemPresets queuedFinalPreset = L2;
+  @Getter private CoralSystemPresets queuedFinalPreset = STAGED_FOR_SCORING;
 
   public void setQueuedFinalPreset(CoralSystemPresets preset) {
     queuedFinalPreset = preset;
@@ -466,7 +466,8 @@ public class CoralSystem extends SubsystemBase {
                 || currentCoralPreset == L4 && targetCoralPreset == L4_FAR
                 || currentCoralPreset == L2_FAR && targetCoralPreset == L2
                 || currentCoralPreset == L3_FAR && targetCoralPreset == L3
-                || currentCoralPreset == L4_FAR && targetCoralPreset == L4) {
+                || currentCoralPreset == L4_FAR && targetCoralPreset == L4
+                || currentCoralPreset == STAGED_FOR_SCORING && targetCoralPreset == L2) {
               coralSystemState = CoralSystemMovementState.MOVE_ELEVATOR;
             } else coralSystemState = CoralSystemMovementState.SAFE_ARM;
           }

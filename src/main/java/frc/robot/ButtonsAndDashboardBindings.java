@@ -74,50 +74,10 @@ public class ButtonsAndDashboardBindings {
 
   private static void configureDashboardBindings() {
 
-    // Dashboard Buttons to Mimic the Button Box
-    SmartDashboard.putData(
-        "Shelf - L1",
-        Commands.runOnce(
-            () -> {
-              if (coralSystem.haveCoral) coralSystem.setTargetPreset(CoralSystemPresets.L1_SCORE);
-              else coralSystem.setTargetPreset(CoralSystemPresets.L1_STOW);
-            })); // L1
-
-    SmartDashboard.putData(
-        "Low - L2",
-        Commands.runOnce(
-            () -> {
-              if (coralSystem.isStagedPreScoringOn()) {
-                coralSystem.setTargetPreset(CoralSystemPresets.STAGED_FOR_SCORING);
-                coralSystem.setQueuedFinalPreset(CoralSystemPresets.L2);
-              } else {
-                coralSystem.setTargetPreset(CoralSystemPresets.L2);
-              }
-            }));
-
-    SmartDashboard.putData(
-        "Mid - L3",
-        Commands.runOnce(
-            () -> {
-              if (coralSystem.isStagedPreScoringOn()) {
-                coralSystem.setTargetPreset(CoralSystemPresets.STAGED_FOR_SCORING);
-                coralSystem.setQueuedFinalPreset(CoralSystemPresets.L3);
-              } else {
-                coralSystem.setTargetPreset(CoralSystemPresets.L3);
-              }
-            }));
-
-    SmartDashboard.putData(
-        "High - L4",
-        Commands.runOnce(
-            () -> {
-              if (coralSystem.isStagedPreScoringOn()) {
-                coralSystem.setTargetPreset(CoralSystemPresets.STAGED_FOR_SCORING);
-                coralSystem.setQueuedFinalPreset(CoralSystemPresets.L4);
-              } else {
-                coralSystem.setTargetPreset(CoralSystemPresets.L4);
-              }
-            }));
+    SmartDashboard.putData("Shelf - L1", createShelfCommand());
+    SmartDashboard.putData("Low - L2", createPresetCommand(CoralSystemPresets.L2));
+    SmartDashboard.putData("Mid - L3", createPresetCommand(CoralSystemPresets.L3));
+    SmartDashboard.putData("High - L4", createPresetCommand(CoralSystemPresets.L4));
 
     SmartDashboard.putData("Pickup Coral", createPickupCoralCommand());
     SmartDashboard.putData("Reef Action", createReefActionCommand()); // Score OR Dislodge
@@ -242,21 +202,10 @@ public class ButtonsAndDashboardBindings {
 
   private static void configureOperatorButtonBindings() {
 
-    oi.getButtonBox1YAxisPositive()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  if (coralSystem.haveCoral)
-                    coralSystem.setTargetPreset(CoralSystemPresets.L1_SCORE);
-                  else coralSystem.setTargetPreset(CoralSystemPresets.L1_STOW);
-                })); // L1
-
-    oi.getButtonBox1YAxisNegative()
-        .onTrue(Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L2))); // L2
-    oi.getButtonBox1XAxisNegative()
-        .onTrue(Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L3))); // L3
-    oi.getButtonBox1XAxisPositive()
-        .onTrue(Commands.runOnce(() -> coralSystem.setTargetPreset(CoralSystemPresets.L4))); // L4
+    oi.getButtonBox1YAxisPositive().onTrue(createShelfCommand()); // L1
+    oi.getButtonBox1YAxisNegative().onTrue(createPresetCommand(CoralSystemPresets.L2)); // L2
+    oi.getButtonBox1XAxisNegative().onTrue(createPresetCommand(CoralSystemPresets.L3)); // L3
+    oi.getButtonBox1XAxisPositive().onTrue(createPresetCommand(CoralSystemPresets.L4)); // L4
 
     oi.getButtonBox1Button1() // Prep L1 Algae Dislodge
         .onTrue(createPrepL1DislodgeCommand());
@@ -343,4 +292,33 @@ public class ButtonsAndDashboardBindings {
                 (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.PICKUP
                     || (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L1_STOW))));
   }
+
+  // L1 which checks for coral presence:
+  private static Command createShelfCommand() {
+    return Commands.runOnce(
+        () -> {
+          if (coralSystem.haveCoral) coralSystem.setTargetPreset(CoralSystemPresets.L1_SCORE);
+          else coralSystem.setTargetPreset(CoralSystemPresets.L1_STOW);
+        });
+  }
+
+  // For L2, L3, and L4 which use the staged pre-scoring logic:
+  private static Command createPresetCommand(CoralSystemPresets preset) {
+    return Commands.runOnce(
+        () -> {
+          if (coralSystem.isStagedPreScoringOn()) {
+            if (preset == coralSystem.getQueuedFinalPreset()) {
+              coralSystem.setTargetPreset(preset);
+            } else {
+              coralSystem.setTargetPreset(CoralSystemPresets.STAGED_FOR_SCORING);
+              coralSystem.setQueuedFinalPreset(preset);
+            }
+          } else {
+            coralSystem.setTargetPreset(preset);
+          }
+        });
+  }
+
+  // lighting to show level
+  // check staged preset to L2
 }
