@@ -288,7 +288,7 @@ public class CoralSystem extends SubsystemBase {
         }
         break;
       case ARM_RECOVERY:
-        this.arm.recoverArm(); // go to L1 Angle
+        this.arm.recoverArm(); // go to L1_STOW Angle
         if (arm.isAtGoal()) {
           coralSystemState = CoralSystemMovementState.ELEVATOR_RECOVERY;
         }
@@ -298,8 +298,8 @@ public class CoralSystem extends SubsystemBase {
         if (elevator.isAtGoal()) {
           elevator.clearElevatorError();
           arm.clearArmError();
-          this.targetCoralPreset = CoralSystemPresets.L1_SCORE;
-          this.currentCoralPreset = CoralSystemPresets.L1_SCORE;
+          this.targetCoralPreset = CoralSystemPresets.L1_STOW;
+          this.currentCoralPreset = CoralSystemPresets.L1_STOW;
           coralSystemState = CoralSystemMovementState.STABLE;
           Elastic.selectTab("Teleoperated");
           intake.stopIntake();
