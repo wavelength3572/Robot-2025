@@ -116,6 +116,20 @@ public class PathPlannerCommands {
             Commands.print("Scoring")
                 .andThen(new ScoreCoralInAutoCommand(coralSystem.getIntake())));
 
+    new EventTrigger("PrepareLowDislodge")
+        .onTrue(
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () ->
+                        coralSystem.setTargetPreset(
+                            CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1)),
+                new WaitUntilCommand(coralSystem::isAtGoal),
+                new InstantCommand(
+                    () ->
+                        coralSystem.setTargetPreset(
+                            CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1)),
+                new WaitUntilCommand(coralSystem::isAtGoal)));
+
     try {
       List<AutoPathConditional> autoPathConditionals = new ArrayList<>();
 
