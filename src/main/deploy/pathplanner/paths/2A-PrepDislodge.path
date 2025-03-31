@@ -8,54 +8,40 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1512308194737533,
-        "y": 5.895039308768749
+        "x": 3.962206811493101,
+        "y": 5.62623203759829
       },
       "isLocked": false,
       "linkedName": "Score4-2A"
     },
     {
       "anchor": {
-        "x": 1.3976103821532828,
-        "y": 7.148285463792298
+        "x": 4.001431717249522,
+        "y": 5.2518825764627675
       },
       "prevControl": {
-        "x": 1.644374546955169,
-        "y": 7.108192484735766
+        "x": 3.8514317172495223,
+        "y": 5.5116901975980985
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "StationLeft-FarLeft"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [
-    {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.85,
-      "maxWaypointRelativePos": 1.0,
-      "constraints": {
-        "maxVelocity": 1.0,
-        "maxAcceleration": 1.5,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    }
-  ],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Pickup",
-      "waypointRelativePos": 0.0,
+      "name": "PrepareLowDislodge",
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
       "command": null
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 2.75,
+    "maxVelocity": 0.5,
+    "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -63,13 +49,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -54.0
+    "rotation": -59.99999999999999
   },
   "reversed": false,
-  "folder": "Score4High",
+  "folder": "Score4",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -59.99999999999999
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

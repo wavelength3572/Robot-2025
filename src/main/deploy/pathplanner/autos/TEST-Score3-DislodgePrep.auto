@@ -1,0 +1,97 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score4-Cage2-3B-High"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForPreset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score4-3B-StationLeft"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score4-StationLeft-2BHigh"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForPreset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score4-2B-StationLeft"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score4-StationLeft-2AHigh"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForPreset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2A-PrepDislodge"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Tests",
+  "choreoAuto": false
+}
