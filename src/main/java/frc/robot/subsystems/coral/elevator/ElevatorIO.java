@@ -19,19 +19,21 @@ public interface ElevatorIO {
     public double followerAppliedVolts = 0.0;
     public double followerCurrentAmps = 0.0;
     public double followerError = 0.0;
+
+    public boolean ELEVATOR_STUCK_ERROR = false;
+    public boolean inElevatorRecoveryMode = false;
   }
 
   /** Update the set of loggable inputs. */
-  public default void updateInputs(ElevatorIOInputs inputs) {}
+  public default void updateInputs(ElevatorIOInputs inputs) {
+  }
 
   /** Run open loop at the specified voltage. */
-  public default void setVoltage(double volts) {}
+  public default void setVoltage(double volts) {
+  }
 
-  public default void setPosition(double requestedPosition) {}
-
-  public default void recoverElevator() {}
-
-  public default void clearElevatorError() {}
+  public default void setPosition(double requestedPosition) {
+  }
 
   public default double getHeightInMeters() {
     return 0.0;
@@ -41,12 +43,24 @@ public interface ElevatorIO {
     return 0.0;
   }
 
-  public default void runCharacterization(double output) {}
+  public default void runCharacterization(double output) {
+  }
 
   public default double getFFCharacterizationVelocity() {
     return 0.0;
   }
 
   public default void setPIDValues(
-      double kP, double kD, double VelocityMax, double AccelerationMax) {}
+      double kP, double kD, double VelocityMax, double AccelerationMax) {
+  }
+
+  public default boolean isElevatorInError() {
+    return false;
+  }
+
+  public default void clearElevatorError() {
+  }
+
+  public default void recoverElevator() {
+  }
 }

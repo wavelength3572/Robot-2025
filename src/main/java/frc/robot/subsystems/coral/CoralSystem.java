@@ -629,4 +629,8 @@ public class CoralSystem extends SubsystemBase {
   public boolean isArmInError() {
     return arm.isArmInError();
   }
+
+  public boolean isElevatorInError() {
+    return elevator.isElevatorInError();
+  }
 }

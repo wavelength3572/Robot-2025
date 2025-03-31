@@ -50,7 +50,7 @@ public class ArmIOMMSpark implements ArmIO {
 
     if (inputs.currentAmps > 48.0) {
       ARM_STUCK_ERROR_COUNT++;
-      if (ARM_STUCK_ERROR == false && ARM_STUCK_ERROR_COUNT >= 25) { // Approx .25 seconds
+      if (ARM_STUCK_ERROR == false && ARM_STUCK_ERROR_COUNT >= 25) { // Approx .5 seconds
         ARM_STUCK_ERROR = true;
         // turn off motor immediatly;
         armMotor.set(0.0);
@@ -107,7 +107,8 @@ public class ArmIOMMSpark implements ArmIO {
 
   @Override
   public void setArbFFConstant(double volts) {
-    if (volts >= -0.4 && volts <= 0.4) armArbFF = volts;
+    if (volts >= -0.4 && volts <= 0.4)
+      armArbFF = volts;
   }
 
   @Override
@@ -115,15 +116,6 @@ public class ArmIOMMSpark implements ArmIO {
     if (TBE_Valid && ARM_STUCK_ERROR == false) {
       this.armTargetDEG = requestedPosition;
       this.armTargetEncoderRotations = angleToRotations(requestedPosition);
-    }
-  }
-
-  @Override
-  public void recoverArm() {
-    if (TBE_Valid) {
-      inArmRecoveryMode = true;
-      this.armTargetDEG = CoralSystemPresets.L1_SCORE.getArmAngle();
-      this.armTargetEncoderRotations = angleToRotations(this.armTargetDEG);
     }
   }
 
@@ -137,13 +129,19 @@ public class ArmIOMMSpark implements ArmIO {
     return rotationsToAngle(armEncoder.getPosition());
   }
 
+  public double angleToRotations(double angle) {
+    return angle * ArmConstants.kArmGearing / 360.0;
+  }
+
+  public double rotationsToAngle(double rotations) {
+    return (rotations / ArmConstants.kArmGearing) * 360.0;
+  }
+
   @Override
   public void setPIDValues(double kP, double kD, double VelocityMax, double AccelerationMax) {
     final SparkFlexConfig config = new SparkFlexConfig();
-    config
-        .closedLoop
-        .pidf(kP, 0.0, kD, 0.0)
-        .maxMotion
+    config.closedLoop
+        .pidf(kP, 0.0, kD, 0.0).maxMotion
         // Set MAXMotion parameters for position control
         .maxVelocity(VelocityMax)
         .maxAcceleration(AccelerationMax)
@@ -163,11 +161,12 @@ public class ArmIOMMSpark implements ArmIO {
     inArmRecoveryMode = false;
   }
 
-  public double angleToRotations(double angle) {
-    return angle * ArmConstants.kArmGearing / 360.0;
-  }
-
-  public double rotationsToAngle(double rotations) {
-    return (rotations / ArmConstants.kArmGearing) * 360.0;
+  @Override
+  public void recoverArm() {
+    if (TBE_Valid) {
+      inArmRecoveryMode = true;
+      this.armTargetDEG = CoralSystemPresets.L1_SCORE.getArmAngle();
+      this.armTargetEncoderRotations = angleToRotations(this.armTargetDEG);
+    }
   }
 }

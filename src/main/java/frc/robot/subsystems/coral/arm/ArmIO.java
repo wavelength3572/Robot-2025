@@ -27,8 +27,6 @@ public interface ArmIO {
 
   public default void setTargetAngleDEG(double requestedPositionDEG) {}
 
-  public default void recoverArm() {}
-
   public default double getTargetAngleDEG() {
     return 0.0;
   }
@@ -47,4 +45,7 @@ public interface ArmIO {
   }
 
   public default void clearArmError() {}
+
+  public default void recoverArm() {}
+
 }

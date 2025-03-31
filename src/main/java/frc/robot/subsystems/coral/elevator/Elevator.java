@@ -108,4 +108,8 @@ public class Elevator {
     return Math.abs(getHeightInInches() - getSetpointInInches())
         < ElevatorConstants.kSetpointThresholdINCHES;
   }
+
+  public boolean isElevatorInError() {
+    return io.isElevatorInError();
+  }
 }

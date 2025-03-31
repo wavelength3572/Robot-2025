@@ -11,6 +11,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.util.Elastic;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.RobotStatus;
 
@@ -20,18 +21,20 @@ public class ElevatorIOSpark implements ElevatorIO {
   // elevator, so we also
   // need to initialize the closed loop controller and encoder.
   private SparkMax leaderMotor = new SparkMax(ElevatorConstants.leaderCanId, MotorType.kBrushless);
-  private SparkClosedLoopController elevatorClosedLoopController =
-      leaderMotor.getClosedLoopController();
+  private SparkClosedLoopController elevatorClosedLoopController = leaderMotor.getClosedLoopController();
   private RelativeEncoder leaderEncoder = leaderMotor.getEncoder();
 
-  private SparkMax followerMotor =
-      new SparkMax(ElevatorConstants.followerCanId, MotorType.kBrushless);
+  private SparkMax followerMotor = new SparkMax(ElevatorConstants.followerCanId, MotorType.kBrushless);
   private RelativeEncoder followerEncoder = followerMotor.getEncoder();
 
   private double elevatorCurrentTarget = 0.0;
   private double elevatorCurrentArbFF = 0.0;
 
   private boolean firstTimeArmInError = true;
+
+  private boolean ELEVATOR_STUCK_ERROR = false;
+  private double ELEVATOR_STUCK_ERROR_COUNT = 0;
+
   private boolean inElevatorRecoveryMode = false;
 
   private static final LoggedTunableNumber ElevatorKg = new LoggedTunableNumber("Elevator/Kg", 0.0);
@@ -55,6 +58,22 @@ public class ElevatorIOSpark implements ElevatorIO {
     inputs.leaderPositionRotations = leaderEncoder.getPosition();
     inputs.followerPositionRotations = followerEncoder.getPosition();
     inputs.followerError = inputs.leaderPositionRotations - inputs.followerPositionRotations;
+    inputs.leaderCurrentAmps = leaderMotor.getOutputCurrent();
+    inputs.followerCurrentAmps = followerMotor.getOutputCurrent();
+
+    if (inputs.leaderCurrentAmps > 47.0) {
+      ELEVATOR_STUCK_ERROR_COUNT++;
+      if (ELEVATOR_STUCK_ERROR == false && ELEVATOR_STUCK_ERROR_COUNT >= 25) { // Approx .5 seconds
+        ELEVATOR_STUCK_ERROR = true;
+        // turn of motor immediatly
+        leaderMotor.set(0.0);
+        // It will get set very soon to it's own current position
+        // using MaxMotion
+        Elastic.selectTab("ARM ERROR");
+      }
+    } else {
+      ELEVATOR_STUCK_ERROR_COUNT = 0;
+    }
 
     // If the arm is in error then don't move the elevator
     if (RobotStatus.isArmInError()) {
@@ -81,14 +100,11 @@ public class ElevatorIOSpark implements ElevatorIO {
     inputs.setpoint = this.elevatorCurrentTarget;
     inputs.leaderVelocityRPM = leaderEncoder.getVelocity();
     inputs.followerVelocityRPM = followerEncoder.getVelocity();
-    inputs.elevatorHeightCalc =
-        Units.metersToInches(
-            (leaderEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
-                * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI));
-    inputs.leaderAppliedVolts =
-        leaderMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
-    inputs.followerAppliedVolts =
-        followerMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
+    inputs.elevatorHeightCalc = Units.metersToInches(
+        (leaderEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
+            * (ElevatorConstants.kElevatorDrumRadius * 2.0 * Math.PI));
+    inputs.leaderAppliedVolts = leaderMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
+    inputs.followerAppliedVolts = followerMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
     inputs.leaderCurrentAmps = leaderMotor.getOutputCurrent();
     inputs.followerCurrentAmps = followerMotor.getOutputCurrent();
     inputs.feedforwardOutput = elevatorCurrentArbFF;
@@ -105,19 +121,6 @@ public class ElevatorIOSpark implements ElevatorIO {
       }
       this.elevatorCurrentTarget = requestedPosition;
     }
-  }
-
-  @Override
-  public void recoverElevator() {
-    inElevatorRecoveryMode = true;
-    this.elevatorCurrentArbFF = 0.0;
-    this.elevatorCurrentTarget = 0.0;
-  }
-
-  @Override
-  public void clearElevatorError() {
-    firstTimeArmInError = true;
-    inElevatorRecoveryMode = false;
   }
 
   @Override
@@ -145,15 +148,31 @@ public class ElevatorIOSpark implements ElevatorIO {
   @Override
   public void setPIDValues(double kP, double kD, double VelocityMax, double AccelerationMax) {
     final SparkMaxConfig config = new SparkMaxConfig();
-    config
-        .closedLoop
-        .pidf(kP, 0.0, kD, 0.0)
-        .maxMotion
+    config.closedLoop
+        .pidf(kP, 0.0, kD, 0.0).maxMotion
         // Set MAXMotion parameters for position control
         .maxVelocity(VelocityMax)
         .maxAcceleration(AccelerationMax)
         .allowedClosedLoopError(0.1);
     leaderMotor.configure(
         config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+  }
+
+  @Override
+  public boolean isElevatorInError() {
+    return ELEVATOR_STUCK_ERROR;
+  }
+
+  @Override
+  public void clearElevatorError() {
+    firstTimeArmInError = true;
+    inElevatorRecoveryMode = false;
+  }
+
+  @Override
+  public void recoverElevator() {
+    inElevatorRecoveryMode = true;
+    this.elevatorCurrentArbFF = 0.0;
+    this.elevatorCurrentTarget = 0.0;
   }
 }
