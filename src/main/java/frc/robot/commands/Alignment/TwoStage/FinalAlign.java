@@ -24,7 +24,7 @@ public class FinalAlign extends Command {
   private static final LoggedTunableNumber kDTranslation =
       new LoggedTunableNumber("FinalAlign/kDTranslation", 0.0);
   private static final LoggedTunableNumber kPRotation =
-      new LoggedTunableNumber("FinalAlign/kPRotation", 4.0);
+      new LoggedTunableNumber("FinalAlign/kPRotation", 1.0);
   private static final LoggedTunableNumber kDRotation =
       new LoggedTunableNumber("FinalAlign/kDRotation", 0.0);
   private static final LoggedTunableNumber rotationToleranceDeg =
@@ -32,7 +32,7 @@ public class FinalAlign extends Command {
   private static final LoggedTunableNumber positionToleranceMeters =
       new LoggedTunableNumber("FinalAlign/PositionToleranceMeters", 0.02);
   private static final LoggedTunableNumber requiredStableCycles =
-      new LoggedTunableNumber("FinalAlign/StableCycles", 1);
+      new LoggedTunableNumber("FinalAlign/StableCycles", 3);
 
   public FinalAlign(Drive drive, Pose2d targetPose) {
     this.drive = drive;

@@ -144,7 +144,7 @@ public class AlgaeIOSpark implements AlgaeIO {
             currentAlgIntakeState = algaeIntakeState.CAPTURE;
           }
         } else {
-          detectionCount = 0; 
+          detectionCount = 0;
         }
         previousArmAngle = inputs.currentAngle;
         break;
