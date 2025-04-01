@@ -7,6 +7,7 @@ public enum CoralSystemPresets {
   STOW(22, 105),
   ARMSAFE(22, 85),
   PICKUP(39.0, 233),
+  // PRE_PICKUP - Used for putting the arm in a decent angle when going to pickup
   PRE_PICKUP(39.0, 115),
   PICKUPFAR(37.0, 233),
   L1_STOW(0.0, 92),
@@ -18,7 +19,13 @@ public enum CoralSystemPresets {
   L2_FAR(16.0 + 3.5, 77), // moved up 2inches
   L3_FAR(33.0 + 3.5, 77), // moved up 2inches
   L4_FAR(64.5, 55), // not changed
+  // PRE_SCORE - Not really used
+  // Only use is commented out in unsued code
+  // to try to autop make the arm go up when moved away
+  // from coral station
   PRE_SCORE(39.0, 85),
+  // PREL4 - Used in Auto Routines. Need to see if this
+  // can be factored out
   PREL4(39.0, 105),
   AUTO_START_L4(64.5, 48),
   AUTO_SCORE_END(45, 85),
