@@ -42,14 +42,14 @@ public final class ElevatorConfigs {
           .idleMode(IdleMode.kBrake)
           .smartCurrentLimit(ElevatorConstants.elevatorCurrentLimit)
           .voltageCompensation(12)
-          .follow(leaderCanId, true);
+          .follow(leaderCanId, false);
 
       // Configure basic settings of the elevator motor
       newFollowerConfig
           .idleMode(IdleMode.kBrake)
           .smartCurrentLimit(ElevatorConstants.elevatorCurrentLimit)
           .voltageCompensation(12)
-          .inverted(true);
+          .inverted(false);
       /*
        * Configure the closed loop controller. We want to make sure we set the
        * feedback sensor as the primary encoder.

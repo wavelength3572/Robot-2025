@@ -29,6 +29,7 @@ public class AlgaeIOSpark implements AlgaeIO {
 
   private double previousArmAngle = 0.0;
   private double detectionCount = 0;
+  private double burstCount = 0;
 
   private boolean haveAlgae = false;
 
@@ -92,17 +93,19 @@ public class AlgaeIOSpark implements AlgaeIO {
         // algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldVolts);
         previousArmAngle = inputs.currentAngle;
         detectionCount = 0;
+        burstCount = 0;
         break;
       case BURST:
         algaeCaptureMotor.setVoltage(AlgaeConstants.captureIntakeVolts);
         algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
         detectionCount = 0;
+        burstCount = 0;
         previousArmAngle = inputs.currentAngle;
         currentAlgIntakeState = algaeIntakeState.PULL;
         break;
       case PULL:
-        detectionCount++;
-        if (detectionCount <= 50) {
+        if (burstCount < 25) {
+          burstCount++;
           algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
         } else {
           algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldOutVolts);
@@ -135,7 +138,7 @@ public class AlgaeIOSpark implements AlgaeIO {
             currentAlgIntakeState = algaeIntakeState.CAPTURE;
           }
         } else {
-          detectionCount = 0;
+          detectionCount = 0; 
         }
         previousArmAngle = inputs.currentAngle;
         break;
@@ -149,7 +152,7 @@ public class AlgaeIOSpark implements AlgaeIO {
         break;
       case PULL_ARM:
         algaeDeployController.setReference(
-            AlgaeConstants.algaeStowPosition,
+            AlgaeConstants.algaeCapturePosition,
             ControlType.kPosition,
             ClosedLoopSlot.kSlot0,
             inputs.armArbFF);
