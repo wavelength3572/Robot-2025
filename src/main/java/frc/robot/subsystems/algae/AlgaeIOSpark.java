@@ -155,14 +155,15 @@ public class AlgaeIOSpark implements AlgaeIO {
         algaeCaptureController.setReference(captureEncoderValue, ControlType.kPosition);
         detectionCount = 0;
         currentAlgIntakeState = algaeIntakeState.PULL_ARM;
+        algaeDeployMotor.setVoltage(0.0);
         break;
       case PULL_ARM:
-        algaeDeployController.setReference(
-            AlgaeConstants.algaeCapturePosition,
-            ControlType.kPosition,
-            ClosedLoopSlot.kSlot0,
-            inputs.armArbFF);
-        // algaeDeployMotor.setVoltage(inputs.armArbFF);
+        // algaeDeployController.setReference(
+        //     AlgaeConstants.algaeCapturePosition,
+        //     ControlType.kPosition,
+        //     ClosedLoopSlot.kSlot0,
+        //     inputs.armArbFF);
+        algaeDeployMotor.setVoltage(inputs.armArbFF);
         break;
       case PUSH:
         algaeDeployMotor.setVoltage(AlgaeConstants.deployPushAlgaeVolts);
