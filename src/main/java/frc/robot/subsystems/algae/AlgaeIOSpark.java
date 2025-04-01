@@ -138,7 +138,7 @@ public class AlgaeIOSpark implements AlgaeIO {
             currentAlgIntakeState = algaeIntakeState.CAPTURE;
           }
         } else {
-          detectionCount = 0; 
+          detectionCount = 0;
         }
         previousArmAngle = inputs.currentAngle;
         break;
@@ -149,6 +149,7 @@ public class AlgaeIOSpark implements AlgaeIO {
         algaeCaptureController.setReference(captureEncoderValue, ControlType.kPosition);
         detectionCount = 0;
         currentAlgIntakeState = algaeIntakeState.PULL_ARM;
+        algaeDeployMotor.setVoltage(0.0);
         break;
       case PULL_ARM:
         // algaeDeployController.setReference(
