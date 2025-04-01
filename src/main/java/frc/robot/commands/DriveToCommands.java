@@ -181,7 +181,7 @@ public class DriveToCommands {
     Logger.recordOutput("Alignment/calculateL1Pose/AdjustedMidpoint", adjustedMidpoint);
 
     // Offset from center left/right depending on button pushed
-    double offsetDistance = 0.08;
+    double offsetDistance = 0.03;
 
     // If isLeft is true, use a negative offset (to shift left); otherwise, use positive (to shift
     // right)

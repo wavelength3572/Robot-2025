@@ -6,9 +6,9 @@ public enum CoralSystemPresets {
   STARTUP(0, 105),
   STOW(22, 105),
   ARMSAFE(22, 85),
-  PICKUP(39.0, 233),
-  PRE_PICKUP(39.0, 115),
-  PICKUPFAR(37.0, 233),
+  PICKUP(38, 233),
+  PRE_PICKUP(38.0, 115),
+  PICKUPFAR(35, 233),
   L1_STOW(0.0, 92),
   L1_SCORE(22.0, 240),
   L2(16.0, 77),
@@ -18,7 +18,7 @@ public enum CoralSystemPresets {
   L2_FAR(16.0 + 3.5, 77), // moved up 2inches
   L3_FAR(33.0 + 3.5, 77), // moved up 2inches
   L4_FAR(64.5, 55), // not changed
-  PRE_SCORE(39.0, 85),
+  PRE_SCORE(38.0, 85),
   PREL4(39.0, 105),
   AUTO_START_L4(64.5, 48),
   AUTO_SCORE_END(45, 85),

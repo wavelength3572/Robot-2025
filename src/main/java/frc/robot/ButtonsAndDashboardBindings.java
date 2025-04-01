@@ -309,6 +309,7 @@ public class ButtonsAndDashboardBindings {
           if (coralSystem.isStagedPreScoringOn()) {
             if (preset == coralSystem.getQueuedFinalPreset()) {
               coralSystem.setTargetPreset(preset);
+              coralSystem.setQueuedFinalPreset(CoralSystemPresets.STAGED_FOR_SCORING);
             } else {
               coralSystem.setTargetPreset(CoralSystemPresets.STAGED_FOR_SCORING);
               coralSystem.setQueuedFinalPreset(preset);

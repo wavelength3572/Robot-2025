@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -22,7 +23,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class AlgaeCommands {
 
-  private static final double SPEED_SCALAR = 0.5;
+  private static final double SPEED_SCALAR = 1.0;
 
   private AlgaeCommands() {
     // Prevent instantiation - utility class
@@ -137,7 +138,7 @@ public class AlgaeCommands {
                     drive,
                     () -> {
                       Pose2d currentPose = drive.getPose();
-                      double offsetMeters = -0.254 * 3.0; // Move backward by 10 inches
+                      double offsetMeters = -Units.inchesToMeters(7); // Move backward by 10 inches
                       Translation2d offset =
                           new Translation2d(offsetMeters, 0).rotateBy(currentPose.getRotation());
                       Translation2d targetTranslation = currentPose.getTranslation().plus(offset);

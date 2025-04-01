@@ -51,7 +51,7 @@ public class CoralSystem extends SubsystemBase {
 
   @AutoLogOutput(key = "CoralSystem/StagedPreScoringOn")
   @Getter
-  public boolean StagedPreScoringOn = false;
+  public boolean StagedPreScoringOn = true;
 
   @Getter private CoralSystemPresets queuedFinalPreset = STAGED_FOR_SCORING;
 
@@ -308,8 +308,8 @@ public class CoralSystem extends SubsystemBase {
         if (elevator.isAtGoal()) {
           elevator.clearElevatorError();
           arm.clearArmError();
-          this.targetCoralPreset = CoralSystemPresets.L1_SCORE;
-          this.currentCoralPreset = CoralSystemPresets.L1_SCORE;
+          this.targetCoralPreset = CoralSystemPresets.L1_STOW;
+          this.currentCoralPreset = CoralSystemPresets.L1_STOW;
           coralSystemState = CoralSystemMovementState.STABLE;
           Elastic.selectTab("Teleoperated");
           intake.stopIntake();
