@@ -53,7 +53,7 @@ public class CoralSystem extends SubsystemBase {
   @Getter
   public boolean StagedPreScoringOn = false;
 
-  @Getter private CoralSystemPresets queuedFinalPreset = STAGED_FOR_SCORING;
+  @Getter private CoralSystemPresets queuedFinalPreset = null;
 
   public void setQueuedFinalPreset(CoralSystemPresets preset) {
     queuedFinalPreset = preset;
@@ -290,6 +290,7 @@ public class CoralSystem extends SubsystemBase {
         if ((targetCoralPreset == CoralSystemPresets.PICKUP
                 || targetCoralPreset == CoralSystemPresets.PICKUPFAR)
             && !haveCoral) {
+          setQueuedFinalPreset(null);
           intake.pullCoral();
         }
         if (arm.isAtGoal() && elevator.isAtGoal()) {
