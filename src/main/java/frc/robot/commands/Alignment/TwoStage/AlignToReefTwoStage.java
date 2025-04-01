@@ -106,6 +106,7 @@ public class AlignToReefTwoStage extends SequentialCommandGroup {
                     && coralSystem.getCurrentCoralPreset() == CoralSystemPresets.STAGED_FOR_SCORING
                     && coralSystem.getQueuedFinalPreset() != null) {
                   coralSystem.setTargetPreset(coralSystem.getQueuedFinalPreset());
+                  coralSystem.setQueuedFinalPreset(null);
                 }
               });
 

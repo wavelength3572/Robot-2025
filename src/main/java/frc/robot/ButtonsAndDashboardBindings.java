@@ -309,7 +309,8 @@ public class ButtonsAndDashboardBindings {
           if (coralSystem.isStagedPreScoringOn()) {
             // Check if we are in L1/L2/L3 and nothing is queued
             if (coralSystem.getQueuedFinalPreset() == null
-                && (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L2_FAR
+                && (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.STAGED_FOR_SCORING
+                    || coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L2_FAR
                     || coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L3_FAR
                     || coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L4_FAR
                     || coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L2

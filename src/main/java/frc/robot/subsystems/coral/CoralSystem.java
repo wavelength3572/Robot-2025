@@ -51,9 +51,11 @@ public class CoralSystem extends SubsystemBase {
 
   @AutoLogOutput(key = "CoralSystem/StagedPreScoringOn")
   @Getter
-  public boolean StagedPreScoringOn = false;
+  public boolean StagedPreScoringOn = true;
 
-  @Getter private CoralSystemPresets queuedFinalPreset = null;
+  @AutoLogOutput(key = "CoralSystem/QueuedPreset")
+  @Getter
+  private CoralSystemPresets queuedFinalPreset = null;
 
   public void setQueuedFinalPreset(CoralSystemPresets preset) {
     queuedFinalPreset = preset;
@@ -409,12 +411,25 @@ public class CoralSystem extends SubsystemBase {
   public void setTargetPreset(CoralSystemPresets requestedPreset) {
     // If the ARM isn't Stuck then allow new presets
     if (arm.isArmInError() == false) {
-      // We are trying to go to a different location AND
-      // We ARE NOT Climbing AND
-      // We are not currently traveling to a location
-      if (requestedPreset != this.currentCoralPreset
-          && targetCoralPreset != CoralSystemPresets.CLIMB
-          && coralSystemState == CoralSystemMovementState.STABLE) {
+      boolean isOverride =
+          canOverridePresetsAmongFrontScoringPresets(requestedPreset)
+              || canOverridePresetFromPickUpToStaged(requestedPreset);
+
+      // Skip if the requested preset is the current preset
+      // And we aren't overriding, because if we are overriding we may want to be able to double
+      // back to the spot we just left
+      if (!isOverride && requestedPreset == this.currentCoralPreset) {
+        return;
+      }
+
+      // Never allowe the preset to change if we're in CLIMB mode.
+      if (targetCoralPreset == CoralSystemPresets.CLIMB) {
+        return;
+      }
+
+      // Allow change if we're stable or if override conditions are met.
+      if (coralSystemState == CoralSystemMovementState.STABLE || isOverride) {
+
         // We are allowed to move
         // Lets just hard code situations where we can just move the
         // elevator and arm at the same time
@@ -644,5 +659,47 @@ public class CoralSystem extends SubsystemBase {
 
   public void toggleStagedPrescoring() {
     StagedPreScoringOn = !StagedPreScoringOn; // Toggle the boolean value
+  }
+
+  private boolean canOverridePresetFromPickUpToStaged(CoralSystemPresets requestedPreset) {
+    return ((currentCoralPreset == CoralSystemPresets.PICKUP
+            || currentCoralPreset == CoralSystemPresets.PICKUPFAR)
+        && targetCoralPreset == CoralSystemPresets.STAGED_FOR_SCORING
+        && (requestedPreset == CoralSystemPresets.L3 || requestedPreset == CoralSystemPresets.L4));
+  }
+
+  private boolean canOverridePresetsAmongFrontScoringPresets(CoralSystemPresets requestedPreset) {
+    return (targetCoralPreset != requestedPreset
+        && currentPresetIsFrontScoringPreset()
+        && targetPresetIsFrontScoring()
+        && requestedPresetIsFrontScoring(requestedPreset));
+  }
+
+  private boolean requestedPresetIsFrontScoring(CoralSystemPresets requestedPreset) {
+    return (requestedPreset == CoralSystemPresets.L2
+        || requestedPreset == CoralSystemPresets.L2_FAR
+        || requestedPreset == CoralSystemPresets.L3
+        || requestedPreset == CoralSystemPresets.L3_FAR
+        || requestedPreset == CoralSystemPresets.L4
+        || requestedPreset == CoralSystemPresets.L4_FAR);
+  }
+
+  private boolean currentPresetIsFrontScoringPreset() {
+    return (currentCoralPreset == CoralSystemPresets.STAGED_FOR_SCORING
+            || currentCoralPreset == CoralSystemPresets.L2
+            || currentCoralPreset == CoralSystemPresets.L2_FAR)
+        || (currentCoralPreset == CoralSystemPresets.L3
+            || currentCoralPreset == CoralSystemPresets.L3_FAR)
+        || (currentCoralPreset == CoralSystemPresets.L4
+            || currentCoralPreset == CoralSystemPresets.L4_FAR);
+  }
+
+  private boolean targetPresetIsFrontScoring() {
+    return (targetCoralPreset == CoralSystemPresets.L2
+        || targetCoralPreset == CoralSystemPresets.L2_FAR
+        || targetCoralPreset == CoralSystemPresets.L3
+        || targetCoralPreset == CoralSystemPresets.L3_FAR
+        || targetCoralPreset == CoralSystemPresets.L4
+        || targetCoralPreset == CoralSystemPresets.L4_FAR);
   }
 }
