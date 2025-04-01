@@ -48,7 +48,7 @@ public class AlignToReefTwoStage extends SequentialCommandGroup {
                 }),
             new DriveToPosePP(drive, standoffPose, drivingBackwards, flipStartTangent)
                 .withTimeout(3),
-            new FinalAlignWithPresetTransition(drive, reefPose, coralSystem).withTimeout(.7),
+            new FinalAlignWithPresetTransition(drive, reefPose, coralSystem).withTimeout(1.5),
             Commands.runOnce(
                 () ->
                     Logger.recordOutput(
@@ -104,9 +104,10 @@ public class AlignToReefTwoStage extends SequentialCommandGroup {
               () -> {
                 if (coralSystem.isStagedPreScoringOn()
                     && coralSystem.getCurrentCoralPreset() == CoralSystemPresets.STAGED_FOR_SCORING
+                    && coralSystem.getTargetCoralPreset() == CoralSystemPresets.STAGED_FOR_SCORING
                     && coralSystem.getQueuedFinalPreset() != null) {
                   coralSystem.setTargetPreset(coralSystem.getQueuedFinalPreset());
-                  coralSystem.setQueuedFinalPreset(CoralSystemPresets.STAGED_FOR_SCORING);
+                  coralSystem.setQueuedFinalPreset(null);
                 }
               });
 

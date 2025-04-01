@@ -234,13 +234,14 @@ public class ButtonsAndDashboardBindings {
     oi.getButtonBox1Button8().onTrue(Commands.runOnce(climber::climb)); // Climb
   }
 
-  // If you click the pickup button and you have coral then do nothing
   private static Command createPickupCoralCommand() {
     return Commands.runOnce(
         () -> {
           if (RobotStatus.haveCoral() == false) {
             coralSystem.setTargetPreset(CoralSystemPresets.PICKUP);
-            coralSystem.getIntake().pullCoral();
+            coralSystem.setQueuedFinalPreset(null);
+            // // We'll turn on the intake in the CoralSystem
+            // coralSystem.getIntake().pullCoral();
           } else {
             coralSystem.getIntake().pullCoral();
           }
@@ -307,19 +308,36 @@ public class ButtonsAndDashboardBindings {
     return Commands.runOnce(
         () -> {
           if (coralSystem.isStagedPreScoringOn()) {
-            if (preset == coralSystem.getQueuedFinalPreset()) {
+            // Check if we are in L1/L2/L3 and nothing is queued
+            if (coralSystem.getQueuedFinalPreset() == null
+                && (coralSystem.getCurrentCoralPreset() == CoralSystemPresets.STAGED_FOR_SCORING
+                    || coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L2_FAR
+                    || coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L3_FAR
+                    || coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L4_FAR
+                    || coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L2
+                    || coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L3
+                    || coralSystem.getCurrentCoralPreset() == CoralSystemPresets.L4)) {
+              // Manual override: immediately set the new preset.
               coralSystem.setTargetPreset(preset);
-              coralSystem.setQueuedFinalPreset(CoralSystemPresets.STAGED_FOR_SCORING);
+              // Clear any queued preset.
+              coralSystem.setQueuedFinalPreset(null);
             } else {
-              coralSystem.setTargetPreset(CoralSystemPresets.STAGED_FOR_SCORING);
-              coralSystem.setQueuedFinalPreset(preset);
+              // We are in staging mode. Now check if a preset is already queued.
+              if (coralSystem.getQueuedFinalPreset() != null
+                  && coralSystem.getQueuedFinalPreset().equals(preset)) {
+                // Button pressed twice: commit to the preset.
+                coralSystem.setTargetPreset(preset);
+                coralSystem.setQueuedFinalPreset(null);
+              } else {
+                // First press: remain in staging and queue this preset.
+                coralSystem.setTargetPreset(CoralSystemPresets.STAGED_FOR_SCORING);
+                coralSystem.setQueuedFinalPreset(preset);
+              }
             }
           } else {
+            // Staged pre-scoring is off: go directly to the preset.
             coralSystem.setTargetPreset(preset);
           }
         });
   }
-
-  // lighting to show level
-  // check staged preset to L2
 }
