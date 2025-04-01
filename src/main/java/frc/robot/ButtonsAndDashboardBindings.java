@@ -262,7 +262,8 @@ public class ButtonsAndDashboardBindings {
         () -> {
           if (RobotStatus.haveCoral() == false) {
             coralSystem.setTargetPreset(CoralSystemPresets.PICKUP);
-            coralSystem.getIntake().pullCoral();
+            // We'll turn on the intake in the CoralSystem
+            // coralSystem.getIntake().pullCoral();
           } else {
             coralSystem.getIntake().pullCoral();
           }
