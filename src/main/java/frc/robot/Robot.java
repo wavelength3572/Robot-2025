@@ -239,7 +239,7 @@ public class Robot extends LoggedRobot {
     robotContainer.getVision().setVisionOn();
 
     // Set drive mode based on the boolean value
-    if (robotContainer.getDrive().isDriveModeSmart()) {
+    if (robotContainer.getDrive().isDriveModeSmart() && DriverStation.isFMSAttached()) {
       robotContainer.SmartDriving();
     } else robotContainer.NormalDriving();
   }
