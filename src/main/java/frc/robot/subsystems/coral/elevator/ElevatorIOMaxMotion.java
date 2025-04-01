@@ -50,7 +50,7 @@ public class ElevatorIOMaxMotion implements ElevatorIO {
     leaderEncoder.setPosition(0);
 
     followerMotor.configure(
-        ElevatorConfigs.ElevatorSubsystem.newFollowerConfig,
+        ElevatorConfigs.ElevatorSubsystem.followerConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     followerEncoder.setPosition(0);
