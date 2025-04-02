@@ -15,7 +15,7 @@ public final class AlgaeConfigs {
       algaeCaptureConfig
           .idleMode(IdleMode.kBrake)
           .smartCurrentLimit(AlgaeConstants.algaeCaptureCurrentLimit)
-          .openLoopRampRate(0.0)
+          .openLoopRampRate(0.1)
           .closedLoopRampRate(0.0)
           .voltageCompensation(12);
       algaeCaptureConfig
@@ -32,6 +32,7 @@ public final class AlgaeConfigs {
           .openLoopRampRate(.5)
           .closedLoopRampRate(0.25)
           .voltageCompensation(12);
+
       algaeDeployConfig
           .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)

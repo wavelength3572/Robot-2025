@@ -40,9 +40,6 @@ public interface AlgaeIO {
 
   public default void setIntakeVolts(double requestedVolts) {}
 
-  /** Set PID values dynamically for position control tuning. */
-  public default void setCapturePIDValues(double kP, double kD) {}
-
   /** Run intake motor to pull in algae (game piece). */
   public default void pullAlgae() {}
 

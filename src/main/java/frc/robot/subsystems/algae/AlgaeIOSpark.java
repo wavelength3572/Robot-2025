@@ -43,6 +43,9 @@ public class AlgaeIOSpark implements AlgaeIO {
   private static final LoggedTunableNumber deploykP =
       new LoggedTunableNumber("Algae/deploykP", AlgaeConstants.kAlgaeDeployKp);
 
+  private static final LoggedTunableNumber deploykD =
+      new LoggedTunableNumber("Algae/deploykD", AlgaeConstants.kAlgaeDeployKd);
+
   public AlgaeIOSpark() {
     algaeCaptureMotor.configure(
         AlgaeConfigs.AlgaeSubsystem.algaeCaptureConfig,
@@ -61,9 +64,9 @@ public class AlgaeIOSpark implements AlgaeIO {
   @Override
   public void updateInputs(AlgaeIOInputs inputs) {
 
-    if (deploykP.hasChanged(hashCode())) {
+    if (deploykP.hasChanged(hashCode()) || deploykD.hasChanged(hashCode())) {
       final SparkMaxConfig config = new SparkMaxConfig();
-      config.closedLoop.pidf(deploykP.get(), 0.0, 0.0, 0.0);
+      config.closedLoop.pidf(deploykP.get(), 0.0, deploykD.get(), 0.0);
       algaeDeployMotor.configure(
           config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
@@ -110,7 +113,7 @@ public class AlgaeIOSpark implements AlgaeIO {
         currentAlgIntakeState = algaeIntakeState.PULL;
         break;
       case PULL:
-        if (burstCount < 25) {
+        if (burstCount < 2) {
           burstCount++;
           algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
         } else {
@@ -158,12 +161,12 @@ public class AlgaeIOSpark implements AlgaeIO {
         algaeDeployMotor.setVoltage(0.0);
         break;
       case PULL_ARM:
-        // algaeDeployController.setReference(
-        //     AlgaeConstants.algaeCapturePosition,
-        //     ControlType.kPosition,
-        //     ClosedLoopSlot.kSlot0,
-        //     inputs.armArbFF);
-        algaeDeployMotor.setVoltage(inputs.armArbFF);
+        algaeDeployController.setReference(
+            AlgaeConstants.algaeCapturePosition,
+            ControlType.kPosition,
+            ClosedLoopSlot.kSlot0,
+            inputs.armArbFF);
+        // algaeDeployMotor.setVoltage(inputs.armArbFF);
         break;
       case PUSH:
         algaeDeployMotor.setVoltage(AlgaeConstants.deployPushAlgaeVolts);
@@ -223,14 +226,6 @@ public class AlgaeIOSpark implements AlgaeIO {
   public void algaeInClimbPosition() {
     detectionCount = 0;
     currentAlgIntakeState = algaeIntakeState.CLIMB;
-  }
-
-  @Override
-  public void setCapturePIDValues(double kP, double kD) {
-    final SparkMaxConfig config = new SparkMaxConfig();
-    config.closedLoop.pidf(kP, 0.0, kD, 0.0);
-    algaeCaptureMotor.configure(
-        config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   @Override
