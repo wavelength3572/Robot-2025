@@ -214,7 +214,7 @@ public class CoralSystem extends SubsystemBase {
     if ((targetCoralPreset == CoralSystemPresets.PICKUP
             || targetCoralPreset == CoralSystemPresets.PICKUPFAR)
         && (!haveCoral)) {
-      if (getTimeOfFlightRangeCoralStation() < 0.44) {
+      if (getTimeOfFlightRangeCoralStation() < 0.42) {
         if (getTimeOfFlightRangeCoralStation() > 0.29) {
           // We are in the far zone
           coralStationNearCounter = 0;
