@@ -125,7 +125,7 @@ public class AlgaeIOSpark implements AlgaeIO {
         if (inputs.currentAngle < previousArmAngle && inputs.currentAngle < 100.0) {
           // Checking to see if the arm is rising, i.e Angle is decreasing
           detectionCount++;
-          if (detectionCount >= 3) {
+          if (detectionCount >= 4) {
             // We have detected 3 consecutive samples of the arm rising
             currentAlgIntakeState = algaeIntakeState.DETECT;
             detectionCount = 0;
@@ -143,9 +143,9 @@ public class AlgaeIOSpark implements AlgaeIO {
         if (inputs.currentAngle < previousArmAngle) {
           // Checking to see if the arm is lowering, i.e Angle is increasing
           detectionCount++;
-          if (detectionCount >= 3) {
+          if (detectionCount >= 4) {
             // We have detected 3 consecutive samples of the arm lowering
-            captureEncoderValue = inputs.captureEncRotations;
+            captureEncoderValue = inputs.captureEncRotations + 7.0;
             currentAlgIntakeState = algaeIntakeState.CAPTURE;
           }
         }
