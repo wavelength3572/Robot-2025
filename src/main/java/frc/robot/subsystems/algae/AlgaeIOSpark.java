@@ -121,8 +121,9 @@ public class AlgaeIOSpark implements AlgaeIO {
         }
         // Pull until we see the angle decrease, the arm is moving upward
         algaeCaptureMotor.setVoltage(AlgaeConstants.captureIntakeVolts);
-        if (previousArmAngle - inputs.currentAngle > 0.0) {
-          // Checking to see if the arm is rising
+        // This if is detecting the arm angle rising as an algae comes in
+        if (inputs.currentAngle < previousArmAngle && inputs.currentAngle < 100.0) {
+          // Checking to see if the arm is rising, i.e Angle is decreasing
           detectionCount++;
           if (detectionCount >= 3) {
             // We have detected 3 consecutive samples of the arm rising
@@ -130,7 +131,8 @@ public class AlgaeIOSpark implements AlgaeIO {
             detectionCount = 0;
             algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldOutVolts);
           }
-        } else {
+        }
+        if (inputs.currentAngle > previousArmAngle && inputs.currentAngle < 100.0) {
           detectionCount = 0;
         }
         previousArmAngle = inputs.currentAngle;
@@ -138,15 +140,16 @@ public class AlgaeIOSpark implements AlgaeIO {
       case DETECT:
         algaeCaptureMotor.setVoltage(AlgaeConstants.captureIntakeVolts);
         algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldOutVolts);
-        if (inputs.currentAngle - previousArmAngle > 0) {
-          // Checking to see if the arm is lowering
+        if (inputs.currentAngle < previousArmAngle) {
+          // Checking to see if the arm is lowering, i.e Angle is increasing
           detectionCount++;
           if (detectionCount >= 3) {
             // We have detected 3 consecutive samples of the arm lowering
             captureEncoderValue = inputs.captureEncRotations;
             currentAlgIntakeState = algaeIntakeState.CAPTURE;
           }
-        } else {
+        }
+        if (inputs.currentAngle > previousArmAngle) {
           detectionCount = 0;
         }
         previousArmAngle = inputs.currentAngle;
