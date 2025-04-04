@@ -47,8 +47,8 @@ public class AlignToReefTwoStage extends SequentialCommandGroup {
                   runtimeTimer.start();
                 }),
             new DriveToPosePP(drive, standoffPose, drivingBackwards, flipStartTangent)
-                .withTimeout(3),
-            new FinalAlignWithPresetTransition(drive, reefPose, coralSystem).withTimeout(1.5),
+                .withTimeout(2.5),
+            new FinalAlignWithPresetTransition(drive, reefPose, coralSystem).withTimeout(2.0),
             Commands.runOnce(
                 () ->
                     Logger.recordOutput(
@@ -97,7 +97,7 @@ public class AlignToReefTwoStage extends SequentialCommandGroup {
     public FinalAlignWithPresetTransition(Drive drive, Pose2d reefPose, CoralSystem coralSystem) {
       super();
 
-      Command finalAlign = new FinalAlign(drive, reefPose).withTimeout(0.7);
+      Command finalAlign = new FinalAlign(drive, reefPose);
 
       Command maybeTransition =
           Commands.runOnce(
