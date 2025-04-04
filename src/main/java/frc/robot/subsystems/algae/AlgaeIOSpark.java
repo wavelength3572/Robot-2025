@@ -140,16 +140,16 @@ public class AlgaeIOSpark implements AlgaeIO {
       case DETECT:
         algaeCaptureMotor.setVoltage(AlgaeConstants.captureIntakeVolts);
         algaeDeployMotor.setVoltage(AlgaeConstants.deployHoldOutVolts);
-        if (inputs.currentAngle < previousArmAngle) {
+        if (inputs.currentAngle > previousArmAngle) {
           // Checking to see if the arm is lowering, i.e Angle is increasing
           detectionCount++;
           if (detectionCount >= 4) {
             // We have detected 3 consecutive samples of the arm lowering
-            captureEncoderValue = inputs.captureEncRotations + 7.0;
+            captureEncoderValue = inputs.captureEncRotations + 14.0;
             currentAlgIntakeState = algaeIntakeState.CAPTURE;
           }
         }
-        if (inputs.currentAngle > previousArmAngle) {
+        if (inputs.currentAngle < previousArmAngle) {
           detectionCount = 0;
         }
         previousArmAngle = inputs.currentAngle;

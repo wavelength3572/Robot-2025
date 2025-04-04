@@ -6,4 +6,10 @@ public class IntakeConstants {
 
   public static final double intakeInSpeed = 0.50; // Original -0.6
   public static final double intakeOutSpeed = -0.75; // Original 1.0
+
+  public static enum INTAKE_STATE {
+    OFF,
+    PUSH,
+    PULL
+  }
 }

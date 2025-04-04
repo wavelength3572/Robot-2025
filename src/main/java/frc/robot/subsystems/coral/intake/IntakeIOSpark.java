@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.subsystems.coral.arm.ArmConstants;
+import frc.robot.subsystems.coral.intake.IntakeConstants.INTAKE_STATE;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.RobotStatus;
 
@@ -22,14 +23,9 @@ public class IntakeIOSpark implements IntakeIO {
   private Double requestedSpeed = 0.0;
   private boolean haveCoral = false;
   private double intakePushPower = IntakeConstants.intakeOutSpeed;
+  private double coralDetectorCount = 0;
 
-  private enum intakeState {
-    OFF,
-    PUSH,
-    PULL
-  }
-
-  private intakeState currentIntakeState = intakeState.OFF;
+  private INTAKE_STATE currentIntakeState = INTAKE_STATE.OFF;
 
   public IntakeIOSpark() {
     intakeMotor.configure(
@@ -44,28 +40,31 @@ public class IntakeIOSpark implements IntakeIO {
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
+    inputs.intakeState = currentIntakeState;
     if (PushPower.hasChanged(hashCode())) {
       intakePushPower = PushPower.get();
     }
     inputs.limitSwitch = intakeMotor.getForwardLimitSwitch().isPressed();
     inputs.appliedVolts = intakeMotor.getAppliedOutput() * RobotController.getBatteryVoltage();
-    if (currentIntakeState == intakeState.PULL) {
+    if (currentIntakeState == INTAKE_STATE.PULL) {
       if ((intakeMotor.getOutputCurrent() >= 25.0 && inputs.appliedVolts > 0.0)) {
-        haveCoral = true;
+        coralDetectorCount++;
+        if (coralDetectorCount >= 3) haveCoral = true;
       }
     } else {
+      coralDetectorCount = 0;
       haveCoral = false;
     }
 
     if (RobotStatus.isArmInError() == false) {
-      if (currentIntakeState == intakeState.PULL && haveCoral) {
+      if (currentIntakeState == INTAKE_STATE.PULL && haveCoral) {
         intakeMotor.set(0.03);
       } else {
         intakeMotor.set(requestedSpeed);
       }
     } else {
       // Arm is in an emergency
-      if (currentIntakeState == intakeState.PUSH) {
+      if (currentIntakeState == INTAKE_STATE.PUSH) {
         intakeMotor.set(requestedSpeed);
       } else {
         stopIntake();
@@ -89,20 +88,20 @@ public class IntakeIOSpark implements IntakeIO {
 
   @Override
   public void pullCoral() {
-    haveCoral = false;
-    currentIntakeState = intakeState.PULL;
+    // haveCoral = false;
+    currentIntakeState = INTAKE_STATE.PULL;
     this.requestedSpeed = IntakeConstants.intakeInSpeed;
   }
 
   @Override
   public void pushCoral() {
-    currentIntakeState = intakeState.PUSH;
+    currentIntakeState = INTAKE_STATE.PUSH;
     this.requestedSpeed = intakePushPower;
   }
 
   @Override
   public void stopIntake() {
-    currentIntakeState = intakeState.OFF;
+    currentIntakeState = INTAKE_STATE.OFF;
     requestedSpeed = 0.0;
   }
 
@@ -116,6 +115,6 @@ public class IntakeIOSpark implements IntakeIO {
   @Override
   public void autoSetHaveCoral(boolean coral) {
     this.haveCoral = coral;
-    currentIntakeState = intakeState.PULL;
+    currentIntakeState = INTAKE_STATE.PULL;
   }
 }

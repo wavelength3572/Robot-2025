@@ -1,5 +1,6 @@
 package frc.robot.subsystems.coral.intake;
 
+import frc.robot.subsystems.coral.intake.IntakeConstants.INTAKE_STATE;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeIO {
@@ -14,6 +15,7 @@ public interface IntakeIO {
     public double currentAmps = 0.0;
     public double Arm_TBE = 0.0;
     public double Arm_TBE_DEG = 0.0;
+    public INTAKE_STATE intakeState = INTAKE_STATE.OFF;
   }
 
   /** Update the set of loggable inputs. */

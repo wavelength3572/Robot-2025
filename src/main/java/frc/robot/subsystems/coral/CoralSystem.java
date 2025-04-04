@@ -422,7 +422,8 @@ public class CoralSystem extends SubsystemBase {
               || canOverridePresetFromPickUpToStaged(requestedPreset);
 
       // Skip if the requested preset is the current preset
-      // And we aren't overriding, because if we are overriding we may want to be able to double
+      // And we aren't overriding, because if we are overriding we may want to be able
+      // to double
       // back to the spot we just left
       if (!isOverride && requestedPreset == this.currentCoralPreset) {
         return;
