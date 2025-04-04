@@ -32,7 +32,7 @@ public class FinalAlign extends Command {
   private static final LoggedTunableNumber positionToleranceMeters =
       new LoggedTunableNumber("FinalAlign/PositionToleranceMeters", 0.02);
   private static final LoggedTunableNumber requiredStableCycles =
-      new LoggedTunableNumber("FinalAlign/StableCycles", 3);
+      new LoggedTunableNumber("FinalAlign/StableCycles", 8);
 
   public FinalAlign(Drive drive, Pose2d targetPose) {
     this.drive = drive;

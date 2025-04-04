@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.FieldConstants;
-import frc.robot.commands.Alignment.TwoStage.AlignToReefTwoStage;
 import frc.robot.operator_interface.OperatorInterface;
 import frc.robot.subsystems.coral.CoralSystem;
 import frc.robot.subsystems.coral.CoralSystemPresets;
@@ -43,7 +42,9 @@ public class AlgaeCommands {
                       ? drive.getReefFaceSelection().getAcceptedFaceId()
                       : null;
               if (faceId != null) {
-                return new AlignToReefTwoStage(drive, coralSystem, faceId, false);
+
+                return new DriveToPose(drive, drive::getAlgaeTargetPose);
+
               } else {
                 return Commands.none();
               }

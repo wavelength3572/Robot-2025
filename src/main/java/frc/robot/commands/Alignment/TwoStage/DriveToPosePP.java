@@ -42,7 +42,7 @@ public class DriveToPosePP extends Command {
       new LoggedTunableNumber("DriveToPosePP/kDRotation", 0.0);
 
   private static final LoggedTunableNumber maxVelocity =
-      new LoggedTunableNumber("DriveToPosePP/MaxVelocity", 1.0);
+      new LoggedTunableNumber("DriveToPosePP/MaxVelocity", 1.5);
   private static final LoggedTunableNumber maxAcceleration =
       new LoggedTunableNumber("DriveToPosePP/MaxAcceleration", 1.5);
   private static final LoggedTunableNumber maxAngularVelocityDeg =
