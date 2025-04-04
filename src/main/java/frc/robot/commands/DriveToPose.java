@@ -25,9 +25,9 @@ public class DriveToPose extends Command {
 
   // Constraints
   private static final LoggedTunableNumber maxVelXY =
-      new LoggedTunableNumber("DriveToPose/MaxVelXY", 2.0);
+      new LoggedTunableNumber("DriveToPose/MaxVelXY", 1.5);
   private static final LoggedTunableNumber maxAccelXY =
-      new LoggedTunableNumber("DriveToPose/MaxAccelXY", 3.0);
+      new LoggedTunableNumber("DriveToPose/MaxAccelXY", 1.5);
   private static final LoggedTunableNumber maxVelTheta =
       new LoggedTunableNumber("DriveToPose/MaxVelThetaDeg", 180.0);
   private static final LoggedTunableNumber maxAccelTheta =
