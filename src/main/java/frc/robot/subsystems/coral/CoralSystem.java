@@ -519,6 +519,10 @@ public class CoralSystem extends SubsystemBase {
     return atTargetState || preppedForDislodge;
   }
 
+  public boolean isNotAtGoal() {
+    return !isAtGoal();
+  }
+
   public boolean preppedForDislodge() {
     return isAtGoal()
         && (currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
