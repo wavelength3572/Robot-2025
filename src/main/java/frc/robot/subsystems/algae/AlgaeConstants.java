@@ -16,7 +16,7 @@ public class AlgaeConstants {
   public static final double deployHoldVolts =
       -0.4; // Voltage to hold arm back to robot during stow
   public static final double deployPullBackFF = 0.6;
-
+ 
   public static final double kAlgaeCaptureKp = 0.1;
   public static final double kAlgaeCaptureKd = 0.0;
 
@@ -25,7 +25,7 @@ public class AlgaeConstants {
 
   public static final double kAlgaeDeployGearing = 7.5;
   public static final double kAlgaeDeployInitalAngle = 45.5; // Degrees
-  public static final double algaeStowPosition = 1.519; // Encoder Rotations
+  public static final double algaeStowPosition = 0.972; // 1.519; // Encoder Rotations
   public static final double algaeCapturePosition = 1.662; // Encoder Rotations
   public static final double algae90Degrees = 1.867; // Encoder 90 Deg
   public static final double algaeClimbPosition = 1.662; // Encoder Rotations
