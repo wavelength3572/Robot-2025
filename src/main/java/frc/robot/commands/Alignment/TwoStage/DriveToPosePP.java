@@ -34,7 +34,7 @@ public class DriveToPosePP extends Command {
 
   // Tunable PID and motion profile constants
   private static final LoggedTunableNumber kPTranslation =
-      new LoggedTunableNumber("DriveToPosePP/kPTranslation", 8.0);
+      new LoggedTunableNumber("DriveToPosePP/kPTranslation", 9.0);
   private static final LoggedTunableNumber kDTranslation =
       new LoggedTunableNumber("DriveToPosePP/kDTranslation", 0.0);
   private static final LoggedTunableNumber kPRotation =
