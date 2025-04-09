@@ -28,63 +28,76 @@ public class AlgaeCommands {
     // Prevent instantiation - utility class
   }
 
-  /**
-   * Creates a command to drive to the dislodge (algae removal) target pose if all conditions are
-   * met.
-   */
   public static Command AlgaeAlignment(Drive drive, CoralSystem coralSystem, OperatorInterface oi) {
 
     Command alignmentCommand =
         Commands.defer(
-            () -> {
-              Integer faceId =
-                  (drive.getReefFaceSelection() != null)
-                      ? drive.getReefFaceSelection().getAcceptedFaceId()
-                      : null;
-              if (faceId != null) {
-
-                return new DriveToPose(drive, drive::getAlgaeTargetPose);
-
-              } else {
-                return Commands.none();
-              }
-            },
+            () ->
+                drive.isAtPose(
+                        drive.getAlgaeTargetPose(),
+                        FieldConstants.ALGAE_ALIGNMENT_TRANSLATION_TOLERANCE,
+                        FieldConstants.ALGAE_ALIGNMENT_ANGLE_TOLERANCE_DEGREES)
+                    ? Commands.none()
+                    : new DriveToPose(drive, drive::getAlgaeTargetPose),
             Set.of(drive));
 
-    return new ConditionalCommand(
-        new ParallelCommandGroup(
-            // Get the Elevator and Arm prepped for dislodge
+    Command coralPrepCommand =
+        new ConditionalCommand(
             new SequentialCommandGroup(
                 SetAppropriateDislodgePresetPart1Command(drive, coralSystem),
                 new WaitUntilCommand(coralSystem::isAtGoal),
                 SetAppropriateDislodgePresetPart2Command(coralSystem),
                 new WaitUntilCommand(coralSystem::isAtGoal)),
-            // Drive to the dislodge spot simultaneously
-            alignmentCommand),
-        Commands.none(),
-        // Condition: Only execute if:
-        // - The accepted reef face is within the threshold distance,
-        // - AND there is NO coral currently in the robot.
-        () -> {
-          AlignmentUtils.ReefFaceSelection selection = drive.getReefFaceSelection();
-          boolean withinThreshold = false;
-          if (selection != null) {
-            double distance = selection.getAcceptedDistance();
-            withinThreshold = (distance < FieldConstants.THRESHOLD_DISTANCE_FOR_DISLODGE);
-          }
-          boolean noCoral = !coralSystem.isHaveCoral();
+            Commands.none(),
+            () -> !isCoralPreppedForDislodge());
 
-          boolean alreadyPreppedForDislodge =
-              (RobotStatus.getTargetPreset() == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1
-                  || RobotStatus.getTargetPreset()
-                      == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2
-                  || RobotStatus.getTargetPreset()
-                      == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
-                  || RobotStatus.getTargetPreset()
-                      == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2);
+    Command dislodgeCommand = createDislodgeSequence(drive, coralSystem, oi);
 
-          return withinThreshold && noCoral && !alreadyPreppedForDislodge;
-        });
+    return new ConditionalCommand(
+            new SequentialCommandGroup(
+                new ParallelCommandGroup(alignmentCommand, coralPrepCommand),
+                new WaitUntilCommand(
+                    () ->
+                        drive.isAtPose(
+                                drive.getAlgaeTargetPose(),
+                                FieldConstants.ALGAE_ALIGNMENT_TRANSLATION_TOLERANCE,
+                                FieldConstants.ALGAE_ALIGNMENT_ANGLE_TOLERANCE_DEGREES)
+                            && coralSystem.isAtGoal()
+                            && !coralSystem.isHaveCoral()),
+                dislodgeCommand),
+            Commands.none(),
+            () -> {
+              AlignmentUtils.ReefFaceSelection selection = drive.getReefFaceSelection();
+              boolean withinThreshold =
+                  selection != null
+                      && selection.getAcceptedDistance()
+                          < FieldConstants.THRESHOLD_DISTANCE_FOR_DISLODGE;
+              boolean noCoral = !coralSystem.isHaveCoral();
+
+              return withinThreshold && noCoral;
+            })
+        .finallyDo(
+            (interrupted) -> {
+              if (interrupted) {
+                Commands.sequence(
+                        new WaitUntilCommand(coralSystem::isAtGoal)
+                            .withTimeout(2.0), // 2-second timeout for extra safety
+                        Commands.runOnce(
+                            () -> coralSystem.setTargetPreset(CoralSystemPresets.PICKUP),
+                            coralSystem))
+                    .schedule();
+                Logger.recordOutput(
+                    "AlgaeAlignment", "Canceled: waited (with timeout) then reset to STOWED.");
+              }
+            });
+  }
+
+  private static boolean isCoralPreppedForDislodge() {
+    CoralSystemPresets targetPreset = RobotStatus.getTargetPreset();
+    return targetPreset == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1
+        || targetPreset == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2
+        || targetPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+        || targetPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2;
   }
 
   private static Command SetAppropriateDislodgePresetPart2Command(CoralSystem coralSystem) {

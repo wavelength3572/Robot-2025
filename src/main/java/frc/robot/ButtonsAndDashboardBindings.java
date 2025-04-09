@@ -164,14 +164,15 @@ public class ButtonsAndDashboardBindings {
         .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
 
     oi.getRightJoyDownButton()
-        .toggleOnTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi)
-          .unless(coralSystem::isNotAtGoal)
-          .withTimeout(3.0)
-          );
+        .toggleOnTrue(
+            AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi)
+                .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
+                .withTimeout(3.0));
     oi.getRightJoyUpButton()
-        .toggleOnTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi)
-          .unless(coralSystem::isNotAtGoal)
-          .withTimeout(3.0));
+        .toggleOnTrue(
+            AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi)
+                .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
+                .withTimeout(3.0));
 
     oi.getButtonI()
         .onTrue(

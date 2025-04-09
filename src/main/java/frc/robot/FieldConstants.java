@@ -1095,4 +1095,9 @@ public final class FieldConstants {
 
   /** Orientation data for RED reef faces, keyed by faceId 1-2 */
   public static final Rotation2d PROCESSOR_ORIENTATION_RED = new Rotation2d(Math.toRadians(0));
+
+  // FieldConstants.java
+  public static final double ALGAE_ALIGNMENT_TRANSLATION_TOLERANCE =
+      Units.inchesToMeters(2.0); // positional tolerance
+  public static final double ALGAE_ALIGNMENT_ANGLE_TOLERANCE_DEGREES = 2.0; // rotational tolerance
 }

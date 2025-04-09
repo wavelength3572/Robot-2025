@@ -524,4 +524,22 @@ public class Drive extends SubsystemBase {
     // Round to one decimal place.
     return Math.round(speed * 10.0) / 10.0;
   }
+
+  public boolean isAtPose(Pose2d targetPose, double toleranceMeters, double toleranceDegrees) {
+    Pose2d currentPose = getPose();
+    double distance = currentPose.getTranslation().getDistance(targetPose.getTranslation());
+    double angleErrorDegrees =
+        Math.abs(currentPose.getRotation().minus(targetPose.getRotation()).getDegrees());
+
+    boolean withinDistance = distance <= toleranceMeters;
+    boolean withinAngle = angleErrorDegrees <= toleranceDegrees;
+
+    Logger.recordOutput("Drive/isAtPose/DistanceErrorMeters", distance);
+    Logger.recordOutput("Drive/isAtPose/AngleErrorDegrees", angleErrorDegrees);
+    Logger.recordOutput("Drive/isAtPose/WithinDistance", withinDistance);
+    Logger.recordOutput("Drive/isAtPose/WithinAngle", withinAngle);
+    Logger.recordOutput("Drive/isAtPose/Result", withinDistance && withinAngle);
+
+    return withinDistance && withinAngle;
+  }
 }
