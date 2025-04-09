@@ -2,10 +2,8 @@ package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.FieldConstants;
 import frc.robot.subsystems.coral.CoralSystemPresets;
 import frc.robot.subsystems.vision.VisionConstants;
 import java.util.Optional;
@@ -23,27 +21,14 @@ public final class BranchAlignmentUtils {
   // ----------------- TUNE THESE DISTANCES (meters) -----------------
   // Threshold for forward alignment—if the robot isn’t within this distance,
   // we consider it not aligned regardless of lateral offset.
-  private static final double FORWARD_THRESHOLD = 0.30;
-
-  // Lateral thresholds for traffic-light style alignment.
-  public static final double LATERAL_THRESHOLD_RED = 0.05;
-  public static final double LATERAL_THRESHOLD_SOLID_GREEN =
-      0.025; // this is only used to make the blinking solid
-
-  // ----------------- OFFSET VALUES (meters) -----------------
-  // Offsets for scoring positions relative to the AprilTag pose.
-  // One for the left pole and one for the right pole.
-
-  // x is distance from the face to center of robot, y is the lateral distance
-  // from the face.
-  public static final Transform2d RIGHT_POLE_OFFSET =
-      new Transform2d(
-          new Translation2d(Units.inchesToMeters(17.51), Units.inchesToMeters(-0.787)),
-          new Rotation2d(0));
-  public static final Transform2d LEFT_POLE_OFFSET =
-      new Transform2d(
-          new Translation2d(Units.inchesToMeters(17.51), Units.inchesToMeters(-13.582)),
-          new Rotation2d(0));
+  // Tunable tolerances
+  public static final LoggedTunableNumber FORWARD_THRESHOLD_METERS =
+      new LoggedTunableNumber("BranchAlignment/ForwardThresholdInches", Units.inchesToMeters(4));
+  public static final LoggedTunableNumber LATERAL_THRESHOLD_METERS_RED =
+      new LoggedTunableNumber("BranchAlignment/LateralThresholdRed", Units.inchesToMeters(2.25));
+  public static final LoggedTunableNumber LATERAL_THRESHOLD_METERS_SOLID_GREEN =
+      new LoggedTunableNumber(
+          "BranchAlignment/LateralThresholdSolidGreen", Units.inchesToMeters(1.0));
 
   @Getter
   public static BranchAlignmentStatus currentBranchAlignmentStatus = BranchAlignmentStatus.NONE;
@@ -91,8 +76,8 @@ public final class BranchAlignmentUtils {
     Pose2d tagPose2d = reefFacePose3d.get().toPose2d();
 
     // Use plus() to apply the scoring offsets.
-    Pose2d leftScoringPose = tagPose2d.plus(LEFT_POLE_OFFSET);
-    Pose2d rightScoringPose = tagPose2d.plus(RIGHT_POLE_OFFSET);
+    Pose2d leftScoringPose = tagPose2d.plus(FieldConstants.LEFT_POLE_OFFSET);
+    Pose2d rightScoringPose = tagPose2d.plus(FieldConstants.RIGHT_POLE_OFFSET);
 
     // Transform the robot's pose relative to both scoring poses.
     Pose2d leftRelativePose = robotPose.relativeTo(leftScoringPose);
@@ -106,10 +91,14 @@ public final class BranchAlignmentUtils {
     // Log both sets of scoring data.
     Logger.recordOutput("Alignment/Branch/LeftScoringPose", leftScoringPose);
     Logger.recordOutput("Alignment/Branch/RightScoringPose", rightScoringPose);
-    Logger.recordOutput("Alignment/Branch/LeftForwardError", leftForwardError);
-    Logger.recordOutput("Alignment/Branch/LeftLateralError", leftLateralError);
-    Logger.recordOutput("Alignment/Branch/RightForwardError", rightForwardError);
-    Logger.recordOutput("Alignment/Branch/RightLateralError", rightLateralError);
+    Logger.recordOutput(
+        "Alignment/Branch/LeftForwardErrorInches", Units.metersToInches(leftForwardError));
+    Logger.recordOutput(
+        "Alignment/Branch/LeftLateralErrorInches", Units.metersToInches(leftLateralError));
+    Logger.recordOutput(
+        "Alignment/Branch/RightForwardErrorInches", Units.metersToInches(rightForwardError));
+    Logger.recordOutput(
+        "Alignment/Branch/RightLateralErrorInches", Units.metersToInches(rightLateralError));
 
     // Determine which scoring pose is closer to the robot.
     double leftDistance = robotPose.getTranslation().getDistance(leftScoringPose.getTranslation());
@@ -129,21 +118,23 @@ public final class BranchAlignmentUtils {
     }
 
     Logger.recordOutput("Alignment/Branch/ChosenSide", chosenSide);
-    Logger.recordOutput("Alignment/Branch/LateralErrorToChosenPole", lateralErrorToNearestPole);
+    Logger.recordOutput(
+        "Alignment/Branch/LateralErrorInchesToChosenPole",
+        Units.metersToInches(lateralErrorToNearestPole));
 
     // Use the chosen relative pose to decide alignment.
     double forwardOffset = chosenRelativePose.getTranslation().getX();
     double lateralOffset = chosenRelativePose.getTranslation().getY();
 
     // Check the forward alignment.
-    if (Math.abs(forwardOffset) > FORWARD_THRESHOLD) {
+    if (Math.abs(forwardOffset) > FORWARD_THRESHOLD_METERS.get()) {
       Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.NONE.toString());
       currentBranchAlignmentStatus = BranchAlignmentStatus.NONE;
       return currentBranchAlignmentStatus;
     }
 
     // Evaluate the lateral offset to decide the traffic-light status.
-    if (Math.abs(lateralOffset) > LATERAL_THRESHOLD_RED) {
+    if (Math.abs(lateralOffset) > LATERAL_THRESHOLD_METERS_RED.get()) {
       Logger.recordOutput("Alignment/Branch/Status", BranchAlignmentStatus.RED.toString());
       currentBranchAlignmentStatus = BranchAlignmentStatus.RED;
     } else {

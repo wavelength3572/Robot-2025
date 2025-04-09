@@ -16,7 +16,7 @@ public class AlgaeConstants {
   public static final double deployHoldVolts =
       -0.4; // Voltage to hold arm back to robot during stow
   public static final double deployPullBackFF = 0.6;
- 
+
   public static final double kAlgaeCaptureKp = 0.1;
   public static final double kAlgaeCaptureKd = 0.0;
 
