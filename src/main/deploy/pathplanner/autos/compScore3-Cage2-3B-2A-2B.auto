@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score4-Cage2-3B-High"
+            "pathName": "Score3-Cage2-3B-High"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score4-3B-StationLeft"
+            "pathName": "Score3-3B-StationLeft"
           }
         },
         {
@@ -37,7 +37,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score4-StationLeft-2BHigh"
+            "pathName": "Score3-StationLeft-2AHigh"
           }
         },
         {
@@ -55,7 +55,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score4-2B-StationLeft"
+            "pathName": "Score3-2A-StationLeft"
           }
         },
         {
@@ -67,7 +67,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score4-StationLeft-2AHigh"
+            "pathName": "Score3-StationLeft-2BHigh"
           }
         },
         {
@@ -83,21 +83,15 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Score4-2A-StationLeft"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "WaitForCoral"
+            "name": "L1"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Tests",
+  "folder": "CompetitionAutos",
   "choreoAuto": false
 }

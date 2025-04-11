@@ -3,40 +3,40 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.8542838351513398,
-        "y": 5.171247140904298
+        "x": 1.5377403846153839,
+        "y": 0.7482371794871778
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.5747079604697705,
-        "y": 5.407402736926659
+        "x": 1.7540775391106962,
+        "y": 1.115369739161118
       },
       "isLocked": false,
-      "linkedName": "Score4-2B"
+      "linkedName": "StationRight-Far"
     },
     {
       "anchor": {
-        "x": 1.3865001122158775,
-        "y": 7.172453889675985
+        "x": 3.5362122178088184,
+        "y": 3.0694129592851267
       },
       "prevControl": {
-        "x": 1.652619830485349,
-        "y": 6.966369681102794
+        "x": 3.467461229074172,
+        "y": 2.8290521855552844
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "StationLeft-FarLeft"
+      "linkedName": "Score3Center6A"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.95,
-      "maxWaypointRelativePos": 1.0,
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 0.8,
       "constraints": {
-        "maxVelocity": 1.0,
-        "maxAcceleration": 1.5,
+        "maxVelocity": 2.0,
+        "maxAcceleration": 2.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -47,15 +47,15 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Pickup",
-      "waypointRelativePos": 0.0,
+      "name": "PREL4SEQ",
+      "waypointRelativePos": 0.1,
       "endWaypointRelativePos": null,
       "command": null
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.25,
-    "maxAcceleration": 2.75,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 1.25,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -63,13 +63,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -54.0
+    "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": "Score4",
+  "folder": "Score3Center",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": 54.0
   },
   "useDefaultConstraints": false
 }

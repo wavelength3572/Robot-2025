@@ -83,15 +83,47 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "2A-PrepDislodge"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "2A-PrepDislodge"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareLowDislodge"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Algae2Dislodge"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "DislodgeLow"
+                }
+              }
+            ]
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Tests",
+  "folder": "CompetitionAutos",
   "choreoAuto": false
 }
