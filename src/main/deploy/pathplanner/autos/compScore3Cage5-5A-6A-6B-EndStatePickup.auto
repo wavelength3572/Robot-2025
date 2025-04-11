@@ -1,0 +1,97 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score3-Cage5-5A-High"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForPreset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score3-5A-StationRight"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score3-StationRight-6AHigh"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForPreset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score3-6A-StationRight"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score3-StationRight-6BHigh"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForPreset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Pickup"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "CompetitionAutos",
+  "choreoAuto": false
+}

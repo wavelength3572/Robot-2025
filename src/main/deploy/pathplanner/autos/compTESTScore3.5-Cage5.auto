@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-Cage5-5A-High"
+            "pathName": "Score4-Cage5-5A-High"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-5A-StationRight"
+            "pathName": "Score4-5A-StationRight"
           }
         },
         {
@@ -37,7 +37,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-StationRight-6AHigh"
+            "pathName": "Score4-StationRight-6BHigh"
           }
         },
         {
@@ -55,7 +55,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-6A-StationRight"
+            "pathName": "Score4-6B-StationRight"
           }
         },
         {
@@ -67,7 +67,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-StationRight-6BHigh"
+            "pathName": "Score4-StationRight-6AHigh"
           }
         },
         {
@@ -83,9 +83,9 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "L1"
+            "pathName": "Score4-6A-StationRight"
           }
         }
       ]
