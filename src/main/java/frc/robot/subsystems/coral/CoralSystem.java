@@ -219,7 +219,7 @@ public class CoralSystem extends SubsystemBase {
           // We are in the far zone
           coralStationNearCounter = 0;
           coralStationFarCounter++;
-          if (coralStationFarCounter > 25) { // About .5 seconds
+          if (coralStationFarCounter > 45) { // About .5 seconds
             // go to elevator far away position
             setTargetPreset(CoralSystemPresets.PICKUPFAR);
           }
