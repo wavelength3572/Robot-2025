@@ -3,36 +3,36 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.8542838351513398,
-        "y": 5.171247140904298
+        "x": 1.639843166311891,
+        "y": 7.369116297285631
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.5747079604697705,
-        "y": 5.407402736926659
+        "x": 1.8373598166759895,
+        "y": 7.09725795073246
       },
       "isLocked": false,
-      "linkedName": "Score4-2B"
+      "linkedName": "StationLeft-Far"
     },
     {
       "anchor": {
-        "x": 1.3865001122158775,
-        "y": 7.172453889675985
+        "x": 4.142392060625717,
+        "y": 5.330590723405478
       },
       "prevControl": {
-        "x": 1.652619830485349,
-        "y": 6.966369681102794
+        "x": 4.017392060625717,
+        "y": 5.547097074351587
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "StationLeft-FarLeft"
+      "linkedName": "Score3Center2A"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.95,
+      "minWaypointRelativePos": 0.8000000000000018,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.0,
@@ -47,8 +47,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Pickup",
-      "waypointRelativePos": 0.0,
+      "name": "PREL4SEQ",
+      "waypointRelativePos": 0.1,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -63,13 +63,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -54.0
+    "rotation": -59.99999999999999
   },
   "reversed": false,
-  "folder": "Score4",
+  "folder": "Score3Center",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": -54.0
   },
   "useDefaultConstraints": false
 }

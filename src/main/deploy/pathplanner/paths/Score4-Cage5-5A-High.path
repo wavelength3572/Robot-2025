@@ -3,40 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.8542838351513398,
-        "y": 5.171247140904298
+        "x": 6.985,
+        "y": 1.91
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.5747079604697705,
-        "y": 5.407402736926659
+        "x": 5.998897977156866,
+        "y": 2.257524640205345
       },
       "isLocked": false,
-      "linkedName": "Score4-2B"
+      "linkedName": "Cage5"
     },
     {
       "anchor": {
-        "x": 1.3865001122158775,
-        "y": 7.172453889675985
+        "x": 4.861,
+        "y": 2.714
       },
       "prevControl": {
-        "x": 1.652619830485349,
-        "y": 6.966369681102794
+        "x": 5.104959888116773,
+        "y": 2.622067914900114
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "StationLeft-FarLeft"
+      "linkedName": "Score4-5A"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 119.99999999999999
+    }
+  ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.95,
-      "maxWaypointRelativePos": 1.0,
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.9,
       "constraints": {
-        "maxVelocity": 1.0,
-        "maxAcceleration": 1.5,
+        "maxVelocity": 2.25,
+        "maxAcceleration": 2.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -47,29 +52,29 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Pickup",
+      "name": "L4",
       "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": null
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.25,
-    "maxAcceleration": 2.75,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 1.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -54.0
+    "velocity": 0.0,
+    "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": "Score4",
+  "folder": "Score4Right",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": 135.0
   },
   "useDefaultConstraints": false
 }

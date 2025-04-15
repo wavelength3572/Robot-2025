@@ -12,10 +12,12 @@
     "Face5",
     "Face6",
     "Mid",
-    "Score4High",
+    "Score4Right",
     "Score3Cage2",
     "Score3Cage5",
+    "Score3Center",
     "Score4",
+    "Score4High",
     "Sneaky-Cage1",
     "StationLeft",
     "StationRight",
@@ -24,6 +26,7 @@
   "autoFolders": [
     "Cage5",
     "CompetitionAutos",
+    "Old",
     "Tests",
     "TimeCheck"
   ],

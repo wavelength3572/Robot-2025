@@ -3,40 +3,40 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.8542838351513398,
-        "y": 5.171247140904298
+        "x": 4.142392060625717,
+        "y": 5.330590723405478
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.5747079604697705,
-        "y": 5.407402736926659
+        "x": 3.918022635951404,
+        "y": 5.719209966606385
       },
       "isLocked": false,
-      "linkedName": "Score4-2B"
+      "linkedName": "Score3Center2A"
     },
     {
       "anchor": {
-        "x": 1.3865001122158775,
-        "y": 7.172453889675985
+        "x": 1.639843166311891,
+        "y": 7.369116297285631
       },
       "prevControl": {
-        "x": 1.652619830485349,
-        "y": 6.966369681102794
+        "x": 1.8923292363745892,
+        "y": 7.18567442965614
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "StationLeft-FarLeft"
+      "linkedName": "StationLeft-Far"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.95,
-      "maxWaypointRelativePos": 1.0,
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.95,
       "constraints": {
-        "maxVelocity": 1.0,
-        "maxAcceleration": 1.5,
+        "maxVelocity": 1.5,
+        "maxAcceleration": 2.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -48,14 +48,14 @@
   "eventMarkers": [
     {
       "name": "Pickup",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
       "command": null
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.25,
-    "maxAcceleration": 2.75,
+    "maxVelocity": 0.5,
+    "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -66,7 +66,7 @@
     "rotation": -54.0
   },
   "reversed": false,
-  "folder": "Score4",
+  "folder": "Score3Center",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -59.99999999999999

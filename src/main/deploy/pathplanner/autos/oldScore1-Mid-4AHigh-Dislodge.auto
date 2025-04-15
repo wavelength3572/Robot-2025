@@ -63,6 +63,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "CompetitionAutos",
+  "folder": "Old",
   "choreoAuto": false
 }
