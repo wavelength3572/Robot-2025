@@ -49,7 +49,7 @@ public class IntakeIOSpark implements IntakeIO {
     if (currentIntakeState == INTAKE_STATE.PULL) {
       if ((intakeMotor.getOutputCurrent() >= 25.0 && inputs.appliedVolts > 0.0)) {
         coralDetectorCount++;
-        if (coralDetectorCount >= 3) haveCoral = true;
+        if (coralDetectorCount >= 4) haveCoral = true;
       }
     } else {
       coralDetectorCount = 0;
