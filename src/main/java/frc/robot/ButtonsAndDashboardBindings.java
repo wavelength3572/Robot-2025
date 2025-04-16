@@ -222,16 +222,15 @@ public class ButtonsAndDashboardBindings {
     oi.getButtonBox1Button4().onTrue(createPickupCoralCommand());
 
     // Trigger haveCoral = new Trigger();
-    Trigger haveCoral = new Trigger(coralSystem::isHaveCoral);
-    Trigger notHaveCoral = new Trigger(coralSystem::isHaveCoral).negate();
+    Trigger triggerHaveCoral = new Trigger(coralSystem::isHaveCoral);
+    Trigger triggerNotHaveCoral = new Trigger(coralSystem::isHaveCoral).negate();
 
-    oi.getButtonBox1Button4().and(notHaveCoral).onTrue(createPickupCoralCommand());
+    oi.getButtonBox1Button4().and(triggerNotHaveCoral).onTrue(createPickupCoralCommand());
 
-    // oi.getButtonBox1Button4()
-    // .and(coralSystem::isHaveCoral)
-    // .negate() // Pickup Coral
-    // .whileTrue(Commands.runOnce(coralSystem.getIntake()::forcePullCoral))
-    // .onFalse(Commands.runOnce(coralSystem.getIntake()::pullCoral));
+    oi.getButtonBox1Button4()
+        .and(triggerHaveCoral)
+        .whileTrue(Commands.runOnce(coralSystem.getIntake()::forcePullCoral))
+        .onFalse(Commands.runOnce(coralSystem.getIntake()::pullCoral));
 
     oi.getButtonBox1Button5() // Process Algae / Stow Collector
         .onTrue(Commands.runOnce(algae::pushAlgae))
