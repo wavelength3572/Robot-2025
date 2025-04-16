@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlgaeCommands;
 import frc.robot.commands.Alignment.AlignAndScore.AlignAndScore;
 import frc.robot.commands.Alignment.AlignAndScorePP.AlignAndScorePP;
@@ -218,8 +219,19 @@ public class ButtonsAndDashboardBindings {
     oi.getButtonBox1Button3() // Reef Action - Dislodge Algae Sequence OR score coral
         .onTrue(createReefActionCommand());
 
-    oi.getButtonBox1Button4() // Pickup Coral
-        .onTrue(createPickupCoralCommand());
+    oi.getButtonBox1Button4().onTrue(createPickupCoralCommand());
+
+    // Trigger haveCoral = new Trigger();
+    Trigger haveCoral = new Trigger(coralSystem::isHaveCoral);
+    Trigger notHaveCoral = new Trigger(coralSystem::isHaveCoral).negate();
+
+    oi.getButtonBox1Button4().and(notHaveCoral).onTrue(createPickupCoralCommand());
+
+    // oi.getButtonBox1Button4()
+    // .and(coralSystem::isHaveCoral)
+    // .negate() // Pickup Coral
+    // .whileTrue(Commands.runOnce(coralSystem.getIntake()::forcePullCoral))
+    // .onFalse(Commands.runOnce(coralSystem.getIntake()::pullCoral));
 
     oi.getButtonBox1Button5() // Process Algae / Stow Collector
         .onTrue(Commands.runOnce(algae::pushAlgae))

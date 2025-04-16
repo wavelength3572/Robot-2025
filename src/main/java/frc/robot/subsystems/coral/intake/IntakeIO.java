@@ -23,6 +23,8 @@ public interface IntakeIO {
 
   public default void pullCoral() {}
 
+  public default void forcePullCoral() {}
+
   public default void pushCoral() {}
 
   public default void stopIntake() {}
