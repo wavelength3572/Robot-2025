@@ -15,7 +15,7 @@ import frc.robot.util.RobotStatus;
 import org.littletonrobotics.junction.Logger;
 
 public class AlignToReefTwoStage extends SequentialCommandGroup {
-  private final double STANDOFF_DISTANCE = 0.20; // Meters to stand off from the reef face.
+  private final double STANDOFF_DISTANCE = 0.00; // Meters to stand off from the reef face.
 
   private final Timer runtimeTimer = new Timer();
   private boolean drivingBackwards = false;

@@ -5,9 +5,11 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.util.BranchAlignmentUtils;
 import frc.robot.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
@@ -29,10 +31,10 @@ public class FinalAlign extends Command {
       new LoggedTunableNumber("FinalAlign/kDRotation", 0.0);
   private static final LoggedTunableNumber rotationToleranceDeg =
       new LoggedTunableNumber("FinalAlign/RotationToleranceDeg", 1.5);
-  private static final LoggedTunableNumber positionToleranceMeters =
-      new LoggedTunableNumber("FinalAlign/PositionToleranceMeters", 0.02);
   private static final LoggedTunableNumber requiredStableCycles =
       new LoggedTunableNumber("FinalAlign/StableCycles", 8);
+
+  private boolean skip = false;
 
   public FinalAlign(Drive drive, Pose2d targetPose) {
     this.drive = drive;
@@ -52,6 +54,34 @@ public class FinalAlign extends Command {
     stableCycles = 0;
     runtimeTimer.reset();
     runtimeTimer.start();
+
+    // Check if already aligned
+    Pose2d current = drive.getPose();
+
+    // Transform the current pose into the target's frame of reference
+    Pose2d error = targetPose.relativeTo(current); // Get relative pose from current to target
+
+    // Calculate forward (X) and lateral (Y) errors separately in the target's local frame
+    double forwardError = error.getTranslation().getX(); // Forward error along target's heading
+    double lateralError =
+        error.getTranslation().getY(); // Lateral error perpendicular to target's heading
+    double rotError = Math.abs(targetPose.getRotation().minus(current.getRotation()).getDegrees());
+
+    // Use the forward and lateral thresholds from BranchAlignmentUtils
+    boolean posOk =
+        Math.abs(forwardError) <= BranchAlignmentUtils.FORWARD_THRESHOLD_METERS.get()
+            && Math.abs(lateralError) <= BranchAlignmentUtils.LATERAL_THRESHOLD_METERS_RED.get();
+    boolean rotOk = rotError <= rotationToleranceDeg.get();
+
+    skip = posOk && rotOk;
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/SkipAlignment", skip);
+    Logger.recordOutput(
+        "AlignAndScoreTwoStage/FinalAlign/InitialForwardErrorInches",
+        Units.metersToInches(forwardError));
+    Logger.recordOutput(
+        "AlignAndScoreTwoStage/FinalAlign/InitialLateralErrorInches",
+        Units.metersToInches(lateralError));
+    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/RotationError", rotError);
   }
 
   @Override
@@ -71,16 +101,21 @@ public class FinalAlign extends Command {
     Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/CommandedSpeeds", speeds);
 
     Pose2d error = targetPose.relativeTo(current);
-    double posError = error.getTranslation().getNorm();
+    double forwardError = error.getTranslation().getX();
+    double lateralError = error.getTranslation().getY();
     double rotError = Math.abs(targetPose.getRotation().minus(current.getRotation()).getDegrees());
 
-    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/Error/X", error.getX());
-    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/Error/Y", error.getY());
+    Logger.recordOutput(
+        "AlignAndScoreTwoStage/FinalAlign/Error/forwardErrorInches",
+        Units.metersToInches(forwardError));
+    Logger.recordOutput(
+        "AlignAndScoreTwoStage/FinalAlign/Error/lateralERrorInches",
+        Units.metersToInches(lateralError));
     Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/Error/RotationDeg", rotError);
-    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/PositionErrorMeters", posError);
-    Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/RotationErrorDeg", rotError);
 
-    boolean posOk = posError <= positionToleranceMeters.get();
+    boolean posOk =
+        Math.abs(forwardError) <= BranchAlignmentUtils.FORWARD_THRESHOLD_METERS.get()
+            && Math.abs(lateralError) <= BranchAlignmentUtils.LATERAL_THRESHOLD_METERS_RED.get();
     boolean rotOk = rotError <= rotationToleranceDeg.get();
     Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/WithinTolerance", posOk && rotOk);
 
@@ -95,7 +130,7 @@ public class FinalAlign extends Command {
 
   @Override
   public boolean isFinished() {
-    boolean done = stableCycles >= requiredStableCycles.get();
+    boolean done = skip || (stableCycles >= requiredStableCycles.get());
     Logger.recordOutput("AlignAndScoreTwoStage/FinalAlign/IsFinished", done);
     return done;
   }

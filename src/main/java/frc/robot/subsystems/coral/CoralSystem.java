@@ -219,7 +219,7 @@ public class CoralSystem extends SubsystemBase {
           // We are in the far zone
           coralStationNearCounter = 0;
           coralStationFarCounter++;
-          if (coralStationFarCounter > 25) { // About .5 seconds
+          if (coralStationFarCounter > 45) { // About .5 seconds
             // go to elevator far away position
             setTargetPreset(CoralSystemPresets.PICKUPFAR);
           }
@@ -419,7 +419,8 @@ public class CoralSystem extends SubsystemBase {
     if (arm.isArmInError() == false) {
       boolean isOverride =
           canOverridePresetsAmongFrontScoringPresets(requestedPreset)
-              || canOverridePresetFromPickUpToStaged(requestedPreset);
+              || canOverridePresetFromPickUpToStaged(requestedPreset)
+              || canOverridePresetForDislodgePrep(requestedPreset);
 
       // Skip if the requested preset is the current preset
       // And we aren't overriding, because if we are overriding we may want to be able
@@ -442,6 +443,7 @@ public class CoralSystem extends SubsystemBase {
         // elevator and arm at the same time
         moveArmSafely = true;
         this.targetCoralPreset = requestedPreset;
+
         if (this.targetCoralPreset == CoralSystemPresets.PICKUP
             && DriverStation.isAutonomousEnabled()
             && !haveCoral
@@ -468,6 +470,16 @@ public class CoralSystem extends SubsystemBase {
 
         if (currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1
             && targetCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1) {
+          moveArmSafely = false;
+        }
+
+        if (currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+            && targetCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_1) {
+          moveArmSafely = false;
+        }
+
+        if (currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2
+            && targetCoralPreset == CoralSystemPresets.FINAL_DISLODGE_LEVEL_2) {
           moveArmSafely = false;
         }
 
@@ -668,6 +680,13 @@ public class CoralSystem extends SubsystemBase {
     StagedPreScoringOn = !StagedPreScoringOn; // Toggle the boolean value
   }
 
+  private boolean canOverridePresetForDislodgePrep(CoralSystemPresets requestedPreset) {
+    return (targetCoralPreset != requestedPreset)
+        && currentPresetIsFrontScoringPreset()
+        && targetPresetIsFrontScoring()
+        && requestedPresetIsDislodgePrep(requestedPreset);
+  }
+
   private boolean canOverridePresetFromPickUpToStaged(CoralSystemPresets requestedPreset) {
     return ((currentCoralPreset == CoralSystemPresets.PICKUP
             || currentCoralPreset == CoralSystemPresets.PICKUPFAR)
@@ -708,5 +727,14 @@ public class CoralSystem extends SubsystemBase {
         || targetCoralPreset == CoralSystemPresets.L3_FAR
         || targetCoralPreset == CoralSystemPresets.L4
         || targetCoralPreset == CoralSystemPresets.L4_FAR);
+  }
+
+  private boolean requestedPresetIsDislodgePrep(CoralSystemPresets requestedPreset) {
+    return (requestedPreset == PREPARE_DISLODGE_PART1_LEVEL_1
+        || requestedPreset == PREPARE_DISLODGE_PART1_LEVEL_2);
+  }
+
+  public boolean armIsPastSafeThresholdForAlgaeDislodge() {
+    return arm.getCurrentAngleDEG() > CoralSystemPresets.FINAL_DISLODGE_LEVEL_2.getArmAngle() - 10;
   }
 }

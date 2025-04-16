@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-Cage5-5A-High"
+            "pathName": "Score3Center-Mid-4B"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-5A-StationRight"
+            "pathName": "Score3Center-4B-StationLeft"
           }
         },
         {
@@ -37,7 +37,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-StationRight-6AHigh"
+            "pathName": "Score3Center-StationLeft-2BHigh"
           }
         },
         {
@@ -55,7 +55,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-6A-StationRight"
+            "pathName": "Score3Center-2B-StationLeft"
           }
         },
         {
@@ -67,7 +67,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3-StationRight-6BHigh"
+            "pathName": "Score3Center-StationLeft-2AHigh"
           }
         },
         {
@@ -83,15 +83,15 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "L1"
+            "pathName": "Score3Center-2A-StationLeft"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "TimeCheck",
+  "folder": "CompetitionAutos",
   "choreoAuto": false
 }

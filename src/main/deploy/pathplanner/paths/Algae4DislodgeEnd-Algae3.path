@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.627678431370832,
-        "y": 3.8187886348457813
+        "x": 6.078766025643056,
+        "y": 3.8250400641032356
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.627678431370832,
-        "y": 4.818788634845781
+        "x": 6.078766025643056,
+        "y": 4.825040064103235
       },
       "isLocked": false,
       "linkedName": "Algae4End"
@@ -33,9 +33,9 @@
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 0.9,
+      "maxWaypointRelativePos": 0.92,
       "constraints": {
-        "maxVelocity": 1.5,
+        "maxVelocity": 1.75,
         "maxAcceleration": 2.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,

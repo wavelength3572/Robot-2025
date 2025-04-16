@@ -215,7 +215,7 @@ public class IndicatorLight extends SubsystemBase {
       BranchAlignmentStatus state = BranchAlignmentUtils.getCurrentBranchAlignmentStatus();
       switch (state) {
         case GREEN:
-          if (lateralError <= BranchAlignmentUtils.LATERAL_THRESHOLD_SOLID_GREEN) {
+          if (lateralError <= BranchAlignmentUtils.LATERAL_THRESHOLD_METERS_SOLID_GREEN.get()) {
             currentColor_GOAL = LED_EFFECTS.GREEN;
           } else {
             currentColor_GOAL = LED_EFFECTS.DYNAMIC_BLINK;

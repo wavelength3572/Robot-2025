@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -28,6 +29,15 @@ import java.util.Set;
  * (log replay from a file).
  */
 public final class FieldConstants {
+
+  public static final Transform2d RIGHT_POLE_OFFSET =
+      new Transform2d(
+          new Translation2d(Units.inchesToMeters(17.51), Units.inchesToMeters(-0.787)),
+          new Rotation2d(0));
+  public static final Transform2d LEFT_POLE_OFFSET =
+      new Transform2d(
+          new Translation2d(Units.inchesToMeters(17.51), Units.inchesToMeters(-13.582)),
+          new Rotation2d(0));
 
   public static final double THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE = 2.0; // meters
   public static final double THRESHOLD_DISTANCE_FOR_AUTOMATIC_ROTATION_TO_REEF = 2.0; // meters

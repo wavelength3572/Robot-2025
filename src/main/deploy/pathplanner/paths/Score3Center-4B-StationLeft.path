@@ -3,32 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.8542838351513398,
-        "y": 5.171247140904298
+        "x": 5.789284797997052,
+        "y": 3.9853438366025222
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.5747079604697705,
-        "y": 5.407402736926659
+        "x": 5.833653846153323,
+        "y": 5.431169871793757
       },
       "isLocked": false,
-      "linkedName": "Score4-2B"
+      "linkedName": "4B"
     },
     {
       "anchor": {
-        "x": 1.3865001122158775,
-        "y": 7.172453889675985
+        "x": 1.639843166311891,
+        "y": 7.369116297285631
       },
       "prevControl": {
-        "x": 1.652619830485349,
-        "y": 6.966369681102794
+        "x": 6.353250412363214,
+        "y": 5.297233077081961
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "StationLeft-FarLeft"
+      "linkedName": "StationLeft-Far"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.20478890989287585,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 0.8279773156899717,
+      "rotationDegrees": -54.0
+    }
+  ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
@@ -66,10 +75,10 @@
     "rotation": -54.0
   },
   "reversed": false,
-  "folder": "Score4",
+  "folder": "Tests",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -59.99999999999999
+    "rotation": 180.0
   },
   "useDefaultConstraints": false
 }

@@ -3,6 +3,7 @@ package frc.robot.commands.Alignment.TwoStage;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
@@ -33,7 +34,7 @@ public class DriveToPosePP extends Command {
 
   // Tunable PID and motion profile constants
   private static final LoggedTunableNumber kPTranslation =
-      new LoggedTunableNumber("DriveToPosePP/kPTranslation", 5.0);
+      new LoggedTunableNumber("DriveToPosePP/kPTranslation", 9.0);
   private static final LoggedTunableNumber kDTranslation =
       new LoggedTunableNumber("DriveToPosePP/kDTranslation", 0.0);
   private static final LoggedTunableNumber kPRotation =
@@ -73,25 +74,46 @@ public class DriveToPosePP extends Command {
     Logger.recordOutput(logPrefix + "/StartPose", startPose);
     Logger.recordOutput(logPrefix + "/TargetPose", targetPose);
 
-    Rotation2d desiredStartTangent =
-        startPose.getRotation(); // Default to the robot's current rotation
-    Rotation2d desiredEndTangent =
-        targetPose.getRotation(); // Default to the target pose's rotation
-    // If the robot is driving backwards, adjust adjents
-    if (drivingBackwards) {
-      desiredStartTangent = desiredStartTangent.plus(Rotation2d.fromDegrees(180));
-      desiredEndTangent = desiredEndTangent.plus(Rotation2d.fromDegrees(180));
+    ChassisSpeeds speeds = drive.getChassisSpeeds();
+
+    // Convert robot-relative velocity to field-relative
+    Translation2d linearVelocityRobotRelative =
+        new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+    Translation2d linearVelocityFieldRelative =
+        linearVelocityRobotRelative.rotateBy(startPose.getRotation());
+
+    double velocityMagnitude = linearVelocityFieldRelative.getNorm();
+
+    Rotation2d desiredStartTangent;
+
+    if (velocityMagnitude < 0.5) {
+      desiredStartTangent =
+          new Rotation2d(
+              targetPose.getX() - startPose.getX(), targetPose.getY() - startPose.getY());
+      Logger.recordOutput(logPrefix + "/StartTangentMode", "TargetDirection");
+    } else {
+      desiredStartTangent = linearVelocityFieldRelative.getAngle();
+      Logger.recordOutput(logPrefix + "/StartTangentMode", "VelocityDirection");
     }
 
-    if (flipStartTangent) {
-      desiredStartTangent = desiredStartTangent.plus(Rotation2d.fromDegrees(180));
-    }
+    Logger.recordOutput(logPrefix + "/StartTangentDeg", desiredStartTangent.getDegrees());
+    Logger.recordOutput(logPrefix + "/VelocityVectorField", linearVelocityFieldRelative);
 
-    double controlDistance = 0.4;
+    Rotation2d desiredEndTangent = targetPose.getRotation();
+    double controlDistance = 0.25;
+
+    IdealStartingState startingState =
+        new IdealStartingState(velocityMagnitude, startPose.getRotation());
 
     trajectory =
         generateTrajectoryWithTangents(
-            drive, startPose, targetPose, desiredStartTangent, desiredEndTangent, controlDistance);
+            drive,
+            startPose,
+            targetPose,
+            desiredStartTangent,
+            desiredEndTangent,
+            controlDistance,
+            startingState);
 
     Logger.recordOutput(logPrefix + "/TrajectoryDuration", trajectory.getTotalTimeSeconds());
     Logger.recordOutput(logPrefix + "/TrajectoryPointCount", trajectory.getStates().size());
@@ -100,7 +122,7 @@ public class DriveToPosePP extends Command {
         trajectory.getStates().stream().map(state -> state.pose).toArray(Pose2d[]::new);
     Logger.recordOutput(logPrefix + "/TrajectoryPoses", poses);
 
-    controller.reset(startPose, drive.getChassisSpeeds());
+    controller.reset(startPose, speeds);
     timer.reset();
     timer.start();
     runtimeTimer.reset();
@@ -162,7 +184,8 @@ public class DriveToPosePP extends Command {
       Pose2d targetPose,
       Rotation2d startTangent,
       Rotation2d endTangent,
-      double controlDistance) {
+      double controlDistance,
+      IdealStartingState startingState) {
 
     // --- Create Start Waypoint ---
     Translation2d startAnchor = startPose.getTranslation();
@@ -202,10 +225,8 @@ public class DriveToPosePP extends Command {
     // Assume a target velocity of 0 at the endpoint.
     GoalEndState goalEndState = new GoalEndState(0, targetPose.getRotation());
 
-    // --- Create the Custom Path ---
-    PathPlannerPath customPath = new PathPlannerPath(waypoints, constraints, null, goalEndState);
-
-    // --- Generate and Return the Trajectory ---
+    PathPlannerPath customPath =
+        new PathPlannerPath(waypoints, constraints, startingState, goalEndState);
     return customPath.generateTrajectory(
         drive.getChassisSpeeds(), startPose.getRotation(), DriveConstants.ppConfig);
   }

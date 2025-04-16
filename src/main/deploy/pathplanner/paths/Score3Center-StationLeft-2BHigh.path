@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3865001122158775,
-        "y": 7.172453889675985
+        "x": 1.639843166311891,
+        "y": 7.369116297285631
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6533450844844888,
-        "y": 6.936348092649531
+        "x": 1.8714773901681934,
+        "y": 7.02433393801988
       },
       "isLocked": false,
-      "linkedName": "StationLeft-FarLeft"
+      "linkedName": "StationLeft-Far"
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 5.171247140904298
       },
       "prevControl": {
-        "x": 3.5588440678277857,
-        "y": 5.394785340187852
+        "x": 3.866205922859212,
+        "y": 5.420962706748091
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,7 +32,7 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.9,
+      "minWaypointRelativePos": 0.8,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 1.0,
@@ -90,7 +90,7 @@
     "rotation": -59.99999999999999
   },
   "reversed": false,
-  "folder": "Score4",
+  "folder": "Score3Center",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -54.0
