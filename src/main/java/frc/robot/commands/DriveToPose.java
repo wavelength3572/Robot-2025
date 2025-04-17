@@ -16,8 +16,8 @@ import org.littletonrobotics.junction.Logger;
 public class DriveToPose extends Command {
 
   // PID Gains
-  private static final LoggedTunableNumber kPX = new LoggedTunableNumber("DriveToPose/kPX", .9);
-  private static final LoggedTunableNumber kPY = new LoggedTunableNumber("DriveToPose/kPY", .9);
+  private static final LoggedTunableNumber kPX = new LoggedTunableNumber("DriveToPose/kPX", 1.1);
+  private static final LoggedTunableNumber kPY = new LoggedTunableNumber("DriveToPose/kPY", 1.1);
   private static final LoggedTunableNumber kPTheta =
       new LoggedTunableNumber("DriveToPose/kPTheta", .9);
 
@@ -75,8 +75,8 @@ public class DriveToPose extends Command {
     // Log target pose
     Logger.recordOutput("DriveToPose/Init/TargetPose", targetPose);
 
-    driveControllerX.setTolerance(Units.inchesToMeters(2.25));
-    driveControllerY.setTolerance(Units.inchesToMeters(2.25));
+    driveControllerX.setTolerance(Units.inchesToMeters(3.5));
+    driveControllerY.setTolerance(Units.inchesToMeters(3.5));
     thetaController.setTolerance(Units.degreesToRadians(2.0));
   }
 
