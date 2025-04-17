@@ -57,8 +57,14 @@ public class IntakeIOSpark implements IntakeIO {
     }
 
     if (RobotStatus.isArmInError() == false) {
-      if (currentIntakeState == INTAKE_STATE.PULL && haveCoral) {
-        intakeMotor.set(0.03);
+      if ((currentIntakeState == INTAKE_STATE.PULL || currentIntakeState == INTAKE_STATE.FORCE_PULL)
+          && haveCoral) {
+        if (currentIntakeState == INTAKE_STATE.PULL) {
+          intakeMotor.set(0.03);
+        }
+        if (currentIntakeState == INTAKE_STATE.FORCE_PULL) {
+          intakeMotor.set(IntakeConstants.intakeInSpeed);
+        }
       } else {
         intakeMotor.set(requestedSpeed);
       }
@@ -91,6 +97,11 @@ public class IntakeIOSpark implements IntakeIO {
     // haveCoral = false;
     currentIntakeState = INTAKE_STATE.PULL;
     this.requestedSpeed = IntakeConstants.intakeInSpeed;
+  }
+
+  @Override
+  public void forcePullCoral() {
+    currentIntakeState = INTAKE_STATE.FORCE_PULL;
   }
 
   @Override

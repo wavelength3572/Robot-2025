@@ -23,6 +23,10 @@ public class Intake {
     io.pullCoral();
   }
 
+  public void forcePullCoral() {
+    io.forcePullCoral();
+  }
+
   public void stopIntake() {
     io.stopIntake();
   }

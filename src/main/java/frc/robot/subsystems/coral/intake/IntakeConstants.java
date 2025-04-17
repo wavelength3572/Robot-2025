@@ -10,6 +10,7 @@ public class IntakeConstants {
   public static enum INTAKE_STATE {
     OFF,
     PUSH,
-    PULL
+    PULL,
+    FORCE_PULL
   }
 }
