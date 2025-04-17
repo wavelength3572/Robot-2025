@@ -20,7 +20,7 @@ public enum CoralSystemPresets {
   L4_FAR(64.5, 55), // not changed
   PRE_SCORE(38.0, 85),
   PREL4(39.0, 105), // Used going from Pickup to L4
-  AUTO_START_L4(64.5, 46), // Used for first score in auto
+  AUTO_START_L4(64.5, 50), // Used for first score in auto
   AUTO_SCORE_END(45, 85),
   PREPARE_DISLODGE_PART1_LEVEL_1(15, 45),
   PREPARE_DISLODGE_PART2_LEVEL_1(20, 45),
