@@ -8,7 +8,7 @@ import org.littletonrobotics.junction.Logger;
 public class ScoreCoralInAutoCommand extends Command {
   private static final double MAX_OUTTAKE_TIME = 0.6; // total hard stop, in seconds
   private static final double ADDITIONAL_CLEAR_TIME =
-      0.15; // how long to keep running after the coral is gone
+      0.20; // how long to keep running after the coral is gone
 
   private final Intake intake;
   private final Timer timer = new Timer();
