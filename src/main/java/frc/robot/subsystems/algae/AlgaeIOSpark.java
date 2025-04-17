@@ -113,7 +113,7 @@ public class AlgaeIOSpark implements AlgaeIO {
         currentAlgIntakeState = algaeIntakeState.PULL;
         break;
       case PULL:
-        if (burstCount < 2) {
+        if (inputs.currentAngle < 80.0) {
           burstCount++;
           algaeDeployMotor.setVoltage(AlgaeConstants.deployBurstVolts);
         } else {
