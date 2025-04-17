@@ -24,7 +24,8 @@ public class AlgaeCommandsChamps {
         new SequentialCommandGroup(
             new ParallelCommandGroup(
                 SetAppropriateDislodgePresetPart1Command(coralSystem),
-                new DriveToPose(drive, drive::getAlgaeTargetPose)),
+                new DriveToPose(drive, drive::getAlgaeTargetPose)
+                  .withTimeout(1.8)),
             new TimedWaitUntilCommand(
                 "WaitForDislodgePart1Stable",
                 isAtPreset(
