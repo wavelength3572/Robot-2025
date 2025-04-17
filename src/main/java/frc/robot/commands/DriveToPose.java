@@ -16,8 +16,8 @@ import org.littletonrobotics.junction.Logger;
 public class DriveToPose extends Command {
 
   // PID Gains
-  private static final LoggedTunableNumber kPX = new LoggedTunableNumber("DriveToPose/kPX", 1.1);
-  private static final LoggedTunableNumber kPY = new LoggedTunableNumber("DriveToPose/kPY", 1.1);
+  private static final LoggedTunableNumber kPX = new LoggedTunableNumber("DriveToPose/kPX", 1.5);
+  private static final LoggedTunableNumber kPY = new LoggedTunableNumber("DriveToPose/kPY", 1.5);
   private static final LoggedTunableNumber kPTheta =
       new LoggedTunableNumber("DriveToPose/kPTheta", .9);
 
@@ -126,6 +126,8 @@ public class DriveToPose extends Command {
     // Log completion state
     Logger.recordOutput("DriveToPose/End/FinalPose", drivetrain.getPose());
     Logger.recordOutput("DriveToPose/End/WasInterrupted", interrupted);
+    Logger.recordOutput("DriveToPose/CompletionReason", atGoal() ? "Reached Target" : "Timed Out");
+
   }
 
   @Override
@@ -133,7 +135,6 @@ public class DriveToPose extends Command {
     boolean finished = atGoal();
 
     Logger.recordOutput("DriveToPose/IsFinished", finished);
-    Logger.recordOutput("DriveToPose/CompletionReason", atGoal() ? "Reached Target" : "Timed Out");
 
     return finished;
   }
