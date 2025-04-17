@@ -127,7 +127,6 @@ public class DriveToPose extends Command {
     Logger.recordOutput("DriveToPose/End/FinalPose", drivetrain.getPose());
     Logger.recordOutput("DriveToPose/End/WasInterrupted", interrupted);
     Logger.recordOutput("DriveToPose/CompletionReason", atGoal() ? "Reached Target" : "Timed Out");
-
   }
 
   @Override
