@@ -126,12 +126,6 @@
                       "data": {
                         "name": "WaitForPreset"
                       }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Pickup"
-                      }
                     }
                   ]
                 }
