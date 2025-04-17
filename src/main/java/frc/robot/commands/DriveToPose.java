@@ -75,8 +75,8 @@ public class DriveToPose extends Command {
     // Log target pose
     Logger.recordOutput("DriveToPose/Init/TargetPose", targetPose);
 
-    driveControllerX.setTolerance(Units.inchesToMeters(.5));
-    driveControllerY.setTolerance(Units.inchesToMeters(.5));
+    driveControllerX.setTolerance(Units.inchesToMeters(1.5));
+    driveControllerY.setTolerance(Units.inchesToMeters(1.5));
     thetaController.setTolerance(Units.degreesToRadians(1.5));
   }
 
