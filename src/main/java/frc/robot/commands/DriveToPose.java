@@ -77,7 +77,7 @@ public class DriveToPose extends Command {
 
     driveControllerX.setTolerance(Units.inchesToMeters(.5));
     driveControllerY.setTolerance(Units.inchesToMeters(.5));
-    thetaController.setTolerance(Units.degreesToRadians(0.1));
+    thetaController.setTolerance(Units.degreesToRadians(1.5));
   }
 
   @Override
