@@ -236,6 +236,10 @@ public class Robot extends LoggedRobot {
       autonomousCommand.cancel();
     }
 
+    System.out.println("Boost Current Limit");
+
+    robotContainer.getDrive().boostCurrentLimit();
+
     robotContainer.getVision().setVisionOn();
 
     // Set drive mode based on the boolean value
