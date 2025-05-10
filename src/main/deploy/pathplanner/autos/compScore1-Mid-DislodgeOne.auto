@@ -11,9 +11,9 @@
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 1.0
+            "name": "WaitForPreset"
           }
         },
         {
@@ -42,12 +42,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.25
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -65,49 +59,11 @@
               }
             ]
           }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Algae4DislodgeEnd-Algae3"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "PrepareHighDislodge"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Algae3Dislodge"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "DislodgeHigh"
-                }
-              }
-            ]
-          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Tests",
+  "folder": "CompetitionAutos",
   "choreoAuto": false
 }

@@ -1,0 +1,84 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.861,
+        "y": 2.714
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.174322043768566,
+        "y": 2.3175462971231995
+      },
+      "isLocked": false,
+      "linkedName": "Score4-5A"
+    },
+    {
+      "anchor": {
+        "x": 1.4301140942173802,
+        "y": 0.8101713068456899
+      },
+      "prevControl": {
+        "x": 2.18244887665647,
+        "y": 1.0839987738566572
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Score4-StationRight"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.15879017013232463,
+      "rotationDegrees": 119.99999999999999
+    },
+    {
+      "waypointRelativePos": 0.717076244486441,
+      "rotationDegrees": 54.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 0.93,
+      "constraints": {
+        "maxVelocity": 2.25,
+        "maxAcceleration": 2.75,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Pickup",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 1.5,
+    "maxAcceleration": 1.75,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 54.0
+  },
+  "reversed": false,
+  "folder": "Score4Right",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 119.99999999999999
+  },
+  "useDefaultConstraints": false
+}

@@ -81,17 +81,11 @@
           "data": {
             "name": "Score"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L1"
-          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "TimeCheck",
+  "folder": "CompetitionAutos",
   "choreoAuto": false
 }

@@ -7,11 +7,11 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveToPoseJoystickCancel extends DriveToPose {
-  private static final double JOYSTICK_DEADBAND = 0.1;
+  public static final double JOYSTICK_DEADBAND = 0.1;
 
-  private final DoubleSupplier xJoystickSupplier;
-  private final DoubleSupplier yJoystickSupplier;
-  private final DoubleSupplier rotationJoystickSupplier;
+  public final DoubleSupplier xJoystickSupplier;
+  public final DoubleSupplier yJoystickSupplier;
+  public final DoubleSupplier rotationJoystickSupplier;
 
   public DriveToPoseJoystickCancel(
       Drive drivetrain,

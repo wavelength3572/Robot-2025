@@ -193,9 +193,9 @@ public class ModuleIOSpark implements ModuleIO {
     CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
     // cancoderConfig.MagnetSensor.MagnetOffset = constants.CANcoderOffset;
     // cancoderConfig.MagnetSensor.SensorDirection =
-    //     constants.CANcoderInverted
-    //         ? SensorDirectionValue.Clockwise_Positive
-    //         : SensorDirectionValue.CounterClockwise_Positive;
+    // constants.CANcoderInverted
+    // ? SensorDirectionValue.Clockwise_Positive
+    // : SensorDirectionValue.CounterClockwise_Positive;
     cancoder.getConfigurator().apply(cancoderConfig);
     turnAbsolutePosition = cancoder.getAbsolutePosition(); // This is a Angle in Radians
     BaseStatusSignal.setUpdateFrequencyForAll(50.0, turnAbsolutePosition);
@@ -281,5 +281,17 @@ public class ModuleIOSpark implements ModuleIO {
   @Override
   public void setTurnPosition(Rotation2d rotation) {
     turnController.setReference(rotation.getRadians(), ControlType.kPosition);
+  }
+
+  @Override
+  public void boostCurrentLimit() {
+    var driveConfig = new SparkMaxConfig();
+    driveConfig.smartCurrentLimit(42);
+    tryUntilOk(
+        driveSpark,
+        5,
+        () ->
+            driveSpark.configure(
+                driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
 }

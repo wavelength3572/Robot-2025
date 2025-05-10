@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AlgaeCommands;
+import frc.robot.commands.AlgaeCommandsChamps;
 import frc.robot.commands.Alignment.AlignAndScore.AlignAndScore;
 import frc.robot.commands.Alignment.AlignAndScorePP.AlignAndScorePP;
 import frc.robot.commands.Alignment.TwoStage.AlignAndScoreTwoStage;
@@ -141,7 +142,8 @@ public class ButtonsAndDashboardBindings {
             drive, false, FieldConstants.THRESHOLD_DISTANCE_FOR_DRIVE_TO_POLE));
 
     SmartDashboard.putData(
-        "Closest Staged Algae", AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
+        "Closest Staged Algae",
+        AlgaeCommandsChamps.AlgaeAlignmentAndDislodge(drive, coralSystem, oi));
 
     SmartDashboard.putData(
         "Shorten Foot", Commands.runOnce(() -> climber.setRelayState(Relay.Value.kForward)));
@@ -164,10 +166,11 @@ public class ButtonsAndDashboardBindings {
     oi.getResetGyroButton()
         .onTrue(Commands.runOnce(drive::zeroGyroscope, drive).ignoringDisable(true));
 
-    oi.getRightJoyDownButton()
-        .toggleOnTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi).withTimeout(3.0));
     oi.getRightJoyUpButton()
-        .toggleOnTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi).withTimeout(3.0));
+        .toggleOnTrue(
+            AlgaeCommandsChamps.AlgaeAlignmentAndDislodge(drive, coralSystem, oi)
+                .andThen(createPickupCoralCommand()));
+    oi.getRightJoyDownButton().toggleOnTrue(AlgaeCommands.AlgaeAlignment(drive, coralSystem, oi));
 
     oi.getButtonI()
         .onTrue(
@@ -264,10 +267,16 @@ public class ButtonsAndDashboardBindings {
   private static Command createReefActionCommand() {
     return Commands.runOnce(
         () -> {
-          if (coralSystem.currentCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
-              || coralSystem.currentCoralPreset
+          if (coralSystem.targetCoralPreset == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_1
+              || coralSystem.targetCoralPreset
+                  == CoralSystemPresets.PREPARE_DISLODGE_PART1_LEVEL_2) {
+            AlgaeCommandsChamps.operatorInitiatedPart2PlusDislodge(drive, coralSystem, oi)
+                .schedule();
+          } else if (coralSystem.targetCoralPreset
+                  == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_1
+              || coralSystem.targetCoralPreset
                   == CoralSystemPresets.PREPARE_DISLODGE_PART2_LEVEL_2) {
-            AlgaeCommands.createDislodgeSequence(drive, coralSystem, oi).schedule();
+            AlgaeCommandsChamps.operatorInitiatedDislodge(drive, coralSystem, oi).schedule();
           } else {
             new ScoreCoralInTeleopCommand(coralSystem.getIntake()).schedule();
           }

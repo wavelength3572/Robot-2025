@@ -14,12 +14,10 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveToPose extends Command {
-  private static final LoggedTunableNumber timeout =
-      new LoggedTunableNumber("DriveToPose/timeout", 2.0);
 
   // PID Gains
-  private static final LoggedTunableNumber kPX = new LoggedTunableNumber("DriveToPose/kPX", .9);
-  private static final LoggedTunableNumber kPY = new LoggedTunableNumber("DriveToPose/kPY", .9);
+  private static final LoggedTunableNumber kPX = new LoggedTunableNumber("DriveToPose/kPX", 1.5);
+  private static final LoggedTunableNumber kPY = new LoggedTunableNumber("DriveToPose/kPY", 1.5);
   private static final LoggedTunableNumber kPTheta =
       new LoggedTunableNumber("DriveToPose/kPTheta", .9);
 
@@ -77,11 +75,9 @@ public class DriveToPose extends Command {
     // Log target pose
     Logger.recordOutput("DriveToPose/Init/TargetPose", targetPose);
 
-    driveControllerX.setTolerance(Units.inchesToMeters(.5));
-    driveControllerY.setTolerance(Units.inchesToMeters(.5));
-    thetaController.setTolerance(Units.degreesToRadians(0.1));
-
-    timeoutTimer.restart();
+    driveControllerX.setTolerance(Units.inchesToMeters(2.2));
+    driveControllerY.setTolerance(Units.inchesToMeters(2.2));
+    thetaController.setTolerance(Units.degreesToRadians(2.0));
   }
 
   @Override
@@ -126,21 +122,18 @@ public class DriveToPose extends Command {
   @Override
   public void end(boolean interrupted) {
     drivetrain.stop();
-    timeoutTimer.stop();
 
     // Log completion state
     Logger.recordOutput("DriveToPose/End/FinalPose", drivetrain.getPose());
-    Logger.recordOutput("DriveToPose/End/TotalTime", timeoutTimer.get());
     Logger.recordOutput("DriveToPose/End/WasInterrupted", interrupted);
-    Logger.recordOutput("DriveToPose/End/TimedOut", timeoutTimer.hasElapsed(timeout.get()));
+    Logger.recordOutput("DriveToPose/CompletionReason", atGoal() ? "Reached Target" : "Timed Out");
   }
 
   @Override
   public boolean isFinished() {
-    boolean finished = atGoal() || timeoutTimer.hasElapsed(timeout.get());
+    boolean finished = atGoal();
 
     Logger.recordOutput("DriveToPose/IsFinished", finished);
-    Logger.recordOutput("DriveToPose/CompletionReason", atGoal() ? "Reached Target" : "Timed Out");
 
     return finished;
   }

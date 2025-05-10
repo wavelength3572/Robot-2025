@@ -83,21 +83,60 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Score4-2A-StationLeft"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "2A-PrepDislodge"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareLowDislodge"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "WaitForCoral"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Algae2Dislodge"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "DislodgeLow"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "WaitForPreset"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Tests",
+  "folder": "CompetitionAutos",
   "choreoAuto": false
 }

@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score4-Cage2-3B-High"
+            "pathName": "Score4-Cage5-5A-High"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score4-3B-StationLeft"
+            "pathName": "Score4-5A-StationRight"
           }
         },
         {
@@ -37,7 +37,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score4-StationLeft-2BHigh"
+            "pathName": "Score4-StationRight-6BHigh"
           }
         },
         {
@@ -55,7 +55,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score4-2B-StationLeft"
+            "pathName": "Score4-6B-StationRight"
           }
         },
         {
@@ -67,7 +67,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score4-StationLeft-2AHigh"
+            "pathName": "Score4-StationRight-6AHigh"
           }
         },
         {
@@ -83,15 +83,60 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "2A-PrepDislodge"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "6A-Algae6"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PrepareLowDislodge"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Algae6Dislodge"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "DislodgeLow"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "WaitForPreset"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Tests",
+  "folder": "CompetitionAutos",
   "choreoAuto": false
 }

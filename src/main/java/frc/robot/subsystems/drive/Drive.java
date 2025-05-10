@@ -524,4 +524,10 @@ public class Drive extends SubsystemBase {
     // Round to one decimal place.
     return Math.round(speed * 10.0) / 10.0;
   }
+
+  public void boostCurrentLimit() {
+    for (int i = 0; i < 4; i++) {
+      modules[i].boostCurrentLimit();
+    }
+  }
 }

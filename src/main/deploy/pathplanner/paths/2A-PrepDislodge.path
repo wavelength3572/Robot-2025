@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.112206811493101,
-        "y": 5.366424416462958
+        "x": 4.144844975352989,
+        "y": 5.3244584365873004
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.962206811493101,
-        "y": 5.62623203759829
+        "x": 3.864091861290004,
+        "y": 5.426644213283771
       },
       "isLocked": false,
-      "linkedName": "Score4-2A"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.001431717249522,
-        "y": 5.2518825764627675
+        "x": 4.000864493965771,
+        "y": 5.247595440290485
       },
       "prevControl": {
-        "x": 3.8514317172495223,
-        "y": 5.5116901975980985
+        "x": 3.847703727041367,
+        "y": 5.512877670329769
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,14 +31,7 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "PrepareLowDislodge",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 0.5,
     "maxAcceleration": 1.0,
